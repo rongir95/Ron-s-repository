@@ -169,8 +169,8 @@ export function StepObjectives({ draft, update }: StepProps) {
       <Field label="Strategic relevance">
         <Textarea value={o.strategicRelevance} onChange={(v) => update((d) => (d.objectives.strategicRelevance = v))} />
       </Field>
-      <Field label="Goals this feature supports" hint="Select all that apply.">
-        <ChipSelect options={OBJECTIVE_GOALS} selected={o.goals} onToggle={toggle} />
+      <Field label="Goals this feature supports" hint="Select all that apply, or add your own.">
+        <ChipSelect options={OBJECTIVE_GOALS} selected={o.goals} onToggle={toggle} allowCustom customPlaceholder="Add a custom goal…" />
       </Field>
     </div>
   )

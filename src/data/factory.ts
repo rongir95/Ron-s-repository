@@ -31,6 +31,7 @@ export function blankPlatforms(): PlatformEntry[] {
     notes: '',
     differentBehavior: '',
     inMvp: false,
+    rtl: false,
   }))
 }
 

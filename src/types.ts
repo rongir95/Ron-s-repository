@@ -121,6 +121,7 @@ export interface PlatformEntry {
   notes: string
   differentBehavior: string
   inMvp: boolean
+  rtl: boolean // needs a dedicated right-to-left design on this platform
 }
 
 export interface Market {

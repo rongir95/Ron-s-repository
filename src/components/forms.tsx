@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Button, IconButton } from './ui'
 
 // A labelled field wrapper with optional required marker and helper hint.
@@ -111,29 +111,68 @@ export function Checkbox({
   )
 }
 
-// A multi-select rendered as toggleable chips.
+// A multi-select rendered as toggleable chips. With `allowCustom`, the user can
+// also type and add their own values, which appear as selected chips and can be
+// toggled off (removed) like any other.
 export function ChipSelect({
   options,
   selected,
   onToggle,
+  allowCustom,
+  customPlaceholder = 'Add your own…',
 }: {
   options: string[]
   selected: string[]
   onToggle: (value: string) => void
+  allowCustom?: boolean
+  customPlaceholder?: string
 }) {
+  const [custom, setCustom] = useState('')
+  // Show the fixed options plus any selected values that aren't in the list
+  // (i.e. custom entries the user added).
+  const extras = selected.filter((s) => !options.includes(s))
+  const all = [...options, ...extras]
+
+  const add = () => {
+    const v = custom.trim()
+    if (v && !selected.includes(v)) onToggle(v)
+    setCustom('')
+  }
+
   return (
-    <div className="chip-select">
-      {options.map((o) => (
-        <button
-          key={o}
-          type="button"
-          className={`chip-toggle ${selected.includes(o) ? 'on' : ''}`}
-          onClick={() => onToggle(o)}
-        >
-          {selected.includes(o) ? '✓ ' : ''}
-          {o}
-        </button>
-      ))}
+    <div>
+      <div className="chip-select">
+        {all.map((o) => (
+          <button
+            key={o}
+            type="button"
+            className={`chip-toggle ${selected.includes(o) ? 'on' : ''}`}
+            onClick={() => onToggle(o)}
+          >
+            {selected.includes(o) ? '✓ ' : ''}
+            {o}
+          </button>
+        ))}
+      </div>
+      {allowCustom && (
+        <div className="row" style={{ marginTop: 10, maxWidth: 380 }}>
+          <input
+            className="input"
+            value={custom}
+            placeholder={customPlaceholder}
+            onChange={(e) => setCustom(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                add()
+              }
+            }}
+          />
+          <Button size="sm" type="button" onClick={add} disabled={!custom.trim()}>
+            Add
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

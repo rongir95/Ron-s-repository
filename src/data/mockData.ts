@@ -129,6 +129,7 @@ export function createMockBrief(): FeatureBrief {
       return {
         ...p,
         selected: true,
+        rtl: p.name === 'Web' || p.name === 'iOS',
         inMvp: p.name === 'Web' || p.name === 'iOS' || p.name === 'Android',
         notes:
           p.name === 'tvOS' || p.name === 'Android TV'

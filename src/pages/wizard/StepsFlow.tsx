@@ -28,11 +28,18 @@ export function StepPlatformsMarkets({ draft, update }: StepProps) {
                       <Input value={p.differentBehavior} onChange={(v) => update((d) => (d.platforms.find((x) => x.name === p.name)!.differentBehavior = v))} />
                     </Field>
                   </div>
-                  <Checkbox
-                    checked={p.inMvp}
-                    onChange={(v) => update((d) => (d.platforms.find((x) => x.name === p.name)!.inMvp = v))}
-                    label="Included in MVP"
-                  />
+                  <div className="row wrap">
+                    <Checkbox
+                      checked={p.inMvp}
+                      onChange={(v) => update((d) => (d.platforms.find((x) => x.name === p.name)!.inMvp = v))}
+                      label="Included in MVP"
+                    />
+                    <Checkbox
+                      checked={!!p.rtl}
+                      onChange={(v) => update((d) => (d.platforms.find((x) => x.name === p.name)!.rtl = v))}
+                      label="Needs RTL design"
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -43,6 +50,21 @@ export function StepPlatformsMarkets({ draft, update }: StepProps) {
       <div className="divider" />
 
       <Field label="Markets / regions">
+        {draft.markets.length > 0 && (
+          <div className="row" style={{ marginBottom: 12 }}>
+            <span className="muted text-sm">
+              {draft.markets.filter((m) => m.inScope).length} of {draft.markets.length} in scope
+            </span>
+            <span className="grow" />
+            <button className="link-btn" type="button" onClick={() => update((d) => d.markets.forEach((m) => (m.inScope = true)))}>
+              Mark all in scope
+            </button>
+            <span className="muted">·</span>
+            <button className="link-btn" type="button" onClick={() => update((d) => d.markets.forEach((m) => (m.inScope = false)))}>
+              Clear all
+            </button>
+          </div>
+        )}
         <RepeatableList
           items={draft.markets}
           itemLabel="Market"
@@ -52,21 +74,21 @@ export function StepPlatformsMarkets({ draft, update }: StepProps) {
           onRemove={(id) => update((d) => (d.markets = d.markets.filter((m) => m.id !== id)))}
           renderItem={(m) => (
             <>
+              <Field label="Market name">
+                <Input value={m.name} placeholder="e.g. Germany" onChange={(v) => update((d) => (d.markets.find((x) => x.id === m.id)!.name = v))} />
+              </Field>
               <div className="field-row">
-                <Field label="Market name">
-                  <Input value={m.name} placeholder="e.g. Germany" onChange={(v) => update((d) => (d.markets.find((x) => x.id === m.id)!.name = v))} />
+                <Field label="Notes">
+                  <Input value={m.notes} onChange={(v) => update((d) => (d.markets.find((x) => x.id === m.id)!.notes = v))} />
                 </Field>
-                <Field label="In scope?">
-                  <Select
-                    value={m.inScope ? 'Yes' : 'No'}
-                    options={['Yes', 'No'] as const}
-                    onChange={(v) => update((d) => (d.markets.find((x) => x.id === m.id)!.inScope = v === 'Yes'))}
+                <Field label="Scope">
+                  <Checkbox
+                    checked={m.inScope}
+                    onChange={(v) => update((d) => (d.markets.find((x) => x.id === m.id)!.inScope = v))}
+                    label="In scope"
                   />
                 </Field>
               </div>
-              <Field label="Notes">
-                <Input value={m.notes} onChange={(v) => update((d) => (d.markets.find((x) => x.id === m.id)!.notes = v))} />
-              </Field>
             </>
           )}
         />

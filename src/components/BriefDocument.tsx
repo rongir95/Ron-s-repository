@@ -133,6 +133,7 @@ export function BriefDocument({ brief: b }: { brief: FeatureBrief }) {
               <div key={p.name} className="row wrap">
                 <strong style={{ minWidth: 90 }}>{p.name}</strong>
                 {p.inMvp && <GenericChip label="MVP" tone="green" />}
+                {p.rtl && <GenericChip label="RTL" tone="purple" />}
                 <span className="text-sm muted">{p.differentBehavior || p.notes || 'Standard behavior'}</span>
               </div>
             ))}
