@@ -22,10 +22,19 @@ npm run dev        # start the dev server (http://localhost:5173)
 Other scripts:
 
 ```bash
-npm run build      # type-check + production build to dist/
-npm run preview    # preview the production build
-npm run typecheck  # type-check only
+npm run build             # type-check + production build to dist/
+npm run build:standalone  # build + inline everything into one HTML file
+npm run preview           # preview the production build
+npm run typecheck         # type-check only
 ```
+
+### Standalone HTML
+
+`npm run build:standalone` produces **`feature-brief-builder.standalone.html`** —
+a single self-contained file with all JS and CSS inlined. Open it directly in
+any browser (double-click / `file://`); no server or internet is required, and
+it persists to that browser's localStorage. A pre-built copy is committed at the
+repo root.
 
 On first load the app seeds two sample briefs (including the fully-populated
 *Post-Signup Social Profile Onboarding* example). Use **Settings → Reset all
