@@ -1,16 +1,19 @@
 /**
  * The dashboard.
  *
- * Reading order is deliberate: what is it worth (hero) -> how is it doing
- * (KPI row) -> where is the money (allocation) -> how did it get here
- * (performance) -> which holdings (returns + table). Every number that a chart
- * encodes in colour is also written out in the table below it.
+ * Reading order is deliberate, and front-loads what gets checked daily: what is
+ * it worth (hero + allocation) -> how is it doing (KPI row) -> what do I hold
+ * (the holdings table) -> how did it get here (performance, return by holding)
+ * -> everyone else's portfolios. Every number a chart encodes in colour is also
+ * written out in the holdings table.
  */
 import { useMemo, useState } from 'react'
 import { AllocationChart } from '../components/charts/AllocationChart'
 import { PerformanceChart } from '../components/charts/PerformanceChart'
 import { ReturnsChart } from '../components/charts/ReturnsChart'
+import { CashPanel } from '../components/CashPanel'
 import { PositionForm } from '../components/PositionForm'
+import { SellForm } from '../components/SellForm'
 import { PositionsTable } from '../components/PositionsTable'
 import { PortfolioAvatar } from '../components/PortfolioSwitcher'
 import {
@@ -59,6 +62,7 @@ export function Dashboard({
   const [adding, setAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [sellingId, setSellingId] = useState<string | null>(null)
 
   const masked = settings.privacyMode
   const currency = portfolio.baseCurrency
@@ -77,12 +81,14 @@ export function Dashboard({
 
   const editing = editingId ? portfolio.positions.find((position) => position.id === editingId) : undefined
   const deleting = deletingId ? portfolio.positions.find((position) => position.id === deletingId) : undefined
+  const selling = sellingId ? portfolio.positions.find((position) => position.id === sellingId) : undefined
 
   // --- empty state --------------------------------------------------------
 
   if (!portfolio.positions.length) {
     return (
-      <>
+      <div className="stack">
+        <CashPanel metrics={metrics} masked={masked} />
         <Card>
           <EmptyState
             icon={<span style={{ fontSize: 22 }}>📈</span>}
@@ -97,12 +103,10 @@ export function Dashboard({
             loss, and allocation are worked out from there.
           </EmptyState>
         </Card>
-        {adding && <PositionForm onClose={() => setAdding(false)} />}
-      </>
+        {adding && <PositionForm fxRates={fxRates} onClose={() => setAdding(false)} />}
+      </div>
     )
   }
-
-  const dayLabel = metrics.dayChange >= 0 ? 'up' : 'down'
 
   return (
     <div className="stack">
@@ -153,16 +157,28 @@ export function Dashboard({
               {portfolio.name} · total value
             </div>
             <div className={`hero-value ${masked ? 'privacy-mask' : ''}`}>{money(metrics.totalValue, currency)}</div>
-            <div className="hero-delta">
-              <Value amount={metrics.totalPl} currency={currency} masked={masked} bold />
-              <span className={toneClass(metrics.totalPl)}>({signedPercent(metrics.totalPlPct)})</span>
-              <span style={{ color: 'var(--text-3)', fontWeight: 500 }}>all time</span>
-            </div>
-            <div className="meta-line" style={{ marginTop: 6 }}>
-              <span>
-                Today {dayLabel} <Value amount={metrics.dayChange} currency={currency} masked={masked} arrow={false} />{' '}
-                ({signedPercent(metrics.dayChangePct)})
-              </span>
+            {/* The two figures people actually open the dashboard for. They sit
+                directly under the hero at display size, labelled rather than
+                phrased, so "all time" and "today" are never confused. */}
+            <div className="hero-stats">
+              <div className="hero-stat">
+                <span className="hero-stat-label">All time</span>
+                <span className="hero-stat-value">
+                  <Value amount={metrics.totalPl} currency={currency} masked={masked} />
+                  <span className={`hero-stat-pct ${toneClass(metrics.totalPl)}`}>
+                    {signedPercent(metrics.totalPlPct)}
+                  </span>
+                </span>
+              </div>
+              <div className="hero-stat">
+                <span className="hero-stat-label">Today</span>
+                <span className="hero-stat-value">
+                  <Value amount={metrics.dayChange} currency={currency} masked={masked} />
+                  <span className={`hero-stat-pct ${toneClass(metrics.dayChange)}`}>
+                    {signedPercent(metrics.dayChangePct)}
+                  </span>
+                </span>
+              </div>
             </div>
           </div>
 
@@ -187,6 +203,10 @@ export function Dashboard({
         </div>
       </Card>
 
+      {/* --- Cash ----------------------------------------------------------- */}
+
+      <CashPanel metrics={metrics} masked={masked} />
+
       {/* --- KPI row -------------------------------------------------------- */}
 
       <div className="kpi-grid">
@@ -195,28 +215,6 @@ export function Dashboard({
           <span className={`tile-value ${masked ? 'privacy-mask' : ''}`}>{money(metrics.totalInvested, currency)}</span>
           <span className="tile-foot">
             Across {metrics.positions.length} holding{metrics.positions.length === 1 ? '' : 's'}
-          </span>
-        </Card>
-
-        <Card className="tile" pad={false}>
-          <span className="tile-label">Overall profit / loss</span>
-          <span className="tile-value">
-            <Value amount={metrics.totalPl} currency={currency} masked={masked} arrow={false} />
-          </span>
-          <span className={`tile-delta ${toneClass(metrics.totalPl)}`}>
-            <span aria-hidden="true">{metrics.totalPl >= 0 ? '▲' : '▼'}</span>
-            {signedPercent(metrics.totalPlPct)} on cost
-          </span>
-        </Card>
-
-        <Card className="tile" pad={false}>
-          <span className="tile-label">Today’s change</span>
-          <span className="tile-value">
-            <Value amount={metrics.dayChange} currency={currency} masked={masked} arrow={false} />
-          </span>
-          <span className={`tile-delta ${toneClass(metrics.dayChange)}`}>
-            <span aria-hidden="true">{metrics.dayChange >= 0 ? '▲' : '▼'}</span>
-            {signedPercent(metrics.dayChangePct)}
           </span>
         </Card>
 
@@ -271,6 +269,39 @@ export function Dashboard({
         </Card>
       </div>
 
+      {/* --- Positions ------------------------------------------------------ */}
+
+      <Card pad={false}>
+        <div className="card-head" style={{ padding: '18px 20px 0', marginBottom: 12 }}>
+          <div>
+            <div className="card-title">Holdings</div>
+            <div className="card-note">
+              {lastUpdated ? `Prices updated ${relativeTime(lastUpdated)}` : 'Fetching prices…'}
+              {quotesLoading && lastUpdated ? ' · refreshing' : ''}
+            </div>
+          </div>
+          <div className="row-wrap">
+            {metrics.mixedCurrency && (
+              <Chip tone="warn" title="Converted at today's exchange rate">
+                Mixed currencies
+              </Chip>
+            )}
+            <Button variant="primary" size="sm" onClick={() => setAdding(true)}>
+              + Add position
+            </Button>
+          </div>
+        </div>
+        <PositionsTable
+          rows={metrics.positions}
+          currency={currency}
+          history={history}
+          masked={masked}
+          onEdit={setEditingId}
+          onSell={setSellingId}
+          onDelete={setDeletingId}
+        />
+      </Card>
+
       {/* --- Performance ---------------------------------------------------- */}
 
       <Card>
@@ -323,46 +354,22 @@ export function Dashboard({
         <ReturnsChart positions={metrics.positions} currency={currency} masked={masked} metric={returnMetric} />
       </Card>
 
-      {/* --- Positions ------------------------------------------------------ */}
-
-      <Card pad={false}>
-        <div className="card-head" style={{ padding: '18px 20px 0', marginBottom: 12 }}>
-          <div>
-            <div className="card-title">Holdings</div>
-            <div className="card-note">
-              {lastUpdated ? `Prices updated ${relativeTime(lastUpdated)}` : 'Fetching prices…'}
-              {quotesLoading && lastUpdated ? ' · refreshing' : ''}
-            </div>
-          </div>
-          <div className="row-wrap">
-            {metrics.mixedCurrency && (
-              <Chip tone="warn" title="Converted at today's exchange rate">
-                Mixed currencies
-              </Chip>
-            )}
-            <Button variant="primary" size="sm" onClick={() => setAdding(true)}>
-              + Add position
-            </Button>
-          </div>
-        </div>
-        <PositionsTable
-          rows={metrics.positions}
-          currency={currency}
-          history={history}
-          masked={masked}
-          onEdit={setEditingId}
-          onDelete={setDeletingId}
-        />
-      </Card>
-
       {/* --- All portfolios ------------------------------------------------- */}
 
       {data.portfolios.length > 1 && <HouseholdSummary quotes={quotes} fxRates={fxRates} masked={masked} />}
 
       {/* --- Dialogs -------------------------------------------------------- */}
 
-      {adding && <PositionForm onClose={() => setAdding(false)} />}
-      {editing && <PositionForm position={editing} onClose={() => setEditingId(null)} />}
+      {adding && <PositionForm fxRates={fxRates} onClose={() => setAdding(false)} />}
+      {editing && <PositionForm position={editing} fxRates={fxRates} onClose={() => setEditingId(null)} />}
+      {selling && (
+        <SellForm
+          position={selling}
+          quote={quotes[selling.symbol]}
+          fxRates={fxRates}
+          onClose={() => setSellingId(null)}
+        />
+      )}
       {deleting && (
         <ConfirmDialog
           title={`Remove ${deleting.symbol}?`}

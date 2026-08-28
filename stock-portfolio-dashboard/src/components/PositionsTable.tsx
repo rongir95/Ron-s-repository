@@ -35,6 +35,7 @@ export function PositionsTable({
   history,
   masked,
   onEdit,
+  onSell,
   onDelete,
 }: {
   rows: PositionMetrics[]
@@ -42,6 +43,7 @@ export function PositionsTable({
   history: Record<string, HistoryPoint[]>
   masked?: boolean
   onEdit: (id: string) => void
+  onSell: (id: string) => void
   onDelete: (id: string) => void
 }) {
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'marketValue', dir: 'desc' })
@@ -151,6 +153,9 @@ export function PositionsTable({
                 <td>{row.hasQuote ? percent(row.weight, 1) : '—'}</td>
                 <td>
                   <span className="row-actions">
+                    <Button size="sm" variant="ghost" onClick={() => onSell(row.id)} aria-label={`Sell ${row.symbol}`}>
+                      Sell
+                    </Button>
                     <Button size="sm" variant="ghost" iconOnly aria-label={`Edit ${row.symbol}`} onClick={() => onEdit(row.id)}>
                       <IconPencil />
                     </Button>
@@ -195,6 +200,9 @@ export function PositionsTable({
                 </span>
               </span>
               <span className="row" style={{ gap: 2 }}>
+                <Button size="sm" variant="ghost" onClick={() => onSell(row.id)} aria-label={`Sell ${row.symbol}`}>
+                  Sell
+                </Button>
                 <Button size="sm" variant="ghost" iconOnly aria-label={`Edit ${row.symbol}`} onClick={() => onEdit(row.id)}>
                   <IconPencil />
                 </Button>

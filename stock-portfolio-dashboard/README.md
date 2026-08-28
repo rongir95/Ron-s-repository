@@ -117,12 +117,14 @@ explains it, and offers a one-click route to Settings, where you can switch to:
 
 **Per holding:** current price, today's change, 30-day sparkline, share count,
 share-weighted average cost, amount invested, current value, profit/loss in both
-money and percent, and share of the portfolio. Sortable on any numeric column.
+money and percent, and share of the portfolio. Sortable on any numeric column,
+with buy / sell / edit / remove on every row.
 
-**Per portfolio:** total value (the hero figure), total invested, overall
-profit/loss in money and percent, today's change, best and worst performer,
-allocation by holding, value-versus-invested over time (1M–5Y), return by
-holding, and a money-weighted annualised return.
+**Per portfolio:** total value (the hero figure), all-time and today's
+profit/loss shown at display size, cash available for investment, total account
+value, total invested, best and worst performer, an allocation pie broken down
+by stock, value-versus-invested over time (1M–5Y), return by holding, and a
+money-weighted annualised return.
 
 **Across portfolios:** an "All portfolios" panel listing every portfolio's
 value, invested, profit/loss and return side by side — the view for whoever
@@ -142,12 +144,39 @@ Beyond the brief, a few things that earn their place in daily use:
   when someone else is looking at the screen.
 - **Backup, CSV export and JSON import** — the data lives in one browser, so
   this is both the safety net and how one brother hands a portfolio to another.
+- **Cash available for investment**, kept per portfolio. Buying deducts the
+  purchase amount, selling credits the proceeds, and it can be set, topped up or
+  drawn down by hand — there is no brokerage feed to read it from.
+- **Realised profit/loss**, banked automatically on each sale, so selling a
+  winner does not make the portfolio's profit appear to shrink.
 - **Keyboard**: `r` refreshes; `Esc` closes any dialog; the ticker lookup is
   arrow-key navigable.
 
 ---
 
 ## Design decisions
+
+### Cash, buying and selling
+
+Each portfolio carries a `cash` balance in its base currency. Buying offers to
+pay for the purchase out of it (a checkbox, on by default — so a holding entered
+after the fact can be recorded without moving money twice); selling credits the
+proceeds. Cash is deliberately **not** part of the hero value or the profit/loss
+percentage — it is not invested, so counting it would dilute the return on the
+money that is. It appears instead as its own section, alongside a total account
+value of holdings plus cash.
+
+A sale takes shares off every purchase lot **pro rata**, which leaves the
+share-weighted average cost exactly unchanged — the average-cost convention. (A
+tax return may need FIFO or specific-lot identification instead; this is a
+portfolio tracker, not a tax tool.) The gain or loss is added to the portfolio's
+cumulative realised profit/loss, which matters for honesty: without it, selling a
+winner would move the gain out of the unrealised figure and the portfolio would
+look like it had lost money. `totalReturn` is unrealised plus realised, and a
+unit check asserts that a sale leaves it unchanged.
+
+Selling every share closes the position and removes the row; the gain it made
+lives on in the realised total.
 
 ### Positions are lot-based
 
@@ -181,9 +210,14 @@ dependency-light approach — and follow a few rules deliberately:
   opposite sides of a zero baseline.
 - **One y-axis, ever.** Value and invested share a scale, so the gap between the
   lines is the profit.
-- Allocation is a stacked bar plus a ranked, direct-labelled list rather than a
-  donut — three of the light-mode hues sit below 3:1 against the surface, so the
-  labels and the positions table carry identity, not colour.
+- **Allocation is a pie, with the precision put back.** A pie is a genuinely
+  risky form for comparing close values, so the exact percentage is
+  direct-labelled beside every slice in the legend, the holdings table states
+  every figure in text, and the hole in the middle carries the total the chart
+  breaks down. Hover detail (value, share, profit/loss) goes in a reserved strip
+  below the chart rather than a floating tooltip — at 208px across, a box big
+  enough for those figures would cover the very slice being inspected. Those
+  labels are also the contrast relief three light-mode hues require.
 
 ### Currency
 
@@ -256,9 +290,12 @@ src/
 
 ## Limitations
 
-- **No sales or dividends.** This tracks what you hold and what you paid, not a
-  full transaction ledger, so realised gains and dividend income are out of
-  scope.
+- **No dividends, fees or tax lots.** Buying, selling, cash and realised
+  profit/loss are tracked; dividend income, commissions and FIFO/specific-lot
+  cost basis are not.
+- **No transaction history.** Sales adjust the position, the cash balance and the
+  realised total, but individual trades are not kept as a ledger you can browse
+  or undo.
 - **Data lives in one browser.** Clearing site data wipes it. Settings →
   *Export everything* is the backup, and the import is how you move it.
 - **Polling, not streaming.** See *Update frequency* above.

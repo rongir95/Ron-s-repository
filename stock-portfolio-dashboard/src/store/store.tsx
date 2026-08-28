@@ -15,6 +15,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { AppData, Lot, Portfolio, Position, Settings } from '../types'
+import { applySale, type SaleResult } from '../lib/calc'
 import { createEmptyPortfolio, createSeedData, DEFAULT_SETTINGS } from '../data/seed'
 import { newId } from '../lib/id'
 
@@ -58,6 +59,11 @@ function persist(data: AppData): void {
 
 const str = (value: unknown, fallback = ''): string => (typeof value === 'string' ? value : fallback)
 const posNum = (value: unknown): number => {
+  const n = typeof value === 'number' ? value : Number.parseFloat(String(value))
+  return Number.isFinite(n) ? n : 0
+}
+/** Any finite number, including negatives (realised P/L can be a loss). */
+const num = (value: unknown): number => {
   const n = typeof value === 'number' ? value : Number.parseFloat(String(value))
   return Number.isFinite(n) ? n : 0
 }
@@ -116,6 +122,9 @@ export function normalise(raw: unknown): AppData | null {
         name: str(portfolio.name) || 'Portfolio',
         baseCurrency: (str(portfolio.baseCurrency, 'USD') || 'USD').toUpperCase().slice(0, 3),
         positions,
+        // Backups written before cash existed simply have none.
+        cash: Math.max(0, num(portfolio.cash)),
+        realisedPl: num(portfolio.realisedPl),
         sample: portfolio.sample === true ? true : undefined,
         createdAt: str(portfolio.createdAt) || new Date().toISOString(),
       }
@@ -159,6 +168,22 @@ export interface NewPositionInput {
   price: number
   date?: string
   notes?: string
+  /**
+   * Amount to take out of available cash, in the portfolio's base currency.
+   * The caller works this out because it is the only place that knows the
+   * instrument's currency and today's exchange rate.
+   */
+  cashSpent?: number
+}
+
+export interface SellInput {
+  shares: number
+  /** Sale price per share, in the instrument's own currency. */
+  price: number
+  /** Instrument-currency to base-currency rate at the time of sale. */
+  fxRate?: number
+  /** When false, the proceeds are not added to cash. */
+  creditCash?: boolean
 }
 
 interface StoreValue {
@@ -176,6 +201,12 @@ interface StoreValue {
   deletePortfolio: (id: string) => void
 
   addPosition: (input: NewPositionInput) => void
+  /** Sell shares: reduces the holding, credits cash, banks the realised P/L. */
+  sellPosition: (positionId: string, input: SellInput) => SaleResult | null
+  /** Set the cash balance outright. */
+  setCash: (amount: number) => void
+  /** Move cash by a delta — a deposit, a withdrawal, or a purchase. */
+  adjustCash: (delta: number) => void
   /** Replaces the whole position — used by the edit form. */
   savePosition: (positionId: string, patch: Pick<Position, 'symbol' | 'name' | 'lots' | 'notes'>) => void
   removePosition: (positionId: string) => void
@@ -296,9 +327,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           }
           // Buying more of something already held adds a lot rather than a
           // duplicate row, so the average cost stays correct automatically.
+          const cash = current.cash - (input.cashSpent ?? 0)
           if (existing) {
             return {
               ...current,
+              cash,
               positions: current.positions.map((p) =>
                 p.id === existing.id
                   ? { ...p, lots: [...p.lots, lot], name: p.name || input.name, notes: input.notes ?? p.notes }
@@ -315,7 +348,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             notes: input.notes,
             createdAt: new Date().toISOString(),
           }
-          return { ...current, positions: [...current.positions, position] }
+          return { ...current, cash, positions: [...current.positions, position] }
         })
       },
 
@@ -339,6 +372,38 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         editActive((current) => ({
           ...current,
           positions: current.positions.filter((p) => p.id !== positionId),
+        })),
+
+      sellPosition: (positionId, input) => {
+        const target = portfolio.positions.find((p) => p.id === positionId)
+        if (!target) return null
+        const result = applySale(target, input.shares, input.price, input.fxRate ?? 1)
+        if (result.sharesSold <= 0) return null
+
+        editActive((current) => ({
+          ...current,
+          cash: current.cash + (input.creditCash === false ? 0 : result.proceeds),
+          realisedPl: current.realisedPl + result.realised,
+          positions:
+            // A holding sold out entirely leaves the list; the gain it made
+            // lives on in the portfolio's realised total.
+            result.sharesRemaining <= 0
+              ? current.positions.filter((p) => p.id !== positionId)
+              : current.positions.map((p) => (p.id === positionId ? { ...p, lots: result.lots } : p)),
+        }))
+        return result
+      },
+
+      setCash: (amount) =>
+        editActive((current) => ({
+          ...current,
+          cash: Number.isFinite(amount) ? Math.max(0, amount) : current.cash,
+        })),
+
+      adjustCash: (delta) =>
+        editActive((current) => ({
+          ...current,
+          cash: Number.isFinite(delta) ? current.cash + delta : current.cash,
         })),
 
       updateSettings: (patch) =>

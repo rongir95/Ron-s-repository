@@ -38,6 +38,18 @@ export interface Portfolio {
   /** Currency all totals are reported in. Quotes are converted into it. */
   baseCurrency: string
   positions: Position[]
+  /**
+   * Un-invested cash available to buy with, in `baseCurrency`. Maintained by
+   * hand — buying a stock deducts the purchase amount, selling credits the
+   * proceeds, and it can be topped up or drawn down directly.
+   */
+  cash: number
+  /**
+   * Cumulative realised profit/loss from sales, in `baseCurrency`. Without it,
+   * selling a winner would silently shrink the portfolio's profit — the gain
+   * would leave the unrealised figure with nowhere to go.
+   */
+  realisedPl: number
   /** Set on first-run sample portfolios; cleared as soon as one is edited. */
   sample?: boolean
   createdAt: string

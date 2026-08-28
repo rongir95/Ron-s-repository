@@ -33,6 +33,8 @@ const samplePortfolios: Portfolio[] = [
     id: 'sample-mine',
     name: 'My portfolio',
     baseCurrency: 'USD',
+    cash: 1850,
+    realisedPl: 0,
     sample: true,
     createdAt: new Date().toISOString(),
     positions: [
@@ -86,6 +88,8 @@ const samplePortfolios: Portfolio[] = [
     id: 'sample-brother',
     name: "Younger brother",
     baseCurrency: 'USD',
+    cash: 420,
+    realisedPl: 0,
     sample: true,
     createdAt: new Date().toISOString(),
     positions: [
@@ -132,6 +136,8 @@ export function createEmptyPortfolio(name: string, baseCurrency = 'USD'): Portfo
     name,
     baseCurrency,
     positions: [],
+    cash: 0,
+    realisedPl: 0,
     createdAt: new Date().toISOString(),
   }
 }

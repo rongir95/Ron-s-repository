@@ -13,7 +13,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getProvider } from '../market'
 import type { Quote, SymbolMatch } from '../market/types'
-import { averageCost, nativeCostBasis, totalShares } from '../lib/calc'
+import { averageCost, fxRateFor, nativeCostBasis, totalShares } from '../lib/calc'
 import { money, percent, shares as fmtShares, todayIso } from '../lib/format'
 import { newId } from '../lib/id'
 import { useStore, type NewPositionInput } from '../store/store'
@@ -164,10 +164,13 @@ function TickerLookup({
 
 export function PositionForm({
   position,
+  fxRates = {},
   onClose,
 }: {
   /** Omit to add a new position. */
   position?: Position
+  /** Needed to convert a foreign-currency purchase into the cash balance. */
+  fxRates?: Record<string, number>
   onClose: () => void
 }) {
   const { settings, portfolio, addPosition, savePosition, toast } = useStore()
@@ -181,6 +184,7 @@ export function PositionForm({
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [quote, setQuote] = useState<Quote | null>(null)
   const [quoteState, setQuoteState] = useState<'idle' | 'loading' | 'missing'>('idle')
+  const [deductCash, setDeductCash] = useState(true)
 
   // Live quote for the chosen symbol — the "did I type the right ticker?" check.
   useEffect(() => {
@@ -233,6 +237,10 @@ export function PositionForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editing, lots, draft.shares, draft.price, quote])
 
+  const purchaseFx = fxRateFor(currency, portfolio.baseCurrency, fxRates)
+  const costInBase = preview.cost * purchaseFx
+  const cashAfter = portfolio.cash - costInBase
+
   function validate(): boolean {
     const next: Record<string, string> = {}
     if (!symbol.trim()) next.symbol = 'Enter a ticker symbol.'
@@ -253,6 +261,7 @@ export function PositionForm({
   function submit() {
     if (!validate()) return
     const ticker = symbol.trim().toUpperCase()
+    const cashSpent = !editing && deductCash ? costInBase : 0
     if (editing && position) {
       savePosition(position.id, {
         symbol: ticker,
@@ -269,13 +278,15 @@ export function PositionForm({
         price: parseNumber(draft.price),
         date: draft.date || undefined,
         notes: notes.trim() || undefined,
+        cashSpent,
       }
       const existing = portfolio.positions.find((entry) => entry.symbol === ticker)
       addPosition(input)
+      const cashNote = cashSpent > 0 ? ` · ${money(cashSpent, portfolio.baseCurrency)} taken from cash` : ''
       toast(
-        existing
+        (existing
           ? `Added to ${ticker} — average cost recalculated across ${existing.lots.length + 1} purchases`
-          : `${ticker} added to ${portfolio.name}`,
+          : `${ticker} added to ${portfolio.name}`) + cashNote,
         'success',
       )
     }
@@ -464,6 +475,35 @@ export function PositionForm({
               <br />
               <Value amount={preview.pl} currency={currency} /> ({percent(preview.plPct, 1)})
             </span>
+          )}
+        </div>
+      )}
+
+      {!editing && costInBase > 0 && (
+        <div className="cash-deduct">
+          <label className="cash-deduct-row">
+            <input
+              type="checkbox"
+              checked={deductCash}
+              onChange={(event) => setDeductCash(event.target.checked)}
+              style={{ width: 17, height: 17, flex: 'none', accentColor: 'var(--accent)' }}
+            />
+            <span>
+              <span style={{ fontWeight: 600 }}>
+                Pay for this with available cash ({money(costInBase, portfolio.baseCurrency)})
+              </span>
+              <span className="switch-sub">
+                {deductCash
+                  ? `Cash goes from ${money(portfolio.cash, portfolio.baseCurrency)} to ${money(cashAfter, portfolio.baseCurrency)}.`
+                  : `Cash stays at ${money(portfolio.cash, portfolio.baseCurrency)} — use this if you already adjusted it.`}
+              </span>
+            </span>
+          </label>
+          {deductCash && cashAfter < 0 && (
+            <p className="field-error" style={{ margin: '2px 0 0' }}>
+              That is {money(Math.abs(cashAfter), portfolio.baseCurrency)} more than you have on record. It will be
+              saved anyway and cash will show as overdrawn — update the cash balance if it is out of date.
+            </p>
           )}
         </div>
       )}

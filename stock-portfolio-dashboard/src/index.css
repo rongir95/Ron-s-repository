@@ -509,7 +509,37 @@ textarea.input { height: auto; padding: 9px 11px; resize: vertical; min-height: 
   letter-spacing: -0.03em;
   line-height: 1.05;
 }
-.hero-delta { font-size: 14px; font-weight: 620; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* The all-time and today figures: display-size, not footnotes. */
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 30px;
+  margin-top: 14px;
+}
+.hero-stat { display: grid; gap: 1px; }
+.hero-stat-label {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.hero-stat-value {
+  font-size: 21px;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  white-space: nowrap;
+}
+.hero-stat-pct { font-size: 14.5px; font-weight: 620; }
+
+@media (max-width: 420px) {
+  .hero-stats { gap: 10px 22px; }
+  .hero-stat-value { font-size: 19px; }
+}
 
 .hero-card {
   display: grid;
@@ -657,28 +687,157 @@ tr:hover .row-actions, .row-actions:focus-within { opacity: 1; }
 .tooltip-row span:first-child { color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; }
 .chart-holder { position: relative; }
 
-.alloc-bar {
-  display: flex;
-  width: 100%;
-  height: 16px;
-  gap: 2px; /* a 2px surface gap between segments, never a border */
-  margin-bottom: 14px;
-}
-.alloc-seg { border-radius: 3px; min-width: 3px; }
+/* --- Allocation donut ---------------------------------------------------- */
 
-.alloc-list { display: grid; gap: 9px; }
-.alloc-row {
+.alloc {
   display: grid;
-  grid-template-columns: minmax(74px, auto) 1fr minmax(96px, auto);
+  grid-template-columns: minmax(180px, 208px) minmax(150px, 1fr);
+  gap: 8px 20px;
   align-items: center;
-  gap: 12px;
+}
+@media (max-width: 520px) {
+  .alloc { grid-template-columns: 1fr; justify-items: center; }
+}
+
+.alloc-chart { max-width: 208px; width: 100%; }
+
+.alloc-hole-label {
+  fill: var(--text-3);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.alloc-hole-value {
+  fill: var(--text);
+  font-size: 19px;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+/* Hover detail strip. min-height reserves the tallest state so the card does
+   not jump as the pointer moves across the slices. */
+.alloc-detail {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 18px;
+  min-height: 42px;
+  margin-top: 6px;
+  padding-top: 11px;
+  border-top: 1px solid var(--border);
   font-size: 12.5px;
 }
-.alloc-name { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; }
-.alloc-track { display: block; height: 8px; background: var(--surface-3); border-radius: 4px; overflow: hidden; }
-/* display:block matters — an inline span ignores width and height. */
-.alloc-fill { display: block; height: 100%; border-radius: 4px; }
-.alloc-value { text-align: right; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.alloc-detail-head { display: inline-flex; align-items: baseline; gap: 7px; min-width: 0; }
+.alloc-detail-name {
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 26ch;
+}
+.alloc-detail-figs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  font-variant-numeric: tabular-nums;
+}
+.alloc-detail-figs > span { display: inline-flex; align-items: baseline; gap: 6px; }
+.alloc-detail-key { color: var(--text-3); }
+.alloc-detail-hint { color: var(--text-3); }
+
+.alloc-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 5px;
+  width: 100%;
+}
+.alloc-legend-item {
+  display: grid;
+  grid-template-columns: 9px minmax(42px, auto) 1fr auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  padding: 2px 6px;
+  margin: 0 -6px;
+  border-radius: 6px;
+  cursor: default;
+}
+.alloc-legend-item[data-active='true'] { background: var(--surface-3); }
+.alloc-legend-sym { font-weight: 650; }
+.alloc-legend-pct { font-weight: 650; font-variant-numeric: tabular-nums; }
+.alloc-legend-val {
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* --- Cash panel ---------------------------------------------------------- */
+
+.cash-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(240px, 1.35fr);
+  gap: 20px 28px;
+  align-items: center;
+}
+@media (max-width: 760px) {
+  .cash-panel { grid-template-columns: 1fr; }
+}
+
+.cash-label {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text-3);
+  letter-spacing: 0.01em;
+}
+.cash-value {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-top: 2px;
+}
+
+.cash-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 14px 20px;
+}
+.cash-stat { display: grid; gap: 1px; align-content: start; }
+.cash-stat-key { font-size: 11.5px; font-weight: 650; color: var(--text-3); }
+.cash-stat-val { font-size: 17px; font-weight: 660; letter-spacing: -0.015em; }
+.cash-stat-sub { font-size: 11.5px; color: var(--text-3); }
+
+.cash-deduct {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 11px 13px;
+}
+.cash-deduct-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+.cash-deduct-row .switch-sub { display: block; margin-top: 2px; }
+
+/* --- Sell preview -------------------------------------------------------- */
+
+.sell-preview {
+  display: grid;
+  gap: 5px;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
 
 /* ==========================================================================
    Modal

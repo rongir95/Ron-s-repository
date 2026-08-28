@@ -7,7 +7,7 @@
  * today's rate, which keeps P/L% currency-invariant. (It does not model the FX
  * rate in force on the purchase date; see README.)
  */
-import type { Portfolio, Position } from '../types'
+import type { Lot, Portfolio, Position } from '../types'
 import type { HistoryPoint, Quote } from '../market/types'
 
 export interface PositionMetrics {
@@ -43,6 +43,7 @@ export interface PositionMetrics {
 export interface PortfolioMetrics {
   baseCurrency: string
   positions: PositionMetrics[]
+  /** Market value of the holdings only. */
   totalValue: number
   totalInvested: number
   totalPl: number
@@ -58,6 +59,16 @@ export interface PortfolioMetrics {
   concentration: number
   /** True when at least one holding trades in a non-base currency. */
   mixedCurrency: boolean
+  /** Un-invested cash. */
+  cash: number
+  /** Holdings + cash: what the account is worth altogether. */
+  accountValue: number
+  /** Cash as a fraction of the account — how much powder is dry. */
+  cashWeight: number
+  /** Cumulative profit/loss already banked through sales. */
+  realisedPl: number
+  /** Unrealised + realised. */
+  totalReturn: number
 }
 
 // --- position-level -------------------------------------------------------
@@ -153,6 +164,10 @@ export function computePortfolio(
     row.weight = totalValue > 0 && row.hasQuote ? row.marketValue / totalValue : 0
   }
 
+  const cash = Number.isFinite(portfolio.cash) ? portfolio.cash : 0
+  const realisedPl = Number.isFinite(portfolio.realisedPl) ? portfolio.realisedPl : 0
+  const accountValue = totalValue + cash
+
   const byPct = priced.slice().sort((a, b) => b.plPct - a.plPct)
   const byWeight = priced.slice().sort((a, b) => b.weight - a.weight)
 
@@ -171,6 +186,11 @@ export function computePortfolio(
     largest: byWeight[0],
     concentration: byWeight[0]?.weight ?? 0,
     mixedCurrency: rows.some((r) => r.converted),
+    cash,
+    accountValue,
+    cashWeight: accountValue > 0 ? cash / accountValue : 0,
+    realisedPl,
+    totalReturn: totalPl + realisedPl,
   }
 }
 
@@ -250,6 +270,57 @@ export function buildSeries(
     }
     return { date, value, invested }
   })
+}
+
+// --- selling --------------------------------------------------------------
+
+export interface SaleResult {
+  /** The position's lots after the sale; empty when it was sold out entirely. */
+  lots: Lot[]
+  sharesSold: number
+  sharesRemaining: number
+  /** Sale value in the instrument's own currency. */
+  nativeProceeds: number
+  /** Sale value in the portfolio's base currency — what lands in cash. */
+  proceeds: number
+  /** Profit/loss banked by this sale, in base currency. */
+  realised: number
+}
+
+/**
+ * Sells `sharesToSell` of a position.
+ *
+ * Shares come off every lot pro rata, which leaves the share-weighted average
+ * cost exactly unchanged — the average-cost convention. (A tax return may need
+ * FIFO or specific-lot instead; this is a portfolio tracker, not a tax tool.)
+ */
+export function applySale(
+  position: Position,
+  sharesToSell: number,
+  pricePerShare: number,
+  fxRate = 1,
+): SaleResult {
+  const held = totalShares(position)
+  const avgCost = averageCost(position)
+  const sold = Math.min(Math.max(sharesToSell, 0), held)
+  const remaining = held - sold
+  // Guard the float: anything under a millionth of a share is "all of it".
+  const soldOut = remaining <= 1e-9
+  const keepFactor = held > 0 && !soldOut ? remaining / held : 0
+
+  const lots: Lot[] = soldOut
+    ? []
+    : position.lots.map((lot) => ({ ...lot, shares: (Number(lot.shares) || 0) * keepFactor }))
+
+  const nativeProceeds = sold * pricePerShare
+  return {
+    lots,
+    sharesSold: sold,
+    sharesRemaining: soldOut ? 0 : remaining,
+    nativeProceeds,
+    proceeds: nativeProceeds * fxRate,
+    realised: sold * (pricePerShare - avgCost) * fxRate,
+  }
 }
 
 // --- money-weighted annualised return (XIRR) ------------------------------

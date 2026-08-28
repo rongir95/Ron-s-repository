@@ -9,6 +9,7 @@ import type { Portfolio, Position } from '../types'
 import type { HistoryPoint, Quote } from '../market/types'
 import {
   annualisedReturn,
+  applySale,
   averageCost,
   buildCashFlows,
   buildSeries,
@@ -52,8 +53,16 @@ const close = (a: number, b: number, eps = 1e-6, msg?: string) =>
 function position(over: Partial<Position> & { symbol: string; lots: Position['lots'] }): Position {
   return { id: `p-${over.symbol}`, colorSlot: 0, createdAt: '2024-01-01T00:00:00.000Z', ...over }
 }
-function portfolio(positions: Position[], baseCurrency = 'USD'): Portfolio {
-  return { id: 'pf', name: 'Test', baseCurrency, positions, createdAt: '2024-01-01T00:00:00.000Z' }
+function portfolio(positions: Position[], baseCurrency = 'USD', cash = 0, realisedPl = 0): Portfolio {
+  return {
+    id: 'pf',
+    name: 'Test',
+    baseCurrency,
+    positions,
+    cash,
+    realisedPl,
+    createdAt: '2024-01-01T00:00:00.000Z',
+  }
 }
 function quote(symbol: string, price: number, previousClose: number, currency = 'USD'): Quote {
   return { symbol, price, previousClose, currency }
@@ -333,6 +342,156 @@ test('survives a total wipeout without hanging or throwing', () => {
   const m = computePortfolio(portfolio([p]), { A: quote('A', 0.01, 0.01) })
   const rate = annualisedReturn(buildCashFlows([p], m, '2024-01-01'))
   assert.ok(rate === null || rate < 0, `expected a loss, got ${rate}`)
+})
+
+// --- cash -----------------------------------------------------------------
+
+test('cash sits alongside holdings in the account value, not inside P/L', () => {
+  const p = position({ symbol: 'AAPL', lots: [{ id: 'l1', shares: 10, price: 100 }] })
+  const m = computePortfolio(portfolio([p], 'USD', 2500), { AAPL: quote('AAPL', 150, 150) })
+  close(m.totalValue, 1500) // holdings only
+  close(m.cash, 2500)
+  close(m.accountValue, 4000)
+  close(m.cashWeight, 2500 / 4000)
+  // Cash is not invested, so it must not dilute the return on what is.
+  close(m.totalPlPct, 0.5)
+})
+
+test('an all-cash portfolio reports weights without dividing by zero', () => {
+  const m = computePortfolio(portfolio([], 'USD', 5000), {})
+  close(m.totalValue, 0)
+  close(m.accountValue, 5000)
+  close(m.cashWeight, 1)
+  close(m.totalPlPct, 0)
+})
+
+test('a portfolio with neither holdings nor cash yields zeros', () => {
+  const m = computePortfolio(portfolio([], 'USD', 0), {})
+  close(m.accountValue, 0)
+  close(m.cashWeight, 0)
+})
+
+test('total return adds banked gains to unrealised ones', () => {
+  const p = position({ symbol: 'A', lots: [{ id: 'l1', shares: 10, price: 100 }] })
+  const m = computePortfolio(portfolio([p], 'USD', 0, 400), { A: quote('A', 150, 150) })
+  close(m.totalPl, 500)
+  close(m.realisedPl, 400)
+  close(m.totalReturn, 900)
+})
+
+test('a legacy portfolio saved before cash existed still computes', () => {
+  const legacy = { ...portfolio([]), cash: undefined, realisedPl: undefined } as unknown as Portfolio
+  const m = computePortfolio(legacy, {})
+  close(m.cash, 0)
+  close(m.realisedPl, 0)
+  close(m.accountValue, 0)
+})
+
+// --- selling --------------------------------------------------------------
+
+test('a partial sale leaves the average cost untouched', () => {
+  const p = position({
+    symbol: 'AAPL',
+    lots: [
+      { id: 'l1', shares: 10, price: 100 },
+      { id: 'l2', shares: 30, price: 200 },
+    ],
+  })
+  close(averageCost(p), 175)
+  const sale = applySale(p, 20, 250)
+  close(sale.sharesSold, 20)
+  close(sale.sharesRemaining, 20)
+  close(sale.proceeds, 5000)
+  // 20 shares sold at 250 against an average cost of 175.
+  close(sale.realised, 20 * (250 - 175))
+  // Pro-rata across both lots, so the weighted average is preserved exactly.
+  const after = { ...p, lots: sale.lots }
+  close(totalShares(after), 20)
+  close(averageCost(after), 175)
+  close(after.lots[0].shares, 5)
+  close(after.lots[1].shares, 15)
+})
+
+test('selling at a loss banks a negative realised amount', () => {
+  const p = position({ symbol: 'NKE', lots: [{ id: 'l1', shares: 10, price: 120 }] })
+  const sale = applySale(p, 4, 90)
+  close(sale.proceeds, 360)
+  close(sale.realised, 4 * (90 - 120))
+  assert.ok(sale.realised < 0)
+})
+
+test('selling everything empties the lots', () => {
+  const p = position({ symbol: 'A', lots: [{ id: 'l1', shares: 10, price: 100 }] })
+  const sale = applySale(p, 10, 130)
+  close(sale.sharesRemaining, 0)
+  assert.equal(sale.lots.length, 0)
+  close(sale.proceeds, 1300)
+  close(sale.realised, 300)
+})
+
+test('a sale is capped at the shares actually held', () => {
+  const p = position({ symbol: 'A', lots: [{ id: 'l1', shares: 5, price: 10 }] })
+  const sale = applySale(p, 999, 20)
+  close(sale.sharesSold, 5)
+  close(sale.sharesRemaining, 0)
+  close(sale.proceeds, 100)
+})
+
+test('a float remainder under a millionth of a share counts as sold out', () => {
+  const p = position({ symbol: 'A', lots: [{ id: 'l1', shares: 0.3, price: 10 }] })
+  const sale = applySale(p, 0.3 - 1e-12, 10)
+  close(sale.sharesRemaining, 0)
+  assert.equal(sale.lots.length, 0)
+})
+
+test('selling nothing is a no-op that still reports the holding intact', () => {
+  const p = position({ symbol: 'A', lots: [{ id: 'l1', shares: 10, price: 100 }] })
+  const sale = applySale(p, 0, 150)
+  close(sale.sharesSold, 0)
+  close(sale.sharesRemaining, 10)
+  close(sale.proceeds, 0)
+  close(sale.realised, 0)
+  close(totalShares({ ...p, lots: sale.lots }), 10)
+})
+
+test('sale proceeds and realised P/L convert into the base currency', () => {
+  const p = position({ symbol: 'TEVA.TA', lots: [{ id: 'l1', shares: 100, price: 10 }] })
+  const sale = applySale(p, 50, 20, 0.27)
+  close(sale.nativeProceeds, 1000)
+  close(sale.proceeds, 1000 * 0.27)
+  close(sale.realised, 50 * (20 - 10) * 0.27)
+})
+
+test('buy then sell leaves the account value unchanged at a flat price', () => {
+  // Holding 10 at 150 plus 2000 cash; selling 5 at 150 moves 750 into cash.
+  const p = position({ symbol: 'A', lots: [{ id: 'l1', shares: 10, price: 150 }] })
+  const before = computePortfolio(portfolio([p], 'USD', 2000), { A: quote('A', 150, 150) })
+  const sale = applySale(p, 5, 150)
+  const after = computePortfolio(
+    portfolio([{ ...p, lots: sale.lots }], 'USD', 2000 + sale.proceeds, sale.realised),
+    { A: quote('A', 150, 150) },
+  )
+  close(before.accountValue, 3500)
+  close(after.accountValue, 3500)
+  close(after.cash, 2750)
+  close(after.totalValue, 750)
+  close(after.realisedPl, 0) // sold at cost, so nothing was banked
+})
+
+test('selling a winner moves the gain from unrealised to realised, keeping total return', () => {
+  const p = position({ symbol: 'A', lots: [{ id: 'l1', shares: 10, price: 100 }] })
+  const before = computePortfolio(portfolio([p], 'USD', 0), { A: quote('A', 150, 150) })
+  close(before.totalReturn, 500)
+
+  const sale = applySale(p, 5, 150)
+  const after = computePortfolio(
+    portfolio([{ ...p, lots: sale.lots }], 'USD', sale.proceeds, sale.realised),
+    { A: quote('A', 150, 150) },
+  )
+  close(after.totalPl, 250) // half the gain is no longer on the books
+  close(after.realisedPl, 250)
+  close(after.totalReturn, 500) // …but the total return is unchanged
+  close(after.accountValue, 1500)
 })
 
 // --- report ---------------------------------------------------------------

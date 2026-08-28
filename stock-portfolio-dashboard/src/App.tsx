@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { PortfolioSwitcher } from './components/PortfolioSwitcher'
-import { Button, Chip } from './components/ui'
+import { Button, Chip, IconGear, IconMoon, IconRefresh, IconSun } from './components/ui'
 import { relativeTime } from './lib/format'
+import { useResolvedTheme } from './lib/theme'
 import { useQuotes } from './market/useMarketData'
 import { Dashboard } from './pages/Dashboard'
 import { Settings } from './pages/Settings'
@@ -10,9 +11,10 @@ import { StoreProvider, useStore } from './store/store'
 type View = 'dashboard' | 'settings'
 
 function Shell() {
-  const { settings, toasts, dismissToast, portfolio } = useStore()
+  const { settings, updateSettings, toasts, dismissToast, portfolio } = useStore()
   const [view, setView] = useState<View>('dashboard')
   const { quotes, fxRates, loading, error, lastUpdated, marketOpen, refresh } = useQuotes()
+  const resolvedTheme = useResolvedTheme(settings.theme)
 
   // Theme: an explicit choice stamps data-theme on the root element; "system"
   // leaves the media query to decide. We only ever clear a stamp we set
@@ -92,20 +94,28 @@ function Shell() {
             title="Refresh prices (r)"
             aria-label="Refresh prices"
           >
-            <span aria-hidden="true">↻</span>
+            <IconRefresh />
             <span className="btn-label">{loading ? 'Refreshing…' : 'Refresh'}</span>
+          </Button>
+          <Button
+            size="sm"
+            iconOnly
+            aria-label={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            onClick={() => updateSettings({ theme: resolvedTheme === 'dark' ? 'light' : 'dark' })}
+          >
+            {/* The icon shows the theme you would switch to, not the current one. */}
+            {resolvedTheme === 'dark' ? <IconSun /> : <IconMoon />}
           </Button>
           <Button
             size="sm"
             variant={view === 'settings' ? 'primary' : 'default'}
             iconOnly
             aria-label="Settings"
+            title="Settings"
             onClick={() => setView(view === 'settings' ? 'dashboard' : 'settings')}
           >
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-              <circle cx="8" cy="8" r="2.2" />
-              <path d="M8 1.4v1.8M8 12.8v1.8M1.4 8h1.8M12.8 8h1.8M3.3 3.3l1.3 1.3M11.4 11.4l1.3 1.3M12.7 3.3l-1.3 1.3M4.6 11.4l-1.3 1.3" strokeLinecap="round" />
-            </svg>
+            <IconGear />
           </Button>
         </div>
       </header>

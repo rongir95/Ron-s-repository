@@ -1,18 +1,22 @@
 /**
- * Portfolio allocation — part-to-whole.
+ * Portfolio allocation — a donut pie chart with a labelled legend.
  *
- * A horizontal stacked bar (the recommended form for part-to-whole with many,
- * long-named categories) over a ranked bar list that direct-labels every
- * holding. Three of the light-mode series hues sit below 3:1 against the
- * surface, so the relief rule applies: the labels here and the positions table
- * carry the identity, never colour alone.
+ * A pie was asked for directly. It is a genuinely risky form for comparing
+ * close values, so two things carry the precision the angles cannot: every
+ * slice is direct-labelled with its exact percentage in the legend, and the
+ * holdings table below states every figure in text. Three of the light-mode
+ * series hues also sit below 3:1 against the surface, so those labels are the
+ * contrast relief as well — identity never rests on colour alone.
  *
- * Holdings past the eighth fold into a single neutral "Other" segment — the
- * palette is never cycled.
+ * The hole in the middle carries the total, which is the number the chart is
+ * a breakdown of.
+ *
+ * Holdings past the eighth fold into one neutral "Other" slice; the validated
+ * palette is never cycled into a ninth generated hue.
  */
 import { useState } from 'react'
 import type { PositionMetrics } from '../../lib/calc'
-import { money, percent } from '../../lib/format'
+import { compactMoney, money, percent, signedMoney, signedPercent } from '../../lib/format'
 import { seriesColor } from '../../lib/series'
 import { OTHER_SLOT } from '../../store/store'
 
@@ -22,7 +26,11 @@ interface Slice {
   sublabel?: string
   value: number
   weight: number
+  pl: number
+  plPct: number
   color: string
+  /** Symbols folded into this slice, when it is the "Other" aggregate. */
+  members?: string[]
 }
 
 function buildSlices(positions: PositionMetrics[]): Slice[] {
@@ -37,21 +45,56 @@ function buildSlices(positions: PositionMetrics[]): Slice[] {
       sublabel: position.name,
       value: position.marketValue,
       weight: position.weight,
+      pl: position.pl,
+      plPct: position.plPct,
       color: seriesColor(position.colorSlot),
     }))
     .sort((a, b) => b.weight - a.weight)
 
   if (tail.length) {
+    const value = tail.reduce((sum, p) => sum + p.marketValue, 0)
+    const cost = tail.reduce((sum, p) => sum + p.costBasis, 0)
+    const pl = tail.reduce((sum, p) => sum + p.pl, 0)
     slices.push({
       key: '__other__',
       label: `Other (${tail.length})`,
-      sublabel: tail.map((position) => position.symbol).join(', '),
-      value: tail.reduce((sum, position) => sum + position.marketValue, 0),
-      weight: tail.reduce((sum, position) => sum + position.weight, 0),
+      value,
+      weight: tail.reduce((sum, p) => sum + p.weight, 0),
+      pl,
+      plPct: cost > 0 ? pl / cost : 0,
       color: 'var(--series-other)',
+      members: tail.map((p) => p.symbol),
     })
   }
   return slices
+}
+
+const SIZE = 208
+const R_OUTER = 100
+const R_INNER = 62
+const CENTRE = SIZE / 2
+
+/** Polar to cartesian, with 0 radians at twelve o'clock, running clockwise. */
+function point(angle: number, radius: number) {
+  return {
+    x: CENTRE + radius * Math.sin(angle),
+    y: CENTRE - radius * Math.cos(angle),
+  }
+}
+
+function arcPath(start: number, end: number): string {
+  const largeArc = end - start > Math.PI ? 1 : 0
+  const o1 = point(start, R_OUTER)
+  const o2 = point(end, R_OUTER)
+  const i2 = point(end, R_INNER)
+  const i1 = point(start, R_INNER)
+  return [
+    `M${o1.x.toFixed(2)},${o1.y.toFixed(2)}`,
+    `A${R_OUTER},${R_OUTER} 0 ${largeArc} 1 ${o2.x.toFixed(2)},${o2.y.toFixed(2)}`,
+    `L${i2.x.toFixed(2)},${i2.y.toFixed(2)}`,
+    `A${R_INNER},${R_INNER} 0 ${largeArc} 0 ${i1.x.toFixed(2)},${i1.y.toFixed(2)}`,
+    'Z',
+  ].join(' ')
 }
 
 export function AllocationChart({
@@ -63,66 +106,139 @@ export function AllocationChart({
   currency: string
   masked?: boolean
 }) {
-  const [hovered, setHovered] = useState<string | null>(null)
+  const [active, setActive] = useState<string | null>(null)
   const slices = buildSlices(positions)
 
   if (!slices.length) {
     return <p style={{ color: 'var(--text-3)', fontSize: 13, margin: 0 }}>No priced holdings to allocate yet.</p>
   }
 
-  const maxWeight = Math.max(...slices.map((slice) => slice.weight))
+  const total = slices.reduce((sum, slice) => sum + slice.value, 0)
+  const hovered = slices.find((slice) => slice.key === active)
+
+  // Lay the slices out clockwise from twelve o'clock, largest first.
+  let cursor = 0
+  const laid = slices.map((slice) => {
+    const sweep = total > 0 ? (slice.value / total) * Math.PI * 2 : 0
+    const start = cursor
+    cursor += sweep
+    return { slice, start, end: start + sweep }
+  })
+
+  const single = laid.length === 1
 
   return (
-    <div>
-      <div className="alloc-bar" role="img" aria-label="Allocation by holding">
-        {slices.map((slice) => (
-          <div
-            key={slice.key}
-            className="alloc-seg"
-            style={{
-              flexGrow: Math.max(slice.weight, 0.005),
-              background: slice.color,
-              opacity: hovered && hovered !== slice.key ? 0.4 : 1,
-              transition: 'opacity 120ms ease',
-            }}
-            onMouseEnter={() => setHovered(slice.key)}
-            onMouseLeave={() => setHovered(null)}
-            title={`${slice.label} — ${percent(slice.weight, 1)}`}
-          />
-        ))}
+    <div className="alloc">
+      <div className="alloc-chart chart-holder">
+        <svg
+          viewBox={`0 0 ${SIZE} ${SIZE}`}
+          className="chart-svg"
+          role="img"
+          aria-label={`Allocation by holding: ${slices
+            .map((slice) => `${slice.label} ${percent(slice.weight, 1)}`)
+            .join(', ')}`}
+          onMouseLeave={() => setActive(null)}
+        >
+          {single ? (
+            // One holding is the whole pie; a full-circle arc cannot be drawn
+            // with a single path command, so stroke a ring instead.
+            <circle
+              cx={CENTRE}
+              cy={CENTRE}
+              r={(R_OUTER + R_INNER) / 2}
+              fill="none"
+              stroke={laid[0].slice.color}
+              strokeWidth={R_OUTER - R_INNER}
+              onMouseEnter={() => setActive(laid[0].slice.key)}
+            />
+          ) : (
+            laid.map(({ slice, start, end }) => (
+              <path
+                key={slice.key}
+                d={arcPath(start, end)}
+                fill={slice.color}
+                /* A 2px surface stroke, not a border: it reads as a gap
+                   between neighbouring fills. */
+                stroke="var(--surface)"
+                strokeWidth={2}
+                opacity={active && active !== slice.key ? 0.35 : 1}
+                style={{ transition: 'opacity 120ms ease', cursor: 'pointer' }}
+                onMouseEnter={() => setActive(slice.key)}
+              >
+                <title>{`${slice.label} — ${percent(slice.weight, 1)}`}</title>
+              </path>
+            ))
+          )}
+
+          {/* The hole carries what the chart is a breakdown of — or, on hover,
+              the slice under the pointer. */}
+          <text x={CENTRE} y={CENTRE - 6} textAnchor="middle" className="alloc-hole-label">
+            {hovered ? hovered.label : 'Total'}
+          </text>
+          <text x={CENTRE} y={CENTRE + 14} textAnchor="middle" className="alloc-hole-value">
+            {masked ? '•••' : compactMoney(hovered ? hovered.value : total, currency)}
+          </text>
+        </svg>
+
       </div>
 
-      <div className="alloc-list">
+      {/* The legend direct-labels every slice — the precision the angles cannot carry. */}
+      <ul className="alloc-legend">
         {slices.map((slice) => (
-          <div
+          <li
             key={slice.key}
-            className="alloc-row"
-            onMouseEnter={() => setHovered(slice.key)}
-            onMouseLeave={() => setHovered(null)}
+            className="alloc-legend-item"
+            data-active={active === slice.key}
+            onMouseEnter={() => setActive(slice.key)}
+            onMouseLeave={() => setActive(null)}
           >
-            <span className="alloc-name" title={slice.sublabel}>
-              <span className="swatch" style={{ background: slice.color }} aria-hidden="true" />
-              {slice.label}
+            <span className="swatch" style={{ background: slice.color }} aria-hidden="true" />
+            <span className="alloc-legend-sym">{slice.label}</span>
+            <span className="alloc-legend-pct">{percent(slice.weight, 1)}</span>
+            <span className={`alloc-legend-val ${masked ? 'privacy-mask' : ''}`}>
+              {compactMoney(slice.value, currency)}
             </span>
-            <span className="alloc-track">
-              {/* Bar length is the weight relative to the largest holding, so
-                  small positions stay visible; the % label carries the truth. */}
-              <span
-                className="alloc-fill"
-                style={{
-                  width: `${Math.max((slice.weight / maxWeight) * 100, 1.5)}%`,
-                  background: slice.color,
-                  opacity: hovered && hovered !== slice.key ? 0.45 : 1,
-                  transition: 'opacity 120ms ease',
-                }}
-              />
-            </span>
-            <span className="alloc-value">
-              <strong style={{ color: 'var(--text)' }}>{percent(slice.weight, 1)}</strong>
-              <span className={masked ? 'privacy-mask' : undefined}> · {money(slice.value, currency, { decimals: 0 })}</span>
-            </span>
-          </div>
+          </li>
         ))}
+      </ul>
+
+      {/*
+        Hover detail goes in a reserved strip rather than a floating tooltip: the
+        donut is only ~200px across, so a box big enough to hold these four
+        figures would cover the very slice being inspected. The height is fixed
+        so hovering never shifts the layout.
+      */}
+      <div className="alloc-detail" aria-live="polite">
+        {hovered ? (
+          <>
+            <span className="alloc-detail-head">
+              <span className="swatch" style={{ background: hovered.color }} aria-hidden="true" />
+              <strong>{hovered.label}</strong>
+              {hovered.sublabel && <span className="alloc-detail-name">{hovered.sublabel}</span>}
+              {hovered.members && <span className="alloc-detail-name">{hovered.members.join(', ')}</span>}
+            </span>
+            <span className="alloc-detail-figs">
+              <span>
+                <span className="alloc-detail-key">Value</span>
+                <strong className={masked ? 'privacy-mask' : undefined}>{money(hovered.value, currency)}</strong>
+              </span>
+              <span>
+                <span className="alloc-detail-key">Share</span>
+                <strong>{percent(hovered.weight, 1)}</strong>
+              </span>
+              <span>
+                <span className="alloc-detail-key">Profit / loss</span>
+                <strong className={hovered.pl >= 0 ? 'v-gain' : 'v-loss'}>
+                  <span aria-hidden="true">{hovered.pl >= 0 ? '▲' : '▼'}</span>{' '}
+                  <span className={masked ? 'privacy-mask' : undefined}>{signedMoney(hovered.pl, currency)}</span>
+                  <span style={{ fontWeight: 500 }}> ({signedPercent(hovered.plPct, 1)})</span>
+                </strong>
+              </span>
+            </span>
+          </>
+        ) : (
+          <span className="alloc-detail-hint">Hover a slice for its value, share and profit or loss.</span>
+        )}
       </div>
     </div>
   )

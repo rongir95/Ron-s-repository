@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { CURRENCIES, PortfolioAvatar } from '../components/PortfolioSwitcher'
 import { Banner, Button, Card, Chip, ConfirmDialog, Field, Input, Modal, Select } from '../components/ui'
 import { PROVIDER_CHOICES, getProvider } from '../market'
+import { useResolvedTheme } from '../lib/theme'
 import { exportAll, exportCsv, exportPortfolio, pickJsonFile } from '../lib/transfer'
 import { normalise, useStore } from '../store/store'
 import type { ProviderId } from '../types'
@@ -21,6 +22,7 @@ export function Settings({ onDone }: { onDone: () => void }) {
   const { data, portfolio, settings, updateSettings, setPortfolioCurrency, deletePortfolio, replaceAll, startFresh, toast } =
     useStore()
   const [confirm, setConfirm] = useState<null | 'fresh' | 'delete-portfolio'>(null)
+  const resolvedTheme = useResolvedTheme(settings.theme)
   const [freshName, setFreshName] = useState(portfolio.name)
   const provider = getProvider(settings)
 
@@ -144,15 +146,18 @@ export function Settings({ onDone }: { onDone: () => void }) {
         <div className="switch-row">
           <span>
             <span className="switch-label">Theme</span>
-            <span className="switch-sub">Follows your system setting unless you pick one.</span>
+            <span className="switch-sub">
+              The sun / moon button in the header flips between light and dark. Pick “System” here to follow your
+              device instead — it is currently {resolvedTheme}.
+            </span>
           </span>
           <Select
             value={settings.theme}
             onChange={(event) => updateSettings({ theme: event.target.value as typeof settings.theme })}
-            style={{ width: 140, flex: 'none' }}
+            style={{ width: 150, flex: 'none' }}
             aria-label="Theme"
           >
-            <option value="system">System</option>
+            <option value="system">System ({resolvedTheme})</option>
             <option value="light">Light</option>
             <option value="dark">Dark</option>
           </Select>

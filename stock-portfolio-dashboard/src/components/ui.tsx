@@ -378,6 +378,65 @@ export function Skeleton({ width = '100%', height = 14 }: { width?: number | str
 // Inline SVG rather than emoji: emoji render differently per platform and can
 // come out as full-colour glyphs that clash with the row they sit in.
 
+function Glyph({ children, size = 15 }: { children: ReactNode; size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  )
+}
+
+/**
+ * A cog. The teeth are a solid toothed ring rather than thin radial spokes —
+ * spokes around a small hub read as a sun, not a gear.
+ */
+export function IconGear() {
+  return (
+    <Glyph>
+      <circle cx="12" cy="12" r="3.1" />
+      <path d="M19.1 14.6a1.6 1.6 0 0 0 .3 1.8l.1.1a1.9 1.9 0 1 1-2.7 2.7l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5v.2a1.9 1.9 0 0 1-3.8 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a1.9 1.9 0 1 1-2.7-2.7l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H2.9a1.9 1.9 0 0 1 0-3.8h.2a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a1.9 1.9 0 1 1 2.7-2.7l.1.1a1.6 1.6 0 0 0 1.8.3h.1a1.6 1.6 0 0 0 1-1.5V2.9a1.9 1.9 0 0 1 3.8 0v.2a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a1.9 1.9 0 1 1 2.7 2.7l-.1.1a1.6 1.6 0 0 0-.3 1.8v.1a1.6 1.6 0 0 0 1.5 1h.2a1.9 1.9 0 0 1 0 3.8h-.2a1.6 1.6 0 0 0-1.5 1z" />
+    </Glyph>
+  )
+}
+
+/** Shown while the light theme is active — clicking it gives you dark. */
+export function IconMoon() {
+  return (
+    <Glyph>
+      <path d="M20.6 14.4A8.6 8.6 0 1 1 9.6 3.4a6.7 6.7 0 0 0 11 11z" />
+    </Glyph>
+  )
+}
+
+/** Shown while the dark theme is active — clicking it gives you light. */
+export function IconSun() {
+  return (
+    <Glyph>
+      <circle cx="12" cy="12" r="4.1" />
+      <path d="M12 1.8v2.3M12 19.9v2.3M4.4 4.4l1.6 1.6M18 18l1.6 1.6M1.8 12h2.3M19.9 12h2.3M4.4 19.6 6 18M18 6l1.6-1.6" />
+    </Glyph>
+  )
+}
+
+export function IconRefresh() {
+  return (
+    <Glyph>
+      <path d="M20.4 12a8.4 8.4 0 1 1-2.5-6" />
+      <path d="M20.7 4.2v4.6h-4.6" />
+    </Glyph>
+  )
+}
+
 export function IconPencil() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
