@@ -1,3 +1,16 @@
+# Ron's repository
+
+Two self-contained prototypes live here:
+
+| Project | What it is |
+|---|---|
+| **[stock-portfolio-dashboard/](stock-portfolio-dashboard/)** | Track stock positions across per-person portfolios, with near-real-time market data. |
+| **Feature Brief Builder** (repo root) | Guide PMs through producing a Product / UX feature brief, with a UX review dashboard. |
+
+Each has its own `package.json` and README — run them independently.
+
+---
+
 # Feature Brief Builder
 
 > Create better product context before UX starts designing.
