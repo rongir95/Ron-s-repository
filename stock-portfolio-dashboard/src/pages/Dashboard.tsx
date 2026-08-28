@@ -187,7 +187,9 @@ export function Dashboard({
               <div>
                 <div className="section-title">Allocation</div>
                 <div className="section-sub">
-                  Share of current market value
+                  {metrics.positions.some((row) => row.hasQuote)
+                    ? 'Share of current market value'
+                    : 'Share of the amount invested'}
                   {metrics.largest ? (
                     <>
                       {' · largest is '}

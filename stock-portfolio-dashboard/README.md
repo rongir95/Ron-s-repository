@@ -210,6 +210,11 @@ dependency-light approach — and follow a few rules deliberately:
   opposite sides of a zero baseline.
 - **One y-axis, ever.** Value and invested share a scale, so the gap between the
   lines is the profit.
+- **The pie falls back to cost when there are no prices.** Market value is the
+  point of the chart, but it needs a live feed; with none, the slices are sized
+  by the amount invested instead — knowable from the purchase records alone —
+  and both the subtitle and a note above the chart say so. An empty chart would
+  be the worse answer, and it reads as a bug.
 - **Allocation is a pie, with the precision put back.** A pie is a genuinely
   risky form for comparing close values, so the exact percentage is
   direct-labelled beside every slice in the legend, the holdings table states
