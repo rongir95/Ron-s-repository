@@ -151,30 +151,34 @@ export function Dashboard({
 
       <Card>
         <div className="hero-card">
-          <div className="hero">
-            <div className="hero-label row" style={{ gap: 7 }}>
-              <PortfolioAvatar id={portfolio.id} name={portfolio.name} size={18} />
-              {portfolio.name} · total value
+          {/*
+            One panel rather than a loose number with two boxes beside it: the
+            total and the two returns are the same fact at three time horizons,
+            so hairlines divide them instead of gaps.
+          */}
+          <div className="value-panel">
+            <div className="value-panel-head">
+              <span className="value-panel-label">
+                <PortfolioAvatar id={portfolio.id} name={portfolio.name} size={18} />
+                {portfolio.name} · total value
+              </span>
+              <div className={`hero-value ${masked ? 'privacy-mask' : ''}`}>{money(metrics.totalValue, currency)}</div>
             </div>
-            <div className={`hero-value ${masked ? 'privacy-mask' : ''}`}>{money(metrics.totalValue, currency)}</div>
-            {/* The two figures people actually open the dashboard for. They sit
-                directly under the hero at display size, labelled rather than
-                phrased, so "all time" and "today" are never confused. */}
-            <div className="hero-stats">
-              <div className="hero-stat">
-                <span className="hero-stat-label">All time</span>
-                <span className="hero-stat-value">
+            <div className="value-panel-stats">
+              <div className="value-stat">
+                <span className="value-stat-label">All time</span>
+                <span className="value-stat-value">
                   <Value amount={metrics.totalPl} currency={currency} masked={masked} />
-                  <span className={`hero-stat-pct ${toneClass(metrics.totalPl)}`}>
+                  <span className={`value-stat-pct ${toneClass(metrics.totalPl)}`}>
                     {signedPercent(metrics.totalPlPct)}
                   </span>
                 </span>
               </div>
-              <div className="hero-stat">
-                <span className="hero-stat-label">Today</span>
-                <span className="hero-stat-value">
+              <div className="value-stat">
+                <span className="value-stat-label">Today</span>
+                <span className="value-stat-value">
                   <Value amount={metrics.dayChange} currency={currency} masked={masked} />
-                  <span className={`hero-stat-pct ${toneClass(metrics.dayChange)}`}>
+                  <span className={`value-stat-pct ${toneClass(metrics.dayChange)}`}>
                     {signedPercent(metrics.dayChangePct)}
                   </span>
                 </span>

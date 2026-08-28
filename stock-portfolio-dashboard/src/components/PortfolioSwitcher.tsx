@@ -10,7 +10,7 @@ import { computePortfolio } from '../lib/calc'
 import { compactMoney, signedPercent } from '../lib/format'
 import type { Quote } from '../market/types'
 import { useStore } from '../store/store'
-import { Button, Chip, Field, Input, Modal, Select, useDismiss } from './ui'
+import { Button, Field, Input, Modal, Select, useDismiss } from './ui'
 
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'ILS', 'CAD', 'AUD', 'CHF', 'JPY', 'SEK', 'INR']
 
@@ -50,6 +50,26 @@ export function PortfolioSwitcher({
   const [draftName, setDraftName] = useState('')
   const [draftCurrency, setDraftCurrency] = useState('USD')
   const ref = useDismiss(open, () => setOpen(false))
+
+  function close() {
+    setCreating(false)
+    setRenaming(false)
+  }
+
+  /** The single save path, shared by the Save button and the Enter key. */
+  function submit() {
+    const name = draftName.trim()
+    if (!name) return
+    if (creating) {
+      addPortfolio(name, draftCurrency)
+      toast(`${name} created`, 'success')
+    } else {
+      renamePortfolio(portfolio.id, name)
+      setPortfolioCurrency(portfolio.id, draftCurrency)
+      toast(`Renamed to ${name}`, 'success')
+    }
+    close()
+  }
 
   return (
     <>
@@ -134,36 +154,11 @@ export function PortfolioSwitcher({
         <Modal
           title={creating ? 'New portfolio' : 'Rename portfolio'}
           subtitle={creating ? 'One per person keeps everyone’s holdings separate.' : undefined}
-          onClose={() => {
-            setCreating(false)
-            setRenaming(false)
-          }}
+          onClose={close}
           footer={
             <>
-              <Button
-                onClick={() => {
-                  setCreating(false)
-                  setRenaming(false)
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                disabled={!draftName.trim()}
-                onClick={() => {
-                  if (creating) {
-                    addPortfolio(draftName, draftCurrency)
-                    toast(`${draftName.trim()} created`, 'success')
-                  } else {
-                    renamePortfolio(portfolio.id, draftName)
-                    setPortfolioCurrency(portfolio.id, draftCurrency)
-                    toast('Portfolio updated', 'success')
-                  }
-                  setCreating(false)
-                  setRenaming(false)
-                }}
-              >
+              <Button onClick={close}>Cancel</Button>
+              <Button variant="primary" disabled={!draftName.trim()} onClick={submit}>
                 {creating ? 'Create' : 'Save'}
               </Button>
             </>
@@ -176,15 +171,9 @@ export function PortfolioSwitcher({
               placeholder="e.g. Ron, or Younger brother"
               onChange={(event) => setDraftName(event.target.value)}
               onKeyDown={(event) => {
-                if (event.key === 'Enter' && draftName.trim()) {
+                if (event.key === 'Enter') {
                   event.preventDefault()
-                  if (creating) addPortfolio(draftName, draftCurrency)
-                  else {
-                    renamePortfolio(portfolio.id, draftName)
-                    setPortfolioCurrency(portfolio.id, draftCurrency)
-                  }
-                  setCreating(false)
-                  setRenaming(false)
+                  submit()
                 }
               }}
             />
@@ -206,9 +195,6 @@ export function PortfolioSwitcher({
               ))}
             </Select>
           </Field>
-          {!creating && portfolio.sample && (
-            <Chip tone="warn">This is still sample data — editing it will clear the sample badge.</Chip>
-          )}
         </Modal>
       )}
     </>

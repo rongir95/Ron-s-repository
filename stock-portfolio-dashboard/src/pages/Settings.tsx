@@ -46,12 +46,14 @@ export function Settings({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="stack" style={{ maxWidth: 780, margin: '0 auto' }}>
-      <div className="section-head">
-        <div>
-          <h1 style={{ fontSize: 20 }}>Settings</h1>
-          <div className="section-sub">Everything is stored in this browser. Nothing is sent anywhere but the price feed.</div>
+      <div className="page-head">
+        <button type="button" className="back-link" onClick={onDone}>
+          <span aria-hidden="true">←</span> Back to dashboard
+        </button>
+        <h1 className="page-title">Settings</h1>
+        <div className="section-sub">
+          Everything is stored in this browser. Nothing is sent anywhere but the price feed.
         </div>
-        <Button onClick={onDone}>Back to dashboard</Button>
       </div>
 
       {/* --- Data source ---------------------------------------------------- */}
@@ -68,15 +70,7 @@ export function Settings({ onDone }: { onDone: () => void }) {
           {PROVIDER_CHOICES.map((choice) => (
             <label
               key={choice.id}
-              className="switch-row"
-              style={{
-                cursor: 'pointer',
-                border: '1px solid',
-                borderColor: settings.providerId === choice.id ? 'var(--accent-border)' : 'var(--border)',
-                background: settings.providerId === choice.id ? 'var(--accent-weak)' : 'transparent',
-                borderRadius: 'var(--radius-sm)',
-                padding: '12px 14px',
-              }}
+              className={`switch-row option-card ${settings.providerId === choice.id ? 'selected' : ''}`}
             >
               <span>
                 <span className="switch-label">{choice.label}</span>
@@ -110,10 +104,10 @@ export function Settings({ onDone }: { onDone: () => void }) {
           </div>
         )}
 
+        {/* Neutral, not "info": the accent tone is what marks the selected
+            option above, and two adjacent blue blocks read as one. */}
         <div style={{ marginTop: 16 }}>
-          <Banner tone="info" title={`Update frequency — ${provider.label}`}>
-            {provider.freshness}
-          </Banner>
+          <Banner title={`Update frequency — ${provider.label}`}>{provider.freshness}</Banner>
         </div>
 
         <div style={{ marginTop: 14 }}>

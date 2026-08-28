@@ -67,7 +67,6 @@ function Shell() {
                 <path d="M9.4 3h3.1v3.1" />
               </svg>
             </span>
-            <span className="brand-text">Portfolio</span>
           </span>
 
           <PortfolioSwitcher quotes={quotes} fxRates={fxRates} masked={settings.privacyMode} />

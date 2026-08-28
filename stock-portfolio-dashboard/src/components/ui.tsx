@@ -153,14 +153,32 @@ export function Modal({
   const panel = useRef<HTMLDivElement>(null)
   const titleId = useId()
 
+  // `onClose` is nearly always an inline arrow, so it is a new function on every
+  // render. Reading it through a ref lets the effect below run once on mount
+  // instead of on every render — which matters, because re-running it re-focused
+  // and re-selected the field, so each keystroke wiped what was already typed.
+  const closeRef = useRef(onClose)
+  useEffect(() => {
+    closeRef.current = onClose
+  }, [onClose])
+
+  // Mount-only: focus, the Tab trap, and the scroll lock are all set up once.
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null
-    // Focus the first control so keyboard users land inside the dialog.
-    panel.current?.querySelector<HTMLElement>('input, select, textarea, button')?.focus()
+    // Focus the first control in the *body*. Scoping matters: the close button
+    // lives in the header and comes first in document order, so an unscoped
+    // query focused ✕ — typing went nowhere and Enter dismissed the dialog.
+    const field =
+      panel.current?.querySelector<HTMLElement>(
+        '.modal-body input:not([type="hidden"]), .modal-body select, .modal-body textarea, .modal-body button',
+      ) ?? panel.current?.querySelector<HTMLElement>('button')
+    field?.focus()
+    // Pre-select existing text so typing replaces it rather than appending.
+    if (field instanceof HTMLInputElement && /^(text|search|url|tel|email)$/.test(field.type)) field.select()
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.stopPropagation()
-        onClose()
+        closeRef.current()
         return
       }
       if (event.key !== 'Tab' || !panel.current) return
@@ -189,7 +207,8 @@ export function Modal({
       document.body.style.overflow = overflow
       previous?.focus?.()
     }
-  }, [onClose])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div
