@@ -101,6 +101,20 @@ prices were fetched and whether the market is open, so a stale number is never
 presented as a fresh one. Settings restates the freshness of whichever source is
 selected.
 
+### Checking whether live prices actually arrive
+
+Settings → **Check the connection → Test** fetches one real quote for AAPL and
+reports either the live price with its exchange timestamp, or the specific
+reason it failed. Use it before trusting an empty-looking dashboard — and note
+that when the demo provider is selected, a banner across the top of the
+dashboard says so, because simulated prices should never be mistaken for real
+ones.
+
+A published/hosted preview of this app (for example an Artifact page) cannot
+fetch live prices at all: those pages are sandboxed with no outbound network
+access, so they fall back to the demo provider by design. Live prices need one
+of the routes below.
+
 ### If the proxy is not available
 
 Hosting the built `dist/` on a plain static host (GitHub Pages, S3, a `file://`

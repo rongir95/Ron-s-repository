@@ -78,6 +78,7 @@ export const yahooProvider: MarketDataProvider = {
 
   async getQuotes(symbols) {
     const out: Record<string, Quote> = {}
+    let firstError: unknown = null
     // One tiny request per symbol; 4 at a time is plenty for a personal portfolio.
     await mapLimit(symbols, 4, async (symbol) => {
       try {
@@ -94,11 +95,15 @@ export const yahooProvider: MarketDataProvider = {
           quotedAt: meta.regularMarketTime ? meta.regularMarketTime * 1000 : Date.now(),
           marketOpen: isMarketOpen(meta),
         }
-      } catch {
+      } catch (err) {
         // A single bad ticker must not sink the whole refresh; the caller
         // surfaces it as an unpriced holding instead.
+        if (!firstError) firstError = err
       }
     })
+    // But if not one symbol resolved, the tickers are not the problem — the
+    // connection is, and that error is the useful one to report.
+    if (!Object.keys(out).length && firstError) throw firstError
     return out
   },
 

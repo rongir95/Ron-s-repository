@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { CURRENCIES, PortfolioAvatar } from '../components/PortfolioSwitcher'
 import { Banner, Button, Card, Chip, ConfirmDialog, Field, Input, Modal, Select } from '../components/ui'
 import { PROVIDER_CHOICES, getProvider } from '../market'
+import { money } from '../lib/format'
 import { useResolvedTheme } from '../lib/theme'
 import { exportAll, exportCsv, exportPortfolio, pickJsonFile } from '../lib/transfer'
 import { normalise, useStore } from '../store/store'
@@ -23,6 +24,30 @@ export function Settings({ onDone }: { onDone: () => void }) {
     useStore()
   const [confirm, setConfirm] = useState<null | 'fresh' | 'delete-portfolio'>(null)
   const resolvedTheme = useResolvedTheme(settings.theme)
+  const [test, setTest] = useState<{ state: 'idle' | 'running' | 'ok' | 'fail'; message?: string }>({
+    state: 'idle',
+  })
+
+  /** Fetches one real quote so you can see whether live prices actually reach
+   *  this browser, instead of guessing from an empty dashboard. */
+  async function testConnection() {
+    setTest({ state: 'running' })
+    try {
+      const quotes = await getProvider(settings).getQuotes(['AAPL'])
+      const quote = quotes.AAPL
+      if (!quote) {
+        setTest({ state: 'fail', message: 'The request completed but no price came back for AAPL.' })
+        return
+      }
+      const stamped = quote.quotedAt ? ` · exchange time ${new Date(quote.quotedAt).toLocaleTimeString()}` : ''
+      setTest({
+        state: 'ok',
+        message: `AAPL ${money(quote.price, quote.currency)}${stamped}`,
+      })
+    } catch (err) {
+      setTest({ state: 'fail', message: (err as Error).message || 'The request failed.' })
+    }
+  }
   const [freshName, setFreshName] = useState(portfolio.name)
   const provider = getProvider(settings)
 
@@ -92,15 +117,25 @@ export function Settings({ onDone }: { onDone: () => void }) {
             <Field
               label="Twelve Data API key"
               htmlFor="td-key"
-              hint="Free at twelvedata.com. Stored only in this browser."
+              hint="Stored only in this browser, never sent anywhere else."
             >
               <Input
                 id="td-key"
                 value={settings.twelveDataKey}
                 placeholder="Paste your API key"
-                onChange={(event) => updateSettings({ twelveDataKey: event.target.value.trim() })}
+                onChange={(event) => {
+                  updateSettings({ twelveDataKey: event.target.value.trim() })
+                  setTest({ state: 'idle' })
+                }}
               />
             </Field>
+            <p className="field-hint" style={{ marginTop: 8 }}>
+              Sign up free at{' '}
+              <a href="https://twelvedata.com/pricing" target="_blank" rel="noreferrer noopener">
+                twelvedata.com
+              </a>{' '}
+              — the free plan covers a personal portfolio. Then press Test below.
+            </p>
           </div>
         )}
 
@@ -108,6 +143,26 @@ export function Settings({ onDone }: { onDone: () => void }) {
             option above, and two adjacent blue blocks read as one. */}
         <div style={{ marginTop: 16 }}>
           <Banner title={`Update frequency — ${provider.label}`}>{provider.freshness}</Banner>
+        </div>
+
+        <div className="switch-row" style={{ marginTop: 4 }}>
+          <span>
+            <span className="switch-label">Check the connection</span>
+            <span className="switch-sub">
+              {test.state === 'ok' ? (
+                <>
+                  Live price received — <strong style={{ color: 'var(--gain-ink)' }}>{test.message}</strong>
+                </>
+              ) : test.state === 'fail' ? (
+                <span style={{ color: 'var(--loss-ink)' }}>{test.message}</span>
+              ) : (
+                'Fetches one real quote so you can see whether prices reach this browser.'
+              )}
+            </span>
+          </span>
+          <Button size="sm" onClick={testConnection} disabled={test.state === 'running'}>
+            {test.state === 'running' ? 'Checking…' : 'Test'}
+          </Button>
         </div>
 
         <div style={{ marginTop: 14 }}>
@@ -128,6 +183,48 @@ export function Settings({ onDone }: { onDone: () => void }) {
               closed.
             </span>
           </Field>
+        </div>
+      </Card>
+
+      {/* --- Getting live prices -------------------------------------------- */}
+
+      <Card>
+        <div className="card-head">
+          <div>
+            <div className="card-title">How to get live prices</div>
+            <div className="card-note">
+              Yahoo Finance sends no CORS headers, so a browser cannot call it directly — the app needs to be served
+              with its own <code>/yf</code> proxy. These are the routes, easiest first.
+            </div>
+          </div>
+        </div>
+        <div className="stack" style={{ gap: 0 }}>
+          <div className="switch-row">
+            <span>
+              <span className="switch-label">Paste a free Twelve Data key (no install)</span>
+              <span className="switch-sub">
+                Works wherever you are already running this, including a file opened straight from disk. Pick Twelve
+                Data above, paste a key, press Test. Free plan: 8 requests/min, 800/day.
+              </span>
+            </span>
+          </div>
+          <div className="switch-row">
+            <span>
+              <span className="switch-label">Deploy it (no key)</span>
+              <span className="switch-sub">
+                Import the repo on Vercel or Netlify — both config files are committed, so the <code>/yf</code> proxy
+                works and Yahoo Finance needs no key. You get a URL you can open on any device.
+              </span>
+            </span>
+          </div>
+          <div className="switch-row">
+            <span>
+              <span className="switch-label">Run it locally (no key)</span>
+              <span className="switch-sub">
+                <code>npm install</code> then <code>npm run dev</code>. The dev server carries the proxy.
+              </span>
+            </span>
+          </div>
         </div>
       </Card>
 

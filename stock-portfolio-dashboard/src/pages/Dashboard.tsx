@@ -125,6 +125,22 @@ export function Dashboard({
         </Banner>
       )}
 
+      {/* Demo prices are synthetic. That must be impossible to miss — a small
+          badge in the header was not enough. */}
+      {settings.providerId === 'demo' && (
+        <Banner
+          title="These prices are simulated"
+          action={
+            <Button size="sm" variant="primary" onClick={onOpenSettings}>
+              Get live prices
+            </Button>
+          }
+        >
+          Nothing here is fetched from a market. Values, profit and loss are all generated locally so you can try the
+          dashboard out — switch data source in Settings to see real prices.
+        </Banner>
+      )}
+
       {quotesError && (
         <Banner
           tone="error"

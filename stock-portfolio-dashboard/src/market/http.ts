@@ -27,7 +27,10 @@ export async function fetchJson<T>(url: string, timeoutMs = 12_000): Promise<T> 
       throw new MarketDataError('Rate limit reached. Wait a moment, or slow the refresh rate in Settings.')
     }
     if (response.status === 401 || response.status === 403) {
-      throw new MarketDataError('The market-data service rejected the request — check your API key in Settings.')
+      throw new MarketDataError(
+        `The market-data service refused the request (HTTP ${response.status}). On Twelve Data, check the API key; ` +
+          'on Yahoo Finance, the /yf proxy is not reachable from where this page is served.',
+      )
     }
     throw new MarketDataError(`Market data unavailable (HTTP ${response.status}).`)
   }
