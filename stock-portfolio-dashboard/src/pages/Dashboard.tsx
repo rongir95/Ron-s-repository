@@ -147,16 +147,17 @@ export function Dashboard({
         </Banner>
       )}
 
-      {/* --- Hero + allocation ---------------------------------------------- */}
+      {/*
+        --- Summary row ------------------------------------------------------
+        Two columns of matched height. Value and cash stack on the left because
+        each is short; allocation is tall, so one against two balances out and
+        neither column is left with dead space. Previously the value panel sat
+        alone beside the taller allocation column and floated in empty air.
+      */}
 
-      <Card>
-        <div className="hero-card">
-          {/*
-            One panel rather than a loose number with two boxes beside it: the
-            total and the two returns are the same fact at three time horizons,
-            so hairlines divide them instead of gaps.
-          */}
-          <div className="value-panel">
+      <div className="summary-grid">
+        <div className="summary-col">
+          <Card pad={false} className="value-card">
             <div className="value-panel-head">
               <span className="value-panel-label">
                 <PortfolioAvatar id={portfolio.id} name={portfolio.name} size={18} />
@@ -164,6 +165,8 @@ export function Dashboard({
               </span>
               <div className={`hero-value ${masked ? 'privacy-mask' : ''}`}>{money(metrics.totalValue, currency)}</div>
             </div>
+            {/* The total and the two returns are one fact at three horizons, so
+                hairlines divide them rather than gaps. */}
             <div className="value-panel-stats">
               <div className="value-stat">
                 <span className="value-stat-label">All time</span>
@@ -184,34 +187,32 @@ export function Dashboard({
                 </span>
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div>
-            <div className="section-head" style={{ marginBottom: 10 }}>
-              <div>
-                <div className="section-title">Allocation</div>
-                <div className="section-sub">
-                  {metrics.positions.some((row) => row.hasQuote)
-                    ? 'Share of current market value'
-                    : 'Share of the amount invested'}
-                  {metrics.largest ? (
-                    <>
-                      {' · largest is '}
-                      <strong style={{ color: 'var(--text-2)' }}>{metrics.largest.symbol}</strong>
-                      {` at ${percent(metrics.concentration, 1)}`}
-                    </>
-                  ) : null}
-                </div>
+          <CashPanel metrics={metrics} masked={masked} />
+        </div>
+
+        <Card className="alloc-card">
+          <div className="card-head" style={{ marginBottom: 12 }}>
+            <div>
+              <div className="card-title">Allocation</div>
+              <div className="card-note">
+                {metrics.positions.some((row) => row.hasQuote)
+                  ? 'Share of current market value'
+                  : 'Share of the amount invested'}
+                {metrics.largest ? (
+                  <>
+                    {' · largest is '}
+                    <strong style={{ color: 'var(--text-2)' }}>{metrics.largest.symbol}</strong>
+                    {` at ${percent(metrics.concentration, 1)}`}
+                  </>
+                ) : null}
               </div>
             </div>
-            <AllocationChart positions={metrics.positions} currency={currency} masked={masked} />
           </div>
-        </div>
-      </Card>
-
-      {/* --- Cash ----------------------------------------------------------- */}
-
-      <CashPanel metrics={metrics} masked={masked} />
+          <AllocationChart positions={metrics.positions} currency={currency} masked={masked} />
+        </Card>
+      </div>
 
       {/* --- KPI row -------------------------------------------------------- */}
 

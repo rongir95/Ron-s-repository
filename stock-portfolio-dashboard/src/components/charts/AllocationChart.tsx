@@ -208,10 +208,10 @@ export function AllocationChart({
           {/* The hole carries what the chart is a breakdown of — or, on hover,
               the slice under the pointer. */}
           <text x={CENTRE} y={CENTRE - 6} textAnchor="middle" className="alloc-hole-label">
-            {hovered ? hovered.label : basis === 'cost' ? 'Invested' : 'Total'}
+            {hovered ? hovered.label : slices.length === 1 ? 'Holding' : 'Holdings'}
           </text>
           <text x={CENTRE} y={CENTRE + 14} textAnchor="middle" className="alloc-hole-value">
-            {masked ? '•••' : compactMoney(hovered ? hovered.value : total, currency)}
+            {hovered ? (masked ? '•••' : compactMoney(hovered.value, currency)) : slices.length}
           </text>
         </svg>
 

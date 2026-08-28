@@ -280,6 +280,10 @@ a:hover { text-decoration: underline; }
 }
 
 .stack { display: grid; gap: 20px; }
+/* Grid items default to min-width:auto, so one wide child — the holdings table
+   — inflates the whole column and pushes the page sideways. Zeroing it keeps
+   wide content inside its own scroll container where it belongs. */
+.stack > * { min-width: 0; }
 .row { display: flex; align-items: center; gap: 10px; }
 .row-wrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .grow { flex: 1; min-width: 0; }
@@ -553,14 +557,13 @@ textarea.input { height: auto; padding: 9px 11px; resize: vertical; min-height: 
 
 /* --- Value panel: total value + the two returns, as one unit -------------- */
 
-.value-panel {
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  border-radius: var(--radius);
-  overflow: hidden;
+.value-panel-head {
+  padding: 18px 20px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
-
-.value-panel-head { padding: 17px 20px 15px; }
 
 .value-panel-label {
   display: flex;
@@ -585,7 +588,7 @@ textarea.input { height: auto; padding: 9px 11px; resize: vertical; min-height: 
   display: grid;
   grid-template-columns: 1fr 1fr;
   border-top: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--surface-2);
 }
 .value-stat { padding: 11px 20px 13px; min-width: 0; }
 .value-stat + .value-stat { border-left: 1px solid var(--border); }
@@ -611,7 +614,7 @@ textarea.input { height: auto; padding: 9px 11px; resize: vertical; min-height: 
 .value-stat-pct { font-size: 13.5px; font-weight: 620; }
 
 /* Side by side needs ~170px a cell; below that they stack. */
-@media (max-width: 560px) {
+@media (max-width: 480px) {
   .value-panel-stats { grid-template-columns: 1fr; }
   .value-stat + .value-stat { border-left: 0; border-top: 1px solid var(--border); }
   .value-panel-head { padding: 15px 16px 13px; }
@@ -631,15 +634,32 @@ textarea.input { height: auto; padding: 9px 11px; resize: vertical; min-height: 
   padding: 7px 10px;
 }
 
-.hero-card {
+/* --- Summary row: value + cash (left, stacked) beside allocation ---------- */
+
+.summary-grid {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) minmax(280px, 1.15fr);
-  gap: 24px;
-  align-items: center;
+  grid-template-columns: minmax(330px, 1fr) minmax(430px, 1.04fr);
+  gap: 18px;
+  align-items: stretch;
 }
-@media (max-width: 860px) {
-  .hero-card { grid-template-columns: 1fr; }
+/* Two short cards against one tall one, so both columns end level. */
+.summary-col {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 18px;
+  min-width: 0;
 }
+.summary-col > .card { min-width: 0; }
+
+/* Below this the allocation donut and its legend can no longer sit side by
+   side in half the width, so everything goes to one column. */
+@media (max-width: 1080px) {
+  .summary-grid { grid-template-columns: 1fr; }
+  .summary-col { grid-template-rows: auto auto; }
+}
+
+.value-card { overflow: hidden; display: flex; flex-direction: column; }
+.alloc-card { display: flex; flex-direction: column; }
 
 /* ==========================================================================
    Positions table
@@ -686,6 +706,19 @@ table.positions tfoot td {
   text-align: right;
 }
 table.positions tfoot td:first-child { text-align: left; padding-left: 20px; }
+
+/* Tighter cells below ~1300px so the table still fits a 1152-wide laptop
+   without a horizontal scroll. */
+@media (max-width: 1300px) {
+  table.positions th,
+  table.positions td { padding-left: 9px; padding-right: 9px; }
+  table.positions th:first-child,
+  table.positions td:first-child { padding-left: 16px; }
+  table.positions th:last-child,
+  table.positions td:last-child { padding-right: 16px; }
+  table.positions tfoot td:first-child { padding-left: 16px; }
+  .sym-name { max-width: 150px; }
+}
 
 th.sortable button {
   appearance: none;
@@ -781,15 +814,23 @@ tr:hover .row-actions, .row-actions:focus-within { opacity: 1; }
 
 .alloc {
   display: grid;
-  grid-template-columns: minmax(180px, 208px) minmax(150px, 1fr);
-  gap: 8px 20px;
+  grid-template-columns: minmax(176px, 208px) minmax(180px, 1fr);
+  gap: 8px 24px;
   align-items: center;
+  flex: 1;
+  align-content: center;
 }
 @media (max-width: 520px) {
   .alloc { grid-template-columns: 1fr; justify-items: center; }
 }
 
 .alloc-chart { max-width: 208px; width: 100%; }
+
+/* A wide card can carry a bigger donut without crowding the legend. */
+@media (min-width: 1200px) {
+  .alloc { grid-template-columns: minmax(200px, 244px) minmax(210px, 1fr); }
+  .alloc-chart { max-width: 244px; }
+}
 
 .alloc-hole-label {
   fill: var(--text-3);
@@ -849,9 +890,9 @@ tr:hover .row-actions, .row-actions:focus-within { opacity: 1; }
 }
 .alloc-legend-item {
   display: grid;
-  grid-template-columns: 9px minmax(42px, auto) 1fr auto;
+  grid-template-columns: 9px minmax(44px, auto) minmax(50px, auto) 1fr;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 12.5px;
   padding: 2px 6px;
   margin: 0 -6px;
@@ -864,19 +905,20 @@ tr:hover .row-actions, .row-actions:focus-within { opacity: 1; }
 .alloc-legend-val {
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
-  text-align: right;
 }
 
 /* --- Cash panel ---------------------------------------------------------- */
 
 .cash-panel {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(240px, 1.35fr);
-  gap: 20px 28px;
-  align-items: center;
+  gap: 18px 28px;
+  align-content: center;
+  height: 100%;
 }
-@media (max-width: 760px) {
-  .cash-panel { grid-template-columns: 1fr; }
+/* Side by side only where the column is genuinely wide; in the summary column
+   the stats sit under the balance instead. */
+@media (min-width: 1400px) {
+  .cash-panel { grid-template-columns: minmax(190px, 1fr) minmax(220px, 1.1fr); }
 }
 
 .cash-label {
