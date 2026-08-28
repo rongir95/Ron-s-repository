@@ -29,6 +29,20 @@ export interface SymbolMatch {
 
 export type HistoryRange = '1mo' | '3mo' | '6mo' | '1y' | '5y'
 
+export interface NewsItem {
+  id: string
+  title: string
+  /** Where to read it. */
+  url: string
+  publisher?: string
+  /** ms epoch. */
+  publishedAt?: number
+  /** Which of the portfolio's holdings this story relates to. */
+  symbols: string[]
+  /** False for synthetic sample headlines, so the UI can refuse to link them. */
+  real: boolean
+}
+
 export interface MarketDataProvider {
   id: string
   label: string
@@ -41,6 +55,11 @@ export interface MarketDataProvider {
   search(query: string): Promise<SymbolMatch[]>
   /** FX rate to convert `from` into `to`. Return null when unavailable. */
   getFxRate(from: string, to: string): Promise<number | null>
+  /**
+   * Recent headlines for the given symbols. Optional: providers without a news
+   * endpoint omit it, and the UI says so rather than showing an empty panel.
+   */
+  getNews?(symbols: string[]): Promise<NewsItem[]>
 }
 
 /** Thrown with a message that is safe (and useful) to show to the user. */

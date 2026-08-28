@@ -14,6 +14,7 @@ import { ReturnsChart } from '../components/charts/ReturnsChart'
 import { CashPanel } from '../components/CashPanel'
 import { PositionForm } from '../components/PositionForm'
 import { SellForm } from '../components/SellForm'
+import { NewsPanel } from '../components/NewsPanel'
 import { PositionsTable } from '../components/PositionsTable'
 import { PortfolioAvatar } from '../components/PortfolioSwitcher'
 import {
@@ -30,7 +31,8 @@ import {
 import { annualisedReturn, buildCashFlows, buildSeries, computePortfolio } from '../lib/calc'
 import { money, percent, relativeTime, signedCompactMoney, signedPercent, todayIso } from '../lib/format'
 import type { HistoryRange, Quote } from '../market/types'
-import { useHistory } from '../market/useMarketData'
+import { getProvider } from '../market'
+import { useHistory, useNews } from '../market/useMarketData'
 import { useStore } from '../store/store'
 
 const RANGES: Array<{ value: HistoryRange; label: string }> = [
@@ -68,6 +70,7 @@ export function Dashboard({
   const currency = portfolio.baseCurrency
   const symbols = useMemo(() => portfolio.positions.map((position) => position.symbol), [portfolio.positions])
   const { history, loading: historyLoading, error: historyError } = useHistory(symbols, range)
+  const news = useNews(symbols)
 
   const metrics = useMemo(() => computePortfolio(portfolio, quotes, fxRates), [portfolio, quotes, fxRates])
   const series = useMemo(
@@ -376,6 +379,20 @@ export function Dashboard({
         </div>
         <ReturnsChart positions={metrics.positions} currency={currency} masked={masked} metric={returnMetric} />
       </Card>
+
+      {/* --- News ----------------------------------------------------------- */}
+
+      <NewsPanel
+        news={news.items}
+        loading={news.loading}
+        error={news.error}
+        supported={news.supported}
+        fetchedAt={news.fetchedAt}
+        positions={metrics.positions}
+        providerLabel={getProvider(settings).label}
+        onRefresh={news.refresh}
+        onOpenSettings={onOpenSettings}
+      />
 
       {/* --- All portfolios ------------------------------------------------- */}
 

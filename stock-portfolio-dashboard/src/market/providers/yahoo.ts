@@ -21,7 +21,15 @@
  * exchanges are delayed by their exchange's own rules (commonly 15 minutes).
  */
 import { fetchJson, mapLimit } from '../http'
-import { MarketDataError, type HistoryPoint, type HistoryRange, type MarketDataProvider, type Quote, type SymbolMatch } from '../types'
+import {
+  MarketDataError,
+  type HistoryPoint,
+  type HistoryRange,
+  type MarketDataProvider,
+  type NewsItem,
+  type Quote,
+  type SymbolMatch,
+} from '../types'
 
 const ORIGIN = 'https://query1.finance.yahoo.com'
 
@@ -215,6 +223,62 @@ function buildYahooProvider({ id, label, freshness, fetchPath }: YahooVariant): 
       } catch {
         return null
       }
+    },
+
+    /**
+     * Headlines come from the same search endpoint used for symbol lookup, one
+     * request per holding. The same story is often returned for several tickers,
+     * so stories are keyed by id and their symbol lists merged.
+     */
+    async getNews(symbols) {
+      interface NewsResponse {
+        news?: Array<{
+          uuid?: string
+          title?: string
+          publisher?: string
+          link?: string
+          providerPublishTime?: number
+          relatedTickers?: string[]
+        }>
+      }
+
+      const byId = new Map<string, NewsItem>()
+      let firstError: unknown = null
+      // Capped: a long portfolio should not fire twenty requests for headlines.
+      const wanted = symbols.slice(0, 8)
+
+      await mapLimit(wanted, 3, async (symbol) => {
+        try {
+          const body = await fetchPath<NewsResponse>(
+            `/v1/finance/search?q=${encodeURIComponent(symbol)}&quotesCount=0&newsCount=6&listsCount=0&enableFuzzyQuery=false`,
+          )
+          for (const story of body.news ?? []) {
+            if (!story.title || !story.link) continue
+            const id = story.uuid || story.link
+            const existing = byId.get(id)
+            if (existing) {
+              // Same story, another holding it touches.
+              if (!existing.symbols.includes(symbol)) existing.symbols.push(symbol)
+              continue
+            }
+            byId.set(id, {
+              id,
+              title: story.title,
+              url: story.link,
+              publisher: story.publisher,
+              publishedAt: story.providerPublishTime ? story.providerPublishTime * 1000 : undefined,
+              // Trust our own holding over relatedTickers, which is often broad.
+              symbols: [symbol],
+              real: true,
+            })
+          }
+        } catch (err) {
+          if (!firstError) firstError = err
+        }
+      })
+
+      if (!byId.size && firstError) throw firstError
+      return [...byId.values()].sort((a, b) => (b.publishedAt ?? 0) - (a.publishedAt ?? 0))
     },
   }
 }

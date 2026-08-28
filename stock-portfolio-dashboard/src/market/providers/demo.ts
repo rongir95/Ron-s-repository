@@ -9,7 +9,7 @@
  * history, and the "current" price drifts on a 5-minute bucket so that pressing
  * Refresh visibly does something.
  */
-import type { HistoryPoint, HistoryRange, MarketDataProvider, Quote, SymbolMatch } from '../types'
+import type { HistoryPoint, HistoryRange, MarketDataProvider, NewsItem, Quote, SymbolMatch } from '../types'
 
 const KNOWN: Record<string, { name: string; currency: string; base: number }> = {
   AAPL: { name: 'Apple Inc.', currency: 'USD', base: 190 },
@@ -186,5 +186,35 @@ export const demoProvider: MarketDataProvider = {
   async getFxRate(from, to) {
     if (from === to) return 1
     return DEMO_FX[`${from}->${to}`] ?? null
+  },
+
+  /**
+   * Placeholder headlines. Deliberately generic and flagged `real: false` so the
+   * UI refuses to link them — a plausible-looking fake headline about a real
+   * company would be worse than no news at all.
+   */
+  async getNews(symbols) {
+    const shapes = [
+      'quarterly results in focus',
+      'analyst price targets revised',
+      'sector moves on rate expectations',
+      'trading volume above average',
+      'index weighting under review',
+    ]
+    const out: NewsItem[] = []
+    const day = Math.floor(Date.now() / DAY_MS)
+    for (const [index, symbol] of symbols.slice(0, 8).entries()) {
+      const pick = shapes[hash(symbol) % shapes.length]
+      out.push({
+        id: `demo-${symbol}-${day}`,
+        title: `${symbol} — ${pick}`,
+        url: '',
+        publisher: 'Sample headline, not real news',
+        publishedAt: Date.now() - (index + 1) * 3_600_000,
+        symbols: [symbol],
+        real: false,
+      })
+    }
+    return out
   },
 }

@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from '../store/store'
 import { getProvider } from './index'
-import type { HistoryPoint, HistoryRange, Quote } from './types'
+import type { HistoryPoint, HistoryRange, NewsItem, Quote } from './types'
 
 export interface QuotesState {
   quotes: Record<string, Quote>
@@ -213,4 +213,82 @@ export function useHistory(symbols: string[], range: HistoryRange): HistoryState
   }, [symbolKey, range, providerKey])
 
   return { history, loading, error }
+}
+
+export interface NewsState {
+  items: NewsItem[]
+  loading: boolean
+  error: string | null
+  /** False when the selected provider has no news endpoint at all. */
+  supported: boolean
+  fetchedAt: number | null
+  refresh: () => void
+}
+
+/**
+ * Headlines for the given holdings.
+ *
+ * Refreshed far less often than quotes — news does not move by the second, and
+ * each refresh costs one request per holding.
+ */
+export function useNews(symbols: string[]): NewsState {
+  const { settings } = useStore()
+  const [items, setItems] = useState<NewsItem[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [fetchedAt, setFetchedAt] = useState<number | null>(null)
+  const [tick, setTick] = useState(0)
+
+  const symbolKey = [...symbols].sort().join(',')
+  const providerKey = `${settings.providerId}:${settings.twelveDataKey}`
+  const requestId = useRef(0)
+  const supported = typeof getProvider(settings).getNews === 'function'
+
+  const refresh = useCallback(() => setTick((n) => n + 1), [])
+
+  useEffect(() => {
+    const provider = getProvider(settings)
+    if (!symbolKey || !provider.getNews) {
+      setItems([])
+      setError(null)
+      setFetchedAt(null)
+      return
+    }
+    const id = ++requestId.current
+    let cancelled = false
+    setLoading(true)
+
+    ;(async () => {
+      try {
+        const found = await provider.getNews!(symbolKey.split(','))
+        if (cancelled || id !== requestId.current) return
+        setItems(found)
+        setFetchedAt(Date.now())
+        setError(found.length ? null : 'No recent headlines for these holdings.')
+      } catch (err) {
+        if (!cancelled && id === requestId.current) {
+          setItems([])
+          setError(errorMessage(err))
+        }
+      } finally {
+        if (!cancelled && id === requestId.current) setLoading(false)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [symbolKey, providerKey, tick])
+
+  // Quarter-hourly is plenty for headlines, and only while the tab is visible.
+  useEffect(() => {
+    if (!symbolKey || !supported) return
+    const timer = window.setInterval(() => {
+      if (!document.hidden) refresh()
+    }, 900_000)
+    return () => clearInterval(timer)
+  }, [symbolKey, supported, refresh])
+
+  return { items, loading, error, supported, fetchedAt, refresh }
 }

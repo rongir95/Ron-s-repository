@@ -157,6 +157,16 @@ value, total invested, best and worst performer, an allocation pie broken down
 by stock, value-versus-invested over time (1M–5Y), return by holding, and a
 money-weighted annualised return.
 
+**News:** headlines for your holdings, newest first, each tagged with the
+holding(s) it concerns in that holding's own chart colour, filterable by ticker.
+A story returned for several of your tickers appears once with both tags rather
+than twice. Fetched from the same Yahoo search endpoint used for symbol lookup —
+so it works over either Yahoo transport, is refreshed every 15 minutes rather
+than every minute, and is capped at eight holdings per fetch. Twelve Data has no
+news endpoint, and the panel says so instead of sitting empty; the demo
+provider's sample headlines are deliberately generic, labelled as not real, and
+never rendered as links.
+
 **Across portfolios:** an "All portfolios" panel listing every portfolio's
 value, invested, profit/loss and return side by side — the view for whoever
 manages more than one — with the same figures in the portfolio switcher.
