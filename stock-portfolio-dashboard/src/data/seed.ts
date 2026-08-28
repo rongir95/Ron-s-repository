@@ -4,10 +4,20 @@
  * dropped the moment a portfolio is edited, and Settings → "Start fresh"
  * removes them entirely.
  */
-import type { AppData, Portfolio } from '../types'
+import type { AppData, Portfolio, ProviderId } from '../types'
+
+/**
+ * Which provider a fresh install starts on. Yahoo Finance everywhere except the
+ * standalone single-file build, which has no /yf proxy to reach it through and
+ * so ships defaulted to offline demo prices. Settings overrides this at any time.
+ */
+function defaultProvider(): ProviderId {
+  const configured = import.meta.env.VITE_DEFAULT_PROVIDER
+  return configured === 'demo' || configured === 'twelvedata' ? configured : 'yahoo'
+}
 
 export const DEFAULT_SETTINGS: AppData['settings'] = {
-  providerId: 'yahoo',
+  providerId: defaultProvider(),
   twelveDataKey: '',
   theme: 'system',
   refreshSeconds: 60,

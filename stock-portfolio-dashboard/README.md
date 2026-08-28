@@ -15,19 +15,34 @@ and persisted in **localStorage** — there is no backend and no account.
 
 ## Running it
 
+**With live prices** — the way to actually use it:
+
 ```bash
 cd stock-portfolio-dashboard
 npm install
 npm run dev          # http://localhost:5173
 ```
 
+That is the only mode that reaches Yahoo Finance, because the dev server carries
+the `/yf` proxy it needs (see *Market data* below). Deploying to Vercel or
+Netlify gives the same thing at a shareable URL — both config files are
+committed.
+
+**Without installing anything** — `portfolio-dashboard.standalone.html` at the
+root of this folder is the whole app inlined into one file. Double-click it and
+it opens in any browser, offline. A `file://` page cannot proxy `/yf`, so it
+starts on offline demo prices; Settings → *Twelve Data* plus a free API key gives
+it real prices, since that provider is callable straight from the browser.
+Rebuild it with `npm run build:standalone`.
+
 Other scripts:
 
 ```bash
-npm run build        # type-check + production build to dist/
-npm run preview      # serve the production build (proxy included)
-npm run typecheck    # type-check only
-npm test             # unit checks for the portfolio maths
+npm run build             # type-check + production build to dist/
+npm run build:standalone  # build + inline everything into one HTML file
+npm run preview           # serve the production build (proxy included)
+npm run typecheck         # type-check only
+npm test                  # unit checks for the portfolio maths
 ```
 
 ---
@@ -262,3 +277,12 @@ npm run build     # -> dist/
 
 On any other static host, expect to switch the data source to Twelve Data in
 Settings, since `/yf` will not be proxied.
+
+### Which mode gives what
+
+| | Live prices | Needs an API key | Setup |
+|---|---|---|---|
+| `npm run dev` / `npm run preview` | ✅ Yahoo | no | `npm install` |
+| Vercel / Netlify deploy | ✅ Yahoo | no | push; configs committed |
+| `portfolio-dashboard.standalone.html` | via Twelve Data | free key | none — double-click |
+| Other static host | via Twelve Data | free key | upload `dist/` |

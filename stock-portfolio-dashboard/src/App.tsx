@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PortfolioSwitcher } from './components/PortfolioSwitcher'
 import { Button, Chip } from './components/ui'
 import { relativeTime } from './lib/format'
@@ -14,11 +14,22 @@ function Shell() {
   const [view, setView] = useState<View>('dashboard')
   const { quotes, fxRates, loading, error, lastUpdated, marketOpen, refresh } = useQuotes()
 
-  // Theme: "system" leaves the attribute off so the media query decides.
+  // Theme: an explicit choice stamps data-theme on the root element; "system"
+  // leaves the media query to decide. We only ever clear a stamp we set
+  // ourselves — when this page is embedded, the host may stamp its own theme,
+  // and "system" should defer to it rather than fight it.
+  const stampedTheme = useRef(false)
   useEffect(() => {
     const root = document.documentElement
-    if (settings.theme === 'system') root.removeAttribute('data-theme')
-    else root.setAttribute('data-theme', settings.theme)
+    if (settings.theme === 'system') {
+      if (stampedTheme.current) {
+        root.removeAttribute('data-theme')
+        stampedTheme.current = false
+      }
+      return
+    }
+    root.setAttribute('data-theme', settings.theme)
+    stampedTheme.current = true
   }, [settings.theme])
 
   // A ticking clock so "updated 12s ago" stays honest without a re-fetch.
