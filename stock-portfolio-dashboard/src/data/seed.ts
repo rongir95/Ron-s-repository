@@ -7,13 +7,16 @@
 import type { AppData, Portfolio, ProviderId } from '../types'
 
 /**
- * Which provider a fresh install starts on. Yahoo Finance everywhere except the
- * standalone single-file build, which has no /yf proxy to reach it through and
- * so ships defaulted to offline demo prices. Settings overrides this at any time.
+ * Which provider a fresh install starts on. Yahoo Finance over the app's own
+ * proxy everywhere except the standalone single-file build, which has no proxy
+ * to reach it through and so ships defaulted to the public-relay variant of the
+ * same source. Settings overrides this at any time.
  */
 function defaultProvider(): ProviderId {
   const configured = import.meta.env.VITE_DEFAULT_PROVIDER
-  return configured === 'demo' || configured === 'twelvedata' ? configured : 'yahoo'
+  return configured === 'demo' || configured === 'twelvedata' || configured === 'yahoo-relay'
+    ? configured
+    : 'yahoo'
 }
 
 export const DEFAULT_SETTINGS: AppData['settings'] = {

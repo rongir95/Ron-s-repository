@@ -55,7 +55,7 @@ export interface Portfolio {
   createdAt: string
 }
 
-export type ProviderId = 'yahoo' | 'twelvedata' | 'demo'
+export type ProviderId = 'yahoo' | 'yahoo-relay' | 'twelvedata' | 'demo'
 
 export interface Settings {
   providerId: ProviderId

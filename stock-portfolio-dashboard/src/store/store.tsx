@@ -134,7 +134,7 @@ export function normalise(raw: unknown): AppData | null {
   if (!portfolios.length) return null
 
   const settings: Settings = { ...DEFAULT_SETTINGS, ...(input.settings ?? {}) }
-  if (!['yahoo', 'twelvedata', 'demo'].includes(settings.providerId)) settings.providerId = 'yahoo'
+  if (!['yahoo', 'yahoo-relay', 'twelvedata', 'demo'].includes(settings.providerId)) settings.providerId = 'yahoo'
   if (!['system', 'light', 'dark'].includes(settings.theme)) settings.theme = 'system'
   settings.refreshSeconds = [0, 30, 60, 300, 900].includes(settings.refreshSeconds)
     ? settings.refreshSeconds

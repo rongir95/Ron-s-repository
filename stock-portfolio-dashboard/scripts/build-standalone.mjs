@@ -2,10 +2,12 @@
 // inlining the JS and CSS. The result can be opened straight from disk — no
 // server, no install.
 //
-// A file:// page cannot proxy /yf, so Yahoo Finance is unreachable from the
-// standalone build; it is therefore built with VITE_DEFAULT_PROVIDER=demo and
-// opens on offline demo prices. Settings → Twelve Data (free API key) gives it
-// real prices, since that provider is callable directly from the browser.
+// A file:// page cannot proxy /yf, so Yahoo Finance is not reachable directly
+// from the standalone build. It is therefore built with
+// VITE_DEFAULT_PROVIDER=yahoo-relay, which fetches the same Yahoo prices through
+// a public CORS relay — no key, no deploy. If the relays are down, Settings
+// offers Twelve Data (free key, callable straight from the browser) and offline
+// demo data.
 //
 // Usage: npm run build:standalone
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs'

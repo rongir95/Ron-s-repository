@@ -30,9 +30,10 @@ committed.
 
 **Without installing anything** — `portfolio-dashboard.standalone.html` at the
 root of this folder is the whole app inlined into one file. Double-click it and
-it opens in any browser, offline. A `file://` page cannot proxy `/yf`, so it
-starts on offline demo prices; Settings → *Twelve Data* plus a free API key gives
-it real prices, since that provider is callable straight from the browser.
+it opens in any browser. A `file://` page cannot proxy `/yf`, so it ships
+defaulted to **Yahoo via a public relay**: live Yahoo prices, no key, no deploy.
+Press Settings → *Check the connection → Test* to confirm it is working; if the
+relays are down, Settings offers Twelve Data (free key) and offline demo data.
 Rebuild it with `npm run build:standalone`.
 
 Other scripts:
@@ -81,14 +82,30 @@ a same-origin URL and needs no key anywhere.
 There is no serverless function to maintain, and the same client code runs in
 all three.
 
+### The two Yahoo transports
+
+Yahoo is the same data either way; what differs is how the browser is permitted
+to reach it, since its endpoints send no CORS headers:
+
+- **Yahoo Finance** (default) — same-origin through the app's own `/yf` proxy.
+  Nothing goes to a third party. Requires the app to be served by the dev
+  server, `vite preview`, or a Vercel/Netlify deploy.
+- **Yahoo Finance via a public relay** — the request is passed through a free
+  public CORS relay, which supplies the missing header. No key and no deploy, so
+  it works from a plain static host or a file opened straight from disk. Three
+  relays are tried in turn, because free ones come and go. The trade: a third
+  party sees the request (ticker symbols only — no holdings, amounts or
+  credentials) and there is no uptime promise. This is what the standalone
+  single-file build ships defaulted to.
+
 ### Update frequency — what "real-time" actually means here
 
 There is no genuinely real-time free stock API; every free tier is either
 snapshot-polled or exchange-delayed. What this dashboard does:
 
-- **Yahoo Finance (default)** — the live consolidated price for US listings,
-  typically **under a minute** behind the tape. Some non-US exchanges impose
-  their own delay, commonly 15 minutes.
+- **Yahoo Finance (default, and via the relay)** — the live consolidated price
+  for US listings, typically **under a minute** behind the tape. Some non-US
+  exchanges impose their own delay, commonly 15 minutes.
 - **Twelve Data** — real-time for US listings on the free plan; other venues may
   be delayed by the exchange.
 - **Demo data** — synthetic, generated in the browser. Nothing is fetched.
@@ -338,7 +355,9 @@ Settings, since `/yf` will not be proxied.
 
 | | Live prices | Needs an API key | Setup |
 |---|---|---|---|
-| `npm run dev` / `npm run preview` | ✅ Yahoo | no | `npm install` |
-| Vercel / Netlify deploy | ✅ Yahoo | no | push; configs committed |
-| `portfolio-dashboard.standalone.html` | via Twelve Data | free key | none — double-click |
-| Other static host | via Twelve Data | free key | upload `dist/` |
+| `npm run dev` / `npm run preview` | ✅ Yahoo, via own proxy | no | `npm install` |
+| Vercel / Netlify deploy | ✅ Yahoo, via own proxy | no | push; configs committed |
+| `portfolio-dashboard.standalone.html` | ✅ Yahoo, via public relay | no | none — double-click |
+| Other static host | ✅ Yahoo, via public relay | no | upload `dist/` |
+| Any of the above, relays down | ✅ Twelve Data | free key | paste key in Settings |
+| A published/hosted preview page | ❌ none possible | — | sandboxed, no network |
