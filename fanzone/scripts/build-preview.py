@@ -4,9 +4,9 @@ images and an animated WebP loop of the match inlined) for quick in-app preview.
 import base64, mimetypes, pathlib, re, subprocess, tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-CLIP_SECONDS = 10
-LOOP_FPS = 8
-LOOP_WIDTH = 480
+CLIP_SECONDS = 6
+LOOP_FPS = 10
+LOOP_WIDTH = 720
 
 def data_uri(path: pathlib.Path) -> str:
     mime = mimetypes.guess_type(path.name)[0] or ('font/woff2' if path.suffix == '.woff2' else 'application/octet-stream')
@@ -26,8 +26,8 @@ with tempfile.TemporaryDirectory() as tmp:
     loop = pathlib.Path(tmp) / 'loop.webp'
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-ss', '2', '-t', str(CLIP_SECONDS),
                     '-i', str(ROOT / 'assets/video/match-bg.mp4'), '-an',
-                    '-vf', f'fps={LOOP_FPS},scale={LOOP_WIDTH}:-2', '-c:v', 'libwebp_anim',
-                    '-loop', '0', '-q:v', '35', '-compression_level', '6', str(loop)], check=True)
+                    '-vf', f'fps={LOOP_FPS},scale={LOOP_WIDTH}:-2:flags=lanczos', '-c:v', 'libwebp_anim',
+                    '-loop', '0', '-q:v', '80', '-compression_level', '6', str(loop)], check=True)
     html = re.sub(r'<video [^>]*></video>',
                   f'<img class="video-loop" src="{data_uri(loop)}" alt="Live match">', html)
     css = inline_assets((ROOT / 'styles.css').read_text())

@@ -77,8 +77,8 @@
   // ---------- Scale the phone (1288×596 stage + frame) to fit the window ----------
   const phone = $('phone');
   function fit() {
-    const margin = 48;
-    const s = Math.min((window.innerWidth - margin) / phone.offsetWidth, (window.innerHeight - margin) / phone.offsetHeight);
+    const SIZE = 0.78; // share of the window the phone may fill
+    const s = SIZE * Math.min(window.innerWidth / phone.offsetWidth, window.innerHeight / phone.offsetHeight);
     phone.style.transform = `scale(${s})`;
   }
   window.addEventListener('resize', fit);
