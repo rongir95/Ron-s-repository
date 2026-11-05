@@ -4,7 +4,7 @@ images and a short, compressed video clip inlined) for quick in-app preview."""
 import base64, mimetypes, pathlib, re, subprocess, tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-CLIP_SECONDS = 45
+CLIP_SECONDS = 12
 
 def data_uri(path: pathlib.Path) -> str:
     mime = mimetypes.guess_type(path.name)[0] or ('font/woff2' if path.suffix == '.woff2' else 'application/octet-stream')
@@ -22,8 +22,8 @@ def inline_assets(text: str, clip: pathlib.Path) -> str:
 with tempfile.TemporaryDirectory() as tmp:
     clip = pathlib.Path(tmp) / 'clip.mp4'
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(ROOT / 'assets/video/match-bg.mp4'),
-                    '-t', str(CLIP_SECONDS), '-an', '-vf', 'scale=854:-2', '-c:v', 'libx264',
-                    '-crf', '30', '-preset', 'slow', '-movflags', '+faststart', str(clip)], check=True)
+                    '-t', str(CLIP_SECONDS), '-an', '-vf', 'scale=640:-2', '-c:v', 'libx264',
+                    '-crf', '34', '-preset', 'slow', '-movflags', '+faststart', str(clip)], check=True)
     html = (ROOT / 'index.html').read_text()
     css = inline_assets((ROOT / 'styles.css').read_text(), clip)
     js = inline_assets((ROOT / 'app.js').read_text(), clip)
