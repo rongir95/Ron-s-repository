@@ -84,10 +84,17 @@
   window.addEventListener('resize', fit);
   fit();
 
-  // ---------- Video: make sure it autoplays muted ----------
+  // ---------- Video: autoplays muted and never stays paused ----------
   const video = stage.querySelector('video');
-  video.muted = true;
-  video.play().catch(() => {});
+  if (video) {
+    video.muted = true;
+    const keepPlaying = () => { if (video.paused) video.play().catch(() => {}); };
+    keepPlaying();
+    ['pause', 'ended', 'stalled', 'canplay'].forEach((e) => video.addEventListener(e, keepPlaying));
+    document.addEventListener('visibilitychange', keepPlaying);
+    ['pointerdown', 'keydown'].forEach((e) => document.addEventListener(e, keepPlaying, { once: true }));
+    setInterval(keepPlaying, 2000);
+  }
 
   // ---------- Panel open / close ----------
   let seen = false;

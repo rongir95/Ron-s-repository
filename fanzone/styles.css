@@ -56,7 +56,7 @@ button { font-family: inherit; cursor: pointer; color: inherit; }
   transition: left .35s ease, top .35s ease, width .35s ease, height .35s ease, border-radius .35s ease;
 }
 .stage.is-open .video { left: 20px; top: 75px; width: 797px; height: 446px; border-radius: 12px; }
-.video video { display: block; background: #12301C center / cover no-repeat; width: 100%; height: 100%; object-fit: cover; }
+.video video, .video .video-loop { display: block; background: #12301C center / cover no-repeat; width: 100%; height: 100%; object-fit: cover; }
 .broadcaster { position: absolute; top: 24px; right: 32px; display: block; }
 
 /* ---------- Launcher ---------- */
