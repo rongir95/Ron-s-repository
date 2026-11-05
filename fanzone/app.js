@@ -74,10 +74,12 @@
   const optionsEl = $('options');
   const votesLabel = $('votesLabel');
 
-  // ---------- Scale the 1288×596 stage to fit the window ----------
+  // ---------- Scale the phone (1288×596 stage + frame) to fit the window ----------
+  const phone = $('phone');
   function fit() {
-    const s = Math.min(window.innerWidth / 1288, window.innerHeight / 596);
-    stage.style.transform = `scale(${s})`;
+    const margin = 48;
+    const s = Math.min((window.innerWidth - margin) / phone.offsetWidth, (window.innerHeight - margin) / phone.offsetHeight);
+    phone.style.transform = `scale(${s})`;
   }
   window.addEventListener('resize', fit);
   fit();

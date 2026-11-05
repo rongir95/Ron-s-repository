@@ -27,9 +27,27 @@ body { margin: 0; background: var(--bg); font-family: 'DAZN Oscine', system-ui, 
 button { font-family: inherit; cursor: pointer; color: inherit; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* ---------- Stage (1288×596, scaled to fit by app.js) ---------- */
-.viewport { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.stage { position: relative; flex-shrink: 0; width: 1288px; height: 596px; overflow: hidden; background: var(--bg); transform-origin: center; }
+/* ---------- Phone frame (scaled to fit by app.js) ---------- */
+.viewport {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: radial-gradient(ellipse at center, #2A323B 0%, #0D1217 70%);
+}
+.phone {
+  position: relative; flex-shrink: 0; padding: 20px; border-radius: 68px;
+  background: #050709; transform-origin: center;
+  box-shadow: 0 0 0 2px #3A424B, 0 0 0 7px #161B21, 0 0 0 8px #4A535C, 0 40px 90px rgba(0, 0, 0, .7);
+}
+/* Side buttons (top edge in landscape) */
+.phone::before, .phone::after { content: ''; position: absolute; top: -12px; height: 5px; border-radius: 3px 3px 0 0; background: #2C333B; }
+.phone::before { left: 190px; width: 70px; }
+.phone::after { left: 280px; width: 70px; }
+.phone-camera {
+  position: absolute; left: 7px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%;
+  background: #1A2129; box-shadow: inset 0 0 0 2px #0B0F13;
+}
+
+/* ---------- Stage (1288×596) ---------- */
+.stage { position: relative; width: 1288px; height: 596px; overflow: hidden; background: var(--bg); border-radius: 48px; }
 
 /* ---------- Video ---------- */
 .video {
@@ -38,7 +56,7 @@ button { font-family: inherit; cursor: pointer; color: inherit; }
   transition: left .35s ease, top .35s ease, width .35s ease, height .35s ease, border-radius .35s ease;
 }
 .stage.is-open .video { left: 20px; top: 75px; width: 797px; height: 446px; border-radius: 12px; }
-.video video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.video video { display: block; background: #12301C center / cover no-repeat; width: 100%; height: 100%; object-fit: cover; }
 .broadcaster { position: absolute; top: 24px; right: 32px; display: block; }
 
 /* ---------- Launcher ---------- */
