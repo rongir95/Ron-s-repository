@@ -1,4 +1,4 @@
-<title>בית אלמוגרין A-1</title>
+<title>בית גירשביץ׳</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -118,13 +118,13 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 <div class="loading" id="loading">בונה את הבית…</div>
 
 <header class="brand panel">
-  <div class="eyebrow">אלמוגרין · יקנעם</div>
-  <h1>בית דו-משפחתי <span class="tag">A-1</span></h1>
-  <div class="sub">דירה 29 · קוטג׳ בשתי קומות עם חצר צמודה</div>
+  <div class="eyebrow">יקנעם · דגם A-1</div>
+  <h1>בית גירשביץ׳</h1>
+  <div class="sub">דירה 29 · בית דו-משפחתי בשתי קומות עם חצר צמודה</div>
   <div class="stats">
     <div class="stat"><b id="sG">—</b><span>קומת קרקע, מ״ר</span></div>
     <div class="stat"><b id="sF">—</b><span>קומה א׳, מ״ר</span></div>
-    <div class="stat"><b>5</b><span>חדרי שינה</span></div>
+    <div class="stat"><b>4</b><span>חדרי שינה</span></div>
     <div class="stat"><b>3</b><span>חדרי רחצה</span></div>
   </div>
 </header>
@@ -559,12 +559,12 @@ const OPS1 = {
   7: [W(139, 100, 120, 210), W(324, 60, 140, 210)], // bathroom and en-suite, onto the laundry screen
 };
 const ROOMS = [
-  { id: 'living', f: 0, name: 'חדר דיור ופינת אוכל', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', note: 'חלל פתוח עם דלת הזזה רחבה אל המשטח המרוצף והחצר הצמודה.' },
-  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'מטבח פתוח לפינת האוכל, עם אי ישיבה וחלון מעל הכיור.' },
-  { id: 'storage', f: 0, name: 'פינה (לשעבר מחסן)', dims: [160, 245], rect: [75, 47, 270, 295], mat: 'tile', note: 'קירות המחסן נהרסו והשטח צורף לחלל המגורים. במקום דלת המחסן הותקן חלון.' },
+  { id: 'living', f: 0, name: 'חדר דיור', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', note: 'חלל פתוח עם דלת הזזה רחבה אל המשטח המרוצף והחצר הצמודה.' },
+  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'מטבח פתוח בצורת L: אי, ומשטח ניצב לו שממשיך לכיוון הסלון עם כיסאות בר. חלון מעל הכיור.' },
+  { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [75, 47, 270, 295], mat: 'tile', note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
   { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
   { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [302, 836, 444, 979], mat: 'bath', note: 'שירותים וכיור לאורחים, עם חלון אוורור.' },
-  { id: 'mamad', f: 0, name: 'חדר שינה 5 · ממ״ד', dims: [315, 305], rect: [465, 640, 780, 973], mat: 'parquet', note: 'מרחב מוגן דירתי מבטון מזוין. הכניסה אליו מהמעבר שמתחת למדרגות.' },
+  { id: 'mamad', f: 0, name: 'ממ״ד · חדר אחסון', dims: [315, 305], rect: [465, 640, 780, 973], mat: 'tile', note: 'מרחב מוגן דירתי מבטון מזוין שמשמש כחדר אחסון, עם מדפים לאורך הקירות. הכניסה מהמעבר שמתחת למדרגות.' },
   { id: 'bed1', f: 1, name: 'חדר שינה 1 · הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'parquet', note: 'יחידת הורים עם חדר רחצה צמוד ומלתחה.' },
   { id: 'bed2', f: 1, name: 'חדר שינה 2', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'parquet', note: 'חלון לכיוון החצר.' },
   { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [16, 321, 188, 490], mat: 'bath', note: 'מקלחון, אסלה וכיור, נגיש מחדר ההורים.' },
@@ -724,12 +724,8 @@ function desk(p, base, r, chairAt, faceTo) {
   RB(p, 600, 190, 690, 280, 30, 40, M.walnut, b, .02); B(p, 615, 205, 675, 265, 0, 30, M.black, b);
   RB(p, 640, 340, 710, 405, 8, 40, M.fabric2, b, .04); RB(p, 640, 390, 710, 408, 38, 78, M.fabric2, b, .04);
   B(p, 738, 140, 778, 340, 0, 48, M.oak, b); B(p, 773, 165, 778, 315, 85, 165, M.black, b);
-  plant(p, b, 755, 70, 1.6); plant(p, b, 290, 405, 1.1);
+  plant(p, b, 755, 70, 1.6); plant(p, b, 762, 400, 1.1);
   CY(p, 490, 380, 2, 0, 160, M.black, b); CY(p, 490, 380, 18, 150, 175, M.linen, b, 20, 12);
-  // dining
-  CY(p, 365, 215, 62, 72, 76, M.oak, b, 40); CY(p, 365, 215, 5, 0, 72, M.black, b); CY(p, 365, 215, 26, 0, 3, M.black, b);
-  for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + Math.PI / 4; chair(p, b, 365 + Math.cos(a) * 82, 215 + Math.sin(a) * 82, 365, 215); }
-  CY(p, 365, 215, 24, 205, 232, M.black, b, 24, 6); CY(p, 365, 215, .6, 232, 280, M.black, b, 6);
   // kitchen
   B(p, 16, 320, 76, 699, 10, 88, M.cabinet, b); B(p, 16, 318, 79, 699, 88, 92, M.quartz, b);
   B(p, 76, 640, 186, 699, 10, 88, M.cabinet, b); B(p, 76, 637, 186, 699, 88, 92, M.quartz, b);
@@ -738,21 +734,42 @@ function desk(p, base, r, chairAt, faceTo) {
   CY(p, 22, 505, 1.5, 92, 125, M.steel, b, 8);
   B(p, 190, 630, 290, 699, 0, 218, M.cabinetDark, b); B(p, 212, 628, 268, 630, 110, 160, M.black, b);
   B(p, 196, 382, 268, 538, 0, 88, M.cabinetDark, b); B(p, 190, 376, 284, 544, 88, 93, M.quartz, b);
-  for (let i = 0; i < 3; i++) { CY(p, 300, 410 + i * 55, 17, 64, 68, M.oak, b); CY(p, 300, 410 + i * 55, 2.5, 0, 64, M.black, b, 8); CY(p, 300, 410 + i * 55, 15, 0, 2, M.black, b); }
-  for (let i = 0; i < 3; i++) { CY(p, 230, 405 + i * 55, 10, 175, 195, M.black, b, 18, 5); CY(p, 230, 405 + i * 55, .5, 195, 280, M.black, b, 6); }
+  // kitchen arm perpendicular to the island, reaching towards the living room (L-shape)
+  B(p, 268, 382, 412, 442, 0, 88, M.cabinetDark, b); B(p, 284, 376, 418, 448, 88, 93, M.quartz, b);
+  for (const x of [305, 350, 395]) { CY(p, x, 350, 17, 64, 68, M.oak, b); CY(p, x, 350, 2.5, 0, 64, M.black, b, 8); CY(p, x, 350, 15, 0, 2, M.black, b); }
+  for (const [x, y] of [[230, 440], [300, 410], [370, 410]]) { CY(p, x, y, 10, 175, 195, M.black, b, 18, 5); CY(p, x, y, .5, 195, 280, M.black, b, 6); }
 
-  // reading corner in the former storage room
-  RB(p, 95, 60, 165, 130, 8, 42, M.fabric2, b, .04); RB(p, 95, 60, 113, 130, 40, 82, M.fabric2, b, .04);
-  CY(p, 130, 165, 22, 0, 50, M.oak, b, 24); B(p, 85, 230, 125, 290, 0, 180, M.oak, b);
-  plant(p, b, 225, 75, 1.3);
+  // dining corner in the former storage room: rectangular table for six
+  B(p, 128, 80, 218, 260, 72, 76, M.oak, b);
+  for (const [x, y] of [[134, 86], [212, 86], [134, 254], [212, 254]]) B(p, x - 3, y - 3, x + 3, y + 3, 0, 72, M.black, b);
+  for (const y of [115, 170, 225]) { chair(p, b, 103, y, 173, y); chair(p, b, 243, y, 173, y); }
+  B(p, 133, 168, 213, 172, 210, 214, M.black, b); CY(p, 173, 170, .6, 214, 280, M.black, b, 6);
+  for (const y of [120, 170, 220]) CY(p, 173, y, 12, 185, 205, M.black, b, 18, 6);
   // foyer
   B(p, 305, 700, 340, 812, 0, 95, M.oak, b); plant(p, b, 425, 650, .9);
   // guest wc
   toilet(p, b, 333, 950, 333, 850); vanity(p, b, [390, 945, 442, 979], [416, 962]);
-  // mamad
-  bed(p, b, [470, 880, 670, 972], 'W', M.duvetC);
-  wardrobe(p, b, [738, 642, 780, 862], false);
-  desk(p, b, [610, 648, 730, 708], [670, 735], [670, 650]);
+  // safe room used as a storage room: metal shelving along the side walls, window kept clear
+  const box = std({ color: 0xc39a6b, roughness: .95 }), bin = std({ color: 0x5f7f99, roughness: .6 });
+  const shelving = (X0, Y0, X1, Y1) => {
+    const alongY = (Y1 - Y0) > (X1 - X0);
+    for (const z of [8, 50, 92, 134, 176]) B(p, X0, Y0, X1, Y1, z, z + 2.5, M.steel, b);
+    for (const [x, y] of [[X0, Y0], [X1, Y0], [X0, Y1], [X1, Y1]]) B(p, x - 1.5, y - 1.5, x + 1.5, y + 1.5, 0, 200, M.alu, b);
+    for (const z of [10.5, 52.5, 94.5, 136.5]) {
+      let t = (alongY ? Y0 : X0) + 3; const end = (alongY ? Y1 : X1) - 3;
+      while (t < end - 25) {
+        const len = 28 + rnd() * 22, hgt = 22 + rnd() * 14, m = rnd() > .35 ? box : bin;
+        if (alongY) B(p, X0 + 3, t, X1 - 3, Math.min(t + len, end), z, z + hgt, m, b);
+        else B(p, t, Y0 + 3, Math.min(t + len, end), Y1 - 3, z, z + hgt, m, b);
+        t += len + 4 + rnd() * 6;
+      }
+    }
+  };
+  shelving(735, 650, 778, 960);
+  shelving(468, 700, 512, 960);
+  shelving(620, 650, 728, 692);
+  for (const [x, y, w, d, h] of [[560, 860, 50, 40, 40], [565, 865, 40, 32, 34], [640, 820, 60, 45, 45]]) B(p, x, y, x + w, y + d, h === 34 ? 40 : 0, h === 34 ? 74 : h, box, b);
+  RB(p, 660, 900, 700, 960, 0, 65, M.black, b, .04);
 }
 
 /* first floor furniture */
