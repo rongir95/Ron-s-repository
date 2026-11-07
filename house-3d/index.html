@@ -937,19 +937,19 @@ function desk(p, base, r, chairAt, faceTo) {
   for (const [x, h, m] of [[545, 10, M.pot], [610, 6, M.black], [640, 12, M.linen], [690, 9, M.duvetD]]) B(p, x, 60, x + 12, 75, 28, 28 + h, m, b);
   B(p, 718, 55, 735, 72, 62, 92, M.linen, b);
   // dark wood wine cabinet in the north-east corner
-  B(p, 742, 49, 778, 96, 0, 140, M.espresso, b);
-  B(p, 741.5, 52, 742, 93, 82, 136, M.glass, b);
-  for (let z = 10; z < 78; z += 11) B(p, 741.3, 52, 742, 93, z, z + 1.2, M.black, b);
-  for (let y = 54; y < 94; y += 10) B(p, 741.3, y, 742, y + 1.2, 8, 78, M.black, b);
-  B(p, 752, 60, 770, 80, 140, 162, M.black, b); B(p, 751.5, 63, 752, 77, 143, 159, M.duvetC, b);
+  B(p, 742, 132, 778, 179, 0, 140, M.espresso, b);
+  B(p, 741.5, 135, 742, 176, 82, 136, M.glass, b);
+  for (let z = 10; z < 78; z += 11) B(p, 741.3, 135, 742, 176, z, z + 1.2, M.black, b);
+  for (let y = 137; y < 177; y += 10) B(p, 741.3, y, 742, y + 1.2, 8, 78, M.black, b);
+  B(p, 752, 143, 770, 163, 140, 162, M.black, b); B(p, 751.5, 146, 752, 160, 143, 159, M.duvetC, b);
   // beige leather L-sectional: long side against the party wall, return along the south facing the garden
-  RB(p, 690, 110, 778, 420, 8, 42, M.leather, b, .04); RB(p, 756, 110, 778, 420, 40, 84, M.leather, b, .05);
-  RB(p, 690, 110, 756, 132, 40, 60, M.leather, b, .04);
+  RB(p, 690, 195, 778, 420, 8, 42, M.leather, b, .04); RB(p, 756, 195, 778, 420, 40, 84, M.leather, b, .05);
+  RB(p, 690, 195, 756, 217, 40, 60, M.leather, b, .04);
   RB(p, 530, 334, 690, 420, 8, 42, M.leather, b, .04); RB(p, 530, 398, 756, 420, 40, 84, M.leather, b, .05);
-  for (let k = 0; k < 4; k++) RB(p, 695, 135 + k * 62, 752, 193 + k * 62, 42, 50, M.leather, b, .04);
+  for (let k = 0; k < 2; k++) RB(p, 695, 220 + k * 59, 752, 275 + k * 59, 42, 50, M.leather, b, .04);
   for (let k = 0; k < 3; k++) RB(p, 535 + k * 52, 338, 583 + k * 52, 396, 42, 50, M.leather, b, .04);
-  for (let k = 0; k < 4; k++) RB(p, 760, 140 + k * 60, 774, 190 + k * 60, 78, 98, M.leather, b, .04);
-  RB(p, 735, 140, 754, 166, 48, 72, M.duvetB, b, .05); RB(p, 735, 370, 754, 396, 48, 72, M.duvetD, b, .05);
+  for (let k = 0; k < 3; k++) RB(p, 760, 222 + k * 60, 774, 272 + k * 60, 78, 98, M.leather, b, .04);
+  RB(p, 735, 222, 754, 248, 48, 72, M.duvetB, b, .05); RB(p, 735, 370, 754, 396, 48, 72, M.duvetD, b, .05);
   // white gloss square coffee table, two tiers
   RB(p, 565, 185, 665, 285, 22, 34, M.white, b, .015); B(p, 575, 195, 655, 275, 0, 22, M.white, b);
   // champagne pendant over the coffee table
