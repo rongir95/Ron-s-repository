@@ -445,6 +445,48 @@ T.mosaic = canvasTex(256, (g, s) => {
   const n = 16, t = s / n; g.fillStyle = '#c8ccc8'; g.fillRect(0, 0, s, s);
   for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { const r = rnd(); g.fillStyle = r < .3 ? hsl(160, 12, 40 + rnd() * 12) : r < .6 ? hsl(200, 6, 62 + rnd() * 12) : hsl(90, 8, 80 + rnd() * 10); g.fillRect(i * t + 1, j * t + 1, t - 2, t - 2); }
 }, 0.4);
+const lamTex = (hue, sat, light, vary) => canvasTex(512, (g, s) => {
+  const pw = s / 6;
+  for (let r = 0; r < 6; r++) {
+    let x = -rnd() * 300;
+    while (x < s) {
+      const len = 260 + rnd() * 220, col = hsl(hue + rnd() * 6, sat + rnd() * 6, light + (rnd() - .5) * vary);
+      for (const off of [0, -s]) {
+        g.fillStyle = col; g.fillRect(x + off, r * pw, len, pw);
+        g.strokeStyle = 'rgba(30,20,10,.16)'; for (let k = 0; k < 6; k++) { g.beginPath(); const yy = r * pw + rnd() * pw; g.moveTo(x + off, yy); g.bezierCurveTo(x + off + len * .3, yy + rnd() * 8 - 4, x + off + len * .7, yy + rnd() * 8 - 4, x + off + len, yy); g.stroke(); }
+        g.fillStyle = 'rgba(20,12,5,.4)'; g.fillRect(x + off, r * pw, 1.5, pw);
+      }
+      x += len;
+    }
+    g.fillStyle = 'rgba(20,12,5,.35)'; g.fillRect(0, r * pw, s, 1.2);
+  }
+}, 1.2);
+T.lamDark = lamTex(26, 14, 26, 6);     // Mark's room: dark brown
+T.lamGrey = lamTex(30, 6, 30, 12);     // Ron's room: dark grey-brown, streaky
+T.lamOak = lamTex(30, 50, 50, 8);      // Guy's room: warm oak
+// tropical beach wall murals (Mark's and Ron's rooms)
+const muralTex = (palms) => {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 768; const g = c.getContext('2d'), W = 1024, H = 768;
+  let gr = g.createLinearGradient(0, 0, 0, H * .62); gr.addColorStop(0, '#1f6fc4'); gr.addColorStop(1, '#8cc6ef'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 9; i++) { g.fillStyle = 'rgba(255,255,255,.85)'; const x = rnd() * W, y = H * (.45 + rnd() * .15); for (let k = 0; k < 5; k++) { g.beginPath(); g.arc(x + k * 16, y - (k % 2) * 8, 14 + rnd() * 10, 0, 6.3); g.fill(); } }
+  gr = g.createLinearGradient(0, H * .62, 0, H * .74); gr.addColorStop(0, '#18a6b5'); gr.addColorStop(1, '#7fd8cf'); g.fillStyle = gr; g.fillRect(0, H * .62, W, H * .12);
+  g.fillStyle = '#e8d6a8'; g.fillRect(0, H * .74, W, H * .26);
+  g.fillStyle = '#3d6b2e'; for (let x = 0; x < W; x += 6) g.fillRect(x, H * .62 - 4 - rnd() * 14, 6, 18);
+  for (const [bx, lean, hgt] of palms) {
+    g.strokeStyle = '#7a5a36'; g.lineWidth = 18; g.lineCap = 'round';
+    const tx = bx + lean, ty = H * (1 - hgt);
+    g.beginPath(); g.moveTo(bx, H * .92); g.quadraticCurveTo(bx + lean * .2, H * .6, tx, ty); g.stroke();
+    for (let k = 0; k < 11; k++) {
+      const a = k / 11 * Math.PI * 2 + rnd() * .3, L = 120 + rnd() * 80;
+      g.strokeStyle = hsl(100 + rnd() * 20, 55, 28 + rnd() * 18); g.lineWidth = 10;
+      g.beginPath(); g.moveTo(tx, ty); g.quadraticCurveTo(tx + Math.cos(a) * L * .6, ty + Math.sin(a) * L * .3 - 30, tx + Math.cos(a) * L, ty + Math.abs(Math.sin(a)) * L * .55 + 20); g.stroke();
+    }
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+};
+T.muralMark = muralTex([[120, 160, .82], [380, 260, .9], [700, -60, .7], [900, 40, .78]]);
+T.muralRon = muralTex([[260, 140, .88], [560, 120, .84], [880, -30, .6]]);
+T.concrete2 = canvasTex(256, (g, s) => { g.fillStyle = '#b9b7b2'; g.fillRect(0, 0, s, s); for (let i = 0; i < 60; i++) { g.fillStyle = `rgba(${rnd() > .5 ? '255,255,255' : '0,0,0'},${rnd() * .06})`; g.beginPath(); g.ellipse(rnd() * s, rnd() * s, 20 + rnd() * 40, 6 + rnd() * 14, 0, 0, 6.3); g.fill(); } speckle(g, s, 3000, .08); }, 1.2);
 T.laminate = canvasTex(512, (g, s) => {
   const pw = s / 6;
   for (let r = 0; r < 6; r++) {
@@ -490,6 +532,13 @@ T.terrazzo = canvasTex(512, (g, s) => {
   }
   speckle(g, s, 4000, .05);
 }, 0.8);
+T.plasterWarm = canvasTex(512, (g, s) => { g.fillStyle = '#d9d0c3'; g.fillRect(0, 0, s, s); for (let i = 0; i < 260; i++) { g.fillStyle = `rgba(${rnd() > .5 ? '255,255,255' : '90,70,50'},${rnd() * .05})`; g.beginPath(); g.ellipse(rnd() * s, rnd() * s, 20 + rnd() * 60, 10 + rnd() * 30, rnd() * 3, 0, 6.3); g.fill(); } speckle(g, s, 5000, .05); }, 1.5);
+T.jute = canvasTex(256, (g, s) => { g.fillStyle = '#c9b38e'; g.fillRect(0, 0, s, s); for (let y = 0; y < s; y += 4) for (let x = 0; x < s; x += 4) { g.fillStyle = hsl(36, 30, 55 + ((x + y) % 8 ? 6 : -4) + (rnd() - .5) * 6); g.fillRect(x, y, 4, 4); } }, .5);
+T.landscape = (() => { const c = document.createElement('canvas'); c.width = 256; c.height = 160; const g = c.getContext('2d');
+  let gr = g.createLinearGradient(0, 0, 0, 160); gr.addColorStop(0, '#d9d6c4'); gr.addColorStop(.6, '#c7c3a6'); gr.addColorStop(1, '#8f9670'); g.fillStyle = gr; g.fillRect(0, 0, 256, 160);
+  for (const [x, r] of [[70, 34], [180, 40], [130, 22]]) { g.fillStyle = '#5c6b48'; g.beginPath(); g.arc(x, 70, r, 0, 6.3); g.fill(); g.fillStyle = '#4a3a2a'; g.fillRect(x - 3, 70, 6, 50); }
+  g.fillStyle = '#b8ad8a'; g.beginPath(); g.moveTo(110, 160); g.quadraticCurveTo(140, 120, 200, 110); g.lineTo(210, 112); g.quadraticCurveTo(160, 130, 140, 160); g.fill();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
 T.wcWhite = dotTile('#f3f3f1', 'rgba(0,0,0,.07)', '#d9d9d5');
 T.wcRed = dotTile('#7a1c2d', 'rgba(255,255,255,.13)', '#ece8e6');
 T.bath = tileTex(4, [200, 8, 86], '#a9b0b6', 1.2, 2);
@@ -514,6 +563,24 @@ const M = {
   interior: std({ color: 0xf6f6f4, roughness: .95 }),
   slate: std({ map: T.slate, roughness: .6 }),
   skirt: std({ color: 0x75787a, roughness: .45 }),
+  lamDark: std({ map: T.lamDark, roughness: .5 }),
+  lamGrey: std({ map: T.lamGrey, roughness: .5 }),
+  lamOak: std({ map: T.lamOak, roughness: .45 }),
+  muralMark: std({ map: T.muralMark, roughness: .9 }),
+  muralRon: std({ map: T.muralRon, roughness: .9 }),
+  concreteDoor: std({ map: T.concrete2, roughness: .7 }),
+  turquoise: std({ color: 0x3fc9c4, roughness: 1 }),
+  lilac: std({ color: 0x7d74b8, roughness: 1 }),
+  lime: std({ color: 0xc6d24a, roughness: 1 }),
+  rust: std({ color: 0xb24a2c, roughness: .9 }),
+  plaid: std({ color: 0x8a5552, roughness: 1 }),
+  tealTop: std({ color: 0x6fb3a4, roughness: .5 }),
+  wicker: new THREE.MeshStandardMaterial({ color: 0xe9e0cf, roughness: 1, transparent: true, opacity: .92 }),
+  plasterWarm: std({ map: T.plasterWarm, roughness: .95 }),
+  walnutA: std({ color: 0x8a5a36, roughness: .5 }),
+  jute: std({ map: T.jute, roughness: 1 }),
+  bronze: std({ color: 0x8a7458, roughness: .35, metalness: .7, emissive: 0x3a2610, emissiveIntensity: .4 }),
+  landscape: std({ map: T.landscape, roughness: .8 }),
   greenStack: std({ map: T.greenStack, roughness: .25, envMapIntensity: .7 }),
   terrazzo: std({ map: T.terrazzo, roughness: .45 }),
   led: new THREE.MeshStandardMaterial({ color: 0xfff1d6, emissive: 0xffc874, emissiveIntensity: 1.6, roughness: 1 }),
@@ -795,20 +862,20 @@ const OPS1 = {
   7: [W(139, 100, 120, 210), W(324, 60, 140, 210)], // bathroom and en-suite, onto the laundry screen
 };
 const ROOMS = [
-  { id: 'living', f: 0, name: 'סלון', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', note: 'דלת הזזה לחצר עם וילונות וואל, ומימינה על אותו קיר קיר הטלוויזיה עם פאנל חרדל ומזנון לבן צף. ספת עור פינתית בבז׳ לאורך הקיר המשותף, שולחן קפה לבן ומנורה תלויה.' },
+  { id: 'living', f: 0, name: 'סלון', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', afterMat: 'lamOak', afterNote: 'אחרי השיפוץ: פרקט עץ חם, קיר טלוויזיה בטיח בגוון גריז׳ עם מדף אגוז צף ומזנון אגוז תלוי, ספה פינתית בבד בוקלה בהיר עם כריות זית וטרקוטה, שטיח ג׳וטה, שולחן קפה מאגוז ומנורת פאות ברונזה.', note: 'דלת הזזה לחצר עם וילונות וואל, ומימינה על אותו קיר קיר הטלוויזיה עם פאנל חרדל ומזנון לבן צף. ספת עור פינתית בבז׳ לאורך הקיר המשותף, שולחן קפה לבן ומנורה תלויה.' },
   { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, וחלק בורדו שיוצא מקיר הכיריים וסוגר את המטבח מצפון.', spots: true },
   { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [75, 47, 270, 295], mat: 'tile', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
   { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
   { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [294, 836, 435, 948], mat: 'slate', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק ירוקים בגובה 1.2 מ׳ וצבע לבן מעליהם, ריצוף טרצו, אסלה תלויה עם מיכל סמוי, נישת עץ מוארת מעל האסלה, כיור תלוי קטן ומראה מעוגלת עם תאורה אחורית.', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
   { id: 'mamad', f: 0, name: 'ממ״ד · חדר אחסון', dims: [315, 305], rect: [465, 640, 780, 945], mat: 'tile', note: 'מרחב מוגן דירתי מבטון מזוין שמשמש כחדר אחסון, עם מדפים לאורך הקירות. הכניסה מהמעבר שמתחת למדרגות.' },
   { id: 'bed1', f: 1, name: 'חדר הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'laminate', eye: [300, 230], look: [-1, -.25], note: 'רצפת למינציה, קיר טפט מאחורי המיטה, שידת מגירות ושעון על הקיר המזרחי, מראה עומדת ומנורת תוף. דלתות למקלחת ולחדר הארונות.' },
-  { id: 'bed2', f: 1, name: 'החדר של גיא', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'parquet', note: 'חלון לכיוון החצר.' },
+  { id: 'bed2', f: 1, name: 'החדר של גיא', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'lamOak', eye: [610, 350], look: [.2, -1], note: 'רצפת למינציה בגוון אלון, מיטה לאורך הקיר המערבי, שולחן כתיבה בצורת L מתחת לחלון עם מדפים בטורקיז, ארון גבוה בגימור בטון ליד הדלת ומנורה גאומטרית לבנה.' },
   { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [22, 321, 188, 490], mat: 'ensFloor', eye: [150, 340], look: [-.4, 1], note: 'אריחים לבנים מבריקים עם פס פסיפס, ארון כיור תלוי בטורקיז, מראה מקושתת ומקלחון זכוכית עם ראש גשם.' },
   { id: 'closet', f: 1, name: 'חדר ארונות', dims: [145, 170], rect: [200, 321, 359, 490], mat: 'laminate', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
   { id: 'bath', f: 1, name: 'חדר רחצה אחים', dims: [315, 220], rect: [22, 502, 359, 724], mat: 'bathFloor', eye: [330, 612], look: [-1, 0], note: 'אריחי שמנת עם אריחים חומים, ארון כיור ארוך בוונגה עם מראה וארון גבוה, אמבטיה עם מחיצת זכוכית, מכונת כביסה מתחת לארון גבוה.' },
   { id: 'hall', f: 1, name: 'מסדרון', dims: [90, 400], rect: [371, 321, 456, 724], mat: 'parquet', note: 'מחבר בין המדרגות לכל חדרי הקומה. בתקרה פתח עלייה לגג.' },
-  { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [468, 626, 780, 1024], mat: 'parquet', note: 'חלון לכיוון הרחוב.' },
-  { id: 'bed4', f: 1, name: 'החדר של מרק', dims: [355, 275], rect: [88, 736, 456, 1024], mat: 'parquet', note: 'שני חלונות, ממוקם מעל הכניסה המקורה.' },
+  { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [468, 626, 780, 1024], mat: 'lamGrey', eye: [520, 700], look: [1, .55], note: 'טפט חוף עם דקלים על הקיר המשותף, מיטה מתחת לחלון, ארון כהה עם דלתות הזזה ומדפים פתוחים, שידה ומדף קיר כהים ומנורת כדור קלועה. רצפת למינציה אפורה כהה.' },
+  { id: 'bed4', f: 1, name: 'החדר של מרק', dims: [355, 275], rect: [88, 736, 456, 1024], mat: 'lamDark', eye: [410, 790], look: [-.55, 1], note: 'טפט חוף עם עצי דקל על הקיר המערבי, מיטה לאורך קיר החלון, ארון בגוון עץ אפור לכל אורך הקיר הצפוני ושידה לבנה תלויה. רצפת למינציה כהה.' },
   { id: 'balcony', f: 1, name: 'מסתור כביסה', dims: [70, 410], rect: [-72, 292, -4, 716], mat: 'balcony', note: 'מרפסת שירות מוסתרת ברפפות, צמודה לחדרי הרחצה.', noLight: true },
 ];
 
@@ -960,6 +1027,8 @@ function desk(p, base, r, chairAt, faceTo) {
 {
   const p = F[0].furn, b = 0;
   // ---- living room, matched to the photos ----
+  const livBefore = new THREE.Group(); livBefore.userData.reno = 'before'; p.add(livBefore); renoSets.push({ room: 'living', before: livBefore });
+  { const p = livBefore;
   // TV wall on the garden-side (north) wall, right of the slider: ochre panel, white board, floating white console
   onWall(B(p, 540, 47.5, 735, 48.5, 75, 262, M.ochre, b), b, 75, 262);
   onWall(B(p, 560, 47.5, 715, 51.5, 75, 192, M.white, b), b, 75, 192);
@@ -999,6 +1068,56 @@ function desk(p, base, r, chairAt, faceTo) {
     const m = new THREE.Mesh(UNIT, M.sheer); m.scale.set(.065, 2.6, .006); m.position.set(wx(x + 3), b + 1.3, wz(56 + ((x / 6) % 2) * 3)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); m.renderOrder = 3; p.add(m); onWall(m, b, 0, 260);
   }
   plant(p, b, 512, 72, 1.0);
+  }
+  // ---- living room after the renovation (from the inspiration images) ----
+  const livAfter = new THREE.Group(); livAfter.userData.reno = 'after'; livAfter.visible = false; p.add(livAfter); renoSets[renoSets.length - 1].after = livAfter;
+  { const p = livAfter;
+    // textured greige plaster feature wall behind the TV, long floating walnut shelf, floating walnut media unit
+    onWall(B(p, 525, 47.5, 760, 49, 0, 274, M.plasterWarm, b), b, 0, 274);
+    onWall(B(p, 535, 49, 750, 76, 214, 219, M.walnutA, b), b, 214, 219);
+    onWall(B(p, 572, 49, 708, 53, 112, 190, M.black, b), b, 112, 190);
+    B(p, 530, 49, 752, 92, 26, 66, M.walnutA, b);
+    for (let k = 1; k < 5; k++) B(p, 530 + k * 44.4 - .3, 92, 530 + k * 44.4 + .3, 92.6, 27, 65, M.espresso, b);
+    // decor on the unit and the shelf: mushroom lamp, vases, books, plants, a small figure
+    CY(p, 732, 72, 4, 66, 80, M.walnut, b, 16); { const sh = new THREE.Mesh(new THREE.SphereGeometry(.09, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), M.led); sh.position.set(wx(732), b + .8, wz(72)); p.add(sh); }
+    CY(p, 548, 70, 7, 66, 86, M.nicheBack, b, 16, 5); B(p, 560, 60, 585, 82, 66, 70, M.linen, b); CY(p, 600, 72, 8, 66, 70, M.walnut, b, 20, 6);
+    for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.07, 0), M.leaf)); m.position.set(wx(548 + (rnd() - .5) * 14), b + .95 + k * .05, wz(70 + (rnd() - .5) * 10)); p.add(m); }
+    for (const [x, r, h, m] of [[625, 5, 22, M.nicheBack], [640, 4, 16, M.white], [690, 6, 14, M.nicheBack], [705, 5, 18, M.wenge]]) onWall(CY(p, x, 62, r, 219, 219 + h, m, b, 14), b, 219, 219 + h);
+    onWall(B(p, 650, 55, 665, 72, 219, 240, M.linen, b), b, 219, 240); onWall(B(p, 610, 58, 614, 64, 219, 245, M.espresso, b), b, 219, 245);
+    onWall(CY(p, 560, 62, 7, 219, 233, M.nicheBack, b, 14), b, 219, 233);
+    for (let k = 0; k < 10; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.045, 0), M.leaf)); m.position.set(wx(560 + (rnd() - .5) * 18), b + 2.3 - k * .09 * rnd() * 1.6, wz(66 + rnd() * 6)); p.add(m); onWall(m, b, 120, 250); }
+    // light boucle L-sectional with olive and terracotta cushions, chunky knit throw
+    RB(p, 690, 195, 778, 420, 8, 44, M.boucle, b, .05); RB(p, 752, 195, 778, 420, 40, 82, M.boucle, b, .06);
+    RB(p, 530, 334, 690, 420, 8, 44, M.boucle, b, .05); RB(p, 530, 396, 756, 420, 40, 82, M.boucle, b, .06);
+    RB(p, 530, 334, 552, 400, 40, 60, M.boucle, b, .05);
+    for (let k = 0; k < 2; k++) RB(p, 694, 200 + k * 64, 750, 260 + k * 64, 42, 52, M.boucle, b, .05);
+    for (let k = 0; k < 3; k++) RB(p, 556 + k * 45, 338, 598 + k * 45, 394, 42, 52, M.boucle, b, .05);
+    RB(p, 730, 210, 752, 245, 50, 80, M.sageTowel, b, .05); RB(p, 730, 250, 752, 284, 50, 80, M.rust, b, .05);
+    RB(p, 732, 290, 752, 322, 50, 76, M.linen, b, .05); RB(p, 600, 376, 632, 396, 50, 78, M.sageTowel, b, .05);
+    RB(p, 700, 340, 740, 400, 44, 50, std({ color: 0xece4d4, roughness: 1 }), b, .04);
+    // jute rug, walnut plinth coffee table with a tray, vase and books
+    B(p, 520, 150, 700, 330, 0, 1, M.jute, b);
+    B(p, 572, 200, 662, 290, 0, 22, M.walnutA, b); RB(p, 560, 188, 674, 302, 22, 36, M.walnutA, b, .01);
+    CY(p, 625, 250, 14, 36, 38, M.walnut, b, 28); CY(p, 625, 250, 8, 38, 54, M.nicheBack, b, 18, 6); B(p, 585, 225, 610, 245, 36, 42, M.linen, b);
+    for (let k = 0; k < 5; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.05, 0), M.leaf)); m.position.set(wx(625 + (rnd() - .5) * 16), b + .6 + k * .04, wz(250 + (rnd() - .5) * 16)); p.add(m); }
+    // bronze faceted pendants on a rectangular canopy
+    B(p, 580, 225, 650, 255, 275, 280, M.brushed, b);
+    for (const [x, y, z] of [[592, 232, 215], [605, 248, 200], [618, 236, 222], [632, 246, 206], [644, 234, 214]]) {
+      CY(p, x, y, .25, z + 9, 276, M.black, b, 6);
+      const d = shadowy(new THREE.Mesh(new THREE.DodecahedronGeometry(.055, 0), M.bronze)); d.position.set(wx(x), b + z / 100 + .04, wz(y)); p.add(d);
+    }
+    // landscape print above the sofa
+    onWall(B(p, 778, 220, 779.5, 310, 140, 205, M.walnutA, b), b, 140, 205);
+    onWall(B(p, 777.6, 226, 778, 304, 146, 199, M.linen, b), b, 146, 199);
+    onWall(B(p, 777.2, 234, 777.6, 296, 152, 192, M.landscape, b), b, 152, 192);
+    // sheer linen curtains, big olive tree in a stone pot by the slider
+    onWall(B(p, 230, 51, 530, 53, 260, 262.5, M.black, b), b, 260, 262.5);
+    for (const [x0, x1] of [[232, 300], [440, 524]]) for (let x = x0; x < x1; x += 6) {
+      const m = new THREE.Mesh(UNIT, M.sheer); m.scale.set(.065, 2.6, .006); m.position.set(wx(x + 3), b + 1.3, wz(56 + ((x / 6) % 2) * 3)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); m.renderOrder = 3; p.add(m); onWall(m, b, 0, 260);
+    }
+    CY(p, 505, 80, 20, 0, 45, M.nicheBack, b, 20, 15); CY(p, 505, 80, 2, 45, 120, M.trunk, b, 8);
+    for (let k = 0; k < 14; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.12 + rnd() * .08, 0), M.olive)); m.position.set(wx(505 + (rnd() - .5) * 50), b + 1.05 + rnd() * .7, wz(80 + (rnd() - .5) * 45)); p.add(m); }
+  }
   // ---- kitchen, matched to the photos ----
   // box with texture coordinates in metres (for grained / tiled surfaces)
   const BU = (X0, Y0, X1, Y1, z0, z1, mat) => {
@@ -1272,15 +1391,51 @@ function desk(p, base, r, chairAt, faceTo) {
   };
   shelves(201, 330, 246, 488); shelves(246, 445, 314, 489); shelves(314, 330, 358, 488, true);
   B(p, 214, 312, 218, 318, 0, 212, M.oak, b); B(p, 214, 312, 298, 318, 208, 212, M.oak, b);
-  bed(p, b, [472, 78, 572, 278], 'N', M.duvetB);
-  desk(p, b, [655, 74, 770, 134], [712, 165], [712, 70]);
-  wardrobe(p, b, [738, 232, 780, 398], false);
-  bed(p, b, [476, 816, 576, 1018], 'S', M.duvetD);
-  wardrobe(p, b, [738, 630, 780, 800], false);
-  desk(p, b, [655, 960, 770, 1020], [712, 930], [712, 1030]);
-  bed(p, b, [98, 924, 308, 1018], 'W', M.duvetC);
-  wardrobe(p, b, [96, 742, 336, 800], true);
-  desk(p, b, [372, 945, 452, 1020], [412, 915], [412, 1030]);
+  // ---- Guy's room, from the photos: warm oak laminate, bed along the west wall, L-desk under the window, concrete-look wardrobe by the door ----
+  bed(p, b, [470, 76, 566, 276], 'N', M.lime);
+  B(p, 466, 74, 470, 278, 0, 45, M.rust, b); B(p, 466, 74, 568, 78, 0, 45, M.rust, b);
+  B(p, 590, 64, 778, 124, 72, 76, M.tealTop, b); B(p, 718, 124, 778, 240, 72, 76, M.tealTop, b);
+  B(p, 592, 66, 640, 122, 0, 72, M.wood, b); B(p, 728, 190, 776, 238, 0, 72, M.wood, b);
+  for (const z of [22, 46]) { B(p, 600, 122, 632, 123.5, z, z + 1.5, M.steel, b); B(p, 726.5, 198, 728, 230, z, z + 1.5, M.steel, b); }
+  chair(p, b, 680, 160, 680, 90, M.black, M.fabric);
+  for (const z of [140, 178]) onWall(B(p, 750, 130, 778, 250, z, z + 2.5, M.tealTop, b), b, z, z + 2.5);
+  for (let y = 134; y < 200; y += 5) onWall(B(p, 756, y, 776, y + 4, 142.5, 158 + rnd() * 14, std({ color: new THREE.Color().setHSL(rnd(), .4, .45), roughness: 1 }), b), b, 142, 175);
+  onWall(B(p, 774, 205, 778, 248, 180.5, 212, std({ color: 0xd7b544, roughness: .9 }), b), b, 180, 212);
+  onWall(B(p, 555, 63, 722, 66, 232, 235, M.wood, b), b, 232, 235);
+  for (let x = 558; x < 720; x += 6) { const m = new THREE.Mesh(UNIT, M.sheer); m.scale.set(.065, 1.8, .006); m.position.set(wx(x + 3), b + 1.42, wz(68 + ((x / 6) % 2) * 2)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); m.renderOrder = 3; p.add(m); onWall(m, b, 52, 232); }
+  { const g = new THREE.Mesh(new THREE.IcosahedronGeometry(.22, 0), new THREE.MeshStandardMaterial({ color: 0xffffff, wireframe: true })); g.position.set(wx(622), b + 2.15, wz(235)); p.add(g); CY(p, 622, 235, .3, 237, 274, M.white, b, 6); }
+  B(p, 470, 336, 545, 399, 0, 255, M.concreteDoor, b); B(p, 507, 335.5, 508, 336, 2, 253, M.black, b);
+  // ---- Ron's room, from the photos: beach mural on the party wall, bed under the window, dark wardrobe on the west wall ----
+  { const m = new THREE.Mesh(boxUV(.01, 2.74, 3.98, 0, 0), M.muralRon); m.position.set(wx(779), b + 1.37, wz(825)); p.add(m); onWall(m, b, 0, 274);
+    const uv = m.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) / 3.98, uv.getY(i) / 2.74); uv.needsUpdate = true; }
+  bed(p, b, [580, 900, 778, 1018], 'E', M.lilac);
+  B(p, 578, 898, 778, 902, 0, 30, M.lime, b); B(p, 578, 898, 582, 1020, 0, 30, M.lime, b);
+  B(p, 470, 760, 530, 1022, 0, 250, M.wenge, b);
+  for (const z of [40, 80, 120, 160, 200]) B(p, 529, 762, 531, 860, z, z + 2, M.black, b);
+  B(p, 530, 860, 531.5, 1020, 2, 248, std({ color: 0xd9d4ca, roughness: .4 }), b); B(p, 530, 939, 532, 941, 2, 248, M.wenge, b);
+  B(p, 480, 627, 540, 668, 0, 52, M.wenge, b);
+  onWall(B(p, 488, 627, 538, 660, 145, 190, M.wenge, b), b, 145, 190);
+  onWall(B(p, 722, 1022, 758, 1024, 148, 175, std({ color: 0x3f6b8c, roughness: .6 }), b), b, 148, 175);
+  onWall(B(p, 560, 1018, 712, 1021, 236, 239, M.black, b), b, 236, 239);
+  for (let x = 563; x < 710; x += 6) { const m = new THREE.Mesh(UNIT, M.sheer); m.scale.set(.065, 1.85, .006); m.position.set(wx(x + 3), b + 1.43, wz(1015 - ((x / 6) % 2) * 2)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); m.renderOrder = 3; p.add(m); onWall(m, b, 50, 236); }
+  { const sph = new THREE.Mesh(new THREE.SphereGeometry(.27, 24, 16), M.wicker); sph.position.set(wx(640), b + 2.05, wz(830)); p.add(sph); CY(p, 640, 830, .3, 232, 274, M.steel, b, 6); }
+  // ---- Mark's room, from the photos: palm-beach mural on the west wall, bed along the window wall, grey-wood wardrobe on the north wall ----
+  { const m = new THREE.Mesh(boxUV(.01, 2.74, 2.86, 0, 0), M.muralMark); m.position.set(wx(88.6), b + 1.37, wz(880)); p.add(m); onWall(m, b, 0, 274);
+    const uv = m.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) / 2.86, uv.getY(i) / 2.74); uv.needsUpdate = true; }
+  bed(p, b, [90, 900, 290, 1018], 'W', M.turquoise);
+  B(p, 90, 898, 292, 1020, 0, 22, M.plaid, b);
+  RB(p, 100, 905, 125, 1012, 52, 64, M.duvetB, b, .04);
+  B(p, 96, 738, 360, 798, 0, 255, M.grayWood, b);
+  for (let k = 1; k < 5; k++) B(p, 96 + k * 52.8 - .4, 797.5, 96 + k * 52.8 + .4, 799, 2, 253, M.black, b);
+  for (let k = 0; k < 5; k++) B(p, 96 + k * 52.8 + 44, 798, 96 + k * 52.8 + 46, 800, 110, 130, M.steel, b);
+  onWall(B(p, 418, 840, 456, 920, 50, 92, M.white, b), b, 50, 92);
+  chair(p, b, 105, 865, 160, 865, M.wood, M.white);
+  onWall(B(p, 210, 1022, 370, 1025, 238, 241, M.black, b), b, 238, 241);
+  { const beige = std({ color: 0xcdbfa8, roughness: 1, transparent: true, opacity: .7, side: THREE.DoubleSide });
+    for (let x = 213; x < 368; x += 6) { const m = new THREE.Mesh(UNIT, beige); m.scale.set(.065, 1.9, .006); m.position.set(wx(x + 3), b + 1.43, wz(1019 - ((x / 6) % 2) * 2)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); p.add(m); onWall(m, b, 48, 238); } }
+  for (const [y, r] of [[2.12, .25], [2.0, .26], [1.88, .25]]) { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, .08, 28, 1, true), M.drum); m.position.set(wx(260), b + y, wz(880)); p.add(m); }
+  CY(p, 260, 880, .3, 216, 274, M.white, b, 6);
+
   // ---- parents' en-suite, from the photos: white gloss wall tiles, a mosaic strip, teal wall-hung vanity, dotted glass shower ----
   tileRoom([22.5, 321, 188, 490], M.ensWall, { N: [[120, 190, 0, 210]], W: [[376, 436, 140, 210]] });
   panel(86, 488.6, 100, 489, 0, 274, M.mosaic); panel(186.6, 432, 187, 446, 0, 274, M.mosaic);
