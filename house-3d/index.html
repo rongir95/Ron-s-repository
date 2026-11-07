@@ -384,6 +384,28 @@ const dotTile = (base, dot, grout) => canvasTex(512, (g, s) => {
     g.fillStyle = dot; g.beginPath(); g.arc(x, y, 1.9, 0, Math.PI * 2); g.fill();
   }
 }, 1.2);
+// walnut-look veneer of the breakfast bar (grain runs horizontally, as in the photos)
+T.veneer = canvasTex(512, (g, s) => {
+  g.fillStyle = '#5f4a3d'; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < 520; i++) {
+    const y = rnd() * s, l = 30 + rnd() * 50;
+    g.strokeStyle = `hsla(${22 + rnd() * 10},${18 + rnd() * 14}%,${rnd() > .5 ? 22 + rnd() * 10 : 46 + rnd() * 12}%,${.25 + rnd() * .45})`;
+    g.lineWidth = .6 + rnd() * 1.6; g.beginPath(); g.moveTo(0, y);
+    for (let x = 0; x <= s; x += 32) g.lineTo(x, y + Math.sin(x / 90 + i) * 1.5);
+    g.stroke();
+  }
+}, 0.8);
+// beige damask wallpaper on the dining wall
+T.wallpaper = canvasTex(512, (g, s) => {
+  g.fillStyle = '#d8ccb6'; g.fillRect(0, 0, s, s);
+  speckle(g, s, 9000, .06); speckle(g, s, 6000, .25, true);
+  for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) {
+    const cx = (i + .5) * s / 2 + (j % 2) * s / 4, cy = (j + .5) * s / 2;
+    g.strokeStyle = 'rgba(255,255,255,.28)'; g.lineWidth = 6;
+    for (const k of [1, .7, .42]) { g.beginPath(); g.ellipse(cx, cy, 70 * k, 105 * k, 0, 0, Math.PI * 2); g.stroke(); }
+    g.fillStyle = 'rgba(140,120,90,.08)'; g.beginPath(); g.ellipse(cx, cy, 30, 48, 0, 0, Math.PI * 2); g.fill();
+  }
+}, 0.9);
 T.wcWhite = dotTile('#f3f3f1', 'rgba(0,0,0,.07)', '#d9d9d5');
 T.wcRed = dotTile('#7a1c2d', 'rgba(255,255,255,.13)', '#ece8e6');
 T.bath = tileTex(4, [200, 8, 86], '#a9b0b6', 1.2, 2);
@@ -408,6 +430,16 @@ const M = {
   interior: std({ color: 0xf6f6f4, roughness: .95 }),
   slate: std({ map: T.slate, roughness: .6 }),
   skirt: std({ color: 0x75787a, roughness: .45 }),
+  kCream: std({ color: 0xece3d1, roughness: .2, envMapIntensity: .7 }),
+  kRed: std({ color: 0x7a1424, roughness: .18, envMapIntensity: .8 }),
+  kTop: std({ color: 0xaeaaa2, roughness: .3, envMapIntensity: .6 }),
+  backsplash: std({ color: 0xf4f2ee, roughness: .1, envMapIntensity: .8 }),
+  veneer: std({ map: T.veneer, roughness: .5 }),
+  wallpaper: std({ map: T.wallpaper, roughness: .9 }),
+  espresso: std({ color: 0x3a261c, roughness: .55 }),
+  boucle: std({ color: 0xe6dccb, roughness: 1 }),
+  fridge: std({ color: 0x2c2e33, roughness: .28, metalness: .6, envMapIntensity: 1 }),
+  shade: std({ color: 0xe4dccb, roughness: .95 }),
   ceiling: std({ color: 0xfafaf8, roughness: 1, emissive: 0xffffff, emissiveIntensity: .12 }),
   wcWhite: std({ map: T.wcWhite, roughness: .35 }),
   wcRed: std({ map: T.wcRed, roughness: .35 }),
@@ -642,7 +674,7 @@ const OPS0 = {
   2: [W(187, 100, 100, 200), W(436, 60, 125, 205)],                     // safe-room window between shutter pockets; guest WC (frosted, beside the mirror)
   4: [{ type: 'front', at: 82, w: 90, sill: 0, head: 222 }],           // front door at the lower end of the angled wall
   6: [W(203, 140, 105, 215)],                                           // kitchen window over the sink
-  8: [W(121, 75, 90, 210)],                                             // window where the storage door used to be
+  8: [W(121, 75, 102, 210)],                                             // window where the storage door used to be
 };
 const OPS1 = {
   0: [W(99, 195)],                       // bedroom 1, wide window in the north-west corner
@@ -652,8 +684,8 @@ const OPS1 = {
 };
 const ROOMS = [
   { id: 'living', f: 0, name: 'חדר דיור', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', note: 'חלל פתוח עם דלת הזזה רחבה אל המשטח המרוצף והחצר הצמודה.' },
-  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'מטבח פתוח בצורת L: אי, ומשטח ניצב לו שממשיך לכיוון הסלון עם כיסאות בר. חלון מעל הכיור.' },
-  { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [75, 47, 270, 295], mat: 'tile', note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
+  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, ואי בורדו לכיוון הסלון.', spots: true },
+  { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [75, 47, 270, 295], mat: 'tile', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
   { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
   { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [294, 836, 435, 948], mat: 'slate', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
   { id: 'mamad', f: 0, name: 'ממ״ד · חדר אחסון', dims: [315, 305], rect: [465, 640, 780, 945], mat: 'tile', note: 'מרחב מוגן דירתי מבטון מזוין שמשמש כחדר אחסון, עם מדפים לאורך הקירות. הכניסה מהמעבר שמתחת למדרגות.' },
@@ -823,25 +855,101 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 738, 140, 778, 340, 0, 48, M.oak, b); B(p, 773, 165, 778, 315, 85, 165, M.black, b);
   plant(p, b, 755, 70, 1.6); plant(p, b, 762, 400, 1.1);
   CY(p, 490, 380, 2, 0, 160, M.black, b); CY(p, 490, 380, 18, 150, 175, M.linen, b, 20, 12);
-  // kitchen
-  B(p, 16, 320, 76, 699, 10, 88, M.cabinet, b); B(p, 16, 318, 79, 699, 88, 92, M.quartz, b);
-  B(p, 76, 640, 186, 699, 10, 88, M.cabinet, b); B(p, 76, 637, 186, 699, 88, 92, M.quartz, b);
-  B(p, 16, 320, 50, 430, 150, 225, M.cabinet, b); B(p, 16, 580, 50, 699, 150, 225, M.cabinet, b);
-  B(p, 22, 340, 70, 400, 92, 93, M.black, b); B(p, 26, 472, 68, 538, 86, 92.5, M.steel, b);
-  CY(p, 22, 505, 1.5, 92, 125, M.steel, b, 8);
-  B(p, 190, 630, 290, 699, 0, 218, M.cabinetDark, b); B(p, 212, 628, 268, 630, 110, 160, M.black, b);
-  B(p, 196, 382, 268, 538, 0, 88, M.cabinetDark, b); B(p, 190, 376, 284, 544, 88, 93, M.quartz, b);
-  // kitchen arm perpendicular to the island, reaching towards the living room (L-shape)
-  B(p, 268, 382, 412, 442, 0, 88, M.cabinetDark, b); B(p, 284, 376, 418, 448, 88, 93, M.quartz, b);
-  for (const x of [305, 350, 395]) { CY(p, x, 350, 17, 64, 68, M.oak, b); CY(p, x, 350, 2.5, 0, 64, M.black, b, 8); CY(p, x, 350, 15, 0, 2, M.black, b); }
-  for (const [x, y] of [[230, 440], [300, 410], [370, 410]]) { CY(p, x, y, 10, 175, 195, M.black, b, 18, 5); CY(p, x, y, .5, 195, 280, M.black, b, 6); }
-
-  // dining corner in the former storage room: rectangular table for six
-  B(p, 128, 80, 218, 260, 72, 76, M.oak, b);
-  for (const [x, y] of [[134, 86], [212, 86], [134, 254], [212, 254]]) B(p, x - 3, y - 3, x + 3, y + 3, 0, 72, M.black, b);
-  for (const y of [115, 170, 225]) { chair(p, b, 103, y, 173, y); chair(p, b, 243, y, 173, y); }
-  B(p, 133, 168, 213, 172, 210, 214, M.black, b); CY(p, 173, 170, .6, 214, 280, M.black, b, 6);
-  for (const y of [120, 170, 220]) CY(p, 173, y, 12, 185, 205, M.black, b, 18, 6);
+  // ---- kitchen, matched to the photos ----
+  // box with texture coordinates in metres (for grained / tiled surfaces)
+  const BU = (X0, Y0, X1, Y1, z0, z1, mat) => {
+    const w = (X1 - X0) / 100, d = (Y1 - Y0) / 100, h = (z1 - z0) / 100;
+    const m = shadowy(new THREE.Mesh(boxUV(w, h, d, (X0 + Y0) / 100, z0 / 100), mat));
+    m.position.set(wx((X0 + X1) / 2), b + (z0 + z1) / 200, wz((Y0 + Y1) / 2)); p.add(m); return m;
+  };
+  const handleY = (X, Y0, Y1, z) => B(p, X, Y0, X + 2, Y1, z - .8, z + .8, M.steel, b);   // bar handle on a face looking east
+  const handleX = (X0, X1, Y, z) => B(p, X0, Y - 2, X1, Y, z - .8, z + .8, M.steel, b);   // bar handle on a face looking north
+  // sink wall (west): cream gloss base units, light grey quartz top, white glass splashback
+  B(p, 16, 320, 76, 699, 10, 88, M.kCream, b); B(p, 16, 318, 79, 699, 88, 92, M.kTop, b);
+  B(p, 18, 320, 74, 699, 0, 10, M.skirt, b);
+  for (let y = 320; y < 690; y += 60) {
+    if (y + 30 > 545 && y + 30 < 605) continue;
+    B(p, 76, y - .3, 76.6, y + .3, 10, 88, M.black, b);
+    handleY(76, y + 12, y + 48, 80); handleY(76, y + 12, y + 48, 47);
+  }
+  B(p, 76, 545, 77.5, 605, 10, 86, M.steel, b); B(p, 76.5, 547, 78, 603, 79, 85, M.black, b);       // dishwasher
+  B(p, 26, 472, 68, 538, 86, 92.5, M.steel, b);                                                        // undermount sink
+  CY(p, 22, 505, 1.5, 92, 128, M.steel, b, 8); B(p, 21, 504, 42, 506, 126, 128, M.steel, b);
+  B(p, 22, 340, 70, 400, 92, 93, M.black, b);                                                          // induction hob
+  B(p, 17, 333, 64, 407, 160, 166, M.steel, b); B(p, 17, 352, 44, 388, 166, 250, M.steel, b);          // chimney hood
+  for (const [y0, y1, z1] of [[320, 435, 150], [575, 699, 150], [435, 575, 104]]) B(p, 16.5, y0, 17.5, y1, 92, z1, M.backsplash, b);
+  B(p, 16, 698, 136, 699, 92, 150, M.backsplash, b);
+  B(p, 17.5, 592, 19, 632, 132, 136, M.black, b);                                                      // knife rail
+  for (let k = 0; k < 4; k++) B(p, 18.5, 596 + k * 9, 19.5, 598 + k * 9, 112, 132, M.steel, b);
+  // short run on the south wall with two bordeaux wall cabinets above it
+  B(p, 76, 640, 136, 699, 10, 88, M.kCream, b); B(p, 76, 637, 136, 699, 88, 92, M.kTop, b);
+  handleX(90, 122, 640, 80); handleX(90, 122, 640, 47);
+  B(p, 78, 664, 136, 699, 150, 198, M.kRed, b); B(p, 78, 664, 136, 699, 200, 249, M.kRed, b);
+  handleX(90, 124, 664, 154); handleX(90, 124, 664, 245);
+  // tall oven tower: microwave over oven, drawers under, cream gloss to the ceiling bulkhead
+  B(p, 136, 640, 198, 699, 0, 249, M.kCream, b);
+  B(p, 140, 638.5, 194, 640, 152, 186, M.black, b); B(p, 140, 638.5, 194, 640, 88, 146, M.black, b);
+  handleX(146, 188, 638.5, 140); handleX(146, 188, 640, 60); handleX(146, 188, 640, 30);
+  // black stainless French-door fridge with a cream cabinet above it
+  B(p, 199, 627, 289, 699, 0, 186, M.fridge, b);
+  B(p, 243.6, 626.4, 244.4, 627, 2, 186, M.black, b); B(p, 199, 626.4, 289, 627, 82, 83, M.black, b);
+  for (const x of [237, 249]) { B(p, x, 621, x + 2, 627, 95, 172, M.steel, b); B(p, x, 621, x + 2, 627, 15, 74, M.steel, b); }
+  B(p, 199, 640, 289, 699, 190, 249, M.kCream, b); handleX(225, 263, 640, 194);
+  // breakfast bar in walnut veneer with a waterfall end, running north–south between kitchen and living
+  BU(205, 442, 245, 585, 0, 95, M.veneer);
+  BU(200, 382, 276, 592, 95, 100, M.veneer);
+  BU(200, 585, 276, 592, 0, 95, M.veneer);
+  // bordeaux gloss island with a grey top, at the north end of the bar, reaching towards the living room
+  B(p, 205, 382, 412, 442, 8, 88, M.kRed, b); B(p, 207, 384, 410, 440, 0, 8, M.white, b);
+  B(p, 276, 378, 418, 446, 88, 92, M.kTop, b);
+  for (const x of [300, 360]) handleX(x - 18, x + 18, 446, 80);
+  // bar stools: cream bouclé seat and back, black metal frame
+  const barStool = (X, Y, toX, toY) => {
+    const g = local(p, X, Y, b, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y)));
+    const seat = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.44, .08, .42, 3, .03), M.boucle)); seat.position.set(0, .7, 0); g.add(seat);
+    const back = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.42, .26, .06, 3, .025), M.boucle)); back.position.set(0, .93, -.2); g.add(back);
+    for (const [a, c] of [[-.19, -.18], [.19, -.18], [-.19, .18], [.19, .18]]) lb(g, .022, .7, .022, a, .35, c, M.black);
+    lb(g, .022, .3, .022, -.19, .85, -.2, M.black); lb(g, .022, .3, .022, .19, .85, -.2, M.black);
+    lb(g, .4, .02, .02, 0, .28, .18, M.black); lb(g, .4, .02, .02, 0, .28, -.18, M.black);
+  };
+  for (const y of [470, 517, 562]) barStool(296, y, 230, y);
+  // two white square-frame pendants over the bar
+  B(p, 225, 418, 249, 512, 276, 280, M.white, b);
+  for (const [y, z] of [[440, 175], [490, 188]]) {
+    CY(p, 237, y, .3, z + 24, 276, M.black, b, 6);
+    for (const [y0, y1, z0, z1] of [[y - 12, y + 12, z, z + 2.5], [y - 12, y + 12, z + 21.5, z + 24], [y - 12, y - 9.5, z, z + 24], [y + 9.5, y + 12, z, z + 24]]) B(p, 233, y0, 241, y1, z0, z1, M.white, b);
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(.035, 12, 8), M.fixture); bulb.position.set(wx(237), z / 100 + .12, wz(y)); p.add(bulb);
+  }
+  // roller blinds over the kitchen and dining windows, decorative security grille outside the sink window
+  B(p, 17, 430, 24, 580, 215, 222, M.shade, b); B(p, 17.5, 433, 19, 577, 186, 215, M.shade, b);
+  for (const z of [192, 200, 208]) B(p, 19, 433, 19.4, 577, z, z + 1.2, M.alu, b);
+  B(p, 76, 140, 83, 222, 208, 215, M.shade, b); B(p, 76.5, 143, 78, 219, 178, 208, M.shade, b);
+  { const gx = -11.5;
+    for (let y = 437; y <= 573; y += 12) B(p, gx - .7, y - .7, gx + .7, y + .7, 105, 215, M.alu, b);
+    for (const z of [105, 142, 214]) B(p, gx - .7, 433, gx + .7, 577, z - .7, z + .7, M.alu, b);
+    const gg = local(p, gx, 505, b);
+    for (let k = -6; k <= 6; k++) for (const sg of [1, -1]) {
+      const m = shadowy(new THREE.Mesh(UNIT, M.alu)); m.scale.set(.012, .26, .012);
+      m.position.set(0, 1.235, k * .12); m.rotation.x = sg * Math.PI / 4; gg.add(m);
+    } }
+  // ---- dining corner: espresso table and high-back chairs, wallpapered north wall with frames ----
+  B(p, 128, 80, 218, 260, 72, 76, M.espresso, b);
+  for (const [x, y] of [[133, 85], [213, 85], [133, 255], [213, 255]]) B(p, x - 3, y - 3, x + 3, y + 3, 0, 72, M.espresso, b);
+  const diningChair = (X, Y, toX, toY) => {
+    const g = local(p, X, Y, b, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y)));
+    lb(g, .44, .05, .44, 0, .46, 0, M.espresso); lb(g, .4, .04, .4, 0, .495, .01, std({ color: 0x4a3a30, roughness: 1 }));
+    lb(g, .44, .52, .035, 0, .74, -.205, M.espresso);
+    for (const [a, c] of [[-.19, -.19], [.19, -.19], [-.19, .19], [.19, .19]]) lb(g, .035, .46, .035, a, .23, c, M.espresso);
+  };
+  for (const y of [115, 170, 225]) { diningChair(103, y, 173, y); diningChair(243, y, 173, y); }
+  { const m = new THREE.Mesh(boxUV(1.945, 2.73, .01, .755, .07), M.wallpaper); m.receiveShadow = true;
+    m.position.set(wx(172.75), b + .07 + 1.365, wz(48)); p.add(m); onWall(m, b, 7, 280); }
+  for (const [x, z, w, h] of [[110, 175, 16, 20], [132, 182, 18, 24], [156, 178, 14, 18], [182, 176, 34, 26], [110, 138, 16, 18], [134, 136, 18, 16], [158, 140, 18, 22], [184, 138, 16, 20], [128, 210, 20, 14]]) {
+    onWall(B(p, x, 48.5, x + w, 50.5, z, z + h, M.black, b), b, z, z + h);
+    onWall(B(p, x + 2.5, 50.5, x + w - 2.5, 51, z + 2.5, z + h - 2.5, M.linen, b), b, z, z + h);
+  }
+  onWall(B(p, 200, 48.5, 245, 51, 228, 231, M.white, b), b, 228, 231);
+  for (const x of [205, 222, 239]) onWall(CY(p, x, 56, 3, 220, 228, M.white, b, 12), b, 220, 228);
   // foyer
   // white console with a glass top and the black framed mirror above it, on the safe-room wall
   B(p, 404, 655, 434, 790, 76, 79, M.white, b); B(p, 405, 656, 433, 789, 79, 80, M.glass, b);
@@ -852,6 +960,15 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let y = 674; y < 776; y += 8.5) for (const z of [102, 197]) { const dpt = 3 + rnd() * 5; onWall(B(p, 433 - dpt, y, 433, y + 7.5, z, z + 7.5, M.black, b), b, z, z + 7.5); }
   for (let z = 110; z < 196; z += 8.5) for (const y of [674, 768]) { const dpt = 3 + rnd() * 5; onWall(B(p, 433 - dpt, y, 433, y + 7.5, z, z + 7.5, M.black, b), b, z, z + 7.5); }
   onWall(B(p, 300, 838.5, 312, 843.5, 140, 150, M.black, b), b, 140, 150);
+  { const sp = F[1].shell;
+    B(sp, 16, 47, 190, 699, -60, -30.5, M.ceiling, L1);                 // dropped ceiling over the kitchen run and dining
+    B(sp, 190, 610, 290, 699, -60, -30.5, M.ceiling, L1);               // over the fridge
+    B(sp, 190, 110, 191.5, 270, -56, -36, M.trim, L1);
+    for (let y = 112; y < 268; y += 3) B(sp, 191.5, y, 192, y + 1.6, -55, -37, M.alu, L1);
+    B(sp, 205, 609, 285, 610.5, -56, -40, M.trim, L1);
+    for (let x = 207; x < 283; x += 3) B(sp, x, 608.5, x + 1.6, 609, -55, -41, M.alu, L1);
+    for (const [x, y] of [[100, 360], [100, 500], [100, 640], [120, 110], [120, 230], [240, 655]]) B(sp, x - 4, y - 4, x + 4, y + 4, -60.5, -60, M.fixture, L1);
+  }
   { const sp = F[1].shell, cz = L1 - 0.306;
     for (const [x, y] of [[335, 700], [410, 700], [330, 795], [375, 795], [420, 795], [372, 560]]) B(sp, x - 4, y - 4, x + 4, y + 4, cz * 100 - L1 * 100 - .4, cz * 100 - L1 * 100, M.fixture, L1);
     B(sp, 318, 588, 424, 632, cz * 100 - L1 * 100 - .6, cz * 100 - L1 * 100, M.trim, L1);
