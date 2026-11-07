@@ -64,6 +64,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .roomsel:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .roomsel option,.roomsel optgroup{color:#1d2430;background:#fff}
 .cbtn{all:unset;box-sizing:border-box;display:block;width:100%;text-align:center;margin-top:12px;padding:9px 12px;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:13px;cursor:pointer}
+.cbtn.alt{background:transparent;color:var(--accent);border:1.5px solid var(--accent);margin-top:8px}
 .cbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .focusbar{all:unset;position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:9px 16px;border-radius:999px;cursor:pointer;font-weight:500;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);box-shadow:0 10px 30px rgba(15,25,40,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);white-space:nowrap}
 .focusbar b{font-weight:600}
@@ -182,8 +183,10 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   </dl>
   <p id="cNote"></p>
   <button class="cbtn" id="cFocus">הצגת החדר הזה בלבד</button>
+  <button class="cbtn alt" id="cWalk">עמידה בתוך החדר</button>
 </div>
 
+<button class="focusbar" id="walkBar" hidden><span class="back">יציאה</span><span>עומדים בתוך <b id="walkName"></b></span></button>
 <button class="focusbar" id="focusBar" hidden><span class="back">חזרה לכל הבית</span><span>מבט על <b id="focusName"></b></span></button>
 
 <div class="zoom panel" role="group" aria-label="זום">
@@ -261,6 +264,9 @@ scene.fog = new THREE.Fog(0xdde8f0, 45, 160);
 
 const hemi = new THREE.HemisphereLight(0xdfeaff, 0x7a6a50, 0.9);
 scene.add(hemi);
+// soft room fill, only on while standing inside a room (daylight bouncing off walls and ceiling)
+const roomFill = new THREE.AmbientLight(0xfff6ec, 0);
+scene.add(roomFill);
 const sun = new THREE.DirectionalLight(0xfff0da, 3.2);
 sun.position.set(-14, 22, 15);
 sun.castShadow = true;
@@ -401,6 +407,7 @@ const M = {
   plaster: std({ map: T.plaster, roughness: .95 }),
   interior: std({ color: 0xf6f6f4, roughness: .95 }),
   slate: std({ map: T.slate, roughness: .6 }),
+  ceiling: std({ color: 0xfafaf8, roughness: 1, emissive: 0xffffff, emissiveIntensity: .12 }),
   wcWhite: std({ map: T.wcWhite, roughness: .35 }),
   wcRed: std({ map: T.wcRed, roughness: .35 }),
   frost: new THREE.MeshStandardMaterial({ color: 0xf4f6f7, roughness: .9, transparent: true, opacity: .82, emissive: 0x000000 }),
@@ -662,6 +669,8 @@ I([296, 590], [296, 705]);
 /* first floor slab (with stair void) + walls */
 const SLAB1 = [[-10, 288], [50, 288], [50, -6], [467, -6], [467, 45], [805, 45], [805, 1043], [69, 1043], [69, 742], [-10, 742]];
 slab(F[1].shell, SLAB1, L1, 0.3, M.parquet, M.slabSide, [[[452, 411], [778, 411], [778, 614], [452, 614]]]);
+// white plaster ceiling for the ground floor, just under the slab
+slab(F[1].shell, SLAB1, L1 - 0.299, 0.006, M.ceiling, M.ceiling, [[[452, 411], [778, 411], [778, 614], [452, 614]]]);
 buildOutline(F[1].shell, OUT1, OPS1, { t: 25, base: L1, h: H2 * 100, outMat: M.plaster, inMat: M.interior });
 const J = (a, b, ops = [], t = 12) => wall(F[1].shell, a, b, { t, base: L1, h: H2 * 100, ops, inMat: M.interior });
 J([82, 315], [458, 315], [D(73, 70), D(173, 80), D(338, 80)]);
@@ -903,6 +912,7 @@ function desk(p, base, r, chairAt, faceTo) {
 {
   const Y0 = -46, Y1 = 1083, Yr = (Y0 + Y1) / 2, Dh = (Y1 - Y0) / 200, hR = Dh * Math.tan(PITCH), th = 0.17;
   slab(roofG, [[-10, -6], [PARTY, -6], [PARTY, 1043], [-10, 1043]], ROOF0, ATT, M.cap, M.slabSide);
+  slab(roofG, [[-10, -6], [PARTY, -6], [PARTY, 1043], [-10, 1043]], ROOF0 - ATT + 0.001, 0.006, M.ceiling, M.ceiling); // first floor ceiling
   const prof = new THREE.Shape([
     new THREE.Vector2(-Dh, -th), new THREE.Vector2(-Dh, 0), new THREE.Vector2(0, hR), new THREE.Vector2(Dh, 0), new THREE.Vector2(Dh, -th),
     new THREE.Vector2(0, hR - th / Math.cos(PITCH))
@@ -1036,6 +1046,7 @@ const VIEWS = {
   top: () => [new THREE.Vector3(0.6, 30, 0.42), new THREE.Vector3(0.6, 0, 0.4)],
 };
 function setMode(m, keepFocus) {
+  if (walking && !keepFocus) exitWalk(false);
   if (focus && !keepFocus) { focus = null; clearFocusFilters(); if (autoWalls) { state.walls = 'full'; autoWalls = false; } document.getElementById('focusBar').hidden = true; document.getElementById('cFocus').textContent = 'הצגת החדר הזה בלבד'; document.getElementById('roomSel').value = ''; }
   state.mode = m;
   document.querySelectorAll('.mbtn').forEach(b => b.setAttribute('aria-selected', b.dataset.mode === m));
@@ -1097,6 +1108,7 @@ function applyNight() {
   window.__streetLight.intensity = n ? 30 : 0;
   window.__sign.material.emissiveIntensity = n ? 1.2 : .15;
   renderer.toneMappingExposure = n ? 1.15 : 1.0;
+  if (walking) roomFill.intensity = n ? .35 : 1.1;
 }
 /* ---------- single-room view ----------
    Shows one room on its own: its floor, its furniture and the walls around it (trimmed to the room),
@@ -1126,6 +1138,7 @@ function clearFocusFilters() {
 }
 function focusRoom(id) {
   const r = ROOMS.find(q => q.id === id); if (!r) return;
+  if (walking) exitWalk(false);
   if (!focus) {
     // full-height walls hide most of a single room, so drop them to 1 m for this view (restored on exit)
     autoWalls = state.walls === 'full'; if (autoWalls) state.walls = 'low';
@@ -1170,6 +1183,46 @@ function focusRoom(id) {
   dir.normalize().multiplyScalar(.45); dir.y = 1;
   flyTo(tgt.clone().add(dir.setLength(Math.max(w, d) * 1.9 + 4.5)), tgt, 1.1);
 }
+/* ---------- standing inside a room ----------
+   The camera stands at the middle of the room at eye height and only turns in place:
+   OrbitControls orbits a 5 cm radius around the eye point, so dragging looks around. */
+const EYE = 1.6, ORBIT = { min: 3, max: 70, maxPolar: Math.PI * .495, minPolar: 0, fov: 38 };
+let walking = null; // { id, back: focus id or null, mode, cam }
+function setWalkControls(on) {
+  roomFill.intensity = on ? (state.night ? .35 : 1.1) : 0;
+  if (on) {
+    controls.minDistance = controls.maxDistance = .05; controls.enablePan = false; controls.enableZoom = false;
+    controls.minPolarAngle = Math.PI * .12; controls.maxPolarAngle = Math.PI * .88; controls.rotateSpeed = -.35;
+  } else {
+    controls.minDistance = ORBIT.min; controls.maxDistance = ORBIT.max; controls.enablePan = true; controls.enableZoom = true;
+    controls.minPolarAngle = ORBIT.minPolar; controls.maxPolarAngle = ORBIT.maxPolar; controls.rotateSpeed = 1;
+    camera.fov = ORBIT.fov; camera.updateProjectionMatrix();
+  }
+}
+function enterWalk(id) {
+  const r = ROOMS.find(q => q.id === id); if (!r) return;
+  if (!walking) walking = { back: focus, mode: focus ? prevMode : state.mode, cam: focus ? prevCam : [camera.position.clone(), controls.target.clone()] };
+  walking.id = id;
+  if (focus) { focus = null; clearFocusFilters(); if (autoWalls) { state.walls = 'full'; autoWalls = false; } document.getElementById('focusBar').hidden = true; }
+  setMode('full', true); // whole house with full walls, ceilings and roof, so the room looks real from inside
+  const look = controls.target.clone().sub(camera.position); look.y = 0;
+  if (look.lengthSq() < 1e-6) look.set(1, 0, 0);
+  const [x0, y0, x1, y1] = r.rect, eye = new THREE.Vector3(wx((x0 + x1) / 2), F[r.f].base + EYE, wz((y0 + y1) / 2));
+  setWalkControls(true); camera.fov = 70; camera.updateProjectionMatrix();
+  flyTo(eye.clone().sub(look.normalize().multiplyScalar(.05)), eye, 1.4);
+  document.getElementById('card').hidden = true;
+  document.getElementById('walkName').textContent = r.name; document.getElementById('walkBar').hidden = false;
+  document.getElementById('hint').textContent = 'גרירה להסתובבות · גלילה או כפתורי הזום לשינוי זווית הראייה · Esc ליציאה';
+}
+function exitWalk(goBack = true) {
+  if (!walking) return;
+  const w = walking; walking = null;
+  setWalkControls(false);
+  document.getElementById('walkBar').hidden = true;
+  if (!goBack) return;
+  if (w.back) { focusRoom(w.back); prevMode = w.mode; prevCam = w.cam; }
+  else { setMode(w.mode); if (w.cam) flyTo(w.cam[0], w.cam[1], 1.2); }
+}
 function exitFocus(restoreMode = true) {
   if (!focus) return;
   focus = null; clearFocusFilters();
@@ -1202,7 +1255,7 @@ function selectRoom(id, fly) {
 
 document.querySelectorAll('.mbtn').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
 document.querySelectorAll('[data-walls]').forEach(b => b.addEventListener('click', () => setWalls(b.dataset.walls)));
-document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { const [p, t] = VIEWS[b.dataset.view](); if (b.dataset.view === 'top' && state.mode === 'full') setMode('ground'); flyTo(p, t, 1.4); }));
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { if (walking) exitWalk(false); const [p, t] = VIEWS[b.dataset.view](); if (b.dataset.view === 'top' && state.mode === 'full') setMode('ground'); flyTo(p, t, 1.4); }));
 const tog = (id, key, fn) => { const el = document.getElementById(id); el.addEventListener('click', () => { state[key] = !state[key]; el.setAttribute('aria-pressed', state[key]); fn(); }); };
 tog('tNight', 'night', applyNight);
 tog('tLabels', 'labels', applyLabels);
@@ -1221,6 +1274,7 @@ document.getElementById('cardX').addEventListener('click', () => selectRoom(null
 document.getElementById('cFocus').addEventListener('click', () => { if (focus && focus === state.sel) exitFocus(); else if (state.sel) focusRoom(state.sel); });
 document.getElementById('focusBar').addEventListener('click', () => exitFocus());
 function zoomBy(f) {
+  if (walking) { camera.fov = THREE.MathUtils.clamp(camera.fov * (f < 1 ? .88 : 1.14), 30, 95); camera.updateProjectionMatrix(); return; }
   const base = camTween ? camTween.p1.clone().sub(camTween.t1) : camera.position.clone().sub(controls.target);
   const tgt = camTween ? camTween.t1.clone() : controls.target.clone();
   const len = THREE.MathUtils.clamp(base.length() * f, controls.minDistance, controls.maxDistance);
@@ -1239,7 +1293,7 @@ window.addEventListener('keydown', e => {
   const map = { '1': 'full', '2': 'ground', '3': 'first', '4': 'exploded' };
   if (map[e.key]) setMode(map[e.key]);
   if (e.key === 'n' || e.key === 'N') document.getElementById('tNight').click();
-  if (e.key === 'Escape') { if (focus) exitFocus(); else selectRoom(null); }
+  if (e.key === 'Escape') { if (walking) exitWalk(); else if (focus) exitFocus(); else selectRoom(null); }
   if (e.key === '+' || e.key === '=') zoomBy(.8);
   if (e.key === '-' || e.key === '_') zoomBy(1.25);
   if (e.key === 'w' || e.key === 'W') setWalls({ full: 'low', low: 'none', none: 'full' }[state.walls]);
@@ -1262,9 +1316,13 @@ function pickRoom(e) {
 }
 renderer.domElement.addEventListener('pointerup', e => {
   if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
+  if (walking) return;
   const id = pickRoom(e); if (id || !focus) selectRoom(id, false);
 });
-renderer.domElement.addEventListener('dblclick', e => { const id = pickRoom(e); if (id) focusRoom(id); });
+renderer.domElement.addEventListener('dblclick', e => { if (walking) return; const id = pickRoom(e); if (id) (focus === id ? enterWalk(id) : focusRoom(id)); });
+renderer.domElement.addEventListener('wheel', e => { if (!walking) return; e.preventDefault(); zoomBy(e.deltaY < 0 ? .9 : 1.1); }, { passive: false });
+document.getElementById('cWalk').addEventListener('click', () => { if (state.sel) enterWalk(state.sel); });
+document.getElementById('walkBar').addEventListener('click', () => exitWalk());
 
 function resize() {
   camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
