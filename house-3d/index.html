@@ -36,6 +36,19 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 #stage canvas{display:block;outline:none;touch-action:none}
 .labels{position:absolute;inset:0;pointer-events:none;direction:ltr}
 .labels>div{left:0;top:0}
+.collapse{all:unset;position:absolute;top:8px;width:26px;height:26px;display:grid;place-items:center;border-radius:8px;cursor:pointer;color:var(--muted);font-size:14px;line-height:1;transition:transform .2s}
+.collapse:hover{background:var(--line);color:var(--ink)}
+.collapse:focus-visible{outline:2px solid var(--accent)}
+.brand .collapse{left:8px}
+.tools .collapse{right:6px;top:6px}
+.tools h2:first-of-type{padding-right:26px}
+.panel.min .collapse{transform:rotate(180deg)}
+.brand.min .eyebrow,.brand.min .sub,.brand.min .stats{display:none}
+.brand.min{padding-block:8px}
+.brand.min h1{font-size:18px;margin:0;padding-inline-end:28px}
+.tools.min>*:not(.collapse):not(h2:first-of-type){display:none}
+.tools.min{min-width:0;padding:6px 38px 6px 10px}
+.tools.min h2:first-of-type{margin:4px 0}
 .panel{background:var(--paper);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(15,25,40,.16);transition:background .4s,color .4s}
 
 .brand{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));padding:14px 18px 14px;max-width:340px}
@@ -112,6 +125,9 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   .stat b{font-size:15px}
   .tools{top:auto;bottom:calc(76px + env(safe-area-inset-bottom,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));flex-direction:row;overflow-x:auto;min-width:0;padding:5px;border-radius:12px}
   .tools h2{display:none}
+  .tools .collapse{position:static;flex:none}
+  .tools.min{padding:5px}
+  .tools.min h2:first-of-type{display:block;margin:6px 6px}
   .tools .tbtn{flex:none;padding:6px 9px}
   .views{display:flex;padding:0}
   .seg{flex:none;margin:0}
@@ -129,7 +145,8 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 <div id="stage"></div>
 <div class="loading" id="loading">בונה את הבית…</div>
 
-<header class="brand panel">
+<header class="brand panel" id="brandP">
+  <button class="collapse" data-col="brandP" aria-label="כיווץ" aria-expanded="true">▲</button>
   <div class="eyebrow">יקנעם · דגם A-1</div>
   <h1>בית גירשביץ׳</h1>
   <div class="sub">דירה 29 · בית דו-משפחתי בשתי קומות עם חצר צמודה</div>
@@ -141,7 +158,8 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   </div>
 </header>
 
-<aside class="tools panel" aria-label="אפשרויות תצוגה">
+<aside class="tools panel" id="toolsP" aria-label="אפשרויות תצוגה">
+  <button class="collapse" data-col="toolsP" aria-label="כיווץ" aria-expanded="true">▲</button>
   <h2>תצוגה</h2>
   <button class="tbtn" id="tNight" aria-pressed="false">תאורת לילה <span class="sw"></span></button>
   <button class="tbtn" id="tLabels" aria-pressed="true">שמות חדרים <span class="sw"></span></button>
@@ -170,7 +188,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <button class="mbtn" role="tab" data-mode="full" aria-selected="true">בית מלא</button>
   <button class="mbtn" role="tab" data-mode="ground" aria-selected="false">קומת קרקע</button>
   <button class="mbtn" role="tab" data-mode="first" aria-selected="false">קומה א׳</button>
-  <button class="mbtn" role="tab" data-mode="exploded" aria-selected="false">פיצוץ קומות</button>
+  <button class="mbtn" role="tab" data-mode="exploded" aria-selected="false">פיצול קומות</button>
 </nav>
 
 <div class="card panel" id="card" hidden>
@@ -406,6 +424,48 @@ T.wallpaper = canvasTex(512, (g, s) => {
     g.fillStyle = 'rgba(140,120,90,.08)'; g.beginPath(); g.ellipse(cx, cy, 30, 48, 0, 0, Math.PI * 2); g.fill();
   }
 }, 0.9);
+// upper floor finishes from the photos
+const rectTile = (cols, rows, base, grout, meters, vary = 2) => canvasTex(512, (g, s) => {
+  g.fillStyle = grout; g.fillRect(0, 0, s, s); const tw = s / cols, th = s / rows;
+  for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) { g.fillStyle = hsl(base[0], base[1], base[2] + (rnd() - .5) * vary); g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3); }
+  speckle(g, s, 2500, .04); speckle(g, s, 1500, .25, true);
+}, meters);
+T.ensWall = rectTile(3, 4, [40, 10, 95], '#d9d7d2', 1.2);          // white gloss 40×30
+T.bathWall = rectTile(2, 4, [38, 32, 84], '#cdbfa6', 1.2);         // cream 60×30
+T.bathBrown = rectTile(2, 4, [24, 30, 30], '#8a7563', 1.2, 4);     // brown accent tiles
+T.ensFloor = tileTex(4, [35, 7, 70], '#9b958b', 1.2);
+T.bathFloor = tileTex(4, [40, 24, 86], '#cbc1ae', 1.2);
+T.mosaic = canvasTex(256, (g, s) => {
+  const n = 16, t = s / n; g.fillStyle = '#c8ccc8'; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { const r = rnd(); g.fillStyle = r < .3 ? hsl(160, 12, 40 + rnd() * 12) : r < .6 ? hsl(200, 6, 62 + rnd() * 12) : hsl(90, 8, 80 + rnd() * 10); g.fillRect(i * t + 1, j * t + 1, t - 2, t - 2); }
+}, 0.4);
+T.laminate = canvasTex(512, (g, s) => {
+  const pw = s / 6;
+  for (let r = 0; r < 6; r++) {
+    let x = -rnd() * 300;
+    while (x < s) {
+      const len = 300 + rnd() * 200, col = hsl(28 + rnd() * 6, 12 + rnd() * 8, 38 + rnd() * 9);
+      for (const off of [0, -s]) {
+        g.fillStyle = col; g.fillRect(x + off, r * pw, len, pw);
+        g.strokeStyle = 'rgba(30,20,10,.18)'; for (let k = 0; k < 6; k++) { g.beginPath(); const yy = r * pw + rnd() * pw; g.moveTo(x + off, yy); g.bezierCurveTo(x + off + len * .3, yy + rnd() * 8 - 4, x + off + len * .7, yy + rnd() * 8 - 4, x + off + len, yy); g.stroke(); }
+        g.fillStyle = 'rgba(20,12,5,.45)'; g.fillRect(x + off, r * pw, 1.5, pw);
+      }
+      x += len;
+    }
+    g.fillStyle = 'rgba(20,12,5,.4)'; g.fillRect(0, r * pw, s, 1.2);
+  }
+}, 1.2);
+T.bedspread = canvasTex(512, (g, s) => {
+  g.fillStyle = '#7a1f2b'; g.fillRect(0, 0, s, s);
+  g.strokeStyle = 'rgba(0,0,0,.15)'; g.lineWidth = 2;
+  for (let k = -s; k < s * 2; k += 40) { g.beginPath(); g.moveTo(k, 0); g.lineTo(k + s, s); g.stroke(); g.beginPath(); g.moveTo(k, s); g.lineTo(k + s, 0); g.stroke(); }
+  for (let i = 0; i < 9; i++) {
+    const x = rnd() * s, y = rnd() * s, r = 28 + rnd() * 26, a = rnd() * 6.28;
+    g.save(); g.translate(x, y); g.rotate(a); g.fillStyle = hsl(44, 55, 62 + rnd() * 10);
+    g.beginPath(); for (let k = 0; k < 5; k++) { const t = k / 5 * Math.PI * 2; g.lineTo(Math.cos(t) * r, Math.sin(t) * r); g.lineTo(Math.cos(t + .63) * r * .45, Math.sin(t + .63) * r * .45); } g.closePath(); g.fill(); g.restore();
+  }
+}, 1.0);
+T.drum = canvasTex(256, (g, s) => { for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#c7b98c' : '#8f8455'; g.fillRect(i * s / 8, 0, s / 8, s); } }, 1);
 T.wcWhite = dotTile('#f3f3f1', 'rgba(0,0,0,.07)', '#d9d9d5');
 T.wcRed = dotTile('#7a1c2d', 'rgba(255,255,255,.13)', '#ece8e6');
 T.bath = tileTex(4, [200, 8, 86], '#a9b0b6', 1.2, 2);
@@ -430,6 +490,21 @@ const M = {
   interior: std({ color: 0xf6f6f4, roughness: .95 }),
   slate: std({ map: T.slate, roughness: .6 }),
   skirt: std({ color: 0x75787a, roughness: .45 }),
+  ensWall: std({ map: T.ensWall, roughness: .2 }),
+  bathWall: std({ map: T.bathWall, roughness: .25 }),
+  bathBrown: std({ map: T.bathBrown, roughness: .25 }),
+  ensFloor: std({ map: T.ensFloor, roughness: .5 }),
+  bathFloor: std({ map: T.bathFloor, roughness: .4 }),
+  mosaic: std({ map: T.mosaic, roughness: .2 }),
+  laminate: std({ map: T.laminate, roughness: .55 }),
+  bedspread: std({ map: T.bedspread, roughness: 1 }),
+  drum: new THREE.MeshStandardMaterial({ map: T.drum, roughness: .9, side: THREE.DoubleSide, emissive: 0x000000 }),
+  teal: std({ color: 0x18768a, roughness: .35 }),
+  wenge: std({ color: 0x3d2a20, roughness: .45 }),
+  grayWood: std({ color: 0xa69a8c, roughness: .6 }),
+  olive: std({ color: 0x6b5a3a, roughness: .95 }),
+  wallpaper2: std({ map: T.plaster, color: 0xdccdb2, roughness: .95 }),
+  dotGlass: new THREE.MeshStandardMaterial({ color: 0xe9eef0, roughness: .2, transparent: true, opacity: .45, depthWrite: false, side: THREE.DoubleSide }),
   ochre: std({ color: 0xc19f48, roughness: .85 }),
   leather: std({ color: 0xc4b49c, roughness: .6 }),
   railing: std({ color: 0x4b4e53, roughness: .5, metalness: .4 }),
@@ -682,26 +757,26 @@ const OPS0 = {
   8: [W(121, 75, 102, 210)],                                             // window where the storage door used to be
 };
 const OPS1 = {
-  0: [W(99, 195)],                       // bedroom 1, wide window in the north-west corner
+  0: [W(110, 130)],                      // bedroom 1, window near the north-west corner
   2: [W(184, 150)],                      // bedroom 2
   4: [W(174, 140), W(504, 135)],         // bedrooms 3 and 4, street side
   7: [W(139, 100, 120, 210), W(324, 60, 140, 210)], // bathroom and en-suite, onto the laundry screen
 };
 const ROOMS = [
-  { id: 'living', f: 0, name: 'חדר דיור', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', note: 'קיר טלוויזיה עם פאנל חרדל ומזנון לבן צף, ספת עור פינתית בצבע בז׳, שולחן קפה לבן ומנורה תלויה. דלת הזזה לחצר עם וילונות וואל.' },
+  { id: 'living', f: 0, name: 'סלון', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', note: 'קיר טלוויזיה עם פאנל חרדל ומזנון לבן צף, ספת עור פינתית בצבע בז׳, שולחן קפה לבן ומנורה תלויה. דלת הזזה לחצר עם וילונות וואל.' },
   { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, ואי בורדו לכיוון הסלון.', spots: true },
   { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [75, 47, 270, 295], mat: 'tile', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
   { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
   { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [294, 836, 435, 948], mat: 'slate', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
   { id: 'mamad', f: 0, name: 'ממ״ד · חדר אחסון', dims: [315, 305], rect: [465, 640, 780, 945], mat: 'tile', note: 'מרחב מוגן דירתי מבטון מזוין שמשמש כחדר אחסון, עם מדפים לאורך הקירות. הכניסה מהמעבר שמתחת למדרגות.' },
-  { id: 'bed1', f: 1, name: 'חדר שינה 1 · הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'parquet', note: 'יחידת הורים עם חדר רחצה צמוד ומלתחה.' },
-  { id: 'bed2', f: 1, name: 'חדר שינה 2', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'parquet', note: 'חלון לכיוון החצר.' },
-  { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [16, 321, 188, 490], mat: 'bath', note: 'מקלחון, אסלה וכיור, נגיש מחדר ההורים.' },
-  { id: 'closet', f: 1, name: 'מלתחה', dims: [145, 170], rect: [200, 321, 359, 490], mat: 'parquet', note: 'חדר ארונות פתוח מחדר ההורים.' },
-  { id: 'bath', f: 1, name: 'חדר רחצה', dims: [315, 220], rect: [16, 502, 359, 724], mat: 'bath', note: 'אמבטיה, אסלה וארון כיור. משרת את חדרי הילדים.' },
+  { id: 'bed1', f: 1, name: 'חדר הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'laminate', eye: [300, 230], look: [-1, -.25], note: 'רצפת למינציה, קיר טפט מאחורי המיטה, שידת מגירות ושעון על הקיר המזרחי, מראה עומדת ומנורת תוף. דלתות למקלחת ולחדר הארונות.' },
+  { id: 'bed2', f: 1, name: 'החדר של גיא', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'parquet', note: 'חלון לכיוון החצר.' },
+  { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [22, 321, 188, 490], mat: 'ensFloor', eye: [150, 340], look: [-.4, 1], note: 'אריחים לבנים מבריקים עם פס פסיפס, ארון כיור תלוי בטורקיז, מראה מקושתת ומקלחון זכוכית עם ראש גשם.' },
+  { id: 'closet', f: 1, name: 'מלתחה', dims: [145, 170], rect: [200, 321, 359, 490], mat: 'laminate', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
+  { id: 'bath', f: 1, name: 'חדר רחצה אחים', dims: [315, 220], rect: [22, 502, 359, 724], mat: 'bathFloor', eye: [330, 612], look: [-1, 0], note: 'אריחי שמנת עם אריחים חומים, ארון כיור ארוך בוונגה עם מראה וארון גבוה, אמבטיה עם מחיצת זכוכית, מכונת כביסה מתחת לארון גבוה.' },
   { id: 'hall', f: 1, name: 'מסדרון', dims: [90, 400], rect: [371, 321, 456, 724], mat: 'parquet', note: 'מחבר בין המדרגות לכל חדרי הקומה. בתקרה פתח עלייה לגג.' },
-  { id: 'bed3', f: 1, name: 'חדר שינה 3', dims: [305, 325], rect: [468, 626, 780, 1024], mat: 'parquet', note: 'חלון לכיוון הרחוב.' },
-  { id: 'bed4', f: 1, name: 'חדר שינה 4', dims: [355, 275], rect: [88, 736, 456, 1024], mat: 'parquet', note: 'שני חלונות, ממוקם מעל הכניסה המקורה.' },
+  { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [468, 626, 780, 1024], mat: 'parquet', note: 'חלון לכיוון הרחוב.' },
+  { id: 'bed4', f: 1, name: 'החדר של מרק', dims: [355, 275], rect: [88, 736, 456, 1024], mat: 'parquet', note: 'שני חלונות, ממוקם מעל הכניסה המקורה.' },
   { id: 'balcony', f: 1, name: 'מסתור כביסה', dims: [70, 410], rect: [-72, 292, -4, 716], mat: 'balcony', note: 'מרפסת שירות מוסתרת ברפפות, צמודה לחדרי הרחצה.', noLight: true },
 ];
 
@@ -1063,11 +1138,54 @@ function desk(p, base, r, chairAt, faceTo) {
 /* first floor furniture */
 {
   const p = F[1].furn, b = L1;
-  bed(p, b, [96, 76, 306, 256], 'W', M.duvetA);
-  B(p, 94, 28, 140, 70, 0, 50, M.oak, b); B(p, 94, 262, 140, 304, 0, 50, M.oak, b);
-  CY(p, 117, 49, 10, 50, 85, M.linen, b, 16, 7); CY(p, 117, 283, 10, 50, 85, M.linen, b, 16, 7);
-  B(p, 330, 24, 440, 70, 0, 85, M.oak, b); B(p, 240, 270, 300, 300, 0, 45, M.fabric2, b);
-  B(p, 180, 90, 430, 250, 0, 1, M.rug2, b);
+  // ---- tiles / wallpaper as thin panels on the inside faces of a room, with gaps for doors and windows ----
+  const panel = (X0, Y0, X1, Y1, z0, z1, mat) => {
+    const w = (X1 - X0) / 100, d = (Y1 - Y0) / 100, h = (z1 - z0) / 100;
+    const m = new THREE.Mesh(boxUV(w, h, d, (X0 + Y0) / 100, z0 / 100), mat); m.receiveShadow = true;
+    m.position.set(wx((X0 + X1) / 2), b + (z0 + z1) / 200, wz((Y0 + Y1) / 2)); p.add(m); return onWall(m, b, z0, z1);
+  };
+  const wallRun = (along, fixed, a0, a1, gaps, z0, z1, mat, side) => {
+    const put = (u0, u1, h0, h1) => { if (u1 - u0 < .5 || h1 - h0 < .5) return; along === 'x' ? panel(u0, fixed, u1, fixed + side, h0, h1, mat) : panel(fixed, u0, fixed + side, u1, h0, h1, mat); };
+    let cur = a0;
+    for (const [g0, g1, gz0, gz1] of gaps.slice().sort((q, r) => q[0] - r[0])) { put(cur, g0, z0, z1); put(g0, g1, z0, Math.min(z1, gz0)); put(g0, g1, Math.max(z0, gz1), z1); cur = g1; }
+    put(cur, a1, z0, z1);
+  };
+  const tileRoom = ([x0, y0, x1, y1], mat, gaps = {}, z0 = 0, z1 = 274) => {
+    wallRun('x', y0, x0, x1, gaps.N || [], z0, z1, mat, 1); wallRun('x', y1 - 1, x0, x1, gaps.S || [], z0, z1, mat, 1);
+    wallRun('y', x0, y0 + 1, y1 - 1, gaps.W || [], z0, z1, mat, 1); wallRun('y', x1 - 1, y0 + 1, y1 - 1, gaps.E || [], z0, z1, mat, 1);
+  };
+
+  // ---- parents' bedroom, from the photos: laminate floor, wallpapered headboard wall, burgundy leaf bedspread ----
+  panel(94.5, 19.5, 95.5, 309, 7, 274, M.wallpaper2);
+  bed(p, b, [96, 76, 306, 256], 'W', M.bedspread);
+  B(p, 96, 262, 140, 304, 0, 52, M.grayWood, b); CY(p, 118, 283, 9, 52, 80, M.linen, b, 16, 6);
+  // light grey-wood chest of drawers on the east wall, rustic square clock above it, standing oval mirror
+  B(p, 406, 125, 452, 235, 0, 102, M.grayWood, b);
+  for (let k = 1; k < 5; k++) B(p, 405.5, 127, 406, 233, k * 20, k * 20 + .6, M.black, b);
+  for (let k = 0; k < 5; k++) for (const y of [150, 210]) B(p, 404, y - 1.5, 405.5, y + 1.5, k * 20 + 9, k * 20 + 12, M.steel, b);
+  onWall(B(p, 451, 155, 453, 205, 150, 200, M.wood, b), b, 150, 200); onWall(CY(p, 450.5, 180, 18, 160, 162, M.linen, b, 28), b, 160, 162).rotation.z = Math.PI / 2;
+  { const g = local(p, 385, 275, b, .5); const m = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.25, .25, .02, 40), M.mirror)); m.rotation.x = Math.PI / 2; m.scale.z = 2.9; m.position.y = 1.0; g.add(m);
+    const f = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.25, .012, 8, 40), M.black)); f.scale.y = 2.9; f.position.y = 1.0; g.add(f); lb(g, .02, .6, .02, -.15, .3, -.12, M.black); lb(g, .02, .6, .02, .15, .3, -.12, M.black); }
+  // olive drapes on a rod either side of the window, striped drum pendant
+  onWall(B(p, 110, 24, 275, 26, 228, 231, M.black, b), b, 228, 231);
+  for (const x0 of [112, 245]) for (let x = x0; x < x0 + 28; x += 7) onWall(B(p, x, 25 + ((x / 7) % 2) * 3, x + 7, 27 + ((x / 7) % 2) * 3, 0, 228, M.olive, b), b, 0, 228);
+  { const sh = new THREE.Mesh(new THREE.CylinderGeometry(.26, .3, .3, 32, 1, true), M.drum); sh.position.set(wx(205), b + 2.2, wz(166)); p.add(sh); CY(p, 205, 166, .3, 235, 274, M.black, b, 6); }
+  // walk-in closet: white open shelving on three sides, wood-framed sliding door
+  const shelves = (X0, Y0, X1, Y1, hang) => {
+    for (const z of [0, 40, 80, 120, 160, 200, 232]) B(p, X0, Y0, X1, Y1, z, z + 2, M.white, b);
+    const alongY = Y1 - Y0 > X1 - X0;
+    for (const z of hang ? [] : [2, 42, 82, 122, 162, 202]) {
+      let t = (alongY ? Y0 : X0) + 3; const end = (alongY ? Y1 : X1) - 3;
+      while (t < end - 15) { const l = 18 + rnd() * 18, h = 12 + rnd() * 18, c = std({ color: new THREE.Color().setHSL(rnd(), .35 + rnd() * .3, .3 + rnd() * .35), roughness: 1 });
+        alongY ? B(p, X0 + 4, t, X1 - 4, Math.min(t + l, end), z, z + h, c, b) : B(p, t, Y0 + 4, Math.min(t + l, end), Y1 - 4, z, z + h, c, b); t += l + 3; }
+    }
+    if (hang) {
+      B(p, (X0 + X1) / 2 - .6, Y0, (X0 + X1) / 2 + .6, Y1, 178, 179.5, M.steel, b);
+      for (let y = Y0 + 4; y < Y1 - 4; y += 4.5) B(p, X0 + 5, y, X1 - 5, y + 2.5, 95 + rnd() * 25, 176, std({ color: new THREE.Color().setHSL(rnd(), .3 + rnd() * .4, .25 + rnd() * .45), roughness: 1 }), b);
+    }
+  };
+  shelves(201, 330, 246, 488); shelves(246, 445, 314, 489); shelves(314, 330, 358, 488, true);
+  B(p, 214, 312, 218, 318, 0, 212, M.oak, b); B(p, 214, 312, 298, 318, 208, 212, M.oak, b);
   bed(p, b, [472, 78, 572, 278], 'N', M.duvetB);
   desk(p, b, [655, 74, 770, 134], [712, 165], [712, 70]);
   wardrobe(p, b, [738, 232, 780, 398], false);
@@ -1077,16 +1195,37 @@ function desk(p, base, r, chairAt, faceTo) {
   bed(p, b, [98, 924, 308, 1018], 'W', M.duvetC);
   wardrobe(p, b, [96, 742, 336, 800], true);
   desk(p, b, [372, 945, 452, 1020], [412, 915], [412, 1030]);
-  // ensuite
-  toilet(p, b, 62, 468, 62, 380); vanity(p, b, [20, 328, 92, 372], [56, 350]);
-  B(p, 112, 402, 188, 490, 0, 6, M.white, b);
-  const sg = new THREE.Mesh(UNIT, M.glass); sg.scale.set(.76, 1.95, .01); sg.position.set(wx(150), b + 1.0, wz(402)); p.add(sg);
-  CY(p, 160, 470, 8, 205, 207, M.steel, b, 20);
-  // closet shelving
-  B(p, 200, 372, 242, 488, 0, 235, M.cabinet, b); B(p, 316, 330, 359, 488, 0, 235, M.cabinet, b);
-  // main bath
-  RB(p, 178, 652, 357, 724, 0, 56, M.ceramic, b, .03); B(p, 186, 660, 349, 716, 45, 56.3, M.water, b);
-  toilet(p, b, 105, 690, 105, 600); vanity(p, b, [246, 502, 342, 552], [294, 524]);
+  // ---- parents' en-suite, from the photos: white gloss wall tiles, a mosaic strip, teal wall-hung vanity, dotted glass shower ----
+  tileRoom([22.5, 321, 188, 490], M.ensWall, { N: [[120, 190, 0, 210]], W: [[376, 436, 140, 210]] });
+  panel(86, 488.6, 100, 489, 0, 274, M.mosaic); panel(186.6, 432, 187, 446, 0, 274, M.mosaic);
+  toilet(p, b, 62, 466, 62, 380);
+  B(p, 23.5, 330, 68, 395, 45, 80, M.teal, b); B(p, 30, 340, 60, 385, 80, 94, M.ceramic, b); B(p, 33, 343, 57, 382, 90, 94.5, M.water, b);
+  CY(p, 26, 362, 1.2, 94, 110, M.steel, b, 8); B(p, 25, 361, 40, 363, 108, 110, M.steel, b);
+  B(p, 23, 335, 26, 390, 60, 63, M.steel, b);
+  { const g = local(p, 23.6, 362, b, Math.PI / 2); const m = new THREE.Mesh(new THREE.CylinderGeometry(.24, .24, .01, 32, 1, false, 0, Math.PI), M.mirror); m.rotation.x = Math.PI / 2; m.position.set(0, 1.63, .01); g.add(m); lb(g, .48, .52, .01, 0, 1.37, .01, M.mirror); onWall(g, b, 111, 187); }
+  B(p, 25, 342, 38, 382, 108, 109, M.glass, b);
+  B(p, 112, 402, 188, 490, 0, 4, M.white, b);
+  for (const [x0, y0, x1, y1] of [[112, 401.5, 188, 402.5], [111.5, 402, 112.5, 490]]) { const gl = B(p, x0, y0, x1, y1, 4, 200, M.dotGlass, b); gl.castShadow = false; gl.renderOrder = 3; }
+  B(p, 140, 450, 170, 480, 230, 232, M.steel, b); B(p, 185, 464, 188, 466, 205, 232, M.steel, b);
+  // ---- siblings' bathroom, from the photos: cream tiles with brown accents, wenge vanity, tub with glass screen, washer under a tall cabinet ----
+  tileRoom([22.5, 502, 359, 724], M.bathWall, { E: [[574, 650, 0, 210]], W: [[541, 641, 120, 210]] });
+  panel(118, 502.4, 132, 503.4, 0, 274, M.bathBrown); panel(23.5, 690, 24.5, 704, 0, 274, M.bathBrown);
+  toilet(p, b, 48, 522, 140, 522);
+  // long wenge vanity on the north wall with a vessel basin, framed mirror, tall cabinet beside it
+  B(p, 140, 503, 300, 553, 70, 82, M.wenge, b); B(p, 140, 503, 190, 553, 10, 70, M.wenge, b);
+  for (const z of [26, 50]) B(p, 150, 553, 180, 554.5, z, z + 2, M.steel, b);
+  B(p, 220, 512, 280, 548, 82, 96, M.ceramic, b); B(p, 224, 515, 276, 545, 92, 96.5, M.water, b);
+  CY(p, 250, 508, 1.3, 82, 104, M.steel, b, 8); B(p, 249, 508, 251, 522, 102, 104, M.steel, b);
+  onWall(B(p, 185, 503.5, 285, 506, 112, 192, M.wenge, b), b, 112, 192); onWall(B(p, 191, 506, 279, 506.6, 118, 186, M.mirror, b), b, 118, 186);
+  onWall(B(p, 215, 504, 255, 512, 198, 205, M.steel, b), b, 198, 205);
+  B(p, 300, 503, 345, 543, 0, 90, M.wenge, b); B(p, 290, 503, 345, 541, 150, 270, M.wenge, b);
+  // tub along the south wall with brown tiled apron and a folding glass screen; washer under a tall cabinet; bamboo shelf by the window
+  B(p, 188, 652, 358, 724, 0, 54, M.bathBrown, b); RB(p, 190, 654, 357, 723, 50, 58, M.ceramic, b, .02); B(p, 198, 662, 349, 715, 46, 58.3, M.water, b);
+  { const gl = B(p, 268, 652, 269, 723, 58, 200, M.glass, b); gl.castShadow = false; } B(p, 255, 652, 358, 654, 190, 192, M.steel, b);
+  B(p, 125, 664, 185, 723, 0, 85, M.white, b); CY(p, 155, 663, 17, 30, 31, M.black, b, 24).rotation.x = Math.PI / 2;
+  B(p, 125, 668, 185, 723, 90, 272, M.wenge, b); B(p, 154.6, 667.5, 155.4, 668, 92, 270, M.black, b);
+  B(p, 70, 690, 110, 722, 0, 95, M.oak, b);
+  { const sh = new THREE.Mesh(new THREE.CylinderGeometry(.09, .12, .16, 16), std({ color: 0xb87a3a, roughness: .4, emissive: 0x3a1a00 })); sh.position.set(wx(110), b + 2.1, wz(590)); p.add(sh); CY(p, 110, 590, .3, 218, 274, M.black, b, 6); }
   // hall + balcony
   plant(p, b, 380, 340, .9);
   B(p, -64, 625, -6, 685, 0, 85, M.white, b); CY(p, -6, 655, 15, 30, 60, M.black, b, 20).rotation.z = Math.PI / 2;
@@ -1389,6 +1528,7 @@ function enterWalk(id) {
   const r = ROOMS.find(q => q.id === id); if (!r) return;
   if (!walking) walking = { back: focus, mode: focus ? prevMode : state.mode, cam: focus ? prevCam : [camera.position.clone(), controls.target.clone()] };
   walking.id = id;
+  { const [x0, y0, x1, y1] = r.rect; walking.pos = r.eye ? r.eye.slice() : [(x0 + x1) / 2, (y0 + y1) / 2]; }
   if (focus) { focus = null; clearFocusFilters(); if (autoWalls) { state.walls = 'full'; autoWalls = false; } document.getElementById('focusBar').hidden = true; }
   setMode('full', true); // whole house with full walls, ceilings and roof, so the room looks real from inside
   const look = r.look ? new THREE.Vector3(r.look[0], 0, r.look[1]) : controls.target.clone().sub(camera.position); look.y = 0;
@@ -1399,9 +1539,49 @@ function enterWalk(id) {
   flyTo(eye.clone().sub(look.normalize().multiplyScalar(.05)), eye, 1.4);
   document.getElementById('card').hidden = true;
   document.getElementById('walkName').textContent = r.name; document.getElementById('walkBar').hidden = false;
-  document.getElementById('hint').textContent = 'גרירה להסתובבות · גלילה או כפתורי הזום לשינוי זווית הראייה · Esc ליציאה';
+  document.getElementById('hint').textContent = 'גרירה להסתובבות · לחיצה על הרצפה למעבר לשם, גם לחדר הסמוך · גלילה לזום · Esc ליציאה';
 }
+const walkRing = new THREE.Mesh(new THREE.RingGeometry(.2, .26, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .85, depthTest: false, side: THREE.DoubleSide }));
+walkRing.rotation.x = -Math.PI / 2; walkRing.renderOrder = 10; walkRing.visible = false; scene.add(walkRing);
+// how far the camera may step back from the eye point without leaving the room
+function walkRoomMaxBack() {
+  if (!walking || !walking.pos) return .05;
+  const r = ROOMS.find(q => q.id === walking.id), [x0, y0, x1, y1] = r.rect;
+  const look = controls.target.clone().sub(camera.position); look.y = 0; look.normalize();
+  const X = walking.pos[0], Y = walking.pos[1]; let t = 9;
+  const dx = -look.x * 100, dy = -look.z * 100;
+  if (dx > 0) t = Math.min(t, (x1 - 25 - X) / dx); if (dx < 0) t = Math.min(t, (x0 + 25 - X) / dx);
+  if (dy > 0) t = Math.min(t, (y1 - 25 - Y) / dy); if (dy < 0) t = Math.min(t, (y0 + 25 - Y) / dy);
+  return Math.max(.05, Math.min(3.2, t));
+}
+// floor point under the pointer, only when nothing (wall, furniture) is in front of it
+function walkFloorHit(e) {
+  ptr.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(ptr, camera);
+  const hits = ray.intersectObjects([F[0].group, F[1].group], true).filter(h => visibleChain(h.object) && h.object.material !== M.glass && h.object.material !== M.sheer && h.object.material !== M.dotGlass && !h.object.isPoints && h.object !== walkRing);
+  const h = hits[0]; if (!h) return null;
+  if (h.object.userData.room) return { point: h.point, room: h.object.userData.room };
+  // furniture standing on the floor: walk to its foot if it is close to the floor
+  return null;
+}
+function walkTo(point, roomId) {
+  const r = ROOMS.find(q => q.id === roomId); if (!r) return;
+  const X = (point.x + CX) * 100, Y = (point.z + CZ) * 100;
+  const [x0, y0, x1, y1] = r.rect, cx = Math.min(x1 - 30, Math.max(x0 + 30, X)), cy = Math.min(y1 - 30, Math.max(y0 + 30, Y));
+  walking.id = roomId; walking.pos = [cx, cy];
+  controls.minDistance = controls.maxDistance = .05;
+  const look = controls.target.clone().sub(camera.position); look.y = 0; if (look.lengthSq() < 1e-6) look.set(1, 0, 0); look.normalize();
+  const eye = new THREE.Vector3(wx(cx), F[r.f].base + EYE, wz(cy));
+  flyTo(eye.clone().sub(look.multiplyScalar(.05)), eye, .9);
+  document.getElementById('walkName').textContent = r.name; document.getElementById('roomSel').value = roomId;
+}
+renderer.domElement.addEventListener('pointermove', e => {
+  if (!walking || e.buttons) { walkRing.visible = false; return; }
+  const h = walkFloorHit(e);
+  walkRing.visible = !!h; renderer.domElement.style.cursor = h ? 'pointer' : '';
+  if (h) walkRing.position.set(h.point.x, h.point.y + .01, h.point.z);
+});
 function exitWalk(goBack = true) {
+  walkRing.visible = false; renderer.domElement.style.cursor = '';
   if (!walking) return;
   const w = walking; walking = null;
   setWalkControls(false);
@@ -1449,6 +1629,12 @@ tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
 tog('tRotate', 'rotate', () => controls.autoRotate = state.rotate);
 document.getElementById('cardX').addEventListener('click', () => selectRoom(null));
+document.querySelectorAll('[data-col]').forEach(btn => {
+  const panel = document.getElementById(btn.dataset.col), key = 'col_' + btn.dataset.col;
+  const set = min => { panel.classList.toggle('min', min); btn.setAttribute('aria-expanded', !min); btn.setAttribute('aria-label', min ? 'הרחבה' : 'כיווץ'); try { localStorage.setItem(key, min ? '1' : ''); } catch (e) {} };
+  try { if (localStorage.getItem(key)) set(true); } catch (e) {}
+  btn.addEventListener('click', () => set(!panel.classList.contains('min')));
+});
 { // room picker, grouped by floor
   const sel = document.getElementById('roomSel');
   [['קומת קרקע', 0], ['קומה א׳', 1]].forEach(([label, f]) => {
@@ -1461,7 +1647,17 @@ document.getElementById('cardX').addEventListener('click', () => selectRoom(null
 document.getElementById('cFocus').addEventListener('click', () => { if (focus && focus === state.sel) exitFocus(); else if (state.sel) focusRoom(state.sel); });
 document.getElementById('focusBar').addEventListener('click', () => exitFocus());
 function zoomBy(f) {
-  if (walking) { camera.fov = THREE.MathUtils.clamp(camera.fov * (f < 1 ? .88 : 1.14), 30, 95); camera.updateProjectionMatrix(); return; }
+  if (walking) {
+    const back = controls.maxDistance;
+    if (f > 1) {
+      if (camera.fov < 100) camera.fov = Math.min(100, camera.fov * 1.14);
+      else controls.minDistance = controls.maxDistance = Math.min(walkRoomMaxBack(), back + .4);   // step back, staying inside the room
+    } else {
+      if (back > .06) controls.minDistance = controls.maxDistance = Math.max(.05, back - .4);
+      else camera.fov = Math.max(30, camera.fov * .88);
+    }
+    camera.updateProjectionMatrix(); return;
+  }
   const base = camTween ? camTween.p1.clone().sub(camTween.t1) : camera.position.clone().sub(controls.target);
   const tgt = camTween ? camTween.t1.clone() : controls.target.clone();
   const len = THREE.MathUtils.clamp(base.length() * f, controls.minDistance, controls.maxDistance);
@@ -1503,7 +1699,7 @@ function pickRoom(e) {
 }
 renderer.domElement.addEventListener('pointerup', e => {
   if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
-  if (walking) return;
+  if (walking) { const h = walkFloorHit(e); if (h) walkTo(h.point, h.room); return; }
   const id = pickRoom(e); if (id || !focus) selectRoom(id, false);
 });
 renderer.domElement.addEventListener('dblclick', e => { if (walking) return; const id = pickRoom(e); if (id) (focus === id ? enterWalk(id) : focusRoom(id)); });
