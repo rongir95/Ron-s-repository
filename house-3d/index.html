@@ -78,6 +78,12 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .card p{margin:0;color:var(--muted);line-height:1.55;font-size:13px}
 .card .x{all:unset;position:absolute;top:10px;left:12px;cursor:pointer;font-size:20px;line-height:1;color:var(--muted);padding:4px}
 
+.zoom{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(76px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;padding:4px;gap:2px;border-radius:12px}
+.zoom button{all:unset;cursor:pointer;width:40px;height:40px;display:grid;place-items:center;border-radius:9px;color:var(--ink);font:500 22px/1 var(--f-ui)}
+.zoom button:hover{background:var(--line)}
+.zoom button:active{background:var(--accent);color:var(--accent-ink)}
+.zoom button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.zoom hr{border:0;border-top:1px solid var(--line);margin:0 6px}
 .hint{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--muted);padding:6px 12px;border-radius:999px}
 
 .lbl{display:flex;gap:7px;align-items:baseline;pointer-events:auto;cursor:pointer;background:var(--paper);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:4px 10px;font:500 12px/1.3 var(--f-ui);white-space:nowrap;box-shadow:0 4px 12px rgba(10,20,30,.15);direction:rtl;transition:background .3s}
@@ -103,6 +109,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   .mbtn{padding:8px 10px;font-size:13px;flex:1;text-align:center}
   .card{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));width:auto;bottom:calc(132px + env(safe-area-inset-bottom,0px))}
   .hint{display:none}
+  .zoom{left:auto;right:max(12px,env(safe-area-inset-right,0px));bottom:auto;top:50%;transform:translateY(-50%)}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -159,6 +166,12 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
     <dt>שטח</dt><dd id="cArea"></dd>
   </dl>
   <p id="cNote"></p>
+</div>
+
+<div class="zoom panel" role="group" aria-label="זום">
+  <button id="zIn" aria-label="התקרבות" title="התקרבות (+)">+</button>
+  <hr>
+  <button id="zOut" aria-label="התרחקות" title="התרחקות (−)">−</button>
 </div>
 
 <div class="hint panel" id="hint">גרירה לסיבוב · גלילה לזום · לחיצה על חדר לפרטים</div>
@@ -1001,12 +1014,28 @@ tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
 tog('tRotate', 'rotate', () => controls.autoRotate = state.rotate);
 document.getElementById('cardX').addEventListener('click', () => selectRoom(null));
+function zoomBy(f) {
+  const base = camTween ? camTween.p1.clone().sub(camTween.t1) : camera.position.clone().sub(controls.target);
+  const tgt = camTween ? camTween.t1.clone() : controls.target.clone();
+  const len = THREE.MathUtils.clamp(base.length() * f, controls.minDistance, controls.maxDistance);
+  flyTo(tgt.clone().add(base.setLength(len)), tgt, .45);
+}
+// hold a button to keep zooming
+for (const [id, f] of [['zIn', .8], ['zOut', 1.25]]) {
+  const el = document.getElementById(id); let timer = null;
+  const stop = () => { clearInterval(timer); timer = null; };
+  el.addEventListener('pointerdown', e => { e.preventDefault(); zoomBy(f); stop(); timer = setInterval(() => zoomBy(f), 260); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => el.addEventListener(t, stop));
+  el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); zoomBy(f); } });
+}
 window.addEventListener('keydown', e => {
   if (e.target.closest && e.target.closest('input,textarea')) return;
   const map = { '1': 'full', '2': 'ground', '3': 'first', '4': 'exploded' };
   if (map[e.key]) setMode(map[e.key]);
   if (e.key === 'n' || e.key === 'N') document.getElementById('tNight').click();
   if (e.key === 'Escape') selectRoom(null);
+  if (e.key === '+' || e.key === '=') zoomBy(.8);
+  if (e.key === '-' || e.key === '_') zoomBy(1.25);
   if (e.key === 'w' || e.key === 'W') setWalls({ full: 'low', low: 'none', none: 'full' }[state.walls]);
 });
 
