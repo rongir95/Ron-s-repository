@@ -550,7 +550,7 @@ const OPS0 = {
   2: [W(187, 100, 100, 200), W(440, 60, 150, 200)],                     // safe-room window between shutter pockets; guest WC
   4: [{ type: 'front', at: 65, w: 90, sill: 0, head: 222 }],           // front door at the lower end of the angled wall
   6: [W(203, 140, 105, 215)],                                           // kitchen window over the sink
-  8: [{ type: 'utility', at: 121, w: 75, sill: 0, head: 210 }],         // storage room, entered from outside
+  8: [W(121, 75, 90, 210)],                                             // window where the storage door used to be
 };
 const OPS1 = {
   0: [W(99, 195)],                       // bedroom 1, wide window in the north-west corner
@@ -561,7 +561,7 @@ const OPS1 = {
 const ROOMS = [
   { id: 'living', f: 0, name: 'חדר דיור ופינת אוכל', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', note: 'חלל פתוח עם דלת הזזה רחבה אל המשטח המרוצף והחצר הצמודה.' },
   { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'מטבח פתוח לפינת האוכל, עם אי ישיבה וחלון מעל הכיור.' },
-  { id: 'storage', f: 0, name: 'מחסן', dims: [160, 245], rect: [75, 47, 254, 295], mat: 'concrete', note: 'מחסן צמוד בקומת הקרקע, עם דלת כניסה מבחוץ, מהצד המערבי.' },
+  { id: 'storage', f: 0, name: 'פינה (לשעבר מחסן)', dims: [160, 245], rect: [75, 47, 270, 295], mat: 'tile', note: 'קירות המחסן נהרסו והשטח צורף לחלל המגורים. במקום דלת המחסן הותקן חלון.' },
   { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
   { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [302, 836, 444, 979], mat: 'bath', note: 'שירותים וכיור לאורחים, עם חלון אוורור.' },
   { id: 'mamad', f: 0, name: 'חדר שינה 5 · ממ״ד', dims: [315, 305], rect: [465, 640, 780, 973], mat: 'parquet', note: 'מרחב מוגן דירתי מבטון מזוין. הכניסה אליו מהמעבר שמתחת למדרגות.' },
@@ -588,8 +588,7 @@ const slab0 = offsetPoly(OUT0, 12.5);
 slab(F[0].shell, slab0, 0, 0.45, M.tile, M.concrete);
 buildOutline(F[0].shell, OUT0, OPS0, { t: 25, base: 0, h: 310, outMat: M.stone, inMat: M.interior });
 const I = (a, b, ops = [], t = 12, extra = {}) => wall(F[0].shell, a, b, Object.assign({ t, base: 0, h: 280, ops, inMat: M.interior }, extra));
-I([63, 301], [260, 301]);
-I([260, 35], [260, 301]);
+// the former storage room's inner walls were demolished; its space now opens onto the living area
 I([296, 830], [450, 830], [D(104, 70)]);
 I([450, 625], [450, 985], [], 30);
 I([450, 625], [PARTY, 625], [D(120, 85)], 30);
@@ -741,9 +740,11 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 196, 382, 268, 538, 0, 88, M.cabinetDark, b); B(p, 190, 376, 284, 544, 88, 93, M.quartz, b);
   for (let i = 0; i < 3; i++) { CY(p, 300, 410 + i * 55, 17, 64, 68, M.oak, b); CY(p, 300, 410 + i * 55, 2.5, 0, 64, M.black, b, 8); CY(p, 300, 410 + i * 55, 15, 0, 2, M.black, b); }
   for (let i = 0; i < 3; i++) { CY(p, 230, 405 + i * 55, 10, 175, 195, M.black, b, 18, 5); CY(p, 230, 405 + i * 55, .5, 195, 280, M.black, b, 6); }
-  // storage shelves
-  for (const z of [0, 50, 100, 150, 195]) B(p, 205, 52, 248, 230, z, z + 3, M.steel, b);
-  for (let i = 0; i < 4; i++) B(p, 209, 60 + i * 42, 244, 92 + i * 42, 53 + (i % 3) * 50, 80 + (i % 3) * 50, M.fabric2, b);
+
+  // reading corner in the former storage room
+  RB(p, 95, 60, 165, 130, 8, 42, M.fabric2, b, .04); RB(p, 95, 60, 113, 130, 40, 82, M.fabric2, b, .04);
+  CY(p, 130, 165, 22, 0, 50, M.oak, b, 24); B(p, 85, 230, 125, 290, 0, 180, M.oak, b);
+  plant(p, b, 225, 75, 1.3);
   // foyer
   B(p, 305, 700, 340, 812, 0, 95, M.oak, b); plant(p, b, 425, 650, .9);
   // guest wc
