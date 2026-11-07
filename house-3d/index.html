@@ -60,6 +60,15 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .seg button{all:unset;cursor:pointer;text-align:center;padding:6px 6px;border-radius:8px;font-size:13px;color:var(--ink)}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.roomsel{all:unset;box-sizing:border-box;margin:0 2px 2px;padding:7px 10px;border-radius:9px;background:var(--line);color:var(--ink);font:500 13px var(--f-ui);cursor:pointer;width:calc(100% - 4px);appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:14px 50%,9px 50%;background-size:5px 5px;background-repeat:no-repeat}
+.roomsel:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.roomsel option,.roomsel optgroup{color:#1d2430;background:#fff}
+.cbtn{all:unset;box-sizing:border-box;display:block;width:100%;text-align:center;margin-top:12px;padding:9px 12px;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:13px;cursor:pointer}
+.cbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.focusbar{all:unset;position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:9px 16px;border-radius:999px;cursor:pointer;font-weight:500;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);box-shadow:0 10px 30px rgba(15,25,40,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);white-space:nowrap}
+.focusbar b{font-weight:600}
+.focusbar .back{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:3px 10px;font-size:12px}
+.focusbar:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .views{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 2px 2px}
 .views .tbtn{justify-content:center;background:var(--line);padding:6px 8px}
 .views .tbtn:hover{filter:brightness(.95)}
@@ -105,6 +114,8 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   .tools .tbtn{flex:none;padding:6px 9px}
   .views{display:flex;padding:0}
   .seg{flex:none;margin:0}
+  .roomsel{flex:none;width:auto;margin:0;padding-left:26px}
+  .focusbar{top:calc(128px + env(safe-area-inset-top,0px));max-width:calc(100% - 24px)}
   .modes{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));transform:none;justify-content:space-between;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
   .mbtn{padding:8px 10px;font-size:13px;flex:1;text-align:center}
   .card{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));width:auto;bottom:calc(132px + env(safe-area-inset-bottom,0px))}
@@ -141,6 +152,10 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
     <button data-walls="low" aria-pressed="false">נמוכים</button>
     <button data-walls="none" aria-pressed="false">ללא</button>
   </div>
+  <h2>מבט על חדר</h2>
+  <select class="roomsel" id="roomSel" aria-label="בחירת חדר להתמקדות">
+    <option value="">בחרו חדר…</option>
+  </select>
   <h2>מבט</h2>
   <div class="views">
     <button class="tbtn" data-view="street">חזית</button>
@@ -166,7 +181,10 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
     <dt>שטח</dt><dd id="cArea"></dd>
   </dl>
   <p id="cNote"></p>
+  <button class="cbtn" id="cFocus">הצגת החדר הזה בלבד</button>
 </div>
+
+<button class="focusbar" id="focusBar" hidden><span class="back">חזרה לכל הבית</span><span>מבט על <b id="focusName"></b></span></button>
 
 <div class="zoom panel" role="group" aria-label="זום">
   <button id="zIn" aria-label="התקרבות" title="התקרבות (+)">+</button>
@@ -174,7 +192,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <button id="zOut" aria-label="התרחקות" title="התרחקות (−)">−</button>
 </div>
 
-<div class="hint panel" id="hint">גרירה לסיבוב · גלילה לזום · לחיצה על חדר לפרטים</div>
+<div class="hint panel" id="hint">גרירה לסיבוב · גלילה לזום · לחיצה כפולה על חדר להצגתו בלבד</div>
 
 <script type="importmap">
 { "imports": {
@@ -502,7 +520,7 @@ function slab(p, poly, top, thick, capMat, sideMat, holes = []) {
   for (const h of holes) s.holes.push(new THREE.Path(h.map(([X, Y]) => new THREE.Vector2(wx(X), wz(Y)))));
   const g = new THREE.ExtrudeGeometry(s, { depth: thick, bevelEnabled: false });
   g.rotateX(Math.PI / 2);
-  const m = shadowy(new THREE.Mesh(g, [capMat, sideMat])); m.position.y = top; p.add(m); return m;
+  const m = shadowy(new THREE.Mesh(g, [capMat, sideMat])); m.position.y = top; m.userData.slab = true; p.add(m); return m;
 }
 
 /* ---------------- walls & openings ---------------- */
@@ -528,11 +546,12 @@ function wall(p, a, b, o) {
     const m = shadowy(new THREE.Mesh(g, mats)); const c = (s + e) / 2;
     m.position.set(wx(a[0] + ux * c), o.base + (z0 + z1) / 200, wz(a[1] + uy * c)); m.rotation.y = theta; p.add(m);
     m.userData.wall = { base: o.base, y0: o.base + z0 / 100, y1: o.base + z1 / 100 }; wallPieces.push(m);
+    m.userData.seg = [a[0] + ux * s, a[1] + uy * s, a[0] + ux * e, a[1] + uy * e, m.position.x, m.position.z];
   }
   for (const op of ops) opening(p, a, ux, uy, theta, op, o);
 }
 function opening(p, a, ux, uy, theta, op, o) {
-  const g = new THREE.Group(); g.position.set(wx(a[0] + ux * op.at), o.base, wz(a[1] + uy * op.at)); g.rotation.y = theta; p.add(g); openingGroups.push(g);
+  const g = new THREE.Group(); g.position.set(wx(a[0] + ux * op.at), o.base, wz(a[1] + uy * op.at)); g.rotation.y = theta; p.add(g); openingGroups.push(g); g.userData.plan = [a[0] + ux * op.at, a[1] + uy * op.at];
   const w = op.w / 100, s = (op.sill || 0) / 100, hd = op.head / 100, t = o.t / 100, os = o.outSide || 1, hgt = hd - s;
   if (op.type === 'door') {
     const d = t + 0.03;
@@ -668,6 +687,7 @@ for (const r of ROOMS) {
   el.addEventListener('pointerdown', e => e.stopPropagation());
   el.addEventListener('click', e => { e.stopPropagation(); selectRoom(r.id, true); });
   const lbl = new CSS2DObject(el); lbl.position.set(wx((x0 + x1) / 2), fl.base + 1.25, wz((y0 + y1) / 2));
+  lbl.userData.room = r.id; el.addEventListener('dblclick', e => { e.stopPropagation(); focusRoom(r.id); });
   fl.group.add(lbl); fl.labels.push(lbl); r.el = el;
   if (!r.noLight) {
     const ceil = r.f === 0 ? 2.8 : L1 + H2;
@@ -1015,7 +1035,8 @@ const VIEWS = {
   garden: () => [new THREE.Vector3(5.5, 4.6, -17), new THREE.Vector3(0.6, 2.6, 0)],
   top: () => [new THREE.Vector3(0.6, 30, 0.42), new THREE.Vector3(0.6, 0, 0.4)],
 };
-function setMode(m) {
+function setMode(m, keepFocus) {
+  if (focus && !keepFocus) { focus = null; clearFocusFilters(); if (autoWalls) { state.walls = 'full'; autoWalls = false; } document.getElementById('focusBar').hidden = true; document.getElementById('cFocus').textContent = 'הצגת החדר הזה בלבד'; document.getElementById('roomSel').value = ''; }
   state.mode = m;
   document.querySelectorAll('.mbtn').forEach(b => b.setAttribute('aria-selected', b.dataset.mode === m));
   F[1].group.visible = m !== 'ground';
@@ -1030,7 +1051,7 @@ function setMode(m) {
   if (m === 'exploded') dir = new THREE.Vector3(-1, 1.05, 1.15).setLength(24);
   const tgt = new THREE.Vector3(0.6, ty, 0.4);
   flyTo(tgt.clone().add(dir.setLength(Math.max(16, Math.min(dir.length(), 26)) * (m === 'exploded' ? 1.15 : 1))), tgt, 1.1);
-  document.getElementById('hint').textContent = m === 'full' ? 'גרירה לסיבוב · גלילה לזום · בחרו קומה כדי להיכנס פנימה' : 'גרירה לסיבוב · גלילה לזום · לחיצה על חדר לפרטים';
+  document.getElementById('hint').textContent = m === 'full' ? 'גרירה לסיבוב · גלילה לזום · בחרו קומה או חדר כדי להיכנס פנימה' : 'גרירה לסיבוב · גלילה לזום · לחיצה כפולה על חדר להצגתו בלבד';
 }
 /* walls: full height, cut at 1 m (dollhouse), or only a thin footprint on the floor */
 function applyWalls() {
@@ -1038,25 +1059,27 @@ function applyWalls() {
   const cut = eff === 'full' ? null : eff === 'low' ? 1.0 : 0.06;
   for (const m of wallPieces) {
     const u = m.userData.wall;
+    if (m.userData.focusHide) { m.visible = false; continue; }
     if (cut === null) { m.visible = true; m.scale.y = 1; m.position.y = (u.y0 + u.y1) / 2; continue; }
     const top = u.base + cut;
     if (u.y0 >= top - 0.001) { m.visible = false; continue; }
     const y1 = Math.min(u.y1, top); m.visible = true;
     m.scale.y = (y1 - u.y0) / (u.y1 - u.y0); m.position.y = (u.y0 + y1) / 2;
   }
-  openingGroups.forEach(g => g.visible = cut === null);
-  fixtures.forEach(f => f.visible = cut === null);
+  openingGroups.forEach(g => g.visible = cut === null && !g.userData.focusHide);
+  fixtures.forEach(f => f.visible = cut === null && !f.userData.focusHide);
   document.querySelectorAll('[data-walls]').forEach(b => b.setAttribute('aria-pressed', b.dataset.walls === state.walls));
 }
 function setWalls(w) {
-  state.walls = w;
+  state.walls = w; autoWalls = false;
   if (w !== 'full' && state.mode === 'full') setMode('ground'); else applyWalls();
 }
 function applyNeighbor() { neighbor.visible = state.neighbor && state.mode === 'full'; }
 function applyLabels() {
   const m = state.mode;
-  F[0].labels.forEach(l => l.visible = state.labels && (m === 'ground' || m === 'exploded'));
-  F[1].labels.forEach(l => l.visible = state.labels && (m === 'first' || m === 'exploded'));
+  const ok = l => !focus || l.userData.room === focus;
+  F[0].labels.forEach(l => l.visible = state.labels && (m === 'ground' || m === 'exploded') && ok(l));
+  F[1].labels.forEach(l => l.visible = state.labels && (m === 'first' || m === 'exploded') && ok(l));
 }
 function applyNight() {
   const n = state.night;
@@ -1074,6 +1097,87 @@ function applyNight() {
   window.__streetLight.intensity = n ? 30 : 0;
   window.__sign.material.emissiveIntensity = n ? 1.2 : .15;
   renderer.toneMappingExposure = n ? 1.15 : 1.0;
+}
+/* ---------- single-room view ----------
+   Shows one room on its own: its floor, its furniture and the walls around it (trimmed to the room),
+   with the rest of the house, the garden and the neighbour hidden. */
+let focus = null, prevMode = 'full', prevCam = null, autoWalls = false;
+const focusTouched = [];
+const hideForFocus = o => { if (o.visible) { o.visible = false; focusTouched.push(o); } };
+function clipSeg(ax, ay, bx, by, [x0, y0, x1, y1]) {
+  let t0 = 0, t1 = 1; const dx = bx - ax, dy = by - ay;
+  const P = [-dx, dx, -dy, dy], Q = [ax - x0, x1 - ax, ay - y0, y1 - ay];
+  for (let i = 0; i < 4; i++) {
+    if (P[i] === 0) { if (Q[i] < 0) return null; continue; }
+    const r = Q[i] / P[i];
+    if (P[i] < 0) { if (r > t1) return null; if (r > t0) t0 = r; } else { if (r < t0) return null; if (r < t1) t1 = r; }
+  }
+  return t1 - t0 > 1e-4 ? [t0, t1] : null;
+}
+const planXY = o => { const v = o.getWorldPosition(new THREE.Vector3()); return [(v.x + CX) * 100, (v.z + CZ) * 100]; };
+const inRect = ([X, Y], [x0, y0, x1, y1], pad) => X >= x0 - pad && X <= x1 + pad && Y >= y0 - pad && Y <= y1 + pad;
+function clearFocusFilters() {
+  focusTouched.splice(0).forEach(o => o.visible = true);
+  for (const m of wallPieces) {
+    delete m.userData.focusHide;
+    if (m.userData.seg && m.userData.full) { m.scale.x = 1; m.position.x = m.userData.seg[4]; m.position.z = m.userData.seg[5]; delete m.userData.full; }
+  }
+  openingGroups.forEach(g => delete g.userData.focusHide); fixtures.forEach(f => delete f.userData.focusHide);
+}
+function focusRoom(id) {
+  const r = ROOMS.find(q => q.id === id); if (!r) return;
+  if (!focus) {
+    // full-height walls hide most of a single room, so drop them to 1 m for this view (restored on exit)
+    autoWalls = state.walls === 'full'; if (autoWalls) state.walls = 'low';
+    prevMode = state.mode; prevCam = camTween ? [camTween.p1.clone(), camTween.t1.clone()] : [camera.position.clone(), controls.target.clone()]; }
+  clearFocusFilters();
+  focus = id;
+  setMode(r.f === 0 ? 'ground' : 'first', true);
+  scene.updateMatrixWorld(true);
+  const rect = r.rect, pad = 24;
+  // other floor, garden, neighbour, slabs, other rooms
+  hideForFocus(F[1 - r.f].group); hideForFocus(site); hideForFocus(neighbor);
+  F[r.f].shell.children.forEach(o => {
+    if (o.userData.slab) hideForFocus(o);
+    else if (!o.userData.wall && !o.userData.room && !openingGroups.includes(o) && !fixtures.includes(o) && !inRect(planXY(o), rect, 6)) hideForFocus(o);
+  });
+  ROOMS.forEach(q => { if (q.id !== id) hideForFocus(q.mesh); });
+  F[r.f].furn.children.forEach(o => { if (!o.userData.wall && !inRect(planXY(o), rect, 6)) hideForFocus(o); });
+  F[r.f].lights.forEach(l => { if (!inRect(planXY(l), rect, 6)) hideForFocus(l); });
+  fixtures.forEach(f => { f.userData.focusHide = true; }); // no ceiling in this view, so no ceiling fixtures
+  openingGroups.forEach(g => { if (!g.userData.plan || !inRect(g.userData.plan, rect, pad)) g.userData.focusHide = true; });
+  // walls: keep only the part of each wall that borders the room
+  const big = [rect[0] - pad, rect[1] - pad, rect[2] + pad, rect[3] + pad];
+  for (const m of wallPieces) {
+    if (!m.userData.seg) { if (!inRect(planXY(m), rect, pad)) m.userData.focusHide = true; continue; }
+    const [ax, ay, bx, by] = m.userData.seg;
+    const isThisFloor = Math.abs(m.userData.wall.base - F[r.f].base) < .01;
+    const c = isThisFloor ? clipSeg(ax, ay, bx, by, big) : null;
+    if (!c) { m.userData.focusHide = true; continue; }
+    const [t0, t1] = c; m.userData.full = true;
+    m.scale.x = t1 - t0;
+    m.position.x = wx(ax + (bx - ax) * (t0 + t1) / 2); m.position.z = wz(ay + (by - ay) * (t0 + t1) / 2);
+  }
+  applyWalls(); applyLabels(); selectRoom(id, false);
+  document.getElementById('focusName').textContent = r.name;
+  document.getElementById('focusBar').hidden = false;
+  document.getElementById('cFocus').textContent = 'חזרה לכל הבית';
+  document.getElementById('roomSel').value = id;
+  const w = (rect[2] - rect[0]) / 100, d = (rect[3] - rect[1]) / 100, base = F[r.f].base;
+  const tgt = new THREE.Vector3(wx((rect[0] + rect[2]) / 2), base + .5, wz((rect[1] + rect[3]) / 2));
+  const dir = camera.position.clone().sub(controls.target); dir.y = 0;
+  if (dir.lengthSq() < 1e-6) dir.set(-1, 0, 1);
+  dir.normalize().multiplyScalar(.45); dir.y = 1;
+  flyTo(tgt.clone().add(dir.setLength(Math.max(w, d) * 1.9 + 4.5)), tgt, 1.1);
+}
+function exitFocus(restoreMode = true) {
+  if (!focus) return;
+  focus = null; clearFocusFilters();
+  if (autoWalls) { state.walls = 'full'; autoWalls = false; }
+  document.getElementById('focusBar').hidden = true;
+  document.getElementById('cFocus').textContent = 'הצגת החדר הזה בלבד';
+  document.getElementById('roomSel').value = '';
+  if (restoreMode) { setMode(prevMode); if (prevCam) flyTo(prevCam[0], prevCam[1], 1.1); } else { applyWalls(); applyLabels(); }
 }
 function selectRoom(id, fly) {
   ROOMS.forEach(r => { r.mesh.material = r.baseMat; r.el.classList.remove('on'); });
@@ -1105,6 +1209,17 @@ tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
 tog('tRotate', 'rotate', () => controls.autoRotate = state.rotate);
 document.getElementById('cardX').addEventListener('click', () => selectRoom(null));
+{ // room picker, grouped by floor
+  const sel = document.getElementById('roomSel');
+  [['קומת קרקע', 0], ['קומה א׳', 1]].forEach(([label, f]) => {
+    const og = document.createElement('optgroup'); og.label = label;
+    ROOMS.filter(r => r.f === f).forEach(r => { const o = document.createElement('option'); o.value = r.id; o.textContent = r.name; og.appendChild(o); });
+    sel.appendChild(og);
+  });
+  sel.addEventListener('change', () => sel.value ? focusRoom(sel.value) : exitFocus());
+}
+document.getElementById('cFocus').addEventListener('click', () => { if (focus && focus === state.sel) exitFocus(); else if (state.sel) focusRoom(state.sel); });
+document.getElementById('focusBar').addEventListener('click', () => exitFocus());
 function zoomBy(f) {
   const base = camTween ? camTween.p1.clone().sub(camTween.t1) : camera.position.clone().sub(controls.target);
   const tgt = camTween ? camTween.t1.clone() : controls.target.clone();
@@ -1124,7 +1239,7 @@ window.addEventListener('keydown', e => {
   const map = { '1': 'full', '2': 'ground', '3': 'first', '4': 'exploded' };
   if (map[e.key]) setMode(map[e.key]);
   if (e.key === 'n' || e.key === 'N') document.getElementById('tNight').click();
-  if (e.key === 'Escape') selectRoom(null);
+  if (e.key === 'Escape') { if (focus) exitFocus(); else selectRoom(null); }
   if (e.key === '+' || e.key === '=') zoomBy(.8);
   if (e.key === '-' || e.key === '_') zoomBy(1.25);
   if (e.key === 'w' || e.key === 'W') setWalls({ full: 'low', low: 'none', none: 'full' }[state.walls]);
@@ -1133,20 +1248,23 @@ window.addEventListener('keydown', e => {
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let down = null;
 const visibleChain = o => { while (o) { if (!o.visible) return false; o = o.parent; } return true; };
 renderer.domElement.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; camTween = null; });
-renderer.domElement.addEventListener('pointerup', e => {
-  if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
+function pickRoom(e) {
   ptr.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(ptr, camera);
   const hits = ray.intersectObjects([F[0].group, F[1].group, roofG], true).filter(h => visibleChain(h.object) && h.object.material !== M.glass && !(h.object.isPoints));
   for (const h of hits) {
-    if (h.object.userData.room) { selectRoom(h.object.userData.room, false); return; }
+    if (h.object.userData.room) return h.object.userData.room;
     // furniture or walls: find the room whose rectangle contains the hit point
     const X = (h.point.x + CX) * 100, Y = (h.point.z + CZ) * 100, lvl = h.point.y > L1 - .05 + (F[1].group.position.y) ? 1 : 0;
     const r = ROOMS.find(q => q.f === lvl && X >= q.rect[0] && X <= q.rect[2] && Y >= q.rect[1] && Y <= q.rect[3]);
-    if (r && state.mode !== 'full') { selectRoom(r.id, false); return; }
-    break;
+    return r && state.mode !== 'full' ? r.id : null;
   }
-  selectRoom(null);
+  return null;
+}
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
+  const id = pickRoom(e); if (id || !focus) selectRoom(id, false);
 });
+renderer.domElement.addEventListener('dblclick', e => { const id = pickRoom(e); if (id) focusRoom(id); });
 
 function resize() {
   camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
