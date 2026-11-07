@@ -1744,6 +1744,15 @@ function desk(p, base, r, chairAt, faceTo) {
   // two-car parking pad across the front, no roof, running right to the party line
   flat(-200, 1060, 785, 1450, -0.028, M.pavers);
   for (const X of [-200, 290, 785]) flat(X - 4, 1110, X + 4, 1440, -0.02, M.line);
+  // outdoor storage shed at the far right of the parking, against the party line, doors facing the parking
+  { const shed = std({ color: 0xd6cdbb, roughness: .7 }), trimS = std({ color: 0x6f675c, roughness: .6 });
+    B(p, 650, 1068, 781, 1228, -2, 0, M.concrete);
+    B(p, 655, 1072, 778, 1224, 0, 205, shed);
+    for (let y = 1078; y < 1222; y += 9) B(p, 654.4, y, 655, y + 1, 2, 203, trimS);
+    B(p, 649, 1066, 784, 1230, 205, 212, trimS); B(p, 646, 1063, 787, 1233, 212, 215, shed);
+    B(p, 654, 1100, 655, 1196, 4, 190, std({ color: 0xc7bda9, roughness: .7 })); B(p, 653.8, 1147.6, 655.2, 1148.4, 4, 190, trimS);
+    for (const y of [1140, 1156]) B(p, 652.5, y - 1, 654, y + 1, 95, 115, M.steel);
+    B(p, 653, 1074, 655, 1098, 150, 175, std({ color: 0x9aa4ab, roughness: .3 })); }
   flat(-2000, 1450, 2000, 1620, -0.02, M.concrete);
   B(p, -2000, 1612, 2000, 1628, -15, 1, M.sillStone);
   flat(-2000, 1628, 2000, 2400, GROUND + .005, M.asphalt);
