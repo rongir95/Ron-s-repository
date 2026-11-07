@@ -495,8 +495,8 @@ function opening(p, a, ux, uy, theta, op, o) {
   lb(g, w, fw, fd, 0, hd - fw / 2, fz, M.alu);
   if (s > 0) lb(g, w, fw, fd, 0, s + fw / 2, fz, M.alu);
   const glass = (gw, gh, x, y, z) => { const m = new THREE.Mesh(UNIT, M.glass); m.scale.set(gw, gh, 0.012); m.position.set(x, y, z); m.renderOrder = 2; g.add(m); };
-  if (op.type === 'front') {
-    const leaf = lb(g, w - 2 * fw, hgt - fw - 0.01, 0.055, 0, (hgt - fw) / 2, fz, M.walnut);
+  if (op.type === 'front' || op.type === 'utility') {
+    const leaf = lb(g, w - 2 * fw, hgt - fw - 0.01, 0.055, 0, (hgt - fw) / 2, fz, op.type === 'utility' ? M.cabinetDark : M.walnut);
     for (let i = 1; i < 5; i++) lb(g, w - 2 * fw - 0.02, 0.008, 0.06, 0, i * (hgt - fw) / 5, fz, M.black);
     lb(g, 0.025, 0.7, 0.03, w / 2 - fw - 0.12, 1.05, fz + os * 0.05, M.steel);
     leaf.castShadow = true;
@@ -533,25 +533,25 @@ const OUT1 = [[82, 7], [454, 7], [454, 58], [PARTY, 58], [PARTY, 1030], [82, 103
 const W = (at, w, sill = 90, head = 220) => ({ type: 'win', at, w, sill, head });
 const D = (at, w = 80, head = 210) => ({ type: 'door', at, w, sill: 0, head });
 const OPS0 = {
-  0: [{ type: 'slide', at: 367, w: 320, sill: 0, head: 235 }, W(637, 110)],
-  2: [W(172, 120, 100, 210), W(422, 50, 150, 200)],
-  4: [{ type: 'front', at: 101, w: 100, sill: 0, head: 222 }],
-  5: [W(72, 70, 110, 210)],
-  6: [W(200, 140, 105, 215)],
+  0: [{ type: 'slide', at: 357, w: 200, sill: 0, head: 235 }],          // living → patio, the only opening on the garden side
+  2: [W(187, 100, 100, 200), W(440, 60, 150, 200)],                     // safe-room window between shutter pockets; guest WC
+  4: [{ type: 'front', at: 65, w: 90, sill: 0, head: 222 }],           // front door at the lower end of the angled wall
+  6: [W(203, 140, 105, 215)],                                           // kitchen window over the sink
+  8: [{ type: 'utility', at: 121, w: 75, sill: 0, head: 210 }],         // storage room, entered from outside
 };
 const OPS1 = {
-  0: [W(178, 150)], 2: [W(166, 140)],
-  4: [W(167, 130), W(517, 150)],
-  5: [W(150, 90, 100, 220)],
-  7: [W(130, 80, 120, 210), W(330, 60, 140, 210)],
+  0: [W(99, 195)],                       // bedroom 1, wide window in the north-west corner
+  2: [W(184, 150)],                      // bedroom 2
+  4: [W(174, 140), W(504, 135)],         // bedrooms 3 and 4, street side
+  7: [W(139, 100, 120, 210), W(324, 60, 140, 210)], // bathroom and en-suite, onto the laundry screen
 };
 const ROOMS = [
   { id: 'living', f: 0, name: 'חדר דיור ופינת אוכל', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', note: 'חלל פתוח עם דלת הזזה רחבה אל המשטח המרוצף והחצר הצמודה.' },
   { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'מטבח פתוח לפינת האוכל, עם אי ישיבה וחלון מעל הכיור.' },
-  { id: 'storage', f: 0, name: 'מחסן', dims: [160, 245], rect: [75, 47, 254, 295], mat: 'concrete', note: 'מחסן צמוד בקומת הקרקע, עם כניסה מתוך הבית.' },
+  { id: 'storage', f: 0, name: 'מחסן', dims: [160, 245], rect: [75, 47, 254, 295], mat: 'concrete', note: 'מחסן צמוד בקומת הקרקע, עם דלת כניסה מבחוץ, מהצד המערבי.' },
   { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
   { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [302, 836, 444, 979], mat: 'bath', note: 'שירותים וכיור לאורחים, עם חלון אוורור.' },
-  { id: 'mamad', f: 0, name: 'חדר שינה 5 · ממ״ד', dims: [315, 305], rect: [465, 640, 780, 973], mat: 'parquet', note: 'מרחב מוגן דירתי מבטון מזוין. משמש גם כחדר שינה או חדר עבודה.' },
+  { id: 'mamad', f: 0, name: 'חדר שינה 5 · ממ״ד', dims: [315, 305], rect: [465, 640, 780, 973], mat: 'parquet', note: 'מרחב מוגן דירתי מבטון מזוין. הכניסה אליו מהמעבר שמתחת למדרגות.' },
   { id: 'bed1', f: 1, name: 'חדר שינה 1 · הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'parquet', note: 'יחידת הורים עם חדר רחצה צמוד ומלתחה.' },
   { id: 'bed2', f: 1, name: 'חדר שינה 2', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'parquet', note: 'חלון לכיוון החצר.' },
   { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [16, 321, 188, 490], mat: 'bath', note: 'מקלחון, אסלה וכיור, נגיש מחדר ההורים.' },
@@ -575,11 +575,11 @@ const slab0 = offsetPoly(OUT0, 12.5);
 slab(F[0].shell, slab0, 0, 0.45, M.tile, M.concrete);
 buildOutline(F[0].shell, OUT0, OPS0, { t: 25, base: 0, h: 310, outMat: M.stone, inMat: M.interior });
 const I = (a, b, ops = [], t = 12, extra = {}) => wall(F[0].shell, a, b, Object.assign({ t, base: 0, h: 280, ops, inMat: M.interior }, extra));
-I([63, 301], [260, 301], [D(160)]);
+I([63, 301], [260, 301]);
 I([260, 35], [260, 301]);
-I([296, 830], [450, 830], [D(78, 70)]);
-I([450, 625], [450, 985], [D(80, 85)], 30);
-I([450, 625], [PARTY, 625], [], 30);
+I([296, 830], [450, 830], [D(104, 70)]);
+I([450, 625], [450, 985], [], 30);
+I([450, 625], [PARTY, 625], [D(120, 85)], 30);
 I([150, 705], [296, 705]);
 
 /* first floor slab (with stair void) + walls */
@@ -587,14 +587,14 @@ const SLAB1 = [[-10, 288], [50, 288], [50, -6], [467, -6], [467, 45], [805, 45],
 slab(F[1].shell, SLAB1, L1, 0.3, M.parquet, M.slabSide, [[[452, 411], [778, 411], [778, 614], [452, 614]]]);
 buildOutline(F[1].shell, OUT1, OPS1, { t: 25, base: L1, h: H2 * 100, outMat: M.plaster, inMat: M.interior });
 const J = (a, b, ops = [], t = 12) => wall(F[1].shell, a, b, { t, base: L1, h: H2 * 100, ops, inMat: M.interior });
-J([82, 315], [458, 315], [D(83, 70), D(218, 75), D(328, 80)]);
-J([458, 58], [458, 405], [D(287, 80)]);
+J([82, 315], [458, 315], [D(73, 70), D(173, 80), D(338, 80)]);
+J([458, 58], [458, 405], [D(309, 80)]);
 J([458, 405], [778, 405]);
 J([194, 315], [194, 496]);
-J([365, 315], [365, 730], [D(245, 80)]);
+J([365, 315], [365, 730], [D(297, 75)]);
 J([10, 496], [365, 496]);
-J([82, 730], [462, 730], [D(333, 80)]);
-J([462, 620], [462, 1030], [D(55, 80)]);
+J([82, 730], [462, 730], [D(323, 80)]);
+J([462, 620], [462, 1030], [D(53, 85)]);
 J([462, 620], [778, 620]);
 
 /* room floors, labels, ceiling lights */
@@ -628,9 +628,9 @@ for (const r of ROOMS) {
     B(p, xa, 432, xa + tr + 2, 523, top - 5, top, M.oak);
   }
   B(p, 700, 432, 778, 618, 0, 9 * R - 4, M.interior); B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.oak); // landing
-  for (let j = 0; j < 9; j++) { // flight 2: solid with closet below
+  for (let j = 0; j < 9; j++) { // flight 2: open underneath, the passage to the safe-room door runs below it
     const xb = 700 - (j + 1) * tr, top = 9 * R + (j + 1) * R;
-    B(p, xb, 525, xb + tr, 618, 0, top - 4, M.interior); B(p, xb - 2, 523, xb + tr, 620, top - 4, top, M.oak);
+    B(p, xb, 525, xb + tr, 618, top - R, top - 4, M.interior); B(p, xb - 2, 523, xb + tr, 620, top - 4, top, M.oak);
   }
   // glass balustrades + handrails along the sloped flights
   const rail = (X0, X1, Y, z0, z1, base) => {
@@ -729,8 +729,8 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let i = 0; i < 3; i++) { CY(p, 300, 410 + i * 55, 17, 64, 68, M.oak, b); CY(p, 300, 410 + i * 55, 2.5, 0, 64, M.black, b, 8); CY(p, 300, 410 + i * 55, 15, 0, 2, M.black, b); }
   for (let i = 0; i < 3; i++) { CY(p, 230, 405 + i * 55, 10, 175, 195, M.black, b, 18, 5); CY(p, 230, 405 + i * 55, .5, 195, 280, M.black, b, 6); }
   // storage shelves
-  for (const z of [0, 50, 100, 150, 195]) B(p, 78, 52, 120, 290, z, z + 3, M.steel, b);
-  for (let i = 0; i < 6; i++) B(p, 82, 60 + i * 38, 116, 90 + i * 38, 53 + (i % 3) * 50, 80 + (i % 3) * 50, M.fabric2, b);
+  for (const z of [0, 50, 100, 150, 195]) B(p, 205, 52, 248, 230, z, z + 3, M.steel, b);
+  for (let i = 0; i < 4; i++) B(p, 209, 60 + i * 42, 244, 92 + i * 42, 53 + (i % 3) * 50, 80 + (i % 3) * 50, M.fabric2, b);
   // foyer
   B(p, 305, 700, 340, 812, 0, 95, M.oak, b); plant(p, b, 425, 650, .9);
   // guest wc
@@ -764,7 +764,7 @@ function desk(p, base, r, chairAt, faceTo) {
   const sg = new THREE.Mesh(UNIT, M.glass); sg.scale.set(.76, 1.95, .01); sg.position.set(wx(150), b + 1.0, wz(402)); p.add(sg);
   CY(p, 160, 470, 8, 205, 207, M.steel, b, 20);
   // closet shelving
-  B(p, 200, 324, 359, 372, 0, 235, M.cabinet, b); B(p, 316, 372, 359, 488, 0, 235, M.cabinet, b);
+  B(p, 200, 372, 242, 488, 0, 235, M.cabinet, b); B(p, 316, 330, 359, 488, 0, 235, M.cabinet, b);
   // main bath
   RB(p, 178, 652, 357, 724, 0, 56, M.ceramic, b, .03); B(p, 186, 660, 349, 716, 45, 56.3, M.water, b);
   toilet(p, b, 150, 524, 150, 600); vanity(p, b, [246, 502, 342, 552], [294, 524]);
