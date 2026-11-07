@@ -827,6 +827,13 @@ function opening(p, a, ux, uy, theta, op, o) {
     const d = t + 0.03;
     lb(g, 0.045, hd, d, -w / 2 + 0.022, hd / 2, 0, M.trim); lb(g, 0.045, hd, d, w / 2 - 0.022, hd / 2, 0, M.trim); lb(g, w, 0.045, d, 0, hd - 0.022, 0, M.trim);
     const lw = w - 0.1, lh = hd - 0.05;
+    if (op.slide) { // brown wood sliding door on a track, half open, on the room side
+      const sd = -os * (t / 2 + 0.025);
+      lb(g, w + .9, .05, .05, .4, hd + .03, sd, M.wood);
+      lb(g, w, hd - .02, .035, w * .55, (hd - .02) / 2, sd, M.wood);
+      lb(g, .02, .3, .02, w * .55 - w / 2 + .06, 1.0, sd - os * .025, M.black);
+      return;
+    }
     lb(g, lw, lh, 0.04, 0, lh / 2, 0, M.trim);
     for (const sd of [-1, 1]) {
       const z = sd * 0.021, iw = lw - 0.2, ih = lh - 0.42;
@@ -948,7 +955,7 @@ slab(F[1].shell, SLAB1, L1, 0.3, M.parquet, M.slabSide, [[[452, 411], [778, 411]
 slab(F[1].shell, SLAB1, L1 - 0.299, 0.006, M.ceiling, M.ceiling, [[[452, 411], [778, 411], [778, 614], [452, 614]]]);
 buildOutline(F[1].shell, OUT1, OPS1, { t: 25, base: L1, h: H2 * 100, outMat: M.plaster, inMat: M.interior });
 const J = (a, b, ops = [], t = 12) => wall(F[1].shell, a, b, { t, base: L1, h: H2 * 100, ops, inMat: M.interior });
-J([82, 315], [458, 315], [D(73, 70), D(173, 80), D(338, 80)]);
+J([82, 315], [458, 315], [D(73, 70), Object.assign(D(173, 80), { slide: true }), D(338, 80)]);
 J([458, 58], [458, 405], [D(309, 80)]);
 J([458, 405], [778, 405]);
 J([194, 315], [194, 496]);
@@ -1539,7 +1546,8 @@ function desk(p, base, r, chairAt, faceTo) {
   onWall(B(p, 555, 63, 722, 66, 232, 235, M.wood, b), b, 232, 235);
   for (let x = 558; x < 720; x += 6) { const m = new THREE.Mesh(UNIT, M.sheer); m.scale.set(.065, 1.8, .006); m.position.set(wx(x + 3), b + 1.42, wz(68 + ((x / 6) % 2) * 2)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); m.renderOrder = 3; p.add(m); onWall(m, b, 52, 232); }
   { const g = new THREE.Mesh(new THREE.IcosahedronGeometry(.22, 0), new THREE.MeshStandardMaterial({ color: 0xffffff, wireframe: true })); g.position.set(wx(622), b + 2.15, wz(235)); p.add(g); CY(p, 622, 235, .3, 237, 274, M.white, b, 6); }
-  B(p, 470, 336, 545, 399, 0, 255, M.concreteDoor, b); B(p, 507, 335.5, 508, 336, 2, 253, M.black, b);
+  // tall concrete-look wardrobe against the south wall, just past the door swing, its doors facing the doorway
+  B(p, 542, 341, 602, 403, 0, 255, M.concreteDoor, b); B(p, 541.5, 371.7, 542, 372.3, 2, 253, M.black, b);
   // ---- Ron's room, from the photos: beach mural on the party wall, bed under the window, dark wardrobe on the west wall ----
   { const m = new THREE.Mesh(boxUV(.01, 2.74, 3.98, 0, 0), M.muralRon); m.position.set(wx(779), b + 1.37, wz(825)); p.add(m); onWall(m, b, 0, 274);
     const uv = m.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) / 3.98, uv.getY(i) / 2.74); uv.needsUpdate = true; }
@@ -1548,8 +1556,8 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 470, 760, 530, 1022, 0, 250, M.wenge, b);
   for (const z of [40, 80, 120, 160, 200]) B(p, 529, 762, 531, 860, z, z + 2, M.black, b);
   B(p, 530, 860, 531.5, 1020, 2, 248, std({ color: 0xd9d4ca, roughness: .4 }), b); B(p, 530, 939, 532, 941, 2, 248, M.wenge, b);
-  B(p, 480, 627, 540, 668, 0, 52, M.wenge, b);
-  onWall(B(p, 488, 627, 538, 660, 145, 190, M.wenge, b), b, 145, 190);
+  B(p, 716, 627, 776, 668, 0, 52, M.wenge, b);
+  onWall(B(p, 722, 627, 772, 660, 145, 190, M.wenge, b), b, 145, 190);
   onWall(B(p, 722, 1022, 758, 1024, 148, 175, std({ color: 0x3f6b8c, roughness: .6 }), b), b, 148, 175);
   onWall(B(p, 560, 1018, 712, 1021, 236, 239, M.black, b), b, 236, 239);
   for (let x = 563; x < 710; x += 6) { const m = new THREE.Mesh(UNIT, M.sheer); m.scale.set(.065, 1.85, .006); m.position.set(wx(x + 3), b + 1.43, wz(1015 - ((x / 6) % 2) * 2)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); m.renderOrder = 3; p.add(m); onWall(m, b, 50, 236); }
@@ -1732,16 +1740,19 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let X = 640; X < 770; X += 35) shrub(X, -60 - rnd() * 40, .3, rnd() > .5 ? M.flower : M.shrub);
   for (let X = 100; X < 250; X += 40) shrub(X, -40 - rnd() * 30, .28, rnd() > .5 ? M.flower : M.shrub);
   // front: covered entry, path, parking, street
-  flat(-200, 715, 300, 1450, -0.03, M.pavers);
+  flat(-200, 715, 300, 1060, -0.03, M.pavers);
+  // two-car parking pad across the front, no roof, running right to the party line
+  flat(-200, 1060, 785, 1450, -0.028, M.pavers);
+  for (const X of [-200, 290, 785]) flat(X - 4, 1110, X + 4, 1440, -0.02, M.line);
   flat(-2000, 1450, 2000, 1620, -0.02, M.concrete);
   B(p, -2000, 1612, 2000, 1628, -15, 1, M.sillStone);
   flat(-2000, 1628, 2000, 2400, GROUND + .005, M.asphalt);
   for (let X = -2000; X < 2000; X += 600) flat(X, 2005, X + 300, 2017, GROUND + .01, M.line);
-  for (let X = 320; X < 760; X += 40) shrub(X, 1020 + rnd() * 30, .3, rnd() > .6 ? M.flower : M.shrub);
+  for (let X = 320; X < 760; X += 40) shrub(X, 1022 + rnd() * 16, .26, rnd() > .6 ? M.flower : M.shrub);
   B(p, 296, 1000, 780, 1008, -15, 30, M.stone);
-  // car in the parking bay
-  {
-    const g = local(p, 40, 1230, GROUND + .02);
+  // car in the parking bay (one of the two spaces)
+  for (const [cx, col] of [[40, M.car], [540, null]]) if (col) {
+    const g = local(p, cx, 1255, GROUND + .02);
     const body = shadowy(new THREE.Mesh(new RoundedBoxGeometry(1.8, .62, 4.35, 3, .14), M.car)); body.position.y = .55; g.add(body);
     const cab = shadowy(new THREE.Mesh(new RoundedBoxGeometry(1.62, .55, 2.3, 3, .16), M.car)); cab.position.set(0, 1.06, -.1); g.add(cab);
     const gl = new THREE.Mesh(new RoundedBoxGeometry(1.64, .4, 2.1, 2, .1), std({ color: 0x1c2733, roughness: .1, metalness: .3, envMapIntensity: 1.4 })); gl.position.set(0, 1.08, -.1); g.add(gl);
@@ -1761,8 +1772,6 @@ function desk(p, base, r, chairAt, faceTo) {
     const sign = new THREE.Mesh(new THREE.PlaneGeometry(.44, .22), new THREE.MeshStandardMaterial({ map: tx, emissive: 0xffffff, emissiveMap: tx, emissiveIntensity: .15, roughness: .5 }));
     sign.position.set(wx(268.5), 1.95, wz(895)); sign.rotation.y = -Math.PI / 2; p.add(sign); window.__sign = sign;
   }
-  // mailbox + low entry wall
-  B(p, 150, 1440, 296, 1450, -15, 110, M.stone); B(p, 255, 1425, 290, 1440, 70, 100, M.alu);
 }
 
 /* ---------------- the mirrored neighbour, unit A-2 ---------------- */
