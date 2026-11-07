@@ -70,6 +70,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .tbtn[aria-pressed="true"] .sw{background:var(--accent)}
 .tbtn[aria-pressed="true"] .sw::after{transform:translateX(-13px)}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:3px;margin:0 2px 2px;border-radius:10px;background:var(--line)}
+.seg.two{grid-template-columns:1fr 1fr}
 .seg button{all:unset;cursor:pointer;text-align:center;padding:6px 6px;border-radius:8px;font-size:13px;color:var(--ink)}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
@@ -165,6 +166,11 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <button class="tbtn" id="tLabels" aria-pressed="true">שמות חדרים <span class="sw"></span></button>
   <button class="tbtn" id="tNeighbor" aria-pressed="true">יחידה שכנה A-2 <span class="sw"></span></button>
   <button class="tbtn" id="tRotate" aria-pressed="false">סיבוב אוטומטי <span class="sw"></span></button>
+  <h2>שיפוץ</h2>
+  <div class="seg two" role="group" aria-label="לפני או אחרי שיפוץ">
+    <button data-reno="before" aria-pressed="true">לפני</button>
+    <button data-reno="after" aria-pressed="false">אחרי</button>
+  </div>
   <h2>קירות</h2>
   <div class="seg" role="group" aria-label="גובה קירות">
     <button data-walls="full" aria-pressed="true">מלאים</button>
@@ -466,6 +472,24 @@ T.bedspread = canvasTex(512, (g, s) => {
   }
 }, 1.0);
 T.drum = canvasTex(256, (g, s) => { for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#c7b98c' : '#8f8455'; g.fillRect(i * s / 8, 0, s / 8, s); } }, 1);
+// renovation: sage-green vertical stack tiles (7.5×30) and terrazzo
+T.greenStack = canvasTex(512, (g, s) => {
+  g.fillStyle = '#e8e6df'; g.fillRect(0, 0, s, s); const tw = s / 8, th = s / 2;
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) {
+    const gr = g.createLinearGradient(i * tw, 0, i * tw + tw, 0); const l = 40 + (rnd() - .5) * 4;
+    gr.addColorStop(0, hsl(95, 17, l + 3)); gr.addColorStop(.5, hsl(95, 17, l)); gr.addColorStop(1, hsl(95, 17, l - 2));
+    g.fillStyle = gr; g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3);
+  }
+}, 0.6);
+T.terrazzo = canvasTex(512, (g, s) => {
+  g.fillStyle = '#ece6da'; g.fillRect(0, 0, s, s);
+  const cols = ['#6f6a5c', '#8b8574', '#4f5a45', '#a59a83', '#c7bca5', '#3e3d38', '#7d8a6a'];
+  for (let i = 0; i < 1600; i++) {
+    g.fillStyle = cols[(rnd() * cols.length) | 0]; const x = rnd() * s, y = rnd() * s, r = 1.5 + rnd() * rnd() * 9;
+    g.beginPath(); for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2, rr = r * (.6 + rnd() * .5); g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } g.closePath(); g.fill();
+  }
+  speckle(g, s, 4000, .05);
+}, 0.8);
 T.wcWhite = dotTile('#f3f3f1', 'rgba(0,0,0,.07)', '#d9d9d5');
 T.wcRed = dotTile('#7a1c2d', 'rgba(255,255,255,.13)', '#ece8e6');
 T.bath = tileTex(4, [200, 8, 86], '#a9b0b6', 1.2, 2);
@@ -490,6 +514,13 @@ const M = {
   interior: std({ color: 0xf6f6f4, roughness: .95 }),
   slate: std({ map: T.slate, roughness: .6 }),
   skirt: std({ color: 0x75787a, roughness: .45 }),
+  greenStack: std({ map: T.greenStack, roughness: .25, envMapIntensity: .7 }),
+  terrazzo: std({ map: T.terrazzo, roughness: .45 }),
+  led: new THREE.MeshStandardMaterial({ color: 0xfff1d6, emissive: 0xffc874, emissiveIntensity: 1.6, roughness: 1 }),
+  nicheWood: std({ color: 0xb08a5c, roughness: .55 }),
+  nicheBack: std({ color: 0xe9dfcf, roughness: .9 }),
+  brushed: std({ color: 0xb8b8b4, roughness: .35, metalness: .8, envMapIntensity: .9 }),
+  sageTowel: std({ color: 0x55603f, roughness: 1 }),
   ensWall: std({ map: T.ensWall, roughness: .2 }),
   bathWall: std({ map: T.bathWall, roughness: .25 }),
   bathBrown: std({ map: T.bathBrown, roughness: .25 }),
@@ -584,6 +615,7 @@ const M = {
 /* ---------------- geometry helpers ---------------- */
 const UNIT = new THREE.BoxGeometry(1, 1, 1);
 const wallPieces = [], openingGroups = [], fixtures = [];
+const renoSets = []; // { room, before, after } groups swapped by the before/after switch
 const onWall = (m, base, z0, z1) => { m.userData.wall = { base, y0: base + z0 / 100, y1: base + z1 / 100, sy: m.scale.y }; wallPieces.push(m); return m; };
 function boxUV(w, h, d, uOff = 0, vOff = 0) {
   const g = new THREE.BoxGeometry(w, h, d); const uv = g.attributes.uv;
@@ -767,7 +799,7 @@ const ROOMS = [
   { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, וחלק בורדו שיוצא מקיר הכיריים וסוגר את המטבח מצפון.', spots: true },
   { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [75, 47, 270, 295], mat: 'tile', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
   { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
-  { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [294, 836, 435, 948], mat: 'slate', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
+  { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [294, 836, 435, 948], mat: 'slate', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק ירוקים בגובה 1.2 מ׳ וצבע לבן מעליהם, ריצוף טרצו, אסלה תלויה עם מיכל סמוי, נישת עץ מוארת מעל האסלה, כיור תלוי קטן ומראה מעוגלת עם תאורה אחורית.', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
   { id: 'mamad', f: 0, name: 'ממ״ד · חדר אחסון', dims: [315, 305], rect: [465, 640, 780, 945], mat: 'tile', note: 'מרחב מוגן דירתי מבטון מזוין שמשמש כחדר אחסון, עם מדפים לאורך הקירות. הכניסה מהמעבר שמתחת למדרגות.' },
   { id: 'bed1', f: 1, name: 'חדר הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'laminate', eye: [300, 230], look: [-1, -.25], note: 'רצפת למינציה, קיר טפט מאחורי המיטה, שידת מגירות ושעון על הקיר המזרחי, מראה עומדת ומנורת תוף. דלתות למקלחת ולחדר הארונות.' },
   { id: 'bed2', f: 1, name: 'החדר של גיא', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'parquet', note: 'חלון לכיוון החצר.' },
@@ -1071,7 +1103,7 @@ function desk(p, base, r, chairAt, faceTo) {
   onWall(B(p, 433, 672, 435, 778, 100, 206, M.black, b), b, 100, 206); onWall(B(p, 432, 688, 433, 762, 116, 190, M.mirror, b), b, 116, 190);
   for (let y = 674; y < 776; y += 8.5) for (const z of [102, 197]) { const dpt = 3 + rnd() * 5; onWall(B(p, 433 - dpt, y, 433, y + 7.5, z, z + 7.5, M.black, b), b, z, z + 7.5); }
   for (let z = 110; z < 196; z += 8.5) for (const y of [674, 768]) { const dpt = 3 + rnd() * 5; onWall(B(p, 433 - dpt, y, 433, y + 7.5, z, z + 7.5, M.black, b), b, z, z + 7.5); }
-  onWall(B(p, 300, 838.5, 312, 843.5, 140, 150, M.black, b), b, 140, 150);
+  onWall(B(p, 300, 819, 312, 824, 140, 150, M.black, b), b, 140, 150);
   { const sp = F[1].shell;
     B(sp, 16, 47, 190, 699, -60, -30.5, M.ceiling, L1);                 // dropped ceiling over the kitchen run and dining
     B(sp, 190, 610, 290, 699, -60, -30.5, M.ceiling, L1);               // over the fridge
@@ -1092,6 +1124,8 @@ function desk(p, base, r, chairAt, faceTo) {
     const f = new THREE.Mesh(new THREE.CylinderGeometry(.17, .17, .052, 32), M.linen); f.rotation.z = Math.PI / 2; f.position.copy(c.position); p.add(f); onWall(f, b, 153, 187); }
   // guest wc
   // guest WC, as in the photos: wall tiles, bordeaux accent wall behind the toilet (west), wall-hung basin by the window
+  const wcBefore = new THREE.Group(); wcBefore.userData.reno = 'before'; p.add(wcBefore); renoSets.push({ room: 'wc', before: wcBefore });
+  { const p = wcBefore;
   const tilePanel = (X0, Y0, X1, Y1, z0, z1, mat) => {
     const w = (X1 - X0) / 100, d = (Y1 - Y0) / 100, h = (z1 - z0) / 100;
     const m = new THREE.Mesh(boxUV(w, h, d, X0 / 100 + Y0 / 100, z0 / 100), mat); m.receiveShadow = true;
@@ -1114,6 +1148,56 @@ function desk(p, base, r, chairAt, faceTo) {
   onWall(B(p, 407, 943, 417, 946, 192, 204, M.steel, b), b, 192, 204);
   B(p, 352, 943, 380, 944, 92, 93, M.steel, b); B(p, 358, 941, 372, 944, 62, 92, M.duvetD, b);
   CY(p, 345, 930, 10, 0, 28, M.white, b, 18); CY(p, 345, 930, 10, 28, 30, M.oak, b, 18);
+  }
+  // ---- guest WC after the renovation (from the inspiration images) ----
+  const wcAfter = new THREE.Group(); wcAfter.userData.reno = 'after'; wcAfter.visible = false; p.add(wcAfter); renoSets[renoSets.length - 1].after = wcAfter;
+  { const p = wcAfter;
+    const pan = (X0, Y0, X1, Y1, z0, z1, mat) => {
+      const w = (X1 - X0) / 100, d = (Y1 - Y0) / 100, h = (z1 - z0) / 100;
+      const m = new THREE.Mesh(boxUV(w, h, d, X0 / 100 + Y0 / 100, z0 / 100), mat); m.receiveShadow = true;
+      m.position.set(wx((X0 + X1) / 2), b + (z0 + z1) / 200, wz((Y0 + Y1) / 2)); p.add(m); return onWall(m, b, z0, z1);
+    };
+    const W = 120; // tile wainscot height
+    // green stack-bond tiles to 1.2 m on every wall, white paint above
+    pan(294.5, 836, 295.5, 922, 0, W, M.greenStack);
+    pan(295.5, 836, 365, 837, 0, W, M.greenStack);
+    pan(434, 836, 435, 947.5, 0, W, M.greenStack);
+    pan(324, 946.5, 434, 947.5, 0, W, M.greenStack);
+    pan(294.5, 922, 324, 923, 0, W, M.greenStack); pan(323, 923, 324, 946.5, 0, W, M.greenStack);
+    onWall(B(p, 294.5, 922, 324, 947.5, W, 280, M.interior, b), b, W, 280);                                   // boxed pipe column, painted
+    for (const [X0, Y0, X1, Y1] of [[294.5, 836, 295.6, 922], [295.5, 836, 365, 837.1], [433.9, 836, 435, 947.5], [324, 946.4, 434, 947.5], [294.5, 921.9, 324, 923], [322.9, 923, 324, 946.5]]) pan(X0, Y0, X1, Y1, W, W + .8, M.brushed); // thin metal cap on the tiles
+    // wall-hung rimless toilet with a concealed cistern and a brushed flush plate
+    { const g = local(p, 297, 879, b, Math.PI / 2);
+      const bowl = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.37, .32, .52, 4, .12), M.ceramic)); bowl.position.set(0, .3, .27); g.add(bowl);
+      const lid = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.37, .03, .5, 3, .012), M.white)); lid.position.set(0, .475, .27); g.add(lid); }
+    pan(295.5, 866, 297, 892, 98, 114, M.brushed); pan(297, 868, 297.3, 878.5, 100, 112, M.alu); pan(297, 879.5, 297.3, 890, 100, 112, M.alu);
+    // lit wooden niche above the toilet with two shelves, a trailing plant, towels and a diffuser
+    pan(295, 850, 303, 852.5, 140, 238, M.nicheWood); pan(295, 905.5, 303, 908, 140, 238, M.nicheWood);
+    pan(295, 850, 303, 908, 140, 142.5, M.nicheWood); pan(295, 850, 303, 908, 235.5, 238, M.nicheWood);
+    pan(295.5, 852.5, 296, 905.5, 142.5, 235.5, M.nicheBack);
+    for (const z of [171, 203]) { pan(296, 852.5, 302, 905.5, z, z + 2, M.nicheWood); pan(296.5, 853, 297.5, 905, z - .6, z, M.led); }
+    pan(296.5, 853, 297.5, 905, 235, 235.5, M.led);
+    pan(297, 885, 301, 903, 205, 209, M.sageTowel); pan(297, 886, 301, 902, 209, 213, M.sageTowel);
+    onWall(CY(p, 299, 864, 4, 205, 213, M.nicheBack, b, 14), b, 205, 213);
+    onWall(CY(p, 299, 893, 2.4, 173, 184, std({ color: 0x5a3a1e, roughness: .2, transparent: true, opacity: .85 }), b, 12), b, 173, 184);
+    onWall(CY(p, 299, 880, 2.2, 173, 181, M.white, b, 12), b, 173, 181);
+    for (let k = 0; k < 7; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.035, 0), M.leaf)); m.position.set(wx(300 + rnd() * 2), b + 2.08 - k * .07, wz(862 + (rnd() - .5) * 8)); p.add(m); onWall(m, b, 130, 215); }
+    // small rectangular wall-hung basin with a tall chrome mixer, backlit rounded mirror above
+    B(p, 386, 924, 433, 947, 74, 88, M.ceramic, b); B(p, 391, 927, 422, 944, 84, 88.5, M.water, b);
+    CY(p, 427, 940, 1.3, 88, 108, M.steel, b, 10); B(p, 419, 938, 428, 941, 106, 108, M.steel, b);
+    CY(p, 400, 945, .9, 60, 74, M.steel, b, 8);
+    CY(p, 392, 940, 4, 88, 100, M.nicheBack, b, 14); for (let k = 0; k < 4; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.04, 0), M.leaf)); m.position.set(wx(392 + (rnd() - .5) * 6), b + 1.05 + k * .05, wz(940)); p.add(m); }
+    CY(p, 428, 945, 3, 88, 103, M.linen, b, 12);
+    { const rr = new THREE.Shape(), w = .42, h = .66, r = .1;
+      rr.moveTo(-w / 2 + r, -h / 2); rr.lineTo(w / 2 - r, -h / 2); rr.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r); rr.lineTo(w / 2, h / 2 - r); rr.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
+      rr.lineTo(-w / 2 + r, h / 2); rr.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r); rr.lineTo(-w / 2, -h / 2 + r); rr.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
+      const mk = (mat, sc, z) => { const m = new THREE.Mesh(new THREE.ShapeGeometry(rr), mat); m.scale.set(sc, sc, 1); m.position.set(wx(410), b + 1.6, wz(946.5) - z); m.rotation.y = Math.PI; p.add(m); return onWall(m, b, 125, 195); };
+      mk(M.led, 1.08, .002); mk(M.black, 1.0, .006); mk(M.mirror, .955, .009); }
+    // towel bar with a sage towel on the east wall, paper holder by the toilet, brushed bin with a wood lid
+    pan(432, 905, 434, 937, 95, 97, M.brushed); pan(429, 908, 432, 934, 58, 96, M.sageTowel);
+    pan(330, 837, 345, 840, 70, 72, M.brushed); onWall(CY(p, 337, 842, 5, 63, 74, M.white, b, 16), b, 63, 74);
+    CY(p, 338, 932, 11, 0, 33, M.brushed, b, 20); CY(p, 338, 932, 11, 33, 36, M.nicheWood, b, 20);
+  }
   // safe room used as a storage room: metal shelving along the side walls, window kept clear
   const box = std({ color: 0xc39a6b, roughness: .95 }), bin = std({ color: 0x5f7f99, roughness: .6 });
   const shelving = (X0, Y0, X1, Y1) => {
@@ -1482,7 +1566,8 @@ function focusRoom(id) {
     else if (!o.userData.wall && !o.userData.room && !openingGroups.includes(o) && !fixtures.includes(o) && !inRect(planXY(o), rect, 6)) hideForFocus(o);
   });
   ROOMS.forEach(q => { if (q.id !== id) hideForFocus(q.mesh); });
-  F[r.f].furn.children.forEach(o => { if (o.userData.rail || (!o.userData.wall && !inRect(planXY(o), rect, 6))) hideForFocus(o); });
+  const ff = o => { if (o.userData.reno) { o.children.forEach(ff); return; } if (o.userData.rail || (!o.userData.wall && !inRect(planXY(o), rect, 6))) hideForFocus(o); };
+  F[r.f].furn.children.forEach(ff);
   F[r.f].lights.forEach(l => { if (!inRect(planXY(l), rect, 6)) hideForFocus(l); });
   fixtures.forEach(f => { f.userData.focusHide = true; }); // no ceiling in this view, so no ceiling fixtures
   openingGroups.forEach(g => { if (!g.userData.plan || !inRect(g.userData.plan, rect, pad)) g.userData.focusHide = true; });
@@ -1612,7 +1697,7 @@ function selectRoom(id, fly) {
   document.getElementById('cName').textContent = r.name;
   document.getElementById('cDims').textContent = `${r.dims[0]} × ${r.dims[1]} ס״מ`;
   document.getElementById('cArea').textContent = `${(r.dims[0] * r.dims[1] / 1e4).toFixed(1)} מ״ר`;
-  document.getElementById('cNote').textContent = r.note;
+  document.getElementById('cNote').textContent = state.reno && r.afterNote ? r.afterNote : r.note;
   card.hidden = false;
   if (fly) {
     const [x0, y0, x1, y1] = r.rect, base = r.f === 0 ? 0 : L1 + (state.mode === 'exploded' ? targets.f1 : 0);
@@ -1631,6 +1716,15 @@ tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
 tog('tRotate', 'rotate', () => controls.autoRotate = state.rotate);
 document.getElementById('cardX').addEventListener('click', () => selectRoom(null));
+/* before / after renovation: swaps the room groups and floors in place, camera stays where it is */
+function setReno(on) {
+  state.reno = on;
+  renoSets.forEach(r => { r.before.visible = !on; if (r.after) r.after.visible = on; });
+  ROOMS.forEach(r => { if (!r.afterMat) return; r.baseMat = M[on ? r.afterMat : r.mat]; delete r.hl; r.mesh.material = r.baseMat; });
+  document.querySelectorAll('[data-reno]').forEach(b => b.setAttribute('aria-pressed', (b.dataset.reno === 'after') === on));
+  if (state.sel && !walking) selectRoom(state.sel, false);
+}
+document.querySelectorAll('[data-reno]').forEach(b => b.addEventListener('click', () => setReno(b.dataset.reno === 'after')));
 document.querySelectorAll('[data-col]').forEach(btn => {
   const panel = document.getElementById(btn.dataset.col), key = 'col_' + btn.dataset.col;
   const set = min => { panel.classList.toggle('min', min); btn.setAttribute('aria-expanded', !min); btn.setAttribute('aria-label', min ? 'הרחבה' : 'כיווץ'); try { localStorage.setItem(key, min ? '1' : ''); } catch (e) {} };
@@ -1678,6 +1772,7 @@ window.addEventListener('keydown', e => {
   const map = { '1': 'full', '2': 'ground', '3': 'first', '4': 'exploded' };
   if (map[e.key]) setMode(map[e.key]);
   if (e.key === 'n' || e.key === 'N') document.getElementById('tNight').click();
+  if (e.key === 'r' || e.key === 'R') setReno(!state.reno);
   if (e.key === 'Escape') { if (walking) exitWalk(); else if (focus) exitFocus(); else selectRoom(null); }
   if (e.key === '+' || e.key === '=') zoomBy(.8);
   if (e.key === '-' || e.key === '_') zoomBy(1.25);
