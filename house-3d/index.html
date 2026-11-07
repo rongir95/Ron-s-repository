@@ -56,6 +56,10 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .sw::after{content:"";position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:50%;background:var(--paper-solid);box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .2s}
 .tbtn[aria-pressed="true"] .sw{background:var(--accent)}
 .tbtn[aria-pressed="true"] .sw::after{transform:translateX(-13px)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:3px;margin:0 2px 2px;border-radius:10px;background:var(--line)}
+.seg button{all:unset;cursor:pointer;text-align:center;padding:6px 6px;border-radius:8px;font-size:13px;color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .views{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 2px 2px}
 .views .tbtn{justify-content:center;background:var(--line);padding:6px 8px}
 .views .tbtn:hover{filter:brightness(.95)}
@@ -94,6 +98,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   .tools h2{display:none}
   .tools .tbtn{flex:none;padding:6px 9px}
   .views{display:flex;padding:0}
+  .seg{flex:none;margin:0}
   .modes{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));transform:none;justify-content:space-between;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
   .mbtn{padding:8px 10px;font-size:13px;flex:1;text-align:center}
   .card{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));width:auto;bottom:calc(132px + env(safe-area-inset-bottom,0px))}
@@ -123,6 +128,12 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <button class="tbtn" id="tLabels" aria-pressed="true">שמות חדרים <span class="sw"></span></button>
   <button class="tbtn" id="tNeighbor" aria-pressed="true">יחידה שכנה A-2 <span class="sw"></span></button>
   <button class="tbtn" id="tRotate" aria-pressed="false">סיבוב אוטומטי <span class="sw"></span></button>
+  <h2>קירות</h2>
+  <div class="seg" role="group" aria-label="גובה קירות">
+    <button data-walls="full" aria-pressed="true">מלאים</button>
+    <button data-walls="low" aria-pressed="false">נמוכים</button>
+    <button data-walls="none" aria-pressed="false">ללא</button>
+  </div>
   <h2>מבט</h2>
   <div class="views">
     <button class="tbtn" data-view="street">חזית</button>
@@ -386,6 +397,7 @@ const M = {
 
 /* ---------------- geometry helpers ---------------- */
 const UNIT = new THREE.BoxGeometry(1, 1, 1);
+const wallPieces = [], openingGroups = [], fixtures = [];
 function boxUV(w, h, d, uOff = 0, vOff = 0) {
   const g = new THREE.BoxGeometry(w, h, d); const uv = g.attributes.uv;
   const dims = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
@@ -466,11 +478,12 @@ function wall(p, a, b, o) {
     const g = boxUV((e - s) / 100, (z1 - z0) / 100, t / 100, s / 100, o.base + z0 / 100);
     const m = shadowy(new THREE.Mesh(g, mats)); const c = (s + e) / 2;
     m.position.set(wx(a[0] + ux * c), o.base + (z0 + z1) / 200, wz(a[1] + uy * c)); m.rotation.y = theta; p.add(m);
+    m.userData.wall = { base: o.base, y0: o.base + z0 / 100, y1: o.base + z1 / 100 }; wallPieces.push(m);
   }
   for (const op of ops) opening(p, a, ux, uy, theta, op, o);
 }
 function opening(p, a, ux, uy, theta, op, o) {
-  const g = new THREE.Group(); g.position.set(wx(a[0] + ux * op.at), o.base, wz(a[1] + uy * op.at)); g.rotation.y = theta; p.add(g);
+  const g = new THREE.Group(); g.position.set(wx(a[0] + ux * op.at), o.base, wz(a[1] + uy * op.at)); g.rotation.y = theta; p.add(g); openingGroups.push(g);
   const w = op.w / 100, s = (op.sill || 0) / 100, hd = op.head / 100, t = o.t / 100, os = o.outSide || 1, hgt = hd - s;
   if (op.type === 'door') {
     const d = t + 0.03;
@@ -601,7 +614,7 @@ for (const r of ROOMS) {
   if (!r.noLight) {
     const ceil = r.f === 0 ? 2.8 : L1 + H2;
     const fx = new THREE.Mesh(new THREE.CylinderGeometry(.17, .17, .035, 24), M.fixture);
-    fx.position.set(wx((x0 + x1) / 2), ceil - 0.02, wz((y0 + y1) / 2)); fl.shell.add(fx);
+    fx.position.set(wx((x0 + x1) / 2), ceil - 0.02, wz((y0 + y1) / 2)); fl.shell.add(fx); fixtures.push(fx);
     const pl = new THREE.PointLight(0xffd6a0, 0, 4.6, 2); pl.position.set(fx.position.x, ceil - 0.35, fx.position.z);
     fl.group.add(pl); fl.lights.push(pl);
   }
@@ -885,7 +898,7 @@ document.getElementById('sG').textContent = Math.round(Math.abs(polyArea(slab0))
 document.getElementById('sF').textContent = Math.round(Math.abs(polyArea(offsetPoly(OUT1, 12.5))) / 1e4);
 
 /* ---------------- interaction ---------------- */
-const state = { mode: 'full', night: false, labels: true, neighbor: true, rotate: false, sel: null };
+const state = { walls: 'full', mode: 'full', night: false, labels: true, neighbor: true, rotate: false, sel: null };
 const targets = { f1: 0, roof: 0 };
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 let camTween = null;
@@ -905,7 +918,7 @@ function setMode(m) {
   roofG.visible = m === 'full' || m === 'exploded';
   targets.f1 = m === 'exploded' ? 3.4 : 0;
   targets.roof = m === 'exploded' ? 8.2 : 0;
-  applyNeighbor(); applyLabels();
+  applyNeighbor(); applyLabels(); applyWalls();
   if (m !== 'full' && state.sel && ROOMS.find(r => r.id === state.sel).f === 1 && m === 'ground') selectRoom(null);
   const ty = m === 'ground' ? 1.0 : m === 'first' ? 3.6 : m === 'exploded' ? 4.6 : 2.4;
   let dir = camera.position.clone().sub(controls.target);
@@ -914,6 +927,26 @@ function setMode(m) {
   const tgt = new THREE.Vector3(0.6, ty, 0.4);
   flyTo(tgt.clone().add(dir.setLength(Math.max(16, Math.min(dir.length(), 26)) * (m === 'exploded' ? 1.15 : 1))), tgt, 1.1);
   document.getElementById('hint').textContent = m === 'full' ? 'גרירה לסיבוב · גלילה לזום · בחרו קומה כדי להיכנס פנימה' : 'גרירה לסיבוב · גלילה לזום · לחיצה על חדר לפרטים';
+}
+/* walls: full height, cut at 1 m (dollhouse), or only a thin footprint on the floor */
+function applyWalls() {
+  const eff = state.mode === 'full' ? 'full' : state.walls;
+  const cut = eff === 'full' ? null : eff === 'low' ? 1.0 : 0.06;
+  for (const m of wallPieces) {
+    const u = m.userData.wall;
+    if (cut === null) { m.visible = true; m.scale.y = 1; m.position.y = (u.y0 + u.y1) / 2; continue; }
+    const top = u.base + cut;
+    if (u.y0 >= top - 0.001) { m.visible = false; continue; }
+    const y1 = Math.min(u.y1, top); m.visible = true;
+    m.scale.y = (y1 - u.y0) / (u.y1 - u.y0); m.position.y = (u.y0 + y1) / 2;
+  }
+  openingGroups.forEach(g => g.visible = cut === null);
+  fixtures.forEach(f => f.visible = cut === null);
+  document.querySelectorAll('[data-walls]').forEach(b => b.setAttribute('aria-pressed', b.dataset.walls === state.walls));
+}
+function setWalls(w) {
+  state.walls = w;
+  if (w !== 'full' && state.mode === 'full') setMode('ground'); else applyWalls();
 }
 function applyNeighbor() { neighbor.visible = state.neighbor && state.mode === 'full'; }
 function applyLabels() {
@@ -960,6 +993,7 @@ function selectRoom(id, fly) {
 }
 
 document.querySelectorAll('.mbtn').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+document.querySelectorAll('[data-walls]').forEach(b => b.addEventListener('click', () => setWalls(b.dataset.walls)));
 document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { const [p, t] = VIEWS[b.dataset.view](); if (b.dataset.view === 'top' && state.mode === 'full') setMode('ground'); flyTo(p, t, 1.4); }));
 const tog = (id, key, fn) => { const el = document.getElementById(id); el.addEventListener('click', () => { state[key] = !state[key]; el.setAttribute('aria-pressed', state[key]); fn(); }); };
 tog('tNight', 'night', applyNight);
@@ -973,6 +1007,7 @@ window.addEventListener('keydown', e => {
   if (map[e.key]) setMode(map[e.key]);
   if (e.key === 'n' || e.key === 'N') document.getElementById('tNight').click();
   if (e.key === 'Escape') selectRoom(null);
+  if (e.key === 'w' || e.key === 'W') setWalls({ full: 'low', low: 'none', none: 'full' }[state.walls]);
 });
 
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let down = null;
