@@ -539,6 +539,34 @@ T.landscape = (() => { const c = document.createElement('canvas'); c.width = 256
   for (const [x, r] of [[70, 34], [180, 40], [130, 22]]) { g.fillStyle = '#5c6b48'; g.beginPath(); g.arc(x, 70, r, 0, 6.3); g.fill(); g.fillStyle = '#4a3a2a'; g.fillRect(x - 3, 70, 6, 50); }
   g.fillStyle = '#b8ad8a'; g.beginPath(); g.moveTo(110, 160); g.quadraticCurveTo(140, 120, 200, 110); g.lineTo(210, 112); g.quadraticCurveTo(160, 130, 140, 160); g.fill();
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+// herringbone (פישבון) oak parquet, planks 10×60 cm, laid at 45°
+T.herring = (() => {
+  const L = 6, U = 48, P = 2 * L, S = P * U, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
+  g.fillStyle = '#6b4a2a'; g.fillRect(0, 0, S, S);
+  const plank = (x, y, w, h) => {
+    const col = hsl(31 + rnd() * 6, 46 + rnd() * 10, 47 + (rnd() - .5) * 10);
+    for (const ox of [-S, 0, S]) for (const oy of [-S, 0, S]) {
+      const X = x * U + ox, Y = y * U + oy; if (X > S || Y > S || X + w * U < 0 || Y + h * U < 0) continue;
+      g.fillStyle = col; g.fillRect(X + 1, Y + 1, w * U - 2, h * U - 2);
+      g.strokeStyle = 'rgba(70,40,15,.18)'; g.lineWidth = 1;
+      for (let k = 0; k < 5; k++) { g.beginPath(); if (w > h) { const yy = Y + 3 + rnd() * (h * U - 6); g.moveTo(X + 2, yy); g.bezierCurveTo(X + w * U * .3, yy + rnd() * 4 - 2, X + w * U * .7, yy + rnd() * 4 - 2, X + w * U - 2, yy); } else { const xx = X + 3 + rnd() * (w * U - 6); g.moveTo(xx, Y + 2); g.bezierCurveTo(xx + rnd() * 4 - 2, Y + h * U * .3, xx + rnd() * 4 - 2, Y + h * U * .7, xx, Y + h * U - 2); } g.stroke(); }
+    }
+  };
+  for (let j = -3; j <= 3; j++) for (let k = -P; k < 2 * P; k++) { const ox = j * L, oy = -j * L; plank(k + ox, k + oy, L, 1); plank(k + L + ox, k + 1 - L + oy, 1, L); }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1 / 1.2, 1 / 1.2); t.rotation = Math.PI / 4; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+})();
+T.tealStack = canvasTex(512, (g, s) => {
+  g.fillStyle = '#dfe2df'; g.fillRect(0, 0, s, s); const tw = s / 8, th = s / 2;
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) { const l = 34 + (rnd() - .5) * 5; const gr = g.createLinearGradient(i * tw, 0, i * tw + tw, 0); gr.addColorStop(0, hsl(178, 30, l + 3)); gr.addColorStop(1, hsl(178, 30, l - 2)); g.fillStyle = gr; g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3); }
+}, 0.6);
+T.abstract = (() => { const c = document.createElement('canvas'); c.width = 160; c.height = 200; const g = c.getContext('2d');
+  g.fillStyle = '#ebe4d8'; g.fillRect(0, 0, 160, 200); g.fillStyle = '#c9bba6'; g.beginPath(); g.arc(30, 40, 110, 0, 1.6); g.lineTo(30, 40); g.fill();
+  g.fillStyle = '#7d756b'; g.beginPath(); g.arc(150, 190, 80, 3.2, 4.8); g.lineTo(150, 190); g.fill(); g.fillStyle = '#a89c8a'; g.beginPath(); g.ellipse(70, 150, 40, 30, .4, 0, 6.3); g.fill();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+T.stoneStrip = (() => { const c = document.createElement('canvas'); c.width = 256; c.height = 768; const g = c.getContext('2d');
+  g.fillStyle = '#cfc6b6'; g.fillRect(0, 0, 256, 768); const rh = 768 / 56;
+  for (let r = 0; r < 56; r++) { let x = -rnd() * 40; while (x < 256) { const w = 20 + rnd() * 50; g.fillStyle = hsl(36 + rnd() * 10, 10 + rnd() * 14, 72 + (rnd() - .5) * 18); g.fillRect(x + 1, r * rh + 1, w - 2, rh - 2); x += w; } }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
 T.wcWhite = dotTile('#f3f3f1', 'rgba(0,0,0,.07)', '#d9d9d5');
 T.wcRed = dotTile('#7a1c2d', 'rgba(255,255,255,.13)', '#ece8e6');
 T.bath = tileTex(4, [200, 8, 86], '#a9b0b6', 1.2, 2);
@@ -576,6 +604,18 @@ const M = {
   plaid: std({ color: 0x8a5552, roughness: 1 }),
   tealTop: std({ color: 0x6fb3a4, roughness: .5 }),
   wicker: new THREE.MeshStandardMaterial({ color: 0xe9e0cf, roughness: 1, transparent: true, opacity: .92 }),
+  herring: std({ map: T.herring, roughness: .45, envMapIntensity: .5 }),
+  tealStack: std({ map: T.tealStack, roughness: .2, envMapIntensity: .8 }),
+  terrazzoW: std({ map: T.terrazzo, roughness: .4 }),
+  kWhite: std({ color: 0xf2efe8, roughness: .35 }),
+  qWhite: std({ color: 0xf6f3ec, roughness: .25, envMapIntensity: .6 }),
+  oakLight: std({ color: 0xc49a6c, roughness: .55 }),
+  taupeWall: std({ map: T.plaster, color: 0xcdbfae, roughness: .95 }),
+  taupe: std({ color: 0xc4b6a3, roughness: .6 }),
+  linenBed: std({ color: 0xd9ccb8, roughness: 1 }),
+  knit: std({ color: 0x8c8073, roughness: 1 }),
+  linenCurtain: std({ color: 0xe0d4c1, roughness: 1, transparent: true, opacity: .85, side: THREE.DoubleSide }),
+  abstractArt: std({ map: T.abstract, roughness: .8 }),
   plasterWarm: std({ map: T.plasterWarm, roughness: .95 }),
   walnutA: std({ color: 0x8a5a36, roughness: .5 }),
   jute: std({ map: T.jute, roughness: 1 }),
@@ -605,7 +645,9 @@ const M = {
   dotGlass: new THREE.MeshStandardMaterial({ color: 0xe9eef0, roughness: .2, transparent: true, opacity: .45, depthWrite: false, side: THREE.DoubleSide }),
   ochre: std({ color: 0xc19f48, roughness: .85 }),
   leather: std({ color: 0xc4b49c, roughness: .6 }),
-  railing: std({ color: 0x4b4e53, roughness: .5, metalness: .4 }),
+  railing: std({ color: 0x8c9094, roughness: .45, metalness: .5 }),
+  hallTile: std({ map: T.ensFloor, color: 0x9a9da0, roughness: .45 }),
+  stoneStrip: std({ map: T.stoneStrip, roughness: .9 }),
   sheer: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }),
   champagne: std({ color: 0xd8ccb4, roughness: .35, metalness: .6 }),
   kCream: std({ color: 0xece3d1, roughness: .2, envMapIntensity: .7 }),
@@ -862,18 +904,18 @@ const OPS1 = {
   7: [W(139, 100, 120, 210), W(324, 60, 140, 210)], // bathroom and en-suite, onto the laundry screen
 };
 const ROOMS = [
-  { id: 'living', f: 0, name: 'סלון', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', afterMat: 'lamOak', afterNote: 'אחרי השיפוץ: פרקט עץ חם, קיר טלוויזיה בטיח בגוון גריז׳ עם מדף אגוז צף ומזנון אגוז תלוי, ספה פינתית בבד בוקלה בהיר עם כריות זית וטרקוטה, שטיח ג׳וטה, שולחן קפה מאגוז ומנורת פאות ברונזה.', note: 'דלת הזזה לחצר עם וילונות וואל, ומימינה על אותו קיר קיר הטלוויזיה עם פאנל חרדל ומזנון לבן צף. ספת עור פינתית בבז׳ לאורך הקיר המשותף, שולחן קפה לבן ומנורה תלויה.' },
-  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, וחלק בורדו שיוצא מקיר הכיריים וסוגר את המטבח מצפון.', spots: true },
-  { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [75, 47, 270, 295], mat: 'tile', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
-  { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
+  { id: 'living', f: 0, name: 'סלון', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט עץ חם, קיר טלוויזיה בטיח בגוון גריז׳ עם מדף אגוז צף ומזנון אגוז תלוי, ספה פינתית בבד בוקלה בהיר עם כריות זית וטרקוטה, שטיח ג׳וטה, שולחן קפה מאגוז ומנורת פאות ברונזה.', note: 'דלת הזזה לחצר עם וילונות וואל, ומימינה על אותו קיר קיר הטלוויזיה עם פאנל חרדל ומזנון לבן צף. ספת עור פינתית בבז׳ לאורך הקיר המשותף, שולחן קפה לבן ומנורה תלויה.' },
+  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, ארונות אלון עד התקרה בקיר המקרר עם מגדל תנורים ונישה מוארת, ארונות תחתונים לבנים עם משטח לבן, מדפי אלון צפים במקום הקולט, אי לבן עם בר אלון ומנורות כיפה לבנות. בלי הגבס בתקרה.', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, וחלק בורדו שיוצא מקיר הכיריים וסוגר את המטבח מצפון.', spots: true },
+  { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [75, 47, 270, 295], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון ובלי הגבס בתקרה.', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
+  { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון.', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
   { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [294, 836, 435, 948], mat: 'slate', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק ירוקים בגובה 1.2 מ׳ וצבע לבן מעליהם, ריצוף טרצו, אסלה תלויה עם מיכל סמוי, נישת עץ מוארת מעל האסלה, כיור תלוי קטן ומראה מעוגלת עם תאורה אחורית.', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
   { id: 'mamad', f: 0, name: 'ממ״ד · חדר אחסון', dims: [315, 305], rect: [465, 640, 780, 945], mat: 'tile', note: 'מרחב מוגן דירתי מבטון מזוין שמשמש כחדר אחסון, עם מדפים לאורך הקירות. הכניסה מהמעבר שמתחת למדרגות.' },
-  { id: 'bed1', f: 1, name: 'חדר הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'laminate', eye: [300, 230], look: [-1, -.25], note: 'רצפת למינציה, קיר טפט מאחורי המיטה, שידת מגירות ושעון על הקיר המזרחי, מראה עומדת ומנורת תוף. דלתות למקלחת ולחדר הארונות.' },
+  { id: 'bed1', f: 1, name: 'חדר הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'laminate', afterMat: 'lamOak', afterNote: 'אחרי השיפוץ: קיר טאופ מאחורי המיטה עם שתי הדפסים מופשטים, מיטה מרופדת בבז׳ עם מצעים בהירים, מנורות גליל שחורות משני הצדדים, מנורת תקרה עגולה, שטיח ג׳וטה, שידה בטאופ עם מראה עגולה ופאנל רפפות אלון, וילונות פשתן.', eye: [300, 230], look: [-1, -.25], note: 'רצפת למינציה, קיר טפט מאחורי המיטה, שידת מגירות ושעון על הקיר המזרחי, מראה עומדת ומנורת תוף. דלתות למקלחת ולחדר הארונות.' },
   { id: 'bed2', f: 1, name: 'החדר של גיא', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'lamOak', eye: [610, 350], look: [.2, -1], note: 'רצפת למינציה בגוון אלון, מיטה לאורך הקיר המערבי, שולחן כתיבה בצורת L מתחת לחלון עם מדפים בטורקיז, ארון גבוה בגימור בטון ליד הדלת ומנורה גאומטרית לבנה.' },
-  { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [22, 321, 188, 490], mat: 'ensFloor', eye: [150, 340], look: [-.4, 1], note: 'אריחים לבנים מבריקים עם פס פסיפס, ארון כיור תלוי בטורקיז, מראה מקושתת ומקלחון זכוכית עם ראש גשם.' },
+  { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [22, 321, 188, 490], mat: 'ensFloor', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק בטורקיז־ירוק במקלחון עם נישה מוארת וראש גשם שחור, טרצו בשאר הקירות וברצפה, אסלה תלויה ומעליה ארונית אלון עם נישה פתוחה, ארון כיור אלון עם כיור מונח ומראה מעוגלת עם תאורה.', eye: [150, 340], look: [-.4, 1], note: 'אריחים לבנים מבריקים עם פס פסיפס, ארון כיור תלוי בטורקיז, מראה מקושתת ומקלחון זכוכית עם ראש גשם.' },
   { id: 'closet', f: 1, name: 'חדר ארונות', dims: [145, 170], rect: [200, 321, 359, 490], mat: 'laminate', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
-  { id: 'bath', f: 1, name: 'חדר רחצה אחים', dims: [315, 220], rect: [22, 502, 359, 724], mat: 'bathFloor', eye: [330, 612], look: [-1, 0], note: 'אריחי שמנת עם אריחים חומים, ארון כיור ארוך בוונגה עם מראה וארון גבוה, אמבטיה עם מחיצת זכוכית, מכונת כביסה מתחת לארון גבוה.' },
-  { id: 'hall', f: 1, name: 'מסדרון', dims: [90, 400], rect: [371, 321, 456, 724], mat: 'parquet', note: 'מחבר בין המדרגות לכל חדרי הקומה. בתקרה פתח עלייה לגג.' },
+  { id: 'bath', f: 1, name: 'חדר רחצה אחים', dims: [315, 220], rect: [22, 502, 359, 724], mat: 'bathFloor', afterNote: 'אחרי השיפוץ: אסלה תלויה ומעליה ארונית אלון. שאר החדר עדיין כמו היום, עד שתגיע הדמיה.', eye: [330, 612], look: [-1, 0], note: 'אריחי שמנת עם אריחים חומים, ארון כיור ארוך בוונגה עם מראה וארון גבוה, אמבטיה עם מחיצת זכוכית, מכונת כביסה מתחת לארון גבוה.' },
+  { id: 'hall', f: 1, name: 'מסדרון', dims: [90, 400], rect: [371, 321, 456, 724], mat: 'hallTile', note: 'מחבר בין המדרגות לכל חדרי הקומה. בתקרה פתח עלייה לגג.' },
   { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [468, 626, 780, 1024], mat: 'lamGrey', eye: [520, 700], look: [1, .55], note: 'טפט חוף עם דקלים על הקיר המשותף, מיטה מתחת לחלון, ארון כהה עם דלתות הזזה ומדפים פתוחים, שידה ומדף קיר כהים ומנורת כדור קלועה. רצפת למינציה אפורה כהה.' },
   { id: 'bed4', f: 1, name: 'החדר של מרק', dims: [355, 275], rect: [88, 736, 456, 1024], mat: 'lamDark', eye: [410, 790], look: [-.55, 1], note: 'טפט חוף עם עצי דקל על הקיר המערבי, מיטה לאורך קיר החלון, ארון בגוון עץ אפור לכל אורך הקיר הצפוני ושידה לבנה תלויה. רצפת למינציה כהה.' },
   { id: 'balcony', f: 1, name: 'מסתור כביסה', dims: [70, 410], rect: [-72, 292, -4, 716], mat: 'balcony', note: 'מרפסת שירות מוסתרת ברפפות, צמודה לחדרי הרחצה.', noLight: true },
@@ -944,14 +986,20 @@ for (const r of ROOMS) {
 /* ---------------- stairs (U-shaped, 18 risers) ---------------- */
 {
   const p = F[0].furn, R = 17.22, tr = 248 / 9;
-  for (let i = 0; i < 9; i++) { // flight 1: floating oak treads
+  // as in the photos: solid white stairs with dark wenge treads and grey metal railings
+  for (let i = 0; i < 9; i++) { // flight 1
     const xa = 452 + i * tr, top = (i + 1) * R;
-    B(p, xa, 432, xa + tr + 2, 523, top - 5, top, M.oak);
+    B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.wenge);
   }
-  B(p, 700, 432, 778, 618, 0, 9 * R - 4, M.interior); B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.oak); // landing
+  B(p, 700, 432, 778, 618, 0, 9 * R - 4, M.interior); B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.wenge); // landing
+  // stone-look strip cladding on the tall landing wall, a wall clock, a floor vase; framed pictures along the flight
+  { const m = new THREE.Mesh(boxUV(.01, 5.6, 1.86, 0, 0), M.stoneStrip); m.position.set(wx(777.4), 2.8, wz(525)); p.add(m); onWall(m, 0, 0, 560); }
+  onWall(CY(p, 776, 525, 22, 330, 332, std({ color: 0xd9c9a8, roughness: .8 }), 0, 32), 0, 330, 332).rotation.z = Math.PI / 2;
+  CY(p, 765, 445, 8, 9 * R, 9 * R + 45, M.pot, 0, 14, 5);
+  for (let k = 0; k < 4; k++) { const x = 520 + k * 38, z = 100 + k * 30; onWall(B(p, x, 428.5, x + 26, 430, z, z + 20, M.black, 0), 0, z, z + 20); onWall(B(p, x + 3, 430, x + 23, 430.4, z + 3, z + 17, M.duvetC, 0), 0, z + 3, z + 17); }
   for (let j = 0; j < 9; j++) { // flight 2: open underneath, the passage to the safe-room door runs below it
     const xb = 700 - (j + 1) * tr, top = 9 * R + (j + 1) * R;
-    B(p, xb, 525, xb + tr, 618, top - R, top - 4, M.interior); B(p, xb - 2, 523, xb + tr, 620, top - 4, top, M.oak);
+    B(p, xb, 525, xb + tr, 618, top - R, top - 4, M.interior); B(p, xb - 2, 523, xb + tr, 620, top - 4, top, M.wenge);
   }
   // glass balustrades + handrails along the sloped flights
   const rail = (X0, X1, Y, z0, z1, base) => {
@@ -998,6 +1046,14 @@ function toilet(p, base, X, Y, toX, toY) {
   lb(g, .38, .38, .17, 0, .62, -.24, M.ceramic);
   const bowl = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.19, .15, .4, 24), M.ceramic)); bowl.scale.z = 1.35; bowl.position.set(0, .2, .02); g.add(bowl);
   const lid = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.2, .2, .03, 24), M.white)); lid.scale.z = 1.35; lid.position.set(0, .415, .02); g.add(lid);
+}
+// wall-hung rimless toilet with a concealed cistern and flush plate; rot turns the bowl away from the wall
+function wallToilet(p, base, X, Y, rot, plateMat = M.brushed) {
+  const g = local(p, X, Y, base, rot);
+  const bowl = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.37, .32, .52, 4, .12), M.ceramic)); bowl.position.set(0, .3, .27); g.add(bowl);
+  const lid = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.37, .03, .5, 3, .012), M.white)); lid.position.set(0, .475, .27); g.add(lid);
+  lb(g, .24, .16, .015, 0, 1.05, .008, plateMat); lb(g, .09, .11, .005, -.055, 1.05, .018, M.alu); lb(g, .09, .11, .005, .055, 1.05, .018, M.alu);
+  return g;
 }
 function vanity(p, base, r, basinAt) {
   B(p, ...r, 10, 82, M.cabinetDark, base); B(p, r[0] - 1, r[1] - 1, r[2] + 1, r[3] + 1, 82, 86, M.quartz, base);
@@ -1120,13 +1176,24 @@ function desk(p, base, r, chairAt, faceTo) {
   }
   // ---- kitchen, matched to the photos ----
   // box with texture coordinates in metres (for grained / tiled surfaces)
-  const BU = (X0, Y0, X1, Y1, z0, z1, mat) => {
+  const BU = (X0, Y0, X1, Y1, z0, z1, mat, pp = p) => {
     const w = (X1 - X0) / 100, d = (Y1 - Y0) / 100, h = (z1 - z0) / 100;
     const m = shadowy(new THREE.Mesh(boxUV(w, h, d, (X0 + Y0) / 100, z0 / 100), mat));
-    m.position.set(wx((X0 + X1) / 2), b + (z0 + z1) / 200, wz((Y0 + Y1) / 2)); p.add(m); return m;
+    m.position.set(wx((X0 + X1) / 2), b + (z0 + z1) / 200, wz((Y0 + Y1) / 2)); pp.add(m); return m;
   };
   const handleY = (X, Y0, Y1, z) => B(p, X, Y0, X + 2, Y1, z - .8, z + .8, M.steel, b);   // bar handle on a face looking east
   const handleX = (X0, X1, Y, z) => B(p, X0, Y - 2, X1, Y, z - .8, z + .8, M.steel, b);   // bar handle on a face looking north
+  // bar stools: cream bouclé seat and back, black metal frame
+  const barStool = (X, Y, toX, toY, pp = p) => {
+    const g = local(pp, X, Y, b, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y)));
+    const seat = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.44, .08, .42, 3, .03), M.boucle)); seat.position.set(0, .7, 0); g.add(seat);
+    const back = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.42, .26, .06, 3, .025), M.boucle)); back.position.set(0, .93, -.2); g.add(back);
+    for (const [a, c] of [[-.19, -.18], [.19, -.18], [-.19, .18], [.19, .18]]) lb(g, .022, .7, .022, a, .35, c, M.black);
+    lb(g, .022, .3, .022, -.19, .85, -.2, M.black); lb(g, .022, .3, .022, .19, .85, -.2, M.black);
+    lb(g, .4, .02, .02, 0, .28, .18, M.black); lb(g, .4, .02, .02, 0, .28, -.18, M.black);
+  };
+  const kitBefore = new THREE.Group(); kitBefore.userData.reno = 'before'; p.add(kitBefore); renoSets.push({ room: 'kitchen', before: kitBefore });
+  { const p = kitBefore;
   // sink wall (west): cream gloss base units, light grey quartz top, white glass splashback
   B(p, 16, 320, 76, 699, 10, 88, M.kCream, b); B(p, 16, 318, 79, 699, 88, 92, M.kTop, b);
   B(p, 18, 320, 74, 699, 0, 10, M.skirt, b);
@@ -1159,29 +1226,63 @@ function desk(p, base, r, chairAt, faceTo) {
   for (const x of [237, 249]) { B(p, x, 621, x + 2, 627, 95, 172, M.steel, b); B(p, x, 621, x + 2, 627, 15, 74, M.steel, b); }
   B(p, 199, 640, 289, 699, 190, 249, M.kCream, b); handleX(225, 263, 640, 194);
   // breakfast bar in walnut veneer with a waterfall end, running north–south between kitchen and living
-  BU(205, 384, 245, 560, 0, 95, M.veneer);
-  BU(200, 384, 276, 568, 95, 100, M.veneer);
-  BU(200, 560, 276, 568, 0, 95, M.veneer);
+  BU(205, 384, 245, 560, 0, 95, M.veneer, p);
+  BU(200, 384, 276, 568, 95, 100, M.veneer, p);
+  BU(200, 560, 276, 568, 0, 95, M.veneer, p);
   // bordeaux gloss island with a grey top, at the north end of the bar, reaching towards the living room
   // bordeaux peninsula: runs from the cooktop counter on the west wall eastwards, closing the north end of the kitchen
   B(p, 76, 320, 280, 382, 8, 88, M.kRed, b); B(p, 78, 322, 278, 380, 0, 8, M.white, b);
   B(p, 76, 316, 284, 384, 88, 92, M.kTop, b);
-  // bar stools: cream bouclé seat and back, black metal frame
-  const barStool = (X, Y, toX, toY) => {
-    const g = local(p, X, Y, b, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y)));
-    const seat = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.44, .08, .42, 3, .03), M.boucle)); seat.position.set(0, .7, 0); g.add(seat);
-    const back = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.42, .26, .06, 3, .025), M.boucle)); back.position.set(0, .93, -.2); g.add(back);
-    for (const [a, c] of [[-.19, -.18], [.19, -.18], [-.19, .18], [.19, .18]]) lb(g, .022, .7, .022, a, .35, c, M.black);
-    lb(g, .022, .3, .022, -.19, .85, -.2, M.black); lb(g, .022, .3, .022, .19, .85, -.2, M.black);
-    lb(g, .4, .02, .02, 0, .28, .18, M.black); lb(g, .4, .02, .02, 0, .28, -.18, M.black);
-  };
-  for (const y of [420, 470, 520]) barStool(296, y, 230, y);
+  for (const y of [420, 470, 520]) barStool(296, y, 230, y, p);
   // two white square-frame pendants over the bar
   B(p, 225, 420, 249, 520, 276, 280, M.white, b);
   for (const [y, z] of [[445, 175], [495, 188]]) {
     CY(p, 237, y, .3, z + 24, 276, M.black, b, 6);
     for (const [y0, y1, z0, z1] of [[y - 12, y + 12, z, z + 2.5], [y - 12, y + 12, z + 21.5, z + 24], [y - 12, y - 9.5, z, z + 24], [y + 9.5, y + 12, z, z + 24]]) B(p, 233, y0, 241, y1, z0, z1, M.white, b);
     const bulb = new THREE.Mesh(new THREE.SphereGeometry(.035, 12, 8), M.fixture); bulb.position.set(wx(237), z / 100 + .12, wz(y)); p.add(bulb);
+  }
+  }
+  // ---- kitchen after the renovation: oak tall units to the ceiling on the fridge wall, white base units, no hood, floating oak shelves ----
+  const kitAfter = new THREE.Group(); kitAfter.userData.reno = 'after'; kitAfter.visible = false; p.add(kitAfter); renoSets[renoSets.length - 1].after = kitAfter;
+  { const p = kitAfter, C = 279;
+    const hx = (X0, X1, Y, z) => B(p, X0, Y - 1.5, X1, Y, z - .5, z + .5, M.black, b);
+    // west wall: white handleless base run, white quartz top, sink under the window, induction hob, no wall units
+    B(p, 16, 320, 76, 699, 10, 88, M.kWhite, b); B(p, 16, 318, 79, 699, 88, 92, M.qWhite, b); B(p, 18, 320, 74, 699, 0, 10, M.skirt, b);
+    for (let y = 380; y < 690; y += 60) B(p, 76, y - .3, 76.6, y + .3, 10, 86, M.trim, b);
+    for (let y = 320; y < 690; y += 60) B(p, 76, y + 2, 77, y + 58, 84, 85, M.black, b);
+    B(p, 26, 472, 68, 538, 86, 92.5, M.steel, b); CY(p, 22, 505, 1.5, 92, 128, M.black, b, 8); B(p, 21, 504, 40, 506, 126, 128, M.black, b);
+    B(p, 22, 340, 70, 400, 92, 93, M.black, b);
+    for (const [y0, y1, z1] of [[320, 435, 150], [575, 699, 150], [435, 575, 104]]) B(p, 16.5, y0, 17.5, y1, 92, z1, M.backsplash, b);
+    // floating oak shelves where the hood used to be, with jars, bowls and a plant
+    for (const z of [160, 200]) B(p, 16, 325, 42, 430, z, z + 4, M.oakLight, b);
+    for (let y = 335; y < 400; y += 9) CY(p, 28, y, 3, 164, 175, std({ color: new THREE.Color().setHSL(.05 + rnd() * .1, .6, .35 + rnd() * .2), roughness: .4 }), b, 10);
+    CY(p, 29, 412, 7, 164, 170, M.white, b, 18); CY(p, 28, 345, 7, 204, 214, M.white, b, 18);
+    for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.05, 0), M.leaf)); m.position.set(wx(28 + (rnd() - .5) * 10), b + 2.18 + rnd() * .1, wz(395 + (rnd() - .5) * 16)); p.add(m); }
+    // south wall: oak tall units to the ceiling, oven tower with built-in microwave and oven, lit open niche, fridge set into the oak wall
+    B(p, 76, 640, 136, 699, 10, 88, M.kWhite, b); B(p, 76, 637, 136, 699, 88, 92, M.qWhite, b);
+    B(p, 76, 664, 136, 699, 135, C, M.oakLight, b); B(p, 78, 663.5, 134, 664, 135, 140, M.oakLight, b);
+    B(p, 78, 664, 134, 668, 100, 135, M.oakLight, b); B(p, 78, 664.5, 134, 665, 133, 134, M.led, b);
+    for (const [x, z] of [[90, 115], [112, 115]]) CY(p, x, 680, 4, 102, 110, M.white, b, 14);
+    B(p, 136, 640, 198, 699, 0, C, M.oakLight, b);
+    B(p, 140, 638.5, 194, 640, 152, 186, M.black, b); B(p, 141, 638, 193, 638.5, 156, 182, M.steel, b);
+    B(p, 140, 638.5, 194, 640, 88, 146, M.black, b); B(p, 141, 638, 193, 638.5, 92, 102, M.steel, b);
+    for (let x = 150; x < 190; x += 30) B(p, x, 639.5, x + .4, 640.2, 0, 86, M.espresso, b);
+    B(p, 199, 627, 289, 699, 0, 186, M.fridge, b);
+    B(p, 243.6, 626.4, 244.4, 627, 2, 186, M.black, b); B(p, 199, 626.4, 289, 627, 82, 83, M.black, b);
+    for (const x of [237, 249]) { B(p, x, 621, x + 2, 627, 95, 172, M.steel, b); B(p, x, 621, x + 2, 627, 15, 74, M.steel, b); }
+    B(p, 199, 640, 289, 699, 188, C, M.oakLight, b); B(p, 289, 625, 296, 699, 0, C, M.oakLight, b);
+    for (const x of [244]) B(p, x - .3, 639.4, x + .3, 640, 190, C - 2, M.espresso, b);
+    // white peninsula with a white quartz top, light-oak breakfast bar resting on it
+    B(p, 76, 320, 280, 382, 8, 88, M.kWhite, b); B(p, 78, 322, 278, 380, 0, 8, M.kWhite, b);
+    B(p, 76, 316, 284, 384, 88, 92, M.qWhite, b);
+    BU(205, 384, 245, 560, 0, 95, M.oakLight, p); BU(200, 384, 276, 568, 95, 100, M.oakLight, p); BU(200, 560, 276, 568, 0, 95, M.oakLight, p);
+    for (const y of [420, 470, 520]) barStool(296, y, 230, y, p);
+    // white dome pendants over the bar
+    for (const y of [445, 515]) {
+      CY(p, 238, y, .3, 210, 279, M.black, b, 6); CY(p, 238, y, 4, 277, 279, M.white, b, 14);
+      const d = new THREE.Mesh(new THREE.SphereGeometry(.2, 28, 10, 0, Math.PI * 2, 0, Math.PI / 2.6), std({ color: 0xf4f1ea, roughness: .5, side: THREE.DoubleSide })); d.position.set(wx(238), b + 2.0, wz(y)); p.add(d);
+      const bl = new THREE.Mesh(new THREE.SphereGeometry(.045, 12, 8), M.led); bl.position.set(wx(238), b + 1.92, wz(y)); p.add(bl);
+    }
   }
   // roller blinds over the kitchen and dining windows, decorative security grille outside the sink window
   B(p, 17, 430, 24, 580, 215, 222, M.shade, b); B(p, 17.5, 433, 19, 577, 186, 215, M.shade, b);
@@ -1223,7 +1324,8 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let y = 674; y < 776; y += 8.5) for (const z of [102, 197]) { const dpt = 3 + rnd() * 5; onWall(B(p, 433 - dpt, y, 433, y + 7.5, z, z + 7.5, M.black, b), b, z, z + 7.5); }
   for (let z = 110; z < 196; z += 8.5) for (const y of [674, 768]) { const dpt = 3 + rnd() * 5; onWall(B(p, 433 - dpt, y, 433, y + 7.5, z, z + 7.5, M.black, b), b, z, z + 7.5); }
   onWall(B(p, 300, 819, 312, 824, 140, 150, M.black, b), b, 140, 150);
-  { const sp = F[1].shell;
+  { const bulk = new THREE.Group(); bulk.userData.reno = 'before'; F[1].shell.add(bulk); renoSets.push({ room: 'kitchen-ceiling', before: bulk });
+    const sp = bulk;
     B(sp, 16, 47, 190, 699, -60, -30.5, M.ceiling, L1);                 // dropped ceiling over the kitchen run and dining
     B(sp, 190, 610, 290, 699, -60, -30.5, M.ceiling, L1);               // over the fridge
     B(sp, 190, 110, 191.5, 270, -56, -36, M.trim, L1);
@@ -1344,10 +1446,11 @@ function desk(p, base, r, chairAt, faceTo) {
 {
   const p = F[1].furn, b = L1;
   // ---- tiles / wallpaper as thin panels on the inside faces of a room, with gaps for doors and windows ----
+  let panelTarget = null; // panels go into the before/after group being built
   const panel = (X0, Y0, X1, Y1, z0, z1, mat) => {
     const w = (X1 - X0) / 100, d = (Y1 - Y0) / 100, h = (z1 - z0) / 100;
     const m = new THREE.Mesh(boxUV(w, h, d, (X0 + Y0) / 100, z0 / 100), mat); m.receiveShadow = true;
-    m.position.set(wx((X0 + X1) / 2), b + (z0 + z1) / 200, wz((Y0 + Y1) / 2)); p.add(m); return onWall(m, b, z0, z1);
+    m.position.set(wx((X0 + X1) / 2), b + (z0 + z1) / 200, wz((Y0 + Y1) / 2)); (panelTarget || p).add(m); return onWall(m, b, z0, z1);
   };
   const wallRun = (along, fixed, a0, a1, gaps, z0, z1, mat, side) => {
     const put = (u0, u1, h0, h1) => { if (u1 - u0 < .5 || h1 - h0 < .5) return; along === 'x' ? panel(u0, fixed, u1, fixed + side, h0, h1, mat) : panel(fixed, u0, fixed + side, u1, h0, h1, mat); };
@@ -1361,6 +1464,8 @@ function desk(p, base, r, chairAt, faceTo) {
   };
 
   // ---- parents' bedroom, from the photos: laminate floor, wallpapered headboard wall, burgundy leaf bedspread ----
+  const bedBefore = new THREE.Group(); bedBefore.userData.reno = 'before'; p.add(bedBefore); renoSets.push({ room: 'bed1', before: bedBefore });
+  { const p = bedBefore; panelTarget = bedBefore;
   panel(94.5, 19.5, 95.5, 309, 7, 274, M.wallpaper2);
   bed(p, b, [96, 76, 306, 256], 'W', M.bedspread);
   B(p, 96, 262, 140, 304, 0, 52, M.grayWood, b); CY(p, 118, 283, 9, 52, 80, M.linen, b, 16, 6);
@@ -1375,6 +1480,36 @@ function desk(p, base, r, chairAt, faceTo) {
   onWall(B(p, 110, 24, 275, 26, 228, 231, M.black, b), b, 228, 231);
   for (const x0 of [112, 245]) for (let x = x0; x < x0 + 28; x += 7) onWall(B(p, x, 25 + ((x / 7) % 2) * 3, x + 7, 27 + ((x / 7) % 2) * 3, 0, 228, M.olive, b), b, 0, 228);
   { const sh = new THREE.Mesh(new THREE.CylinderGeometry(.26, .3, .3, 32, 1, true), M.drum); sh.position.set(wx(205), b + 2.2, wz(166)); p.add(sh); CY(p, 205, 166, .3, 235, 274, M.black, b, 6); }
+  }
+  // ---- parents' bedroom after the renovation: taupe feature wall with two abstract prints, upholstered bed, black cylinder pendants, round flush light ----
+  const bedAfter = new THREE.Group(); bedAfter.userData.reno = 'after'; bedAfter.visible = false; p.add(bedAfter); renoSets[renoSets.length - 1].after = bedAfter;
+  { const p = bedAfter; panelTarget = bedAfter;
+    panel(94.5, 19.5, 95.5, 309, 7, 274, M.taupeWall);
+    B(p, 160, 80, 380, 250, 0, 1, M.jute, b);
+    RB(p, 98, 78, 306, 254, 0, 38, M.linenBed, b, .04); RB(p, 94, 74, 104, 258, 0, 110, M.linenBed, b, .04);
+    RB(p, 104, 82, 300, 250, 34, 56, M.white, b, .05); RB(p, 200, 76, 306, 256, 50, 58, M.knit, b, .04);
+    for (const [y0, y1, z, m] of [[86, 162, 56, M.white], [166, 244, 56, M.white], [96, 152, 60, M.linenBed], [176, 234, 60, M.linenBed], [135, 195, 62, M.knit]]) RB(p, 108, y0, 126, y1, z, z + 28, m, b, .05);
+    for (const y0 of [30, 262]) { B(p, 98, y0, 142, y0 + 40, 10, 52, M.taupe, b); B(p, 141.5, y0 + 4, 142, y0 + 36, 30, 31, M.black, b); for (const [x, yy] of [[102, y0 + 4], [138, y0 + 4], [102, y0 + 36], [138, y0 + 36]]) B(p, x - 1, yy - 1, x + 1, yy + 1, 0, 10, M.oakLight, b); }
+    CY(p, 115, 48, 6, 52, 70, M.nicheBack, b, 14); CY(p, 120, 285, 4, 52, 58, M.black, b, 12);
+    for (const y of [50, 282]) { CY(p, 160, y, .3, 195, 274, M.black, b, 6); CY(p, 160, y, 4, 165, 195, M.black, b, 16); const l = new THREE.Mesh(new THREE.CylinderGeometry(.035, .035, .005, 12), M.led); l.position.set(wx(160), b + 1.645, wz(y)); p.add(l); }
+    for (const [y0, y1] of [[95, 158], [172, 235]]) {
+      onWall(B(p, 95.5, y0, 97.5, y1, 140, 215, M.black, b), b, 140, 215); onWall(B(p, 97.5, y0 + 3, 98, y1 - 3, 143, 212, M.abstractArt, b), b, 143, 212);
+    }
+    CY(p, 270, 165, 26, 270, 274, M.black, b, 36); CY(p, 270, 165, 23, 269.5, 270, M.led, b, 36);
+    // taupe dresser on the east wall with a round mirror, slatted oak panel and a mushroom lamp; black oval floor mirror by the window
+    B(p, 410, 125, 452, 245, 0, 80, M.taupe, b); for (let k = 1; k < 3; k++) B(p, 409.5, 127, 410, 243, k * 26, k * 26 + .5, M.black, b); B(p, 409.5, 184.7, 410, 185.3, 2, 78, M.black, b);
+    onWall(CY(p, 451, 185, 34, 120, 121, M.mirror, b, 40), b, 120, 121).rotation.z = Math.PI / 2;
+    { const m = p.children[p.children.length - 1]; m.position.y = b + 1.55; }
+    for (let k = 0; k < 7; k++) onWall(B(p, 448, 252 + k * 6, 452, 256 + k * 6, 0, 274, M.oakLight, b), b, 0, 274);
+    CY(p, 440, 230, 4, 80, 95, M.black, b, 14); { const sh = new THREE.Mesh(new THREE.SphereGeometry(.08, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), M.led); sh.position.set(wx(440), b + .95, wz(230)); p.add(sh); }
+    CY(p, 425, 145, 6, 80, 100, M.nicheBack, b, 14);
+    { const g = local(p, 380, 280, b, .5); const m = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.25, .25, .02, 40), M.mirror)); m.rotation.x = Math.PI / 2; m.scale.z = 2.9; m.position.y = 1.0; g.add(m);
+      const f = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.25, .012, 8, 40), M.black)); f.scale.y = 2.9; f.position.y = 1.0; g.add(f); lb(g, .02, .6, .02, -.15, .3, -.12, M.black); lb(g, .02, .6, .02, .15, .3, -.12, M.black); }
+    // full-height linen curtains on both sides of the window
+    onWall(B(p, 100, 24, 300, 26, 262, 265, M.black, b), b, 262, 265);
+    for (const [x0, x1] of [[102, 150], [262, 300]]) for (let x = x0; x < x1; x += 6) { const m = new THREE.Mesh(UNIT, M.linenCurtain); m.scale.set(.065, 2.6, .01); m.position.set(wx(x + 3), b + 1.3, wz(29 + ((x / 6) % 2) * 3)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); p.add(m); onWall(m, b, 0, 262); }
+  }
+  panelTarget = null;
   // walk-in closet: white open shelving on three sides, wood-framed sliding door
   const shelves = (X0, Y0, X1, Y1, hang) => {
     for (const z of [0, 40, 80, 120, 160, 200, 232]) B(p, X0, Y0, X1, Y1, z, z + 2, M.white, b);
@@ -1437,6 +1572,8 @@ function desk(p, base, r, chairAt, faceTo) {
   CY(p, 260, 880, .3, 216, 274, M.white, b, 6);
 
   // ---- parents' en-suite, from the photos: white gloss wall tiles, a mosaic strip, teal wall-hung vanity, dotted glass shower ----
+  const ensBefore = new THREE.Group(); ensBefore.userData.reno = 'before'; p.add(ensBefore); renoSets.push({ room: 'ensuite', before: ensBefore });
+  { const p = ensBefore; panelTarget = ensBefore;
   tileRoom([22.5, 321, 188, 490], M.ensWall, { N: [[120, 190, 0, 210]], W: [[376, 436, 140, 210]] });
   panel(86, 488.6, 100, 489, 0, 274, M.mosaic); panel(186.6, 432, 187, 446, 0, 274, M.mosaic);
   toilet(p, b, 62, 466, 62, 380);
@@ -1448,10 +1585,51 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 112, 402, 188, 490, 0, 4, M.white, b);
   for (const [x0, y0, x1, y1] of [[112, 401.5, 188, 402.5], [111.5, 402, 112.5, 490]]) { const gl = B(p, x0, y0, x1, y1, 4, 200, M.dotGlass, b); gl.castShadow = false; gl.renderOrder = 3; }
   B(p, 140, 450, 170, 480, 230, 232, M.steel, b); B(p, 185, 464, 188, 466, 205, 232, M.steel, b);
+  }
+  // ---- parents' en-suite after the renovation: teal stack tiles in the shower, terrazzo walls and floor, wall-hung toilet under an oak cabinet, oak vanity ----
+  const ensAfter = new THREE.Group(); ensAfter.userData.reno = 'after'; ensAfter.visible = false; p.add(ensAfter); renoSets[renoSets.length - 1].after = ensAfter;
+  { const p = ensAfter; panelTarget = null;
+    const pa = (X0, Y0, X1, Y1, z0, z1, mat) => { const w = (X1 - X0) / 100, d = (Y1 - Y0) / 100, h = (z1 - z0) / 100;
+      const m = new THREE.Mesh(boxUV(w, h, d, (X0 + Y0) / 100, z0 / 100), mat); m.receiveShadow = true; m.position.set(wx((X0 + X1) / 2), b + (z0 + z1) / 200, wz((Y0 + Y1) / 2)); p.add(m); return onWall(m, b, z0, z1); };
+    // terrazzo on the walls outside the shower
+    pa(22.5, 321, 120, 322, 0, 274, M.terrazzoW); pa(120, 321, 187, 322, 210, 274, M.terrazzoW);
+    pa(22.5, 322, 23.5, 376, 0, 274, M.terrazzoW); pa(22.5, 436, 23.5, 489, 0, 274, M.terrazzoW); pa(22.5, 376, 23.5, 436, 0, 140, M.terrazzoW); pa(22.5, 376, 23.5, 436, 210, 274, M.terrazzoW);
+    pa(23.5, 488.5, 112, 489.5, 0, 274, M.terrazzoW); pa(186.5, 322, 187.5, 402, 0, 274, M.terrazzoW);
+    // teal stack-bond tiles inside the shower, lit niche, black rain head, black-framed glass
+    pa(112, 488.5, 187, 489.5, 0, 274, M.tealStack); pa(186.5, 402, 187.5, 489, 0, 274, M.tealStack);
+    pa(182, 420, 186.5, 470, 110, 145, M.tealStack); pa(182.5, 421, 183, 469, 112, 113, M.led);
+    for (const y of [430, 440]) onWall(CY(p, 184, y, 2.4, 113, 128, std({ color: 0x5a3a1e, roughness: .2 }), b, 10), b, 113, 128);
+    B(p, 112, 402, 187, 489, 0, 1.5, M.terrazzo, b); B(p, 114, 404, 115, 487, 1.4, 1.7, M.black, b);
+    for (const [x0, y0, x1, y1] of [[112, 401.5, 187, 402.5], [111.5, 402, 112.5, 489]]) { const gl = B(p, x0, y0, x1, y1, 2, 200, M.glass, b); gl.castShadow = false; gl.renderOrder = 3; }
+    B(p, 111, 401, 113, 403, 0, 200, M.black, b); B(p, 111, 401, 187, 403, 198, 200, M.black, b); B(p, 111, 401, 113, 489, 198, 200, M.black, b);
+    CY(p, 150, 450, 13, 222, 224, M.black, b, 28); B(p, 149, 450, 151, 489, 236, 238, M.black, b); CY(p, 150, 450, .8, 224, 237, M.black, b, 6);
+    // wall-hung toilet on the south wall with a white flush plate and a black hand shower; oak cabinet above with an open lit niche
+    wallToilet(p, b, 62, 488.5, Math.PI, M.white);
+    pa(30, 487.5, 94, 488.5, 120, 128, M.oakLight); B(p, 30, 458, 94, 488.5, 128, 132, M.oakLight, b);
+    B(p, 30, 458, 32, 488.5, 132, 165, M.oakLight, b); B(p, 92, 458, 94, 488.5, 132, 165, M.oakLight, b);
+    B(p, 30, 458, 94, 488.5, 165, 260, M.oakLight, b); B(p, 61.7, 457.5, 62.3, 458, 166, 259, M.espresso, b);
+    B(p, 32, 486.5, 92, 488.5, 132, 165, M.oakLight, b); B(p, 32, 470, 92, 471, 164, 165, M.led, b);
+    CY(p, 48, 475, 6, 132, 142, M.nicheBack, b, 14); CY(p, 78, 475, 3, 132, 145, M.white, b, 12);
+    for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.04, 0), M.leaf)); m.position.set(wx(48 + (rnd() - .5) * 10), b + 1.44 - k * .06 * rnd() * 2, wz(474)); p.add(m); }
+    B(p, 93, 486, 95, 488.5, 50, 75, M.black, b);
+    // oak vanity with a white top, vessel basin, black wall tap, backlit rounded mirror
+    B(p, 23.5, 325, 70, 398, 45, 82, M.oakLight, b); B(p, 23.5, 325, 70, 398, 18, 20, M.oakLight, b); B(p, 23.5, 325, 25, 398, 18, 82, M.oakLight, b);
+    B(p, 23.5, 323, 73, 400, 82, 86, M.qWhite, b); RB(p, 32, 342, 62, 384, 86, 100, M.ceramic, b, .04); B(p, 35, 345, 59, 381, 95, 100.5, M.water, b);
+    B(p, 23.5, 362, 32, 364, 108, 110, M.black, b); CY(p, 25, 355, 1.5, 102, 104, M.black, b, 10);
+    B(p, 70, 335, 72, 390, 70, 72, M.black, b); B(p, 70.5, 345, 72, 375, 40, 70, M.sageTowel, b);
+    { const rr = new THREE.Shape(), w = .42, h = .7, r = .12;
+      rr.moveTo(-w / 2 + r, -h / 2); rr.lineTo(w / 2 - r, -h / 2); rr.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r); rr.lineTo(w / 2, h / 2 - r); rr.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
+      rr.lineTo(-w / 2 + r, h / 2); rr.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r); rr.lineTo(-w / 2, -h / 2 + r); rr.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
+      const mk = (mat, sc, z) => { const m = new THREE.Mesh(new THREE.ShapeGeometry(rr), mat); m.scale.set(sc, sc, 1); m.position.set(wx(23.5) + z, b + 1.52, wz(350)); m.rotation.y = Math.PI / 2; p.add(m); return onWall(m, b, 115, 190); };
+      mk(M.led, 1.08, .002); mk(M.black, 1.0, .006); mk(M.mirror, .955, .009); }
+  }
   // ---- siblings' bathroom, from the photos: cream tiles with brown accents, wenge vanity, tub with glass screen, washer under a tall cabinet ----
   tileRoom([22.5, 502, 359, 724], M.bathWall, { E: [[574, 650, 0, 210]], W: [[541, 641, 120, 210]] });
   panel(118, 502.4, 132, 503.4, 0, 274, M.bathBrown); panel(23.5, 690, 24.5, 704, 0, 274, M.bathBrown);
-  toilet(p, b, 48, 522, 140, 522);
+  { const bb = new THREE.Group(); bb.userData.reno = 'before'; p.add(bb); toilet(bb, b, 48, 522, 140, 522);
+    const ba = new THREE.Group(); ba.userData.reno = 'after'; ba.visible = false; p.add(ba); renoSets.push({ room: 'bath', before: bb, after: ba });
+    wallToilet(ba, b, 23.5, 522, Math.PI / 2);
+    B(ba, 23.5, 496, 55, 548, 150, 255, M.oakLight, b); B(ba, 55, 521.7, 55.5, 522.3, 151, 254, M.espresso, b); }
   // long wenge vanity on the north wall with a vessel basin, framed mirror, tall cabinet beside it
   B(p, 140, 503, 300, 553, 70, 82, M.wenge, b); B(p, 140, 503, 190, 553, 10, 70, M.wenge, b);
   for (const z of [26, 50]) B(p, 150, 553, 180, 554.5, z, z + 2, M.steel, b);
