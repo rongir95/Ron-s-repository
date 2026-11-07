@@ -750,7 +750,7 @@ const OUT1 = [[82, 7], [454, 7], [454, 58], [PARTY, 58], [PARTY, 1030], [82, 103
 const W = (at, w, sill = 90, head = 220) => ({ type: 'win', at, w, sill, head });
 const D = (at, w = 80, head = 210, hs = 1) => ({ type: 'door', at, w, sill: 0, head, hs }); // hs: which side the handle is on
 const OPS0 = {
-  0: [{ type: 'slide', at: 577, w: 240, sill: 0, head: 235 }],          // living → patio, next to the TV wall (from the photos)
+  0: [{ type: 'slide', at: 367, w: 240, sill: 0, head: 235 }],          // living → patio; the TV wall is to its right on the same wall
   2: [W(187, 100, 100, 200), W(436, 60, 125, 205)],                     // safe-room window between shutter pockets; guest WC (frosted, beside the mirror)
   4: [{ type: 'front', at: 82, w: 90, sill: 0, head: 222 }],           // front door at the lower end of the angled wall
   6: [W(203, 140, 105, 215)],                                           // kitchen window over the sink
@@ -763,8 +763,8 @@ const OPS1 = {
   7: [W(139, 100, 120, 210), W(324, 60, 140, 210)], // bathroom and en-suite, onto the laundry screen
 };
 const ROOMS = [
-  { id: 'living', f: 0, name: 'סלון', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', note: 'קיר טלוויזיה עם פאנל חרדל ומזנון לבן צף, ספת עור פינתית בצבע בז׳, שולחן קפה לבן ומנורה תלויה. דלת הזזה לחצר עם וילונות וואל.' },
-  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, ואי בורדו לכיוון הסלון.', spots: true },
+  { id: 'living', f: 0, name: 'סלון', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', note: 'דלת הזזה לחצר עם וילונות וואל, ומימינה על אותו קיר קיר הטלוויזיה עם פאנל חרדל ומזנון לבן צף. ספת עור פינתית בבז׳ לאורך הקיר המשותף, שולחן קפה לבן ומנורה תלויה.' },
+  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 313, 290, 699], mat: 'tile', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, וחלק בורדו שיוצא מקיר הכיריים וסוגר את המטבח מצפון.', spots: true },
   { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [75, 47, 270, 295], mat: 'tile', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
   { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
   { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [294, 836, 435, 948], mat: 'slate', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
@@ -772,7 +772,7 @@ const ROOMS = [
   { id: 'bed1', f: 1, name: 'חדר הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'laminate', eye: [300, 230], look: [-1, -.25], note: 'רצפת למינציה, קיר טפט מאחורי המיטה, שידת מגירות ושעון על הקיר המזרחי, מראה עומדת ומנורת תוף. דלתות למקלחת ולחדר הארונות.' },
   { id: 'bed2', f: 1, name: 'החדר של גיא', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'parquet', note: 'חלון לכיוון החצר.' },
   { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [22, 321, 188, 490], mat: 'ensFloor', eye: [150, 340], look: [-.4, 1], note: 'אריחים לבנים מבריקים עם פס פסיפס, ארון כיור תלוי בטורקיז, מראה מקושתת ומקלחון זכוכית עם ראש גשם.' },
-  { id: 'closet', f: 1, name: 'מלתחה', dims: [145, 170], rect: [200, 321, 359, 490], mat: 'laminate', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
+  { id: 'closet', f: 1, name: 'חדר ארונות', dims: [145, 170], rect: [200, 321, 359, 490], mat: 'laminate', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
   { id: 'bath', f: 1, name: 'חדר רחצה אחים', dims: [315, 220], rect: [22, 502, 359, 724], mat: 'bathFloor', eye: [330, 612], look: [-1, 0], note: 'אריחי שמנת עם אריחים חומים, ארון כיור ארוך בוונגה עם מראה וארון גבוה, אמבטיה עם מחיצת זכוכית, מכונת כביסה מתחת לארון גבוה.' },
   { id: 'hall', f: 1, name: 'מסדרון', dims: [90, 400], rect: [371, 321, 456, 724], mat: 'parquet', note: 'מחבר בין המדרגות לכל חדרי הקומה. בתקרה פתח עלייה לגג.' },
   { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [468, 626, 780, 1024], mat: 'parquet', note: 'חלון לכיוון הרחוב.' },
@@ -928,44 +928,45 @@ function desk(p, base, r, chairAt, faceTo) {
 {
   const p = F[0].furn, b = 0;
   // ---- living room, matched to the photos ----
-  // TV wall on the party wall: ochre panel, white board, floating white console with open niches
-  onWall(B(p, 778.5, 108, 779.5, 364, 75, 262, M.ochre, b), b, 75, 262);
-  onWall(B(p, 775.5, 128, 779.5, 344, 75, 192, M.white, b), b, 75, 192);
-  onWall(B(p, 771.5, 163, 775.5, 309, 98, 182, M.black, b), b, 98, 182);
-  B(p, 739, 95, 779.5, 377, 22, 62, M.white, b);
-  for (const [y0, y1] of [[102, 165], [172, 236], [243, 306], [313, 370]]) B(p, 738.6, y0, 739.4, y1, 28, 56, std({ color: 0xd9d6cf, roughness: .8 }), b);
-  for (const [y, h, m] of [[120, 10, M.pot], [195, 6, M.black], [260, 12, M.linen], [330, 9, M.duvetD]]) B(p, 750, y, 765, y + 12, 28, 28 + h, m, b);
-  plant(p, b, 755, 75, .9);
-  // beige leather L-shaped sectional: long side against the wall/stair rail, chaise return towards the garden
-  RB(p, 470, 335, 695, 425, 8, 42, M.leather, b, .04); RB(p, 470, 403, 695, 425, 40, 84, M.leather, b, .05);
-  RB(p, 673, 335, 695, 403, 40, 60, M.leather, b, .04);
-  RB(p, 470, 195, 560, 335, 8, 42, M.leather, b, .04); RB(p, 470, 195, 491, 403, 40, 84, M.leather, b, .05);
-  for (let k = 0; k < 3; k++) RB(p, 495 + k * 59, 340, 551 + k * 59, 400, 42, 50, M.leather, b, .04);
-  for (let k = 0; k < 2; k++) RB(p, 494, 200 + k * 68, 556, 264 + k * 68, 42, 50, M.leather, b, .04);
-  for (let k = 0; k < 4; k++) RB(p, 500 + k * 47, 408, 540 + k * 47, 420, 78, 98, M.leather, b, .04);
-  RB(p, 600, 385, 625, 404, 48, 72, M.duvetB, b, .05); RB(p, 640, 385, 666, 404, 48, 72, M.duvetD, b, .05);
+  // TV wall on the garden-side (north) wall, right of the slider: ochre panel, white board, floating white console
+  onWall(B(p, 540, 47.5, 735, 48.5, 75, 262, M.ochre, b), b, 75, 262);
+  onWall(B(p, 560, 47.5, 715, 51.5, 75, 192, M.white, b), b, 75, 192);
+  onWall(B(p, 565, 51.5, 710, 55.5, 98, 182, M.black, b), b, 98, 182);
+  B(p, 530, 47.5, 745, 88, 22, 62, M.white, b);
+  for (const [x0, x1] of [[536, 586], [592, 664], [670, 739]]) B(p, x0, 88, x1, 88.8, 28, 56, std({ color: 0xd9d6cf, roughness: .8 }), b);
+  for (const [x, h, m] of [[545, 10, M.pot], [610, 6, M.black], [640, 12, M.linen], [690, 9, M.duvetD]]) B(p, x, 60, x + 12, 75, 28, 28 + h, m, b);
+  B(p, 718, 55, 735, 72, 62, 92, M.linen, b);
+  // dark wood wine cabinet in the north-east corner
+  B(p, 742, 49, 778, 96, 0, 140, M.espresso, b);
+  B(p, 741.5, 52, 742, 93, 82, 136, M.glass, b);
+  for (let z = 10; z < 78; z += 11) B(p, 741.3, 52, 742, 93, z, z + 1.2, M.black, b);
+  for (let y = 54; y < 94; y += 10) B(p, 741.3, y, 742, y + 1.2, 8, 78, M.black, b);
+  B(p, 752, 60, 770, 80, 140, 162, M.black, b); B(p, 751.5, 63, 752, 77, 143, 159, M.duvetC, b);
+  // beige leather L-sectional: long side against the party wall, return along the south facing the garden
+  RB(p, 690, 110, 778, 420, 8, 42, M.leather, b, .04); RB(p, 756, 110, 778, 420, 40, 84, M.leather, b, .05);
+  RB(p, 690, 110, 756, 132, 40, 60, M.leather, b, .04);
+  RB(p, 530, 334, 690, 420, 8, 42, M.leather, b, .04); RB(p, 530, 398, 756, 420, 40, 84, M.leather, b, .05);
+  for (let k = 0; k < 4; k++) RB(p, 695, 135 + k * 62, 752, 193 + k * 62, 42, 50, M.leather, b, .04);
+  for (let k = 0; k < 3; k++) RB(p, 535 + k * 52, 338, 583 + k * 52, 396, 42, 50, M.leather, b, .04);
+  for (let k = 0; k < 4; k++) RB(p, 760, 140 + k * 60, 774, 190 + k * 60, 78, 98, M.leather, b, .04);
+  RB(p, 735, 140, 754, 166, 48, 72, M.duvetB, b, .05); RB(p, 735, 370, 754, 396, 48, 72, M.duvetD, b, .05);
   // white gloss square coffee table, two tiers
-  RB(p, 575, 225, 675, 325, 22, 34, M.white, b, .015); B(p, 585, 235, 665, 315, 0, 22, M.white, b);
-  // champagne pendant: rectangular canopy with small cubes on wires
-  B(p, 572, 262, 662, 276, 276, 280, M.champagne, b);
-  for (const [x, y, z] of [[582, 266, 214], [600, 272, 200], [617, 266, 222], [634, 272, 206], [652, 266, 216]]) {
+  RB(p, 565, 185, 665, 285, 22, 34, M.white, b, .015); B(p, 575, 195, 655, 275, 0, 22, M.white, b);
+  // champagne pendant over the coffee table
+  B(p, 570, 228, 660, 242, 276, 280, M.champagne, b);
+  for (const [x, y, z] of [[580, 232, 214], [598, 238, 200], [615, 232, 222], [632, 238, 206], [650, 232, 216]]) {
     CY(p, x, y, .25, z + 7, 276, M.black, b, 6); B(p, x - 3.5, y - 3.5, x + 3.5, y + 3.5, z, z + 7, M.champagne, b);
   }
-  // dark wood wine cabinet in the corner, painting above the sofa
-  B(p, 705, 391, 752, 427, 0, 140, M.espresso, b);
-  B(p, 708, 390.5, 749, 391, 82, 136, M.glass, b);
-  for (let z = 10; z < 78; z += 11) B(p, 708, 390.3, 749, 391, z, z + 1.2, M.black, b);
-  for (let x = 710; x < 750; x += 10) B(p, x, 390.3, x + 1.2, 391, 8, 78, M.black, b);
-  B(p, 722, 400, 740, 415, 140, 162, M.black, b); B(p, 725, 399.5, 737, 400, 143, 159, M.duvetC, b);
-  onWall(B(p, 612, 420.5, 688, 422, 145, 210, M.walnut, b), b, 145, 210);
-  onWall(B(p, 620, 420, 680, 420.5, 152, 203, M.linen, b), b, 152, 203);
-  onWall(B(p, 630, 419.6, 670, 420, 160, 195, M.duvetA, b), b, 160, 195);
-  // sheer white curtains on a black rod along the garden wall
-  onWall(B(p, 300, 51, 778, 53, 260, 262.5, M.black, b), b, 260, 262.5);
-  for (const [x0, x1] of [[462, 520], [700, 776]]) for (let x = x0; x < x1; x += 6) {
+  // painting on the party wall above the sofa
+  onWall(B(p, 778, 220, 779.5, 300, 145, 210, M.walnut, b), b, 145, 210);
+  onWall(B(p, 777.6, 228, 778, 292, 152, 203, M.linen, b), b, 152, 203);
+  onWall(B(p, 777.2, 238, 777.6, 282, 160, 195, M.duvetA, b), b, 160, 195);
+  // sheer white curtains on a black rod across the slider
+  onWall(B(p, 230, 51, 530, 53, 260, 262.5, M.black, b), b, 260, 262.5);
+  for (const [x0, x1] of [[232, 300], [440, 528]]) for (let x = x0; x < x1; x += 6) {
     const m = new THREE.Mesh(UNIT, M.sheer); m.scale.set(.065, 2.6, .006); m.position.set(wx(x + 3), b + 1.3, wz(56 + ((x / 6) % 2) * 3)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); m.renderOrder = 3; p.add(m); onWall(m, b, 0, 260);
   }
-  plant(p, b, 450, 70, 1.2);
+  plant(p, b, 512, 72, 1.0);
   // ---- kitchen, matched to the photos ----
   // box with texture coordinates in metres (for grained / tiled surfaces)
   const BU = (X0, Y0, X1, Y1, z0, z1, mat) => {
@@ -1007,12 +1008,13 @@ function desk(p, base, r, chairAt, faceTo) {
   for (const x of [237, 249]) { B(p, x, 621, x + 2, 627, 95, 172, M.steel, b); B(p, x, 621, x + 2, 627, 15, 74, M.steel, b); }
   B(p, 199, 640, 289, 699, 190, 249, M.kCream, b); handleX(225, 263, 640, 194);
   // breakfast bar in walnut veneer with a waterfall end, running north–south between kitchen and living
-  BU(205, 352, 245, 514, 0, 95, M.veneer);
-  BU(200, 292, 276, 522, 95, 100, M.veneer);
-  BU(200, 514, 276, 522, 0, 95, M.veneer);
+  BU(205, 384, 245, 560, 0, 95, M.veneer);
+  BU(200, 384, 276, 568, 95, 100, M.veneer);
+  BU(200, 560, 276, 568, 0, 95, M.veneer);
   // bordeaux gloss island with a grey top, at the north end of the bar, reaching towards the living room
-  B(p, 205, 292, 355, 352, 8, 88, M.kRed, b); B(p, 207, 294, 353, 350, 0, 8, M.white, b);
-  B(p, 276, 288, 360, 356, 88, 92, M.kTop, b);
+  // bordeaux peninsula: runs from the cooktop counter on the west wall eastwards, closing the north end of the kitchen
+  B(p, 76, 320, 280, 382, 8, 88, M.kRed, b); B(p, 78, 322, 278, 380, 0, 8, M.white, b);
+  B(p, 76, 316, 284, 384, 88, 92, M.kTop, b);
   // bar stools: cream bouclé seat and back, black metal frame
   const barStool = (X, Y, toX, toY) => {
     const g = local(p, X, Y, b, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y)));
@@ -1022,10 +1024,10 @@ function desk(p, base, r, chairAt, faceTo) {
     lb(g, .022, .3, .022, -.19, .85, -.2, M.black); lb(g, .022, .3, .022, .19, .85, -.2, M.black);
     lb(g, .4, .02, .02, 0, .28, .18, M.black); lb(g, .4, .02, .02, 0, .28, -.18, M.black);
   };
-  for (const y of [385, 432, 479]) barStool(296, y, 230, y);
+  for (const y of [420, 470, 520]) barStool(296, y, 230, y);
   // two white square-frame pendants over the bar
-  B(p, 225, 365, 249, 465, 276, 280, M.white, b);
-  for (const [y, z] of [[392, 175], [440, 188]]) {
+  B(p, 225, 420, 249, 520, 276, 280, M.white, b);
+  for (const [y, z] of [[445, 175], [495, 188]]) {
     CY(p, 237, y, .3, z + 24, 276, M.black, b, 6);
     for (const [y0, y1, z0, z1] of [[y - 12, y + 12, z, z + 2.5], [y - 12, y + 12, z + 21.5, z + 24], [y - 12, y - 9.5, z, z + 24], [y + 9.5, y + 12, z, z + 24]]) B(p, 233, y0, 241, y1, z0, z1, M.white, b);
     const bulb = new THREE.Mesh(new THREE.SphereGeometry(.035, 12, 8), M.fixture); bulb.position.set(wx(237), z / 100 + .12, wz(y)); p.add(bulb);
@@ -1286,14 +1288,14 @@ function desk(p, base, r, chairAt, faceTo) {
     const m = new THREE.Mesh(g, mat); m.receiveShadow = true; m.position.set(wx((X0 + X1) / 2), y, wz((Y0 + Y1) / 2)); p.add(m); return m;
   };
   // garden patio + pergola
-  flat(428, -210, 790, 24, -0.03, M.pavers);
-  B(p, 428, -214, 790, -206, -15, -1, M.sillStone);
-  for (const X of [436, 782]) B(p, X - 6, -206, X + 6, -194, -3, 265, M.wood);
-  B(p, 428, -206, 790, -194, 252, 270, M.wood);
-  for (let X = 440; X <= 780; X += 37) B(p, X - 3, -206, X + 3, 24, 270, 284, M.wood);
+  flat(208, -210, 600, 24, -0.03, M.pavers);
+  B(p, 208, -214, 600, -206, -15, -1, M.sillStone);
+  for (const X of [216, 592]) B(p, X - 6, -206, X + 6, -194, -3, 265, M.wood);
+  B(p, 208, -206, 600, -194, 252, 270, M.wood);
+  for (let X = 220; X <= 590; X += 37) B(p, X - 3, -206, X + 3, 24, 270, 284, M.wood);
   // outdoor set
-  B(p, 550, -140, 710, -60, 72, 76, M.oak); B(p, 560, -130, 565, -70, 0, 72, M.black); B(p, 695, -130, 700, -70, 0, 72, M.black);
-  for (const X of [575, 630, 685]) { chair(p, 0, X, -165, X, -100, M.black, M.linen); chair(p, 0, X, -35, X, -100, M.black, M.linen); }
+  B(p, 330, -140, 490, -60, 72, 76, M.oak); B(p, 340, -130, 345, -70, 0, 72, M.black); B(p, 475, -130, 480, -70, 0, 72, M.black);
+  for (const X of [355, 410, 465]) { chair(p, 0, X, -165, X, -100, M.black, M.linen); chair(p, 0, X, -35, X, -100, M.black, M.linen); }
   // fences
   B(p, PARTY - 10, -620, PARTY + 10, 24, -15, 180, M.plaster);
   B(p, -220, -630, PARTY + 10, -610, -15, 40, M.stone);
@@ -1310,7 +1312,7 @@ function desk(p, base, r, chairAt, faceTo) {
   olive(30, -380, 1.25); olive(640, -470, 1.0); olive(-120, 1250, 1.1);
   for (let X = -150; X < 760; X += 95) cypress(X, -570, 3.6 + rnd() * 1.2);
   for (let Y = -500; Y < 0; Y += 70) shrub(-170, Y, .45 + rnd() * .2);
-  for (let X = 290; X < 410; X += 35) shrub(X, -60 - rnd() * 40, .3, rnd() > .5 ? M.flower : M.shrub);
+  for (let X = 640; X < 770; X += 35) shrub(X, -60 - rnd() * 40, .3, rnd() > .5 ? M.flower : M.shrub);
   for (let X = 100; X < 250; X += 40) shrub(X, -40 - rnd() * 30, .28, rnd() > .5 ? M.flower : M.shrub);
   // front: covered entry, path, parking, street
   flat(-200, 715, 300, 1450, -0.03, M.pavers);
