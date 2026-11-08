@@ -108,6 +108,11 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .zoom button:active{background:var(--accent);color:var(--accent-ink)}
 .zoom button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .zoom hr{border:0;border-top:1px solid var(--line);margin:0 6px}
+.splitbar{position:fixed;top:0;bottom:0;width:0;left:50%;z-index:5;pointer-events:none}
+.splitbar::before{content:"";position:absolute;top:0;bottom:0;left:-1px;width:2px;background:#fff;box-shadow:0 0 6px rgba(0,0,0,.4)}
+.splitbar .knob{pointer-events:auto;position:absolute;top:50%;left:-20px;width:40px;height:40px;margin-top:-20px;border-radius:50%;background:#fff;color:#1d2430;display:grid;place-items:center;font-size:18px;cursor:ew-resize;box-shadow:0 4px 14px rgba(0,0,0,.3);touch-action:none}
+.splitbar .tag{position:absolute;top:calc(50% + 30px);padding:3px 9px;border-radius:999px;background:rgba(17,22,32,.75);color:#fff;font-size:12px;white-space:nowrap}
+.splitbar .tag.l{right:10px}.splitbar .tag.r{left:10px}
 .hint{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--muted);padding:6px 12px;border-radius:999px}
 
 .lbl{display:flex;gap:7px;align-items:baseline;pointer-events:auto;cursor:pointer;background:var(--paper);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:4px 10px;font:500 12px/1.3 var(--f-ui);white-space:nowrap;box-shadow:0 4px 12px rgba(10,20,30,.15);direction:rtl;transition:background .3s}
@@ -167,9 +172,10 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <button class="tbtn" id="tNeighbor" aria-pressed="true">יחידה שכנה A-2 <span class="sw"></span></button>
   <button class="tbtn" id="tRotate" aria-pressed="false">סיבוב אוטומטי <span class="sw"></span></button>
   <h2>שיפוץ</h2>
-  <div class="seg two" role="group" aria-label="לפני או אחרי שיפוץ">
+  <div class="seg" role="group" aria-label="לפני או אחרי שיפוץ">
     <button data-reno="before" aria-pressed="true">לפני</button>
     <button data-reno="after" aria-pressed="false">אחרי</button>
+    <button data-reno="split" aria-pressed="false">השוואה</button>
   </div>
   <h2>קירות</h2>
   <div class="seg" role="group" aria-label="גובה קירות">
@@ -218,6 +224,8 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <hr>
   <button id="zOut" aria-label="התרחקות" title="התרחקות (−)">−</button>
 </div>
+
+<div class="splitbar" id="splitBar" hidden><span class="tag l">לפני</span><span class="knob" aria-label="גרירה להשוואה">⟷</span><span class="tag r">אחרי</span></div>
 
 <div class="hint panel" id="hint">גרירה לסיבוב · גלילה לזום · לחיצה כפולה על חדר להצגתו בלבד</div>
 
@@ -918,7 +926,7 @@ const ROOMS = [
   { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון.', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
   { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [294, 836, 435, 948], mat: 'slate', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק ירוקים בגובה 1.2 מ׳ וצבע לבן מעליהם, ריצוף טרצו, אסלה תלויה עם מיכל סמוי, נישת עץ מוארת מעל האסלה, כיור תלוי קטן ומראה מעוגלת עם תאורה אחורית.', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
   { id: 'mamad', f: 0, name: 'ממ״ד · חדר אחסון', dims: [315, 305], rect: [465, 640, 780, 945], mat: 'tile', note: 'מרחב מוגן דירתי מבטון מזוין שמשמש כחדר אחסון, עם מדפים לאורך הקירות. הכניסה מהמעבר שמתחת למדרגות.' },
-  { id: 'bed1', f: 1, name: 'חדר הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'laminate', afterMat: 'lamOak', afterNote: 'אחרי השיפוץ: קיר טאופ מאחורי המיטה עם שתי הדפסים מופשטים, מיטה מרופדת בבז׳ עם מצעים בהירים, מנורות גליל שחורות משני הצדדים, מנורת תקרה עגולה, שטיח ג׳וטה, שידה בטאופ עם מראה עגולה ופאנל רפפות אלון, וילונות פשתן.', eye: [300, 230], look: [-1, -.25], note: 'רצפת למינציה, קיר טפט מאחורי המיטה, שידת מגירות ושעון על הקיר המזרחי, מראה עומדת ומנורת תוף. דלתות למקלחת ולחדר הארונות.' },
+  { id: 'bed1', f: 1, name: 'חדר הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'laminate', afterNote: 'אחרי השיפוץ: רצפת הלמינציה נשארת. קיר טאופ מאחורי המיטה עם שתי הדפסים מופשטים, מיטה מרופדת בבז׳ עם מצעים בהירים, מנורות גליל שחורות משני הצדדים, מנורת תקרה עגולה, שטיח ג׳וטה, שידה בטאופ עם מראה עגולה ופאנל רפפות אלון, וילונות פשתן.', eye: [300, 230], look: [-1, -.25], note: 'רצפת למינציה, קיר טפט מאחורי המיטה, שידת מגירות ושעון על הקיר המזרחי, מראה עומדת ומנורת תוף. דלתות למקלחת ולחדר הארונות.' },
   { id: 'bed2', f: 1, name: 'החדר של גיא', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'lamOak', eye: [610, 350], look: [.2, -1], note: 'רצפת למינציה בגוון אלון, מיטה לאורך הקיר המערבי, שולחן כתיבה בצורת L מתחת לחלון עם מדפים בטורקיז, ארון גבוה בגימור בטון ליד הדלת ומנורה גאומטרית לבנה.' },
   { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [22, 321, 188, 490], mat: 'ensFloor', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק בטורקיז־ירוק במקלחון עם נישה מוארת וראש גשם שחור, טרצו בשאר הקירות וברצפה, אסלה תלויה ומעליה ארונית אלון עם נישה פתוחה, ארון כיור אלון עם כיור מונח ומראה מעוגלת עם תאורה.', eye: [150, 340], look: [-.4, 1], note: 'אריחים לבנים מבריקים עם פס פסיפס, ארון כיור תלוי בטורקיז, מראה מקושתת ומקלחון זכוכית עם ראש גשם.' },
   { id: 'closet', f: 1, name: 'חדר ארונות', dims: [145, 170], rect: [200, 321, 359, 490], mat: 'laminate', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
@@ -1010,9 +1018,9 @@ for (const r of ROOMS) {
   // as in the photos: solid white stairs with dark wenge treads and grey metal railings
   for (let i = 0; i < 9; i++) { // flight 1
     const xa = 452 + i * tr, top = (i + 1) * R;
-    B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.wenge);
+    B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.wenge).userData.stair = true;
   }
-  B(p, 700, 432, 778, 618, 0, 9 * R - 4, M.interior); B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.wenge); // landing
+  B(p, 700, 432, 778, 618, 0, 9 * R - 4, M.interior); B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.wenge).userData.stair = true; // landing
   // stone-look strip cladding on the tall landing wall, a wall clock, a floor vase; framed pictures along the flight
   { const m = new THREE.Mesh(boxUV(.01, 3.1, 1.86, 0, 0), M.stoneStrip); m.position.set(wx(777.4), 1.55, wz(525)); p.add(m); onWall(m, 0, 0, 310);
     const uv = m.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setY(i, uv.getY(i) * 3.1 / 5.6); uv.needsUpdate = true;
@@ -1023,7 +1031,7 @@ for (const r of ROOMS) {
   for (let k = 0; k < 4; k++) { const x = 520 + k * 38, z = 120 + k * 26; onWall(B(p, x, 519.5, x + 26, 521, z, z + 20, M.black, 0), 0, z, z + 20); onWall(B(p, x + 3, 519.1, x + 23, 519.5, z + 3, z + 17, M.duvetC, 0), 0, z + 3, z + 17); }
   for (let j = 0; j < 9; j++) { // flight 2: open underneath, the passage to the safe-room door runs below it
     const xb = 700 - (j + 1) * tr, top = 9 * R + (j + 1) * R;
-    B(p, xb, 525, xb + tr, 618, top - R, top - 4, M.interior); B(p, xb - 2, 523, xb + tr, 620, top - 4, top, M.wenge);
+    B(p, xb, 525, xb + tr, 618, top - R, top - 4, M.interior); B(p, xb - 2, 523, xb + tr, 620, top - 4, top, M.wenge).userData.stair = true;
   }
   // glass balustrades + handrails along the sloped flights
   const rail = (X0, X1, Y, z0, z1, base) => {
@@ -1996,7 +2004,7 @@ function enterWalk(id) {
   flyTo(eye.clone().sub(look.normalize().multiplyScalar(.05)), eye, 1.4);
   document.getElementById('card').hidden = true;
   document.getElementById('walkName').textContent = r.name; document.getElementById('walkBar').hidden = false;
-  document.getElementById('hint').textContent = 'גרירה להסתובבות · לחיצה על הרצפה למעבר לשם, גם לחדר הסמוך · גלילה לזום · Esc ליציאה';
+  document.getElementById('hint').textContent = 'גרירה להסתובבות · לחיצה על הרצפה למעבר לשם · לחיצה על המדרגות לקומה השנייה · Esc ליציאה';
 }
 const walkRing = new THREE.Mesh(new THREE.RingGeometry(.2, .26, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .85, depthTest: false, side: THREE.DoubleSide }));
 walkRing.rotation.x = -Math.PI / 2; walkRing.renderOrder = 10; walkRing.visible = false; scene.add(walkRing);
@@ -2014,8 +2022,9 @@ function walkRoomMaxBack() {
 // floor point under the pointer, only when nothing (wall, furniture) is in front of it
 function walkFloorHit(e) {
   ptr.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(ptr, camera);
-  const hits = ray.intersectObjects([F[0].group, F[1].group], true).filter(h => visibleChain(h.object) && h.object.material !== M.glass && h.object.material !== M.sheer && h.object.material !== M.dotGlass && !h.object.isPoints && h.object !== walkRing);
+  const hits = ray.intersectObjects([F[0].group, F[1].group], true).filter(h => visibleChain(h.object) && h.object.material !== M.glass && h.object.material !== M.sheer && h.object.material !== M.dotGlass && !h.object.isPoints && h.object !== walkRing && !h.object.userData.rail);
   const h = hits[0]; if (!h) return null;
+  if (h.object.userData.stair) return { point: h.point, stair: true };
   if (h.object.userData.room) return { point: h.point, room: h.object.userData.room };
   // furniture standing on the floor: walk to its foot if it is close to the floor
   return null;
@@ -2036,6 +2045,7 @@ renderer.domElement.addEventListener('pointermove', e => {
   const h = walkFloorHit(e);
   walkRing.visible = !!h; renderer.domElement.style.cursor = h ? 'pointer' : '';
   if (h) walkRing.position.set(h.point.x, h.point.y + .01, h.point.z);
+  walkRing.material.color.set(h && h.stair ? 0xf0c27e : 0xffffff);
 });
 function exitWalk(goBack = true) {
   walkRing.visible = false; renderer.domElement.style.cursor = '';
@@ -2087,14 +2097,26 @@ tog('tNeighbor', 'neighbor', applyNeighbor);
 tog('tRotate', 'rotate', () => controls.autoRotate = state.rotate);
 document.getElementById('cardX').addEventListener('click', () => selectRoom(null));
 /* before / after renovation: swaps the room groups and floors in place, camera stays where it is */
-function setReno(on) {
-  state.reno = on;
+function renoVisual(on) {
   renoSets.forEach(r => { r.before.visible = !on; if (r.after) r.after.visible = on; });
-  ROOMS.forEach(r => { if (!r.afterMat) return; r.baseMat = M[on ? r.afterMat : r.mat]; delete r.hl; r.mesh.material = r.baseMat; });
-  document.querySelectorAll('[data-reno]').forEach(b => b.setAttribute('aria-pressed', (b.dataset.reno === 'after') === on));
+  ROOMS.forEach(r => { if (!r.afterMat) return; if (r.mesh.material !== r.hl || state.split) r.mesh.material = M[on ? r.afterMat : r.mat]; });
+}
+function setReno(on, split = false) {
+  state.reno = on; state.split = split;
+  ROOMS.forEach(r => { if (r.afterMat) { r.baseMat = M[on ? r.afterMat : r.mat]; delete r.hl; r.mesh.material = r.baseMat; } });
+  renoVisual(on);
+  document.querySelectorAll('[data-reno]').forEach(b => b.setAttribute('aria-pressed', split ? b.dataset.reno === 'split' : (b.dataset.reno === 'after') === on));
+  document.getElementById('splitBar').hidden = !split;
   if (state.sel && !walking) selectRoom(state.sel, false);
 }
-document.querySelectorAll('[data-reno]').forEach(b => b.addEventListener('click', () => setReno(b.dataset.reno === 'after')));
+document.querySelectorAll('[data-reno]').forEach(b => b.addEventListener('click', () => b.dataset.reno === 'split' ? setReno(true, true) : setReno(b.dataset.reno === 'after')));
+// before / after split: the screen is divided at splitX, left half before, right half after
+let splitX = .5;
+{ const bar = document.getElementById('splitBar'), knob = bar.querySelector('.knob'); let drag = false;
+  const place = () => { bar.style.left = (splitX * 100) + '%'; };
+  knob.addEventListener('pointerdown', e => { drag = true; knob.setPointerCapture(e.pointerId); e.preventDefault(); });
+  knob.addEventListener('pointermove', e => { if (!drag) return; splitX = THREE.MathUtils.clamp(e.clientX / innerWidth, .05, .95); place(); });
+  knob.addEventListener('pointerup', () => drag = false); place(); }
 document.querySelectorAll('[data-col]').forEach(btn => {
   const panel = document.getElementById(btn.dataset.col), key = 'col_' + btn.dataset.col;
   const set = min => { panel.classList.toggle('min', min); btn.setAttribute('aria-expanded', !min); btn.setAttribute('aria-label', min ? 'הרחבה' : 'כיווץ'); try { localStorage.setItem(key, min ? '1' : ''); } catch (e) {} };
@@ -2166,7 +2188,15 @@ function pickRoom(e) {
 }
 renderer.domElement.addEventListener('pointerup', e => {
   if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
-  if (walking) { const h = walkFloorHit(e); if (h) walkTo(h.point, h.room); return; }
+  if (walking) {
+    const h = walkFloorHit(e); if (!h) return;
+    if (h.stair) { // take the stairs to the other floor
+      const up = ROOMS.find(q => q.id === walking.id).f === 0;
+      const [X, Y, id] = up ? [412, 360, 'hall'] : [373, 560, 'foyer'];
+      walkTo(new THREE.Vector3(wx(X), 0, wz(Y)), id);
+    } else walkTo(h.point, h.room);
+    return;
+  }
   const id = pickRoom(e); if (id || !focus) selectRoom(id, false);
 });
 renderer.domElement.addEventListener('dblclick', e => { if (walking) return; const id = pickRoom(e); if (id) (focus === id ? enterWalk(id) : focusRoom(id)); });
@@ -2199,7 +2229,13 @@ renderer.setAnimationLoop(() => {
     if (t >= 1) camTween = null;
   }
   controls.update();
-  renderer.render(scene, camera);
+  if (state.split) {
+    const W = innerWidth, H = innerHeight, x = Math.round(W * splitX);
+    renderer.setScissorTest(true);
+    renoVisual(false); renderer.setScissor(0, 0, x, H); renderer.render(scene, camera);
+    renoVisual(true); renderer.setScissor(x, 0, W - x, H); renderer.render(scene, camera);
+    renderer.setScissorTest(false);
+  } else renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
 });
 window.__ready = true;
