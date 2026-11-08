@@ -2088,10 +2088,12 @@ function focusRoom(id) {
   const rect = r.rect, pad = 24;
   // other floor, garden, neighbour, slabs, other rooms
   hideForFocus(F[1 - r.f].group); hideForFocus(site); hideForFocus(neighbor);
-  F[r.f].shell.children.forEach(o => {
+  const sf = o => {
     if (o.userData.slab || o.userData.lowerCeiling) hideForFocus(o);
+    else if (o.isGroup && !openingGroups.includes(o)) o.children.forEach(sf);   // look inside before/after groups
     else if (!o.userData.wall && !o.userData.room && !openingGroups.includes(o) && !fixtures.includes(o) && !inRect(planXY(o), rect, 6)) hideForFocus(o);
-  });
+  };
+  F[r.f].shell.children.forEach(sf);
   ROOMS.forEach(q => { if (q.id !== id) hideForFocus(q.mesh); });
   const ff = o => { if (o.userData.reno) { o.children.forEach(ff); return; } if (o.userData.rail || (!o.userData.wall && !inRect(planXY(o), rect, 6))) hideForFocus(o); };
   F[r.f].furn.children.forEach(ff);
