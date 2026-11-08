@@ -105,6 +105,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .zoom{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(76px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;padding:4px;gap:2px;border-radius:12px}
 .zoom button{all:unset;cursor:pointer;width:40px;height:40px;display:grid;place-items:center;border-radius:9px;color:var(--ink);font:500 22px/1 var(--f-ui)}
 .zoom button:hover{background:var(--line)}
+.zoom button:disabled{opacity:.35;cursor:default;background:none!important;color:var(--ink)!important}
 .zoom button:active{background:var(--accent);color:var(--accent-ink)}
 .zoom button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .zoom hr{border:0;border-top:1px solid var(--line);margin:0 6px}
@@ -968,7 +969,7 @@ const I = (a, b, ops = [], t = 12, extra = {}) => wall(F[0].shell, a, b, Object.
   renoSets.push({ room: 'dining-window', before, after });
   const o = { t: 25, base: 0, h: 310, outSide: -1 }, a = [63, 301];
   const fill = (Y0, Y1, z0, z1) => { onWall(B(before, 50.5, Y0, 63, Y1, z0, z1, M.stone), 0, z0, z1); onWall(B(before, 63, Y0, 75.5, Y1, z0, z1, M.interior), 0, z0, z1); };
-  fill(100, 142.5, 60, 220); fill(217.5, 220, 60, 220); fill(142.5, 217.5, 60, 102); fill(142.5, 217.5, 210, 220);
+  fill(100, 142.5, 60, 220); fill(217.5, 260, 60, 220); fill(142.5, 217.5, 60, 102); fill(142.5, 217.5, 210, 220);
   opening(before, a, 0, -1, Math.PI / 2, W(121, 75, 102, 210), o);
   opening(after, a, 0, -1, Math.PI / 2, W(121, 160, 60, 220), o);
   B(before, 76, 140, 83, 222, 208, 215, M.shade, 0); B(before, 76.5, 143, 78, 219, 178, 208, M.shade, 0);
@@ -1699,31 +1700,30 @@ function desk(p, base, r, chairAt, faceTo) {
     // beige stack tiles: full height in the shower, 1.2 m elsewhere, white paint above
     pa(22.5, 502, 23.5, 541, 0, WT, M.beigeStack); pa(22.5, 641, 23.5, 724, 0, WT, M.beigeStack); pa(22.5, 541, 23.5, 641, 0, 115, M.beigeStack);
     pa(23.5, 502, 359, 503, 0, WT, M.beigeStack);
-    pa(23.5, 723, 260, 724, 0, WT, M.beigeStack);
-    pa(260, 723, 358, 724, 0, 230, M.beigeStack); pa(357.5, 650, 358.5, 723, 0, 230, M.beigeStack);
-    pa(300, 722, 340, 723, 120, 135, M.beigeStack); pa(300, 722.5, 340, 723, 134, 135, M.led);
-    for (const x of [308, 316]) onWall(CY(p, x, 719, 2.4, 120, 135, std({ color: 0x5a3a1e, roughness: .2 }), b, 10), b, 120, 135);
+    pa(23.5, 723, 188, 724, 0, WT, M.beigeStack);
+    pa(188, 723, 358, 724, 0, 230, M.beigeStack); pa(187, 652, 188, 723, 0, 230, M.beigeStack); pa(357.5, 650, 358.5, 723, 0, 230, M.beigeStack);
+    pa(210, 722, 250, 723, 120, 135, M.beigeStack); pa(210, 722.5, 250, 723, 134, 135, M.led);
+    for (const x of [218, 226]) onWall(CY(p, x, 719, 2.4, 120, 135, std({ color: 0x5a3a1e, roughness: .2 }), b, 10), b, 120, 135);
     // shower: low terrazzo tray, black-framed glass front and door, black rain head and hand shower
-    B(p, 260, 650, 358, 723, 0, 1.5, M.terrazzo, b); B(p, 262, 715, 356, 717, 1.4, 1.7, M.black, b);
-    { const gl = B(p, 259.5, 650, 260.5, 723, 2, 205, M.glass, b); gl.castShadow = false; gl.renderOrder = 3; }
-    { const gl = B(p, 260, 649.5, 358, 650.5, 2, 205, M.glass, b); gl.castShadow = false; gl.renderOrder = 3; }
-    for (const [x0, y0, x1, y1] of [[259, 649, 261, 724], [259, 649, 358, 651]]) B(p, x0, y0, x1, y1, 203, 205, M.black, b);
-    B(p, 259, 649, 261, 651, 0, 205, M.black, b); B(p, 300, 648.5, 302, 651, 90, 130, M.black, b);
-    CY(p, 310, 690, 12, 222, 224, M.black, b, 28); B(p, 309, 690, 311, 723, 236, 238, M.black, b); CY(p, 310, 690, .8, 224, 237, M.black, b, 6);
+    B(p, 188, 652, 358, 723, 0, 1.5, M.terrazzo, b); B(p, 190, 715, 356, 717, 1.4, 1.7, M.black, b);
+    { const gl = B(p, 188, 651.5, 358, 652.5, 2, 205, M.glass, b); gl.castShadow = false; gl.renderOrder = 3; }
+    B(p, 188, 651, 358, 653, 203, 205, M.black, b); B(p, 188, 651, 190, 653, 0, 205, M.black, b); B(p, 272, 651, 274, 653, 0, 205, M.black, b);
+    B(p, 262, 649.5, 264, 652, 90, 130, M.black, b);
+    CY(p, 270, 690, 12, 222, 224, M.black, b, 28); B(p, 269, 690, 271, 723, 236, 238, M.black, b); CY(p, 270, 690, .8, 224, 237, M.black, b, 6);
     B(p, 330, 721, 333, 723, 80, 160, M.black, b);
     // washer under a tall oak cabinet, slatted oak laundry cabinet beside it
-    B(p, 195, 664, 255, 723, 0, 85, M.white, b); CY(p, 225, 663, 17, 30, 31, M.black, b, 24).rotation.x = Math.PI / 2;
-    B(p, 192, 664, 258, 723, 90, 270, M.oakLight, b); B(p, 224.7, 663.5, 225.3, 664, 92, 268, M.espresso, b);
-    B(p, 150, 690, 188, 722, 0, 85, M.oakLight, b); for (let x = 152; x < 188; x += 4) B(p, x, 689.5, x + 2, 690, 6, 80, M.wood, b);
+    B(p, 24, 662, 84, 722, 0, 85, M.white, b); { const dr = CY(p, 85, 692, 17, 30, 31, M.black, b, 24); dr.rotation.z = Math.PI / 2; dr.position.y = b + .5; }
+    B(p, 24, 660, 87, 723, 90, 270, M.oakLight, b); B(p, 86.5, 691.2, 87, 691.8, 92, 268, M.espresso, b);
+    B(p, 140, 690, 180, 722, 0, 85, M.oakLight, b); for (let y = 692; y < 720; y += 4) B(p, 139.5, y, 140, y + 2, 6, 80, M.wood, b);
     // wall-hung toilet on the west wall, oak cabinet above with a lit niche
-    wallToilet(p, b, 23.5, 522, Math.PI / 2, M.white);
-    B(p, 23.5, 498, 58, 550, 150, 165, M.oakLight, b); B(p, 23.5, 498, 58, 550, 185, 265, M.oakLight, b);
-    B(p, 23.5, 498, 58, 500, 165, 185, M.oakLight, b); B(p, 23.5, 548, 58, 550, 165, 185, M.oakLight, b);
-    B(p, 24, 500, 26, 548, 165, 185, M.oakLight, b); B(p, 26, 500, 56, 548, 184.4, 185, M.led, b);
-    B(p, 55.7, 523.7, 58.3, 524.3, 186, 264, M.espresso, b);
-    CY(p, 38, 535, 6, 165, 175, M.nicheBack, b, 14); CY(p, 42, 512, 3, 165, 178, M.white, b, 12);
-    for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.04, 0), M.leaf)); m.position.set(wx(38 + (rnd() - .5) * 8), b + 1.78 - k * .07 * rnd() * 2, wz(535)); p.add(m); }
-    B(p, 60, 503, 75, 506, 70, 72, M.black, b); onWall(CY(p, 67, 508, 5, 64, 76, M.white, b, 16), b, 64, 76);
+    wallToilet(p, b, 72, 503, 0, M.white);
+    B(p, 44, 503, 100, 537, 150, 165, M.oakLight, b); B(p, 44, 503, 100, 537, 185, 265, M.oakLight, b);
+    B(p, 44, 503, 46, 537, 165, 185, M.oakLight, b); B(p, 98, 503, 100, 537, 165, 185, M.oakLight, b);
+    B(p, 46, 503, 98, 505, 165, 185, M.oakLight, b); B(p, 46, 505, 98, 535, 184.4, 185, M.led, b);
+    B(p, 71.7, 536.5, 72.3, 537.1, 186, 264, M.espresso, b);
+    CY(p, 58, 518, 6, 165, 175, M.nicheBack, b, 14); CY(p, 86, 518, 3, 165, 178, M.white, b, 12);
+    for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.04, 0), M.leaf)); m.position.set(wx(58 + (rnd() - .5) * 8), b + 1.78 - k * .07 * rnd() * 2, wz(520)); p.add(m); }
+    B(p, 104, 503, 107, 518, 70, 72, M.black, b); onWall(CY(p, 108, 510, 5, 64, 76, M.white, b, 16), b, 64, 76);
     // long floating oak vanity with a white top and a vessel basin, black wall tap, arched black mirror, brass wall light
     B(p, 120, 503, 300, 553, 30, 82, M.oakLight, b); B(p, 120, 553, 300, 553.5, 56, 57, M.espresso, b); B(p, 209.7, 553, 210.3, 553.5, 30, 82, M.espresso, b);
     B(p, 118, 503, 302, 556, 82, 86, M.qWhite, b); RB(p, 225, 512, 285, 546, 86, 100, M.ceramic, b, .04); B(p, 229, 515, 281, 543, 95, 100.5, M.water, b);
@@ -2074,9 +2074,9 @@ function walkRoomMaxBack() {
   const look = controls.target.clone().sub(camera.position); look.y = 0; look.normalize();
   const X = walking.pos[0], Y = walking.pos[1]; let t = 9;
   const dx = -look.x * 100, dy = -look.z * 100;
-  if (dx > 0) t = Math.min(t, (x1 - 25 - X) / dx); if (dx < 0) t = Math.min(t, (x0 + 25 - X) / dx);
-  if (dy > 0) t = Math.min(t, (y1 - 25 - Y) / dy); if (dy < 0) t = Math.min(t, (y0 + 25 - Y) / dy);
-  return Math.max(.05, Math.min(3.2, t));
+  if (dx > 0) t = Math.min(t, (x1 - 8 - X) / dx); if (dx < 0) t = Math.min(t, (x0 + 8 - X) / dx);
+  if (dy > 0) t = Math.min(t, (y1 - 8 - Y) / dy); if (dy < 0) t = Math.min(t, (y0 + 8 - Y) / dy);
+  return Math.max(.05, Math.min(6, t));
 }
 // floor point under the pointer, only when nothing (wall, furniture) is in front of it
 function walkFloorHit(e) {
@@ -2209,8 +2209,8 @@ function zoomBy(f) {
   if (walking) {
     const back = controls.maxDistance;
     if (f > 1) {
-      if (camera.fov < 100) camera.fov = Math.min(100, camera.fov * 1.14);
-      else controls.minDistance = controls.maxDistance = Math.min(walkRoomMaxBack(), back + .4);   // step back, staying inside the room
+      if (camera.fov < 115) camera.fov = Math.min(115, camera.fov * 1.14);
+      else controls.minDistance = controls.maxDistance = Math.max(back, Math.min(walkRoomMaxBack(), back + .4));   // step back, staying inside the room
     } else {
       if (back > .06) controls.minDistance = controls.maxDistance = Math.max(.05, back - .4);
       else camera.fov = Math.max(30, camera.fov * .88);
@@ -2226,7 +2226,7 @@ function zoomBy(f) {
 for (const [id, f] of [['zIn', .8], ['zOut', 1.25]]) {
   const el = document.getElementById(id); let timer = null;
   const stop = () => { clearInterval(timer); timer = null; };
-  el.addEventListener('pointerdown', e => { e.preventDefault(); zoomBy(f); stop(); timer = setInterval(() => zoomBy(f), 260); });
+  el.addEventListener('pointerdown', e => { e.preventDefault(); if (el.disabled) return; zoomBy(f); stop(); timer = setInterval(() => el.disabled ? stop() : zoomBy(f), 260); });
   ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => el.addEventListener(t, stop));
   el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); zoomBy(f); } });
 }
@@ -2261,11 +2261,21 @@ renderer.domElement.addEventListener('pointerup', e => {
   if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
   if (walking) {
     const h = walkFloorHit(e); if (!h) return;
-    if (h.stair) { // take the stairs to the other floor
-      const up = ROOMS.find(q => q.id === walking.id).f === 0;
-      const [X, Y, id] = up ? [412, 360, 'hall'] : [373, 560, 'foyer'];
-      walkTo(new THREE.Vector3(wx(X), 0, wz(Y)), id);
-    } else walkTo(h.point, h.room, h.look);
+    if (h.stair) { // stairs: stop on the half landing first, from there go up or back down
+      const LAND = 9 * 17.22 / 100;
+      if (!walking.landing) {
+        walking.landing = true; walking.pos = [739, 525];
+        controls.minDistance = controls.maxDistance = .05;
+        const eye = new THREE.Vector3(wx(739), LAND + EYE, wz(525)), look = new THREE.Vector3(-1, 0, 0);
+        flyTo(eye.clone().sub(look.multiplyScalar(.05)), eye, 1.0);
+        document.getElementById('walkName').textContent = 'חצי המדרגות';
+      } else {
+        walking.landing = false;
+        const up = h.point.y > LAND + .05;
+        const [X, Y, id] = up ? [412, 360, 'hall'] : [373, 560, 'foyer'];
+        walkTo(new THREE.Vector3(wx(X), 0, wz(Y)), id, new THREE.Vector3(up ? 0 : -1, 0, up ? 1 : 0));
+      }
+    } else { walking.landing = false; walkTo(h.point, h.room, h.look); }
     return;
   }
   const id = pickRoom(e); if (id || !focus) selectRoom(id, false);
@@ -2289,6 +2299,7 @@ setMode('full'); camTween = null; flyTo(p0, t0, 2.4);
 applyNight(); applyLabels();
 document.getElementById('loading').classList.add('done');
 
+const zOutBtn = document.getElementById('zOut');
 const clock = new THREE.Clock();
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), .05), k = 1 - Math.pow(.002, dt);
@@ -2300,6 +2311,11 @@ renderer.setAnimationLoop(() => {
     if (t >= 1) camTween = null;
   }
   controls.update();
+  { // grey out "−" when no further zoom-out is possible
+    const out = walking ? camera.fov >= 114.9 && controls.maxDistance >= walkRoomMaxBack() - .01
+                        : camera.position.distanceTo(controls.target) >= controls.maxDistance - .05;
+    if (zOutBtn.disabled !== out) zOutBtn.disabled = out;
+  }
   if (state.split) {
     const W = innerWidth, H = innerHeight, x = Math.round(W * splitX);
     renderer.setScissorTest(true);
