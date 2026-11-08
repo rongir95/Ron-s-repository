@@ -855,6 +855,8 @@ function wall(p, a, b, o) {
 function opening(p, a, ux, uy, theta, op, o) {
   const g = new THREE.Group(); g.position.set(wx(a[0] + ux * op.at), o.base, wz(a[1] + uy * op.at)); g.rotation.y = theta; p.add(g); openingGroups.push(g); g.userData.plan = [a[0] + ux * op.at, a[1] + uy * op.at];
   if (op.type === 'hole') return;
+  if (op.type === 'front') g.userData.entry = { room: 'foyer', eye: [335, 785], look: [.25, -1] };
+  if (op.type === 'slide' && o.base === 0) g.userData.entry = { room: 'living', eye: [367, 95], look: [.3, 1] };
   const w = op.w / 100, s = (op.sill || 0) / 100, hd = op.head / 100, t = o.t / 100, os = o.outSide || 1, hgt = hd - s;
   if (op.type === 'door') {
     const d = t + 0.03, cx = a[0] + ux * op.at, cy = a[1] + uy * op.at;
@@ -1035,7 +1037,7 @@ for (const r of ROOMS) {
     const fx = new THREE.Mesh(new THREE.CylinderGeometry(.17, .17, .035, 24), M.fixture);
     if (r.spots) fx.visible = false, fx.userData.never = true;
     fx.position.set(wx((x0 + x1) / 2), ceil - 0.02, wz((y0 + y1) / 2)); fl.shell.add(fx); fixtures.push(fx);
-    const pl = new THREE.PointLight(0xffd6a0, 0, 4.6, 2); pl.position.set(fx.position.x, ceil - 0.35, fx.position.z);
+    const pl = new THREE.PointLight(0xffc98a, 0, 6, 2); pl.position.set(fx.position.x, ceil - 0.35, fx.position.z);
     fl.group.add(pl); fl.lights.push(pl);
   }
 }
@@ -1592,7 +1594,7 @@ function desk(p, base, r, chairAt, faceTo) {
     const f = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.25, .012, 8, 40), M.black)); f.scale.y = 2.9; f.position.y = 1.0; g.add(f); lb(g, .02, .6, .02, -.15, .3, -.12, M.black); lb(g, .02, .6, .02, .15, .3, -.12, M.black); }
   // olive drapes on a rod either side of the window, striped drum pendant
   onWall(B(p, 110, 24, 275, 26, 228, 231, M.black, b), b, 228, 231);
-  for (const x0 of [112, 245]) for (let x = x0; x < x0 + 28; x += 7) onWall(B(p, x, 25 + ((x / 7) % 2) * 3, x + 7, 27 + ((x / 7) % 2) * 3, 0, 228, M.olive, b), b, 0, 228);
+  for (const x0 of [112, 245]) for (let x = x0; x < x0 + 28; x += 6) { const m = new THREE.Mesh(UNIT, M.olive); m.scale.set(.065, 2.28, .006); m.position.set(wx(x + 3), b + 1.14, wz(28)); p.add(m); onWall(m, b, 0, 228); }
   { const sh = new THREE.Mesh(new THREE.CylinderGeometry(.26, .3, .3, 32, 1, true), M.drum); sh.position.set(wx(205), b + 2.2, wz(166)); p.add(sh); CY(p, 205, 166, .3, 235, 274, M.black, b, 6); }
   }
   // ---- parents' bedroom after the renovation: taupe feature wall with two abstract prints, upholstered bed, black cylinder pendants, round flush light ----
@@ -2019,7 +2021,8 @@ function applyNight() {
   scene.fog.color.set(n ? 0x1b2a45 : 0xdde8f0);
   scene.environment = n ? null : envTex;
   stars.visible = n;
-  F.forEach(f => f.lights.forEach(l => l.intensity = n ? 6 : 0));
+  F.forEach(f => f.lights.forEach(l => l.intensity = n ? 9 : 0));
+  M.led.emissiveIntensity = n ? 3 : 1.6;
   M.fixture.emissiveIntensity = n ? 3 : .15;
   M.glass.emissive.set(n ? 0xffb560 : 0x000000); M.glass.emissiveIntensity = n ? .55 : 0;
   M.lampHead.emissiveIntensity = n ? 4 : 0;
@@ -2118,16 +2121,16 @@ function setWalkControls(on) {
     camera.fov = ORBIT.fov; camera.updateProjectionMatrix();
   }
 }
-function enterWalk(id) {
+function enterWalk(id, eyeOv, lookOv) {
   const r = ROOMS.find(q => q.id === id); if (!r) return;
   if (!walking) walking = { back: focus, mode: focus ? prevMode : state.mode, cam: focus ? prevCam : [camera.position.clone(), controls.target.clone()] };
   walking.id = id;
-  { const [x0, y0, x1, y1] = r.rect; walking.pos = r.eye ? r.eye.slice() : [(x0 + x1) / 2, (y0 + y1) / 2]; }
+  { const [x0, y0, x1, y1] = r.rect; walking.pos = eyeOv ? eyeOv.slice() : r.eye ? r.eye.slice() : [(x0 + x1) / 2, (y0 + y1) / 2]; }
   if (focus) { focus = null; clearFocusFilters(); if (autoWalls) { state.walls = 'full'; autoWalls = false; } document.getElementById('focusBar').hidden = true; }
   setMode('full', true); // whole house with full walls, ceilings and roof, so the room looks real from inside
-  const look = r.look ? new THREE.Vector3(r.look[0], 0, r.look[1]) : controls.target.clone().sub(camera.position); look.y = 0;
+  const lk = lookOv || r.look; const look = lk ? new THREE.Vector3(lk[0], 0, lk[1]) : controls.target.clone().sub(camera.position); look.y = 0;
   if (look.lengthSq() < 1e-6) look.set(1, 0, 0);
-  const [x0, y0, x1, y1] = r.rect, [ex, ey] = r.eye || [(x0 + x1) / 2, (y0 + y1) / 2];
+  const [x0, y0, x1, y1] = r.rect, [ex, ey] = eyeOv || r.eye || [(x0 + x1) / 2, (y0 + y1) / 2];
   const eye = new THREE.Vector3(wx(ex), F[r.f].base + EYE, wz(ey));
   setWalkControls(true); camera.fov = 70; camera.updateProjectionMatrix();
   flyTo(eye.clone().sub(look.normalize().multiplyScalar(.05)), eye, 1.4);
@@ -2182,6 +2185,12 @@ function walkTo(point, roomId, lookDir) {
   document.getElementById('walkName').textContent = r.name; document.getElementById('roomSel').value = roomId;
 }
 renderer.domElement.addEventListener('pointermove', e => {
+  if (!walking && !e.buttons) {
+    ptr.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(ptr, camera);
+    const hit = ray.intersectObjects([F[0].group], true).find(h => visibleChain(h.object)); let en = false;
+    for (let o = hit && hit.object; o; o = o.parent) if (o.userData.entry) { en = true; break; }
+    renderer.domElement.style.cursor = en ? 'pointer' : '';
+  }
   if (!walking || e.buttons) { walkRing.visible = false; return; }
   const h = walkFloorHit(e);
   walkRing.visible = !!h; renderer.domElement.style.cursor = h ? 'pointer' : '';
@@ -2330,6 +2339,11 @@ function pickRoom(e) {
 }
 renderer.domElement.addEventListener('pointerup', e => {
   if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
+  if (!walking) { // from outside: click the front door or the garden slider to walk in
+    ptr.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(ptr, camera);
+    const hit = ray.intersectObjects([F[0].group], true).find(h => visibleChain(h.object));
+    for (let o = hit && hit.object; o; o = o.parent) if (o.userData.entry) { const en = o.userData.entry; enterWalk(en.room, en.eye, en.look); return; }
+  }
   if (walking) {
     const h = walkFloorHit(e); if (!h) return;
     if (h.stair) { // stairs: stop on the half landing first, from there go up or back down
