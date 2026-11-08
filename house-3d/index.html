@@ -618,6 +618,8 @@ const M = {
   interior: std({ color: 0xf6f6f4, roughness: .95 }),
   slate: std({ map: T.slate, roughness: .6 }),
   screen: std({ color: 0x0b0d10, roughness: .08, metalness: .3, envMapIntensity: 1.2 }),
+  switchPlate: std({ color: 0xf7f6f2, roughness: .4 }),
+  switchKey: std({ color: 0xe8e6e0, roughness: .35 }),
   skirt: std({ color: 0x75787a, roughness: .45 }),
   lamDark: std({ map: T.lamDark, roughness: .7, envMapIntensity: .12 }),
   lamGrey: std({ map: T.lamGrey, roughness: .7, envMapIntensity: .12 }),
@@ -858,6 +860,7 @@ function opening(p, a, ux, uy, theta, op, o) {
     const d = t + 0.03, cx = a[0] + ux * op.at, cy = a[1] + uy * op.at;
     const doorInfo = { f: o.base > 1 ? 1 : 0, sides: [[cx - uy * 70, cy + ux * 70], [cx + uy * 70, cy - ux * 70]] };
     g.userData.doorInfo = doorInfo;
+    for (const sd of [-1, 1]) { lb(g, .08, .08, .01, (w / 2 + .12) * -(op.hs || 1), 1.1, sd * (t / 2 + .005), M.switchPlate); lb(g, .03, .04, .006, (w / 2 + .12) * -(op.hs || 1), 1.1, sd * (t / 2 + .012), M.switchKey); }
     lb(g, 0.045, hd, d, -w / 2 + 0.022, hd / 2, 0, M.trim); lb(g, 0.045, hd, d, w / 2 - 0.022, hd / 2, 0, M.trim); lb(g, w, 0.045, d, 0, hd - 0.022, 0, M.trim);
     const lw = w - 0.1, lh = hd - 0.05;
     if (op.slide) { // brown wood sliding door on a track, half open, on the room side
@@ -912,6 +915,7 @@ function opening(p, a, ux, uy, theta, op, o) {
     // roller-shutter box, a staple of Israeli windows
     lb(g, w, 0.16, t * .55, 0, hd + 0.08, -os * t * 0.15, M.trim).castShadow = false;
   }
+  if (op.type !== 'front' && op.type !== 'utility') { const hy = op.type === 'slide' ? 1.05 : s + hgt * .5; lb(g, .022, .14, .025, (op.type === 'slide' ? .05 : w / 2 - fw - .03), hy, fz - os * .055, M.black); }
   if (s > 0) { lb(g, w + 0.08, 0.04, 0.09, 0, s - 0.02, os * (t / 2 + 0.03), M.sillStone); lb(g, w, 0.025, 0.07, 0, s - 0.012, -os * (t / 2 - 0.02), M.sillStone); }
 }
 function buildOutline(p, poly, opsByEdge, o) {
@@ -1036,6 +1040,13 @@ for (const r of ROOMS) {
   }
 }
 
+// wall sockets: one double socket low on the longest free wall of each dry room
+for (const r of ROOMS) {
+  if (['wc', 'ensuite', 'bath', 'balcony', 'hall', 'closet'].includes(r.id)) continue;
+  const [x0, y0, x1, y1] = r.rect, base = F[r.f].base, X = x0 + (x1 - x0) * .3;
+  const pl = B(F[r.f].shell, X - 8, y0, X + 8, y0 + 1, 28, 36, M.switchPlate, base); onWall(pl, base, 28, 36);
+  for (const dx of [-4, 4]) { const h = CY(F[r.f].shell, X + dx, y0 + 1.1, 1.4, 31.5, 32.5, M.black, base, 10); h.rotation.x = Math.PI / 2; h.position.y = base + .32; onWall(h, base, 31, 33); }
+}
 /* ---------------- stairs (U-shaped, 18 risers) ---------------- */
 {
   const p = F[0].furn, R = 17.22, tr = 248 / 9;
@@ -1246,6 +1257,8 @@ function desk(p, base, r, chairAt, faceTo) {
     RB(p, 730, 210, 752, 245, 50, 80, M.sageTowel, b, .05); RB(p, 730, 250, 752, 284, 50, 80, M.rust, b, .05);
     RB(p, 732, 290, 752, 322, 50, 76, M.linen, b, .05); RB(p, 600, 376, 632, 396, 50, 78, M.sageTowel, b, .05);
     RB(p, 700, 340, 740, 400, 44, 50, std({ color: 0xece4d4, roughness: 1 }), b, .04);
+    for (const [x, y] of [[694, 199], [774, 199], [534, 416], [774, 416], [534, 338], [686, 338]]) B(p, x - 2, y - 2, x + 2, y + 2, 0, 8, M.walnutA, b);
+    { const seam = std({ color: 0xcfc4b1, roughness: 1 }); for (const [x0, y0, x1, y1] of [[694, 263, 750, 264], [600, 337, 601, 396], [645, 337, 646, 396]]) B(p, x0, y0, x1, y1, 52, 52.5, seam, b); }
     // jute rug, walnut plinth coffee table with a tray, vase and books
     B(p, 520, 150, 700, 330, 0, 1, M.jute, b);
     B(p, 572, 200, 662, 290, 0, 22, M.walnutA, b); RB(p, 560, 188, 674, 302, 22, 36, M.walnutA, b, .01);
