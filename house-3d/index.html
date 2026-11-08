@@ -1507,7 +1507,7 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let k = 1; k < 5; k++) B(p, 405.5, 127, 406, 233, k * 20, k * 20 + .6, M.black, b);
   for (let k = 0; k < 5; k++) for (const y of [150, 210]) B(p, 404, y - 1.5, 405.5, y + 1.5, k * 20 + 9, k * 20 + 12, M.steel, b);
   onWall(B(p, 451, 155, 453, 205, 150, 200, M.wood, b), b, 150, 200); onWall(CY(p, 450.5, 180, 18, 160, 162, M.linen, b, 28), b, 160, 162).rotation.z = Math.PI / 2;
-  { const g = local(p, 420, 75, b, -2.2); const m = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.25, .25, .02, 40), M.mirror)); m.rotation.x = Math.PI / 2; m.scale.z = 2.9; m.position.y = 1.0; g.add(m);
+  { const g = local(p, 420, 75, b, 0); // faces the door const m = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.25, .25, .02, 40), M.mirror)); m.rotation.x = Math.PI / 2; m.scale.z = 2.9; m.position.y = 1.0; g.add(m);
     const f = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.25, .012, 8, 40), M.black)); f.scale.y = 2.9; f.position.y = 1.0; g.add(f); lb(g, .02, .6, .02, -.15, .3, -.12, M.black); lb(g, .02, .6, .02, .15, .3, -.12, M.black); }
   // olive drapes on a rod either side of the window, striped drum pendant
   onWall(B(p, 110, 24, 275, 26, 228, 231, M.black, b), b, 228, 231);
