@@ -390,9 +390,9 @@ const tileTex = (n, base, grout, meters, varL = 3) => canvasTex(512, (g, s) => {
 }, meters);
 // ground floor porcelain, matched to the entrance photos: large 60×120 cool grey tiles, tight joints
 T.tile = canvasTex(512, (g, s) => {
-  g.fillStyle = '#6f7274'; g.fillRect(0, 0, s, s);
-  for (let i = 0; i < 2; i++) {
-    g.fillStyle = hsl(200, 3, 54 + (rnd() - .5) * 2.5); g.fillRect(i * s / 2 + 1, 1, s / 2 - 2, s - 2);
+  g.fillStyle = '#4c4f52'; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) {           // 60×60 dark grey porcelain
+    g.fillStyle = hsl(200, 3, 42 + (rnd() - .5) * 3); g.fillRect(i * s / 2 + 1, j * s / 2 + 1, s / 2 - 2, s / 2 - 2);
   }
   for (let k = 0; k < 220; k++) { g.fillStyle = `rgba(${rnd() > .5 ? '255,255,255' : '0,0,0'},${rnd() * .035})`; const r = 10 + rnd() * 40; g.beginPath(); g.arc(rnd() * s, rnd() * s, r, 0, Math.PI * 2); g.fill(); }
   speckle(g, s, 5000, .05); speckle(g, s, 2000, .12, true);
@@ -405,7 +405,7 @@ T.slate = canvasTex(512, (g, s) => {
     for (let k = 0; k < 40; k++) { g.fillStyle = `rgba(${rnd() > .45 ? '0,0,0' : '255,255,255'},${rnd() * .07})`; const r = 6 + rnd() * 26; g.beginPath(); g.arc(i * t + rnd() * t, j * t + rnd() * t, r, 0, Math.PI * 2); g.fill(); }
   }
   speckle(g, s, 5000, .12); speckle(g, s, 1500, .1, true);
-}, 0.8);
+}, 0.66);   // 33×33
 // guest WC walls: 30×60 tiles with a raised dot texture, white and bordeaux
 const dotTile = (base, dot, grout) => canvasTex(512, (g, s) => {
   g.fillStyle = grout; g.fillRect(0, 0, s, s);
@@ -447,8 +447,8 @@ const rectTile = (cols, rows, base, grout, meters, vary = 2) => canvasTex(512, (
 T.ensWall = rectTile(3, 4, [40, 10, 95], '#d9d7d2', 1.2);          // white gloss 40×30
 T.bathWall = rectTile(2, 4, [38, 32, 84], '#cdbfa6', 1.2);         // cream 60×30
 T.bathBrown = rectTile(2, 4, [24, 30, 30], '#8a7563', 1.2, 4);     // brown accent tiles
-T.ensFloor = tileTex(4, [35, 7, 70], '#9b958b', 1.2);
-T.bathFloor = tileTex(4, [40, 24, 86], '#cbc1ae', 1.2);
+T.ensFloor = tileTex(4, [205, 4, 44], '#5d6063', 1.32);   // 33×33 dark grey
+T.bathFloor = tileTex(4, [205, 4, 46], '#606366', 1.32);
 T.mosaic = canvasTex(256, (g, s) => {
   const n = 16, t = s / n; g.fillStyle = '#c8ccc8'; g.fillRect(0, 0, s, s);
   for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { const r = rnd(); g.fillStyle = r < .3 ? hsl(160, 12, 40 + rnd() * 12) : r < .6 ? hsl(200, 6, 62 + rnd() * 12) : hsl(90, 8, 80 + rnd() * 10); g.fillRect(i * t + 1, j * t + 1, t - 2, t - 2); }
@@ -531,6 +531,10 @@ T.greenStack = canvasTex(512, (g, s) => {
     g.fillStyle = gr; g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3);
   }
 }, 0.6);
+T.beigeStack = canvasTex(512, (g, s) => {
+  g.fillStyle = '#e6dfd2'; g.fillRect(0, 0, s, s); const tw = s / 8, th = s / 2;
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) { g.fillStyle = hsl(38, 22, 84 + (rnd() - .5) * 3); g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3); }
+}, 0.6);
 T.terrazzo = canvasTex(512, (g, s) => {
   g.fillStyle = '#ece6da'; g.fillRect(0, 0, s, s);
   const cols = ['#6f6a5c', '#8b8574', '#4f5a45', '#a59a83', '#c7bca5', '#3e3d38', '#7d8a6a'];
@@ -574,7 +578,12 @@ T.abstract = (() => { const c = document.createElement('canvas'); c.width = 160;
 T.stoneStrip = (() => { const c = document.createElement('canvas'); c.width = 256; c.height = 768; const g = c.getContext('2d');
   g.fillStyle = '#cfc6b6'; g.fillRect(0, 0, 256, 768); const rh = 768 / 56;
   for (let r = 0; r < 56; r++) { let x = -rnd() * 40; while (x < 256) { const w = 20 + rnd() * 50; g.fillStyle = hsl(36 + rnd() * 10, 10 + rnd() * 14, 72 + (rnd() - .5) * 18); g.fillRect(x + 1, r * rh + 1, w - 2, rh - 2); x += w; } }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1 / 1.2, 1 / 3.6); return t; })();
+T.tread = canvasTex(512, (g, s) => {
+  g.fillStyle = '#3b2519'; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < 260; i++) { const y = rnd() * s; g.strokeStyle = `hsla(${20 + rnd() * 8},${30 + rnd() * 15}%,${rnd() > .5 ? 14 + rnd() * 8 : 30 + rnd() * 10}%,${.3 + rnd() * .5})`; g.lineWidth = .6 + rnd() * 2;
+    g.beginPath(); g.moveTo(0, y); for (let x = 0; x <= s; x += 32) g.lineTo(x, y + Math.sin(x / 70 + i) * 2.5); g.stroke(); }
+}, 1);
 T.wcWhite = dotTile('#f3f3f1', 'rgba(0,0,0,.07)', '#d9d9d5');
 T.wcRed = dotTile('#7a1c2d', 'rgba(255,255,255,.13)', '#ece8e6');
 T.bath = tileTex(4, [200, 8, 86], '#a9b0b6', 1.2, 2);
@@ -630,6 +639,7 @@ const M = {
   bronze: std({ color: 0x8a7458, roughness: .35, metalness: .7, emissive: 0x3a2610, emissiveIntensity: .4 }),
   landscape: std({ map: T.landscape, roughness: .8 }),
   greenStack: std({ map: T.greenStack, roughness: .25, envMapIntensity: .7 }),
+  beigeStack: std({ map: T.beigeStack, roughness: .3 }),
   terrazzo: std({ map: T.terrazzo, roughness: .45 }),
   led: new THREE.MeshStandardMaterial({ color: 0xfff1d6, emissive: 0xffc874, emissiveIntensity: 1.6, roughness: 1 }),
   nicheWood: std({ color: 0xb08a5c, roughness: .55 }),
@@ -653,8 +663,9 @@ const M = {
   dotGlass: new THREE.MeshStandardMaterial({ color: 0xe9eef0, roughness: .2, transparent: true, opacity: .45, depthWrite: false, side: THREE.DoubleSide }),
   ochre: std({ color: 0xc19f48, roughness: .85 }),
   leather: std({ color: 0xc4b49c, roughness: .6 }),
+  treadWood: std({ map: T.tread, roughness: .45 }),
   railing: std({ color: 0x8c9094, roughness: .45, metalness: .5 }),
-  hallTile: std({ map: T.ensFloor, color: 0x9a9da0, roughness: .45 }),
+  hallTile: std({ map: T.tile, roughness: .4 }),
   stoneStrip: std({ map: T.stoneStrip, roughness: .9 }),
   sheer: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }),
   champagne: std({ color: 0xd8ccb4, roughness: .35, metalness: .6 }),
@@ -833,7 +844,9 @@ function opening(p, a, ux, uy, theta, op, o) {
   if (op.type === 'hole') return;
   const w = op.w / 100, s = (op.sill || 0) / 100, hd = op.head / 100, t = o.t / 100, os = o.outSide || 1, hgt = hd - s;
   if (op.type === 'door') {
-    const d = t + 0.03;
+    const d = t + 0.03, cx = a[0] + ux * op.at, cy = a[1] + uy * op.at;
+    const doorInfo = { f: o.base > 1 ? 1 : 0, sides: [[cx - uy * 70, cy + ux * 70], [cx + uy * 70, cy - ux * 70]] };
+    g.userData.doorInfo = doorInfo;
     lb(g, 0.045, hd, d, -w / 2 + 0.022, hd / 2, 0, M.trim); lb(g, 0.045, hd, d, w / 2 - 0.022, hd / 2, 0, M.trim); lb(g, w, 0.045, d, 0, hd - 0.022, 0, M.trim);
     const lw = w - 0.1, lh = hd - 0.05;
     if (op.slide) { // brown wood sliding door on a track, half open, on the room side
@@ -930,7 +943,7 @@ const ROOMS = [
   { id: 'bed2', f: 1, name: 'החדר של גיא', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'lamOak', eye: [610, 350], look: [.2, -1], note: 'רצפת למינציה בגוון אלון, מיטה לאורך הקיר המערבי, שולחן כתיבה בצורת L מתחת לחלון עם מדפים בטורקיז, ארון גבוה בגימור בטון ליד הדלת ומנורה גאומטרית לבנה.' },
   { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [22, 321, 188, 490], mat: 'ensFloor', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק בטורקיז־ירוק במקלחון עם נישה מוארת וראש גשם שחור, טרצו בשאר הקירות וברצפה, אסלה תלויה ומעליה ארונית אלון עם נישה פתוחה, ארון כיור אלון עם כיור מונח ומראה מעוגלת עם תאורה.', eye: [150, 340], look: [-.4, 1], note: 'אריחים לבנים מבריקים עם פס פסיפס, ארון כיור תלוי בטורקיז, מראה מקושתת ומקלחון זכוכית עם ראש גשם.' },
   { id: 'closet', f: 1, name: 'חדר ארונות', dims: [145, 170], rect: [200, 321, 359, 490], mat: 'laminate', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
-  { id: 'bath', f: 1, name: 'חדר רחצה אחים', dims: [315, 220], rect: [22, 502, 359, 724], mat: 'bathFloor', afterNote: 'אחרי השיפוץ: אסלה תלויה ומעליה ארונית אלון. שאר החדר עדיין כמו היום, עד שתגיע הדמיה.', eye: [330, 612], look: [-1, 0], note: 'אריחי שמנת עם אריחים חומים, ארון כיור ארוך בוונגה עם מראה וארון גבוה, אמבטיה עם מחיצת זכוכית, מכונת כביסה מתחת לארון גבוה.' },
+  { id: 'bath', f: 1, name: 'חדר רחצה אחים', dims: [315, 220], rect: [22, 502, 359, 724], mat: 'bathFloor', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: מקלחון עם מסגרת שחורה במקום האמבטיה, אריחי סטאק בז׳ בגובה 1.2 מ׳, טרצו ברצפה, מכונת כביסה מתחת לארון אלון גבוה, אסלה תלויה מתחת לארונית אלון עם נישה מוארת, ארון כיור אלון ארוך עם כיור מונח, מראה מקושתת שחורה ומנורת קיר.', eye: [330, 612], look: [-1, 0], note: 'אריחי שמנת עם אריחים חומים, ארון כיור ארוך בוונגה עם מראה וארון גבוה, אמבטיה עם מחיצת זכוכית, מכונת כביסה מתחת לארון גבוה.' },
   { id: 'hall', f: 1, name: 'מסדרון', dims: [90, 400], rect: [371, 321, 456, 724], mat: 'hallTile', note: 'מחבר בין המדרגות לכל חדרי הקומה. בתקרה פתח עלייה לגג.' },
   { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [468, 626, 780, 1024], mat: 'lamGrey', eye: [520, 700], look: [1, .55], note: 'טפט חוף עם דקלים על הקיר המשותף, מיטה מתחת לחלון, ארון כהה עם דלתות הזזה ומדפים פתוחים, שידה ומדף קיר כהים ומנורת כדור קלועה. רצפת למינציה אפורה כהה.' },
   { id: 'bed4', f: 1, name: 'החדר של מרק', dims: [355, 275], rect: [88, 736, 456, 1024], mat: 'lamDark', eye: [410, 790], look: [-.55, 1], note: 'טפט חוף עם עצי דקל על הקיר המערבי, מיטה לאורך קיר החלון, ארון בגוון עץ אפור לכל אורך הקיר הצפוני ושידה לבנה תלויה. רצפת למינציה כהה.' },
@@ -1018,20 +1031,18 @@ for (const r of ROOMS) {
   // as in the photos: solid white stairs with dark wenge treads and grey metal railings
   for (let i = 0; i < 9; i++) { // flight 1
     const xa = 452 + i * tr, top = (i + 1) * R;
-    B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.wenge).userData.stair = true;
+    B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.treadWood).userData.stair = true;
   }
-  B(p, 700, 432, 778, 618, 0, 9 * R - 4, M.interior); B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.wenge).userData.stair = true; // landing
+  B(p, 700, 432, 778, 618, 0, 9 * R - 4, M.interior); B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing
   // stone-look strip cladding on the tall landing wall, a wall clock, a floor vase; framed pictures along the flight
-  { const m = new THREE.Mesh(boxUV(.01, 3.1, 1.86, 0, 0), M.stoneStrip); m.position.set(wx(777.4), 1.55, wz(525)); p.add(m); onWall(m, 0, 0, 310);
-    const uv = m.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setY(i, uv.getY(i) * 3.1 / 5.6); uv.needsUpdate = true;
-    const m2 = new THREE.Mesh(boxUV(.01, 2.75, 1.86, 0, 0), M.stoneStrip); m2.position.set(wx(777.4), L1 + 1.375, wz(512)); F[1].furn.add(m2); onWall(m2, L1, 0, 275);
-    const uv2 = m2.geometry.attributes.uv; for (let i = 0; i < uv2.count; i++) uv2.setY(i, .55 + uv2.getY(i) * 2.75 / 5.6 * .8); uv2.needsUpdate = true; }
+  { // brick-strip wallpaper over the whole tall landing wall, both storeys
+    const m = new THREE.Mesh(boxUV(.01, 3.1, 1.88, 4.31, 0), M.stoneStrip); m.position.set(wx(777.4), 1.55, wz(525)); p.add(m); onWall(m, 0, 0, 310);
+    const m2 = new THREE.Mesh(boxUV(.01, 2.75, 2.06, 4.22, L1), M.stoneStrip); m2.position.set(wx(777.4), L1 + 1.375, wz(512)); F[1].furn.add(m2); onWall(m2, L1, 0, 275); }
   onWall(CY(p, 776, 525, 22, 330, 332, std({ color: 0xd9c9a8, roughness: .8 }), 0, 32), 0, 330, 332).rotation.z = Math.PI / 2;
-  CY(p, 765, 445, 8, 9 * R, 9 * R + 45, M.pot, 0, 14, 5);
-  for (let k = 0; k < 4; k++) { const x = 520 + k * 38, z = 120 + k * 26; onWall(B(p, x, 519.5, x + 26, 521, z, z + 20, M.black, 0), 0, z, z + 20); onWall(B(p, x + 3, 519.1, x + 23, 519.5, z + 3, z + 17, M.duvetC, 0), 0, z + 3, z + 17); }
+  for (let k = 0; k < 4; k++) { const x = 540 + k * 40, z = Math.round((x + 13 - 452) / 248 * 9 * R) + 135; onWall(B(p, x, 519.5, x + 26, 521, z, z + 20, M.black, 0), 0, z, z + 20); onWall(B(p, x + 3, 519.1, x + 23, 519.5, z + 3, z + 17, M.duvetC, 0), 0, z + 3, z + 17); }
   for (let j = 0; j < 9; j++) { // flight 2: open underneath, the passage to the safe-room door runs below it
     const xb = 700 - (j + 1) * tr, top = 9 * R + (j + 1) * R;
-    B(p, xb, 525, xb + tr, 618, top - R, top - 4, M.interior); B(p, xb - 2, 523, xb + tr, 620, top - 4, top, M.wenge).userData.stair = true;
+    B(p, xb, 525, xb + tr, 618, top - R, top - 4, M.interior); B(p, xb - 2, 523, xb + tr, 620, top - 4, top, M.treadWood).userData.stair = true;
   }
   // glass balustrades + handrails along the sloped flights
   const rail = (X0, X1, Y, z0, z1, base) => {
@@ -1658,12 +1669,11 @@ function desk(p, base, r, chairAt, faceTo) {
       mk(M.led, 1.08, .002); mk(M.black, 1.0, .006); mk(M.mirror, .955, .009); }
   }
   // ---- siblings' bathroom, from the photos: cream tiles with brown accents, wenge vanity, tub with glass screen, washer under a tall cabinet ----
+  const bathBefore = new THREE.Group(); bathBefore.userData.reno = 'before'; p.add(bathBefore); renoSets.push({ room: 'bath', before: bathBefore });
+  { const p = bathBefore; panelTarget = bathBefore;
   tileRoom([22.5, 502, 359, 724], M.bathWall, { E: [[574, 650, 0, 210]], W: [[541, 641, 120, 210]] });
   panel(118, 502.4, 132, 503.4, 0, 274, M.bathBrown); panel(23.5, 690, 24.5, 704, 0, 274, M.bathBrown);
-  { const bb = new THREE.Group(); bb.userData.reno = 'before'; p.add(bb); toilet(bb, b, 48, 522, 140, 522);
-    const ba = new THREE.Group(); ba.userData.reno = 'after'; ba.visible = false; p.add(ba); renoSets.push({ room: 'bath', before: bb, after: ba });
-    wallToilet(ba, b, 23.5, 522, Math.PI / 2);
-    B(ba, 23.5, 496, 55, 548, 150, 255, M.oakLight, b); B(ba, 55, 521.7, 55.5, 522.3, 151, 254, M.espresso, b); }
+  toilet(p, b, 48, 522, 140, 522);
   // long wenge vanity on the north wall with a vessel basin, framed mirror, tall cabinet beside it
   B(p, 140, 503, 300, 553, 70, 82, M.wenge, b); B(p, 140, 503, 190, 553, 10, 70, M.wenge, b);
   for (const z of [26, 50]) B(p, 150, 553, 180, 554.5, z, z + 2, M.steel, b);
@@ -1679,6 +1689,56 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 125, 668, 185, 723, 90, 272, M.wenge, b); B(p, 154.6, 667.5, 155.4, 668, 92, 270, M.black, b);
   B(p, 70, 690, 110, 722, 0, 95, M.oak, b);
   { const sh = new THREE.Mesh(new THREE.CylinderGeometry(.09, .12, .16, 16), std({ color: 0xb87a3a, roughness: .4, emissive: 0x3a1a00 })); sh.position.set(wx(110), b + 2.1, wz(590)); p.add(sh); CY(p, 110, 590, .3, 218, 274, M.black, b, 6); }
+  panelTarget = null; }
+  // ---- siblings' bathroom after the renovation: walk-in shower by the door, beige stack tiles to 1.2 m, terrazzo floor,
+  //      washer under a tall oak cabinet, wall-hung toilet under an oak cabinet with a lit niche, long oak vanity ----
+  const bathAfter = new THREE.Group(); bathAfter.userData.reno = 'after'; bathAfter.visible = false; p.add(bathAfter); renoSets[renoSets.length - 1].after = bathAfter;
+  { const p = bathAfter, WT = 120;
+    const pa = (X0, Y0, X1, Y1, z0, z1, mat) => { const w = (X1 - X0) / 100, d = (Y1 - Y0) / 100, h = (z1 - z0) / 100;
+      const m = new THREE.Mesh(boxUV(w, h, d, (X0 + Y0) / 100, z0 / 100), mat); m.receiveShadow = true; m.position.set(wx((X0 + X1) / 2), b + (z0 + z1) / 200, wz((Y0 + Y1) / 2)); p.add(m); return onWall(m, b, z0, z1); };
+    // beige stack tiles: full height in the shower, 1.2 m elsewhere, white paint above
+    pa(22.5, 502, 23.5, 541, 0, WT, M.beigeStack); pa(22.5, 641, 23.5, 724, 0, WT, M.beigeStack); pa(22.5, 541, 23.5, 641, 0, 115, M.beigeStack);
+    pa(23.5, 502, 359, 503, 0, WT, M.beigeStack);
+    pa(23.5, 723, 260, 724, 0, WT, M.beigeStack);
+    pa(260, 723, 358, 724, 0, 230, M.beigeStack); pa(357.5, 650, 358.5, 723, 0, 230, M.beigeStack);
+    pa(300, 722, 340, 723, 120, 135, M.beigeStack); pa(300, 722.5, 340, 723, 134, 135, M.led);
+    for (const x of [308, 316]) onWall(CY(p, x, 719, 2.4, 120, 135, std({ color: 0x5a3a1e, roughness: .2 }), b, 10), b, 120, 135);
+    // shower: low terrazzo tray, black-framed glass front and door, black rain head and hand shower
+    B(p, 260, 650, 358, 723, 0, 1.5, M.terrazzo, b); B(p, 262, 715, 356, 717, 1.4, 1.7, M.black, b);
+    { const gl = B(p, 259.5, 650, 260.5, 723, 2, 205, M.glass, b); gl.castShadow = false; gl.renderOrder = 3; }
+    { const gl = B(p, 260, 649.5, 358, 650.5, 2, 205, M.glass, b); gl.castShadow = false; gl.renderOrder = 3; }
+    for (const [x0, y0, x1, y1] of [[259, 649, 261, 724], [259, 649, 358, 651]]) B(p, x0, y0, x1, y1, 203, 205, M.black, b);
+    B(p, 259, 649, 261, 651, 0, 205, M.black, b); B(p, 300, 648.5, 302, 651, 90, 130, M.black, b);
+    CY(p, 310, 690, 12, 222, 224, M.black, b, 28); B(p, 309, 690, 311, 723, 236, 238, M.black, b); CY(p, 310, 690, .8, 224, 237, M.black, b, 6);
+    B(p, 330, 721, 333, 723, 80, 160, M.black, b);
+    // washer under a tall oak cabinet, slatted oak laundry cabinet beside it
+    B(p, 195, 664, 255, 723, 0, 85, M.white, b); CY(p, 225, 663, 17, 30, 31, M.black, b, 24).rotation.x = Math.PI / 2;
+    B(p, 192, 664, 258, 723, 90, 270, M.oakLight, b); B(p, 224.7, 663.5, 225.3, 664, 92, 268, M.espresso, b);
+    B(p, 150, 690, 188, 722, 0, 85, M.oakLight, b); for (let x = 152; x < 188; x += 4) B(p, x, 689.5, x + 2, 690, 6, 80, M.wood, b);
+    // wall-hung toilet on the west wall, oak cabinet above with a lit niche
+    wallToilet(p, b, 23.5, 522, Math.PI / 2, M.white);
+    B(p, 23.5, 498, 58, 550, 150, 165, M.oakLight, b); B(p, 23.5, 498, 58, 550, 185, 265, M.oakLight, b);
+    B(p, 23.5, 498, 58, 500, 165, 185, M.oakLight, b); B(p, 23.5, 548, 58, 550, 165, 185, M.oakLight, b);
+    B(p, 24, 500, 26, 548, 165, 185, M.oakLight, b); B(p, 26, 500, 56, 548, 184.4, 185, M.led, b);
+    B(p, 55.7, 523.7, 58.3, 524.3, 186, 264, M.espresso, b);
+    CY(p, 38, 535, 6, 165, 175, M.nicheBack, b, 14); CY(p, 42, 512, 3, 165, 178, M.white, b, 12);
+    for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.04, 0), M.leaf)); m.position.set(wx(38 + (rnd() - .5) * 8), b + 1.78 - k * .07 * rnd() * 2, wz(535)); p.add(m); }
+    B(p, 60, 503, 75, 506, 70, 72, M.black, b); onWall(CY(p, 67, 508, 5, 64, 76, M.white, b, 16), b, 64, 76);
+    // long floating oak vanity with a white top and a vessel basin, black wall tap, arched black mirror, brass wall light
+    B(p, 120, 503, 300, 553, 30, 82, M.oakLight, b); B(p, 120, 553, 300, 553.5, 56, 57, M.espresso, b); B(p, 209.7, 553, 210.3, 553.5, 30, 82, M.espresso, b);
+    B(p, 118, 503, 302, 556, 82, 86, M.qWhite, b); RB(p, 225, 512, 285, 546, 86, 100, M.ceramic, b, .04); B(p, 229, 515, 281, 543, 95, 100.5, M.water, b);
+    B(p, 254, 503, 256, 516, 108, 110, M.black, b); CY(p, 266, 504, 1.5, 106, 108, M.black, b, 10).rotation.x = Math.PI / 2;
+    { const sh = new THREE.Shape(), w = .5, h = .9, r = .25;
+      sh.moveTo(-w / 2, -h / 2); sh.lineTo(w / 2, -h / 2); sh.lineTo(w / 2, h / 2 - r); sh.absarc(0, h / 2 - r, w / 2, 0, Math.PI, false); sh.lineTo(-w / 2, -h / 2);
+      const mk = (mat, sc, z) => { const m = new THREE.Mesh(new THREE.ShapeGeometry(sh, 24), mat); m.scale.set(sc, sc, 1); m.position.set(wx(255), b + 1.55, wz(503) + z); p.add(m); return onWall(m, b, 105, 200); };
+      mk(M.black, 1, .006); mk(M.mirror, .95, .009); }
+    for (const z of [150, 175]) { const l = new THREE.Mesh(new THREE.CylinderGeometry(.035, .035, .1, 16), M.led); l.position.set(wx(195), b + z / 100, wz(507)); p.add(l); onWall(l, b, z - 5, z + 5); }
+    onWall(B(p, 193, 503, 197, 505, 140, 185, std({ color: 0xb8924a, roughness: .3, metalness: .8 }), b), b, 140, 185);
+    CY(p, 140, 520, 5, 86, 104, M.white, b, 14); for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.035, 0), M.leaf)); m.position.set(wx(140 + (rnd() - .5) * 14), b + 1.12 + k * .06, wz(520 + (rnd() - .5) * 10)); p.add(m); }
+    B(p, 298, 520, 301, 550, 60, 80, M.sageTowel, b);
+    // jute runner
+    B(p, 80, 590, 250, 640, 0, 1, M.jute, b);
+  }
   // hall + balcony
   plant(p, b, 380, 340, .9);
   B(p, -64, 625, -6, 685, 0, 85, M.white, b); CY(p, -6, 655, 15, 30, 60, M.black, b, 20).rotation.z = Math.PI / 2;
@@ -2003,7 +2063,7 @@ function enterWalk(id) {
   flyTo(eye.clone().sub(look.normalize().multiplyScalar(.05)), eye, 1.4);
   document.getElementById('card').hidden = true;
   document.getElementById('walkName').textContent = r.name; document.getElementById('walkBar').hidden = false;
-  document.getElementById('hint').textContent = 'גרירה להסתובבות · לחיצה על הרצפה למעבר לשם · לחיצה על המדרגות לקומה השנייה · Esc ליציאה';
+  document.getElementById('hint').textContent = 'גרירה להסתובבות · לחיצה על הרצפה למעבר לשם · לחיצה על דלת לכניסה לחדר · לחיצה על המדרגות לקומה השנייה · Esc ליציאה';
 }
 const walkRing = new THREE.Mesh(new THREE.RingGeometry(.2, .26, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .85, depthTest: false, side: THREE.DoubleSide }));
 walkRing.rotation.x = -Math.PI / 2; walkRing.renderOrder = 10; walkRing.visible = false; scene.add(walkRing);
@@ -2024,17 +2084,29 @@ function walkFloorHit(e) {
   const hits = ray.intersectObjects([F[0].group, F[1].group], true).filter(h => visibleChain(h.object) && h.object.material !== M.glass && h.object.material !== M.sheer && h.object.material !== M.dotGlass && !h.object.isPoints && h.object !== walkRing && !h.object.userData.rail);
   const h = hits[0]; if (!h) return null;
   if (h.object.userData.stair) return { point: h.point, stair: true };
+  // a door: step through it to the room on the other side
+  for (let o = h.object; o; o = o.parent) if (o.userData.doorInfo) {
+    const di = o.userData.doorInfo, cur = walking && walking.pos ? walking.pos : [0, 0];
+    const d2 = q => (q[0] - cur[0]) ** 2 + (q[1] - cur[1]) ** 2;
+    const tgt = d2(di.sides[0]) > d2(di.sides[1]) ? di.sides[0] : di.sides[1];
+    const inR = (q, r) => q[0] >= r.rect[0] - 5 && q[0] <= r.rect[2] + 5 && q[1] >= r.rect[1] - 5 && q[1] <= r.rect[3] + 5;
+    const dc = r => ((r.rect[0] + r.rect[2]) / 2 - tgt[0]) ** 2 + ((r.rect[1] + r.rect[3]) / 2 - tgt[1]) ** 2;
+    const room = ROOMS.find(r => r.f === di.f && inR(tgt, r)) || ROOMS.filter(r => r.f === di.f).sort((a, b) => dc(a) - dc(b))[0];
+    const other = tgt === di.sides[0] ? di.sides[1] : di.sides[0];
+    if (!room) return null;
+    return { point: new THREE.Vector3(wx(tgt[0]), F[di.f].base, wz(tgt[1])), room: room.id, door: true, look: new THREE.Vector3(tgt[0] - other[0], 0, tgt[1] - other[1]) };
+  }
   if (h.object.userData.room) return { point: h.point, room: h.object.userData.room };
   // furniture standing on the floor: walk to its foot if it is close to the floor
   return null;
 }
-function walkTo(point, roomId) {
+function walkTo(point, roomId, lookDir) {
   const r = ROOMS.find(q => q.id === roomId); if (!r) return;
   const X = (point.x + CX) * 100, Y = (point.z + CZ) * 100;
   const [x0, y0, x1, y1] = r.rect, cx = Math.min(x1 - 30, Math.max(x0 + 30, X)), cy = Math.min(y1 - 30, Math.max(y0 + 30, Y));
   walking.id = roomId; walking.pos = [cx, cy];
   controls.minDistance = controls.maxDistance = .05;
-  const look = controls.target.clone().sub(camera.position); look.y = 0; if (look.lengthSq() < 1e-6) look.set(1, 0, 0); look.normalize();
+  const look = lookDir ? lookDir.clone() : controls.target.clone().sub(camera.position); look.y = 0; if (look.lengthSq() < 1e-6) look.set(1, 0, 0); look.normalize();
   const eye = new THREE.Vector3(wx(cx), F[r.f].base + EYE, wz(cy));
   flyTo(eye.clone().sub(look.multiplyScalar(.05)), eye, .9);
   document.getElementById('walkName').textContent = r.name; document.getElementById('roomSel').value = roomId;
@@ -2044,7 +2116,7 @@ renderer.domElement.addEventListener('pointermove', e => {
   const h = walkFloorHit(e);
   walkRing.visible = !!h; renderer.domElement.style.cursor = h ? 'pointer' : '';
   if (h) walkRing.position.set(h.point.x, h.point.y + .01, h.point.z);
-  walkRing.material.color.set(h && h.stair ? 0xf0c27e : 0xffffff);
+  walkRing.material.color.set(h && (h.stair || h.door) ? 0xf0c27e : 0xffffff);
 });
 function exitWalk(goBack = true) {
   walkRing.visible = false; renderer.domElement.style.cursor = '';
@@ -2193,7 +2265,7 @@ renderer.domElement.addEventListener('pointerup', e => {
       const up = ROOMS.find(q => q.id === walking.id).f === 0;
       const [X, Y, id] = up ? [412, 360, 'hall'] : [373, 560, 'foyer'];
       walkTo(new THREE.Vector3(wx(X), 0, wz(Y)), id);
-    } else walkTo(h.point, h.room);
+    } else walkTo(h.point, h.room, h.look);
     return;
   }
   const id = pickRoom(e); if (id || !focus) selectRoom(id, false);
