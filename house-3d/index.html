@@ -946,7 +946,7 @@ const ROOMS = [
   { id: 'closet', f: 1, name: 'חדר ארונות', dims: [145, 170], rect: [200, 321, 359, 490], mat: 'laminate', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
   { id: 'bath', f: 1, name: 'חדר רחצה אחים', dims: [315, 220], rect: [22, 502, 359, 724], mat: 'bathFloor', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: מקלחון עם מסגרת שחורה במקום האמבטיה, אריחי סטאק בז׳ בגובה 1.2 מ׳, טרצו ברצפה, מכונת כביסה מתחת לארון אלון גבוה, אסלה תלויה מתחת לארונית אלון עם נישה מוארת, ארון כיור אלון ארוך עם כיור מונח, מראה מקושתת שחורה ומנורת קיר.', eye: [330, 612], look: [-1, 0], note: 'אריחי שמנת עם אריחים חומים, ארון כיור ארוך בוונגה עם מראה וארון גבוה, אמבטיה עם מחיצת זכוכית, מכונת כביסה מתחת לארון גבוה.' },
   { id: 'hall', f: 1, name: 'מסדרון', dims: [90, 400], rect: [371, 321, 456, 724], mat: 'hallTile', note: 'מחבר בין המדרגות לכל חדרי הקומה. בתקרה פתח עלייה לגג.' },
-  { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [468, 626, 780, 1024], mat: 'lamGrey', eye: [520, 700], look: [1, .55], note: 'טפט חוף עם דקלים על הקיר המשותף, מיטה מתחת לחלון, ארון כהה עם דלתות הזזה ומדפים פתוחים, שידה ומדף קיר כהים ומנורת כדור קלועה. רצפת למינציה אפורה כהה.' },
+  { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [468, 626, 780, 1024], mat: 'lamGrey', afterNote: 'אחרי השיפוץ: טפט הדקלים על הקיר המשותף מוסר והקיר צבוע לבן. שאר החדר נשאר כמו היום.', eye: [520, 700], look: [1, .55], note: 'טפט חוף עם דקלים על הקיר המשותף, מיטה מתחת לחלון, ארון כהה עם דלתות הזזה ומדפים פתוחים, שידה ומדף קיר כהים ומנורת כדור קלועה. רצפת למינציה אפורה כהה.' },
   { id: 'bed4', f: 1, name: 'החדר של מרק', dims: [355, 275], rect: [88, 736, 456, 1024], mat: 'lamDark', eye: [410, 790], look: [-.55, 1], note: 'טפט חוף עם עצי דקל על הקיר המערבי, מיטה לאורך קיר החלון, ארון בגוון עץ אפור לכל אורך הקיר הצפוני ושידה לבנה תלויה. רצפת למינציה כהה.' },
   { id: 'balcony', f: 1, name: 'מסתור כביסה', dims: [70, 410], rect: [-72, 292, -4, 716], mat: 'balcony', note: 'מרפסת שירות מוסתרת ברפפות, צמודה לחדרי הרחצה.', noLight: true },
 ];
@@ -1587,7 +1587,8 @@ function desk(p, base, r, chairAt, faceTo) {
   // tall concrete-look wardrobe against the south wall, just past the door swing, its doors facing the doorway
   B(p, 542, 341, 602, 403, 0, 255, M.concreteDoor, b); B(p, 541.5, 371.7, 542, 372.3, 2, 253, M.black, b);
   // ---- Ron's room, from the photos: beach mural on the party wall, bed under the window, dark wardrobe on the west wall ----
-  { const m = new THREE.Mesh(boxUV(.01, 2.74, 3.98, 0, 0), M.muralRon); m.position.set(wx(779), b + 1.37, wz(825)); p.add(m); onWall(m, b, 0, 274);
+  { const m = new THREE.Mesh(boxUV(.01, 2.74, 3.98, 0, 0), M.muralRon); m.position.set(wx(779), b + 1.37, wz(825)); onWall(m, b, 0, 274);
+    const mb = new THREE.Group(), ma = new THREE.Group(); ma.visible = false; p.add(mb, ma); mb.add(m); renoSets.push({ room: 'bed3-mural', before: mb, after: ma }); // mural removed in the renovation
     const uv = m.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) / 3.98, uv.getY(i) / 2.74); uv.needsUpdate = true; }
   bed(p, b, [580, 900, 778, 1018], 'E', M.lilac);
   B(p, 578, 898, 778, 902, 0, 30, M.lime, b); B(p, 578, 898, 582, 1020, 0, 30, M.lime, b);
