@@ -1441,7 +1441,7 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let y = 674; y < 776; y += 8.5) for (const z of [102, 197]) { const dpt = 3 + rnd() * 5; onWall(B(p, 433 - dpt, y, 433, y + 7.5, z, z + 7.5, M.black, b), b, z, z + 7.5); }
   for (let z = 110; z < 196; z += 8.5) for (const y of [674, 768]) { const dpt = 3 + rnd() * 5; onWall(B(p, 433 - dpt, y, 433, y + 7.5, z, z + 7.5, M.black, b), b, z, z + 7.5); }
   onWall(B(p, 300, 819, 312, 824, 140, 150, M.black, b), b, 140, 150);
-  { const bulk = new THREE.Group(); bulk.userData.reno = 'before'; F[1].shell.add(bulk); renoSets.push({ room: 'kitchen-ceiling', before: bulk });
+  { const bulk = new THREE.Group(); bulk.userData.reno = 'before'; bulk.userData.lowerCeiling = true; F[1].shell.add(bulk); renoSets.push({ room: 'kitchen-ceiling', before: bulk });
     const sp = bulk;
     B(sp, 16, 47, 190, 699, -60, -30.5, M.ceiling, L1);                 // dropped ceiling over the kitchen run and dining
     B(sp, 190, 610, 290, 699, -60, -30.5, M.ceiling, L1);               // over the fridge
@@ -1451,7 +1451,7 @@ function desk(p, base, r, chairAt, faceTo) {
     for (let x = 207; x < 283; x += 3) B(sp, x, 608.5, x + 1.6, 609, -55, -41, M.alu, L1);
     for (const [x, y] of [[100, 360], [100, 500], [100, 640], [120, 110], [120, 230], [240, 655]]) B(sp, x - 4, y - 4, x + 4, y + 4, -60.5, -60, M.fixture, L1);
   }
-  { const sp = F[1].shell, cz = L1 - 0.306;
+  { const sp = new THREE.Group(); sp.userData.lowerCeiling = true; F[1].shell.add(sp); const cz = L1 - 0.306;
     for (const [x, y] of [[335, 700], [410, 700], [330, 795], [375, 795], [420, 795], [372, 560]]) B(sp, x - 4, y - 4, x + 4, y + 4, cz * 100 - L1 * 100 - .4, cz * 100 - L1 * 100, M.fixture, L1);
     B(sp, 318, 588, 424, 632, cz * 100 - L1 * 100 - .6, cz * 100 - L1 * 100, M.trim, L1);
     for (let x = 322; x < 421; x += 4) B(sp, x, 592, x + 2, 628, cz * 100 - L1 * 100 - 1.2, cz * 100 - L1 * 100 - .6, M.alu, L1); }
@@ -2089,7 +2089,7 @@ function focusRoom(id) {
   // other floor, garden, neighbour, slabs, other rooms
   hideForFocus(F[1 - r.f].group); hideForFocus(site); hideForFocus(neighbor);
   F[r.f].shell.children.forEach(o => {
-    if (o.userData.slab) hideForFocus(o);
+    if (o.userData.slab || o.userData.lowerCeiling) hideForFocus(o);
     else if (!o.userData.wall && !o.userData.room && !openingGroups.includes(o) && !fixtures.includes(o) && !inRect(planXY(o), rect, 6)) hideForFocus(o);
   });
   ROOMS.forEach(q => { if (q.id !== id) hideForFocus(q.mesh); });
@@ -2101,7 +2101,7 @@ function focusRoom(id) {
   // walls: keep only the part of each wall that borders the room
   const big = [rect[0] - pad, rect[1] - pad, rect[2] + pad, rect[3] + pad];
   for (const m of wallPieces) {
-    if (!m.userData.seg) { if (!inRect(planXY(m), rect, pad)) m.userData.focusHide = true; continue; }
+    if (!m.userData.seg) { if (!inRect(planXY(m), rect, 8)) m.userData.focusHide = true; continue; } // wall-mounted items: only this room's side of the wall
     const [ax, ay, bx, by] = m.userData.seg;
     const isThisFloor = Math.abs(m.userData.wall.base - F[r.f].base) < .01;
     const c = isThisFloor ? clipSeg(ax, ay, bx, by, big) : null;
