@@ -823,7 +823,7 @@ function wall(p, a, b, o) {
   const outSide = o.outSide || 0;
   const pz = outSide === 1 ? o.outMat : (o.inMatPz || o.inMat), nz = outSide === -1 ? o.outMat : (o.inMatNz || o.inMat);
   const end = o.inMat; // window and door reveals are plastered on the inside
-  const mats = [end, end, M.cap, M.cap, pz, nz];
+  const mats = [end, end, M.cap, end, pz, nz]; // black only on the top cut; the underside (seen over the stair void) is plaster
   const ops = (o.ops || []).slice().sort((p1, p2) => p1.at - p2.at);
   const pieces = []; let cur = -ext;
   for (const op of ops) {
@@ -1002,9 +1002,9 @@ I([296, 590], [296, 705]);
 
 /* first floor slab (with stair void) + walls */
 const SLAB1 = [[-10, 288], [50, 288], [50, -6], [467, -6], [467, 45], [805, 45], [805, 1043], [69, 1043], [69, 742], [-10, 742]];
-slab(F[1].shell, SLAB1, L1, 0.3, M.parquet, M.slabSide, [[[452, 411], [778, 411], [778, 614], [452, 614]]]);
+slab(F[1].shell, SLAB1, L1, 0.3, M.parquet, M.slabSide, [[[452, 411], [778, 411], [778, 626], [452, 626]]]);
 // white plaster ceiling for the ground floor, just under the slab
-slab(F[1].shell, SLAB1, L1 - 0.299, 0.006, M.ceiling, M.ceiling, [[[452, 411], [778, 411], [778, 614], [452, 614]]]);
+slab(F[1].shell, SLAB1, L1 - 0.299, 0.006, M.ceiling, M.ceiling, [[[452, 411], [778, 411], [778, 626], [452, 626]]]);
 buildOutline(F[1].shell, OUT1, OPS1, { t: 25, base: L1, h: H2 * 100, outMat: M.plaster, inMat: M.interior });
 const J = (a, b, ops = [], t = 12) => wall(F[1].shell, a, b, { t, base: L1, h: H2 * 100, ops, inMat: M.interior });
 J([82, 315], [458, 315], [D(73, 70), Object.assign(D(173, 80), { slide: true }), D(338, 80)]);
@@ -1063,7 +1063,7 @@ for (const r of ROOMS) {
     const m = new THREE.Mesh(boxUV(.01, 3.1, 1.88, 4.31, 0), M.stoneStrip); m.position.set(wx(777.4), 1.55, wz(525)); p.add(m); onWall(m, 0, 0, 310);
     const m2 = new THREE.Mesh(boxUV(.01, 2.75, 2.06, 4.22, L1), M.stoneStrip); m2.position.set(wx(777.4), L1 + 1.375, wz(512)); F[1].furn.add(m2); onWall(m2, L1, 0, 275); }
   onWall(CY(p, 776, 525, 22, 330, 332, std({ color: 0xd9c9a8, roughness: .8 }), 0, 32), 0, 330, 332).rotation.z = Math.PI / 2;
-  for (let k = 0; k < 4; k++) { const x = 540 + k * 40, z = Math.round((x + 13 - 452) / 248 * 9 * R) + 135; onWall(B(p, x, 519.5, x + 26, 521, z, z + 20, M.black, 0), 0, z, z + 20); onWall(B(p, x + 3, 519.1, x + 23, 519.5, z + 3, z + 17, M.duvetC, 0), 0, z + 3, z + 17); }
+  for (let k = 0; k < 4; k++) { const x = 468 + k * 33, z = Math.round((x + 13 - 452) / 248 * 9 * R) + 112; onWall(B(p, x, 519.5, x + 26, 521, z, z + 20, M.black, 0), 0, z, z + 20); onWall(B(p, x + 3, 519.1, x + 23, 519.5, z + 3, z + 17, M.duvetC, 0), 0, z + 3, z + 17); }
   for (let j = 0; j < 9; j++) { // flight 2: open underneath, the passage to the safe-room door runs below it
     const xb = 700 - (j + 1) * tr, top = 9 * R + (j + 1) * R;
     B(p, xb, 525, xb + tr, 618, top - R, top - 4, M.interior); B(p, xb - 2, 523, xb + tr, 620, top - 4, top, M.treadWood).userData.stair = true;
