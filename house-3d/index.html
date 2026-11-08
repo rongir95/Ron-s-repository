@@ -2370,6 +2370,35 @@ setMode('full'); camTween = null; flyTo(p0, t0, 2.4);
 applyNight(); applyLabels();
 document.getElementById('loading').classList.add('done');
 
+/* curtains: the strip-built drapes are merged into single gathered panels with soft folds */
+{
+  const strips = [];
+  scene.traverse(o => { if (o.isMesh && o.geometry === UNIT && Math.abs(o.scale.x - .065) < .002 && Math.abs(o.scale.z) < .02) strips.push(o); });
+  const groups = new Map();
+  for (const m of strips) { const k = [m.parent.uuid, m.material.uuid, m.scale.y.toFixed(2), m.position.y.toFixed(2)].join('|'); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(m); }
+  for (const list of groups.values()) {
+    const xs = list.map(m => m.position.x), zs = list.map(m => m.position.z);
+    const alongX = Math.max(...xs) - Math.min(...xs) >= Math.max(...zs) - Math.min(...zs);
+    list.sort((a, b) => alongX ? a.position.x - b.position.x : a.position.z - b.position.z);
+    const clusters = [[list[0]]];
+    for (let i = 1; i < list.length; i++) { const pr = list[i - 1], c = list[i]; const d = alongX ? c.position.x - pr.position.x : c.position.z - pr.position.z; if (d > .09) clusters.push([c]); else clusters[clusters.length - 1].push(c); }
+    for (const cl of clusters) {
+      const first = cl[0], last = cl[cl.length - 1], h = first.scale.y;
+      const w = (alongX ? last.position.x - first.position.x : last.position.z - first.position.z) + .065;
+      const cx = (first.position.x + last.position.x) / 2, cz = cl.reduce((t, m) => t + (alongX ? m.position.z : m.position.x), 0) / cl.length;
+      const folds = Math.max(2, Math.round(w / .11));
+      const g = new THREE.PlaneGeometry(w, h, folds * 6, 8), pos = g.attributes.position;
+      for (let i = 0; i < pos.count; i++) { const x = pos.getX(i), y = pos.getY(i); pos.setZ(i, Math.sin((x / w + .5) * folds * Math.PI * 2) * .028 * (1 + .25 * (.5 - y / h))); }
+      g.computeVertexNormals();
+      const mat = first.material.clone(); mat.side = THREE.DoubleSide;
+      const m = new THREE.Mesh(g, mat); m.castShadow = true; m.receiveShadow = true; m.renderOrder = 3;
+      if (alongX) m.position.set(cx, first.position.y, cz); else { m.position.set(cz, first.position.y, (first.position.z + last.position.z) / 2); m.rotation.y = Math.PI / 2; }
+      first.parent.add(m);
+      const u = first.userData.wall; if (u) { m.userData.wall = { base: u.base, y0: u.y0, y1: u.y1, sy: 1 }; wallPieces.push(m); }
+      for (const o of cl) { o.parent.remove(o); const i = wallPieces.indexOf(o); if (i >= 0) wallPieces.splice(i, 1); }
+    }
+  }
+}
 const zOutBtn = document.getElementById('zOut');
 // high quality: ambient occlusion (soft contact shadows in corners and under furniture)
 const composer = new EffectComposer(renderer);
