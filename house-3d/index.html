@@ -1704,6 +1704,12 @@ function desk(p, base, r, chairAt, faceTo) {
   for (const [x0, y0, x1, y1] of [[112, 401.5, 188, 402.5], [111.5, 402, 112.5, 490]]) { const gl = B(p, x0, y0, x1, y1, 4, 200, M.dotGlass, b); gl.castShadow = false; gl.renderOrder = 3; }
   B(p, 140, 450, 170, 480, 230, 232, M.steel, b); B(p, 185, 464, 188, 466, 205, 232, M.steel, b);
   }
+  { // accessories (before): towel bar with towels, bath mat, bottles in the shower
+    const p = ensBefore;
+    B(p, 185, 335, 187, 390, 120, 122, M.steel, b); B(p, 183.5, 338, 186, 387, 80, 121, std({ color: 0x8aa8b8, roughness: 1 }), b);
+    B(p, 125, 365, 175, 398, 0, 1.2, std({ color: 0xe9e4da, roughness: 1 }), b);
+    for (const [dx, h, c] of [[0, 22, 0x2f6f8f], [6, 18, 0xe8e2d6], [12, 25, 0x5a3a1e]]) CY(p, 150 + dx, 485, 2.6, 4, 4 + h, std({ color: c, roughness: .25 }), b, 12);
+  }
   // ---- parents' en-suite after the renovation: teal stack tiles in the shower, terrazzo walls and floor, wall-hung toilet under an oak cabinet, oak vanity ----
   const ensAfter = new THREE.Group(); ensAfter.userData.reno = 'after'; ensAfter.visible = false; p.add(ensAfter); renoSets[renoSets.length - 1].after = ensAfter;
   { const p = ensAfter; panelTarget = null;
@@ -1762,6 +1768,11 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 125, 668, 185, 723, 90, 272, M.wenge, b); B(p, 154.6, 667.5, 155.4, 668, 92, 270, M.black, b);
   B(p, 70, 690, 110, 722, 0, 95, M.oak, b);
   { const sh = new THREE.Mesh(new THREE.CylinderGeometry(.09, .12, .16, 16), std({ color: 0xb87a3a, roughness: .4, emissive: 0x3a1a00 })); sh.position.set(wx(110), b + 2.1, wz(590)); p.add(sh); CY(p, 110, 590, .3, 218, 274, M.black, b, 6); }
+  { // accessories (before): bottles on the tub rim, bath mat, towels on hooks by the door
+    for (const [dx, h, c] of [[0, 22, 0x2f6f8f], [6, 18, 0xe8e2d6], [12, 25, 0x5a3a1e]]) CY(p, 320 + dx, 712, 2.6, 58, 58 + h, std({ color: c, roughness: .25 }), b, 12);
+    B(p, 200, 610, 260, 645, 0, 1.2, std({ color: 0xc9a77e, roughness: 1 }), b);
+    for (const [y, c] of [[560, 0xd9cdb8], [545, 0x8a5552]]) { B(p, 356, y - 1, 358.5, y + 1, 168, 172, M.steel, b); B(p, 352, y - 12, 356, y + 12, 105, 170, std({ color: c, roughness: 1 }), b); }
+  }
   panelTarget = null; }
   // ---- siblings' bathroom after the renovation: walk-in shower by the door, beige stack tiles to 1.2 m, terrazzo floor,
   //      washer under a tall oak cabinet, wall-hung toilet under an oak cabinet with a lit niche, long oak vanity ----
@@ -1885,6 +1896,12 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let X = -215; X < PARTY; X += 14) B(p, X, -625, X + 10, -615, 40, 170, M.fence);
   B(p, -230, -630, -210, 1440, -15, 40, M.stone);
   for (let Y = -625; Y < 1440; Y += 14) B(p, -225, Y, -215, Y + 10, 40, 150, M.fence);
+  // garden lights: low bollards that glow at night
+  for (const [X, Y] of [[200, -60], [610, -60], [200, -200], [610, -200], [-80, 900], [-80, 1080], [300, 1100]]) {
+    CY(p, X, Y, 5, -15, 45, M.alu, 0, 12); const h = CY(p, X, Y, 5.4, 38, 44, M.lampHead, 0, 12);
+  }
+  // raised planters with flowers along the back fence
+  for (const X0 of [-150, 150, 450]) { B(p, X0, -608, X0 + 160, -580, -15, 30, M.wood); for (let x = X0 + 10; x < X0 + 155; x += 18) { const f = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.11, 1), rnd() > .5 ? M.flower : M.shrub)); f.position.set(wx(x), .38, wz(-594)); p.add(f); } }
   // garden planting
   const olive = (X, Y, s) => {
     const g = local(p, X, Y, GROUND); const tk = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.1 * s, .2 * s, 1.7 * s, 7), M.trunk)); tk.position.y = .85 * s; tk.rotation.z = .12; g.add(tk);
