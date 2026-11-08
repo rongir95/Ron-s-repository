@@ -617,6 +617,7 @@ const M = {
   plaster: std({ map: T.plaster, roughness: .95 }),
   interior: std({ color: 0xf6f6f4, roughness: .95 }),
   slate: std({ map: T.slate, roughness: .6 }),
+  screen: std({ color: 0x0b0d10, roughness: .08, metalness: .3, envMapIntensity: 1.2 }),
   skirt: std({ color: 0x75787a, roughness: .45 }),
   lamDark: std({ map: T.lamDark, roughness: .7, envMapIntensity: .12 }),
   lamGrey: std({ map: T.lamGrey, roughness: .7, envMapIntensity: .12 }),
@@ -982,7 +983,7 @@ const I = (a, b, ops = [], t = 12, extra = {}) => wall(F[0].shell, a, b, Object.
   opening(before, a, 0, -1, Math.PI / 2, W(121, 75, 102, 210), o);
   opening(after, a, 0, -1, Math.PI / 2, W(121, 160, 60, 220), o);
   B(before, 76, 140, 83, 222, 208, 215, M.shade, 0); B(before, 76.5, 143, 78, 219, 178, 208, M.shade, 0);
-  B(after, 76, 98, 83, 222, 222, 229, M.shade, 0); B(after, 76.5, 101, 78, 219, 200, 222, M.shade, 0);
+  B(after, 76, 96, 83, 264, 222, 229, M.shade, 0); B(after, 76.5, 99, 78, 261, 200, 222, M.shade, 0);
   // split AC unit above the enlarged window
   { const ac = B(after, 75.5, 122, 96, 210, 236, 266, M.white, 0); onWall(ac, 0, 236, 266);
     onWall(B(after, 96, 126, 96.6, 206, 238, 243, M.alu, 0), 0, 238, 243); }
@@ -1116,9 +1117,23 @@ function vanity(p, base, r, basinAt) {
   CY(p, basinAt[0], basinAt[1], 19, 86, 99, M.ceramic, base, 28, 15);
   CY(p, basinAt[0], basinAt[1], 16, 98.5, 99.5, M.water, base);
 }
+const LEAF_GEO = (() => { const g = new THREE.SphereGeometry(1, 10, 6); g.scale(.045, .006, .12); g.translate(0, 0, .11); return g; })();
+const LEAF_MATS = [0x4f7a3a, 0x5f8a44, 0x3f6a32, 0x6a9a4c].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: .6, side: THREE.DoubleSide }));
 function plant(p, base, X, Y, s = 1) {
-  CY(p, X, Y, 16 * s, 0, 38 * s, M.pot, base, 18, 12 * s);
-  for (let i = 0; i < 4; i++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.2 * s, 0), M.leaf)); m.position.set(wx(X) + (rnd() - .5) * .2 * s, base + (.55 + i * .17) * s, wz(Y) + (rnd() - .5) * .2 * s); m.scale.y = 1.3; p.add(m); }
+  CY(p, X, Y, 15 * s, 0, 36 * s, M.pot, base, 28, 11 * s);
+  CY(p, X, Y, 15.6 * s, 34 * s, 38 * s, M.pot, base, 28, 15.6 * s);
+  CY(p, X, Y, 14 * s, 35 * s, 36 * s, std({ color: 0x3a2a1e, roughness: 1 }), base, 20);
+  const g = new THREE.Group(); g.position.set(wx(X), base + .36 * s, wz(Y)); p.add(g);
+  const n = Math.round(9 * s + 4);
+  for (let i = 0; i < n; i++) {
+    const h = (.25 + rnd() * .55) * s, a = rnd() * Math.PI * 2, lean = .15 + rnd() * .35;
+    const st = new THREE.Mesh(new THREE.CylinderGeometry(.004, .006, h, 5), M.trunk); st.position.set(Math.cos(a) * lean * h * .5, h / 2, Math.sin(a) * lean * h * .5); st.rotation.set(Math.sin(a) * lean, 0, -Math.cos(a) * lean); g.add(st);
+    for (let k = 0; k < 3; k++) {
+      const lf = new THREE.Mesh(LEAF_GEO, LEAF_MATS[(rnd() * 4) | 0]); lf.castShadow = true;
+      const t = .5 + k * .25; lf.position.set(Math.cos(a) * lean * h * t, h * t, Math.sin(a) * lean * h * t);
+      lf.rotation.set(-.5 - rnd() * .6, a + (rnd() - .5) * 2.2, 0); lf.scale.setScalar((.8 + rnd() * .5) * s); g.add(lf);
+    }
+  }
 }
 function wardrobe(p, base, r, horizontal) {
   B(p, ...r, 0, 235, M.cabinet, base);
@@ -1144,7 +1159,7 @@ function desk(p, base, r, chairAt, faceTo) {
   // TV wall on the garden-side (north) wall, right of the slider: ochre panel, white board, floating white console
   onWall(B(p, 540, 47.5, 735, 48.5, 75, 262, M.ochre, b), b, 75, 262);
   onWall(B(p, 560, 47.5, 715, 51.5, 75, 192, M.white, b), b, 75, 192);
-  onWall(B(p, 565, 51.5, 710, 55.5, 98, 182, M.black, b), b, 98, 182);
+  onWall(B(p, 565, 51.5, 710, 55.5, 98, 182, M.black, b), b, 98, 182); onWall(B(p, 567, 55.5, 708, 55.8, 100, 180, M.screen, b), b, 100, 180);
   B(p, 530, 47.5, 745, 88, 22, 62, M.white, b);
   for (const [x0, x1] of [[536, 586], [592, 664], [670, 739]]) B(p, x0, 88, x1, 88.8, 28, 56, std({ color: 0xd9d6cf, roughness: .8 }), b);
   for (const [x, h, m] of [[545, 10, M.pot], [610, 6, M.black], [640, 12, M.linen], [690, 9, M.duvetD]]) B(p, x, 60, x + 12, 75, 28, 28 + h, m, b);
@@ -1162,7 +1177,10 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let k = 0; k < 2; k++) RB(p, 695, 220 + k * 59, 752, 275 + k * 59, 42, 50, M.leather, b, .04);
   for (let k = 0; k < 3; k++) RB(p, 535 + k * 52, 338, 583 + k * 52, 396, 42, 50, M.leather, b, .04);
   for (let k = 0; k < 3; k++) RB(p, 760, 222 + k * 60, 774, 272 + k * 60, 78, 98, M.leather, b, .04);
-  RB(p, 735, 222, 754, 248, 48, 72, M.duvetB, b, .05); RB(p, 735, 370, 754, 396, 48, 72, M.duvetD, b, .05);
+  RB(p, 735, 222, 754, 248, 48, 72, M.duvetB, b, .08); RB(p, 735, 370, 754, 396, 48, 72, M.duvetD, b, .08);
+  { const seam = std({ color: 0x9c8c74, roughness: .8 });
+    for (const [x0, y0, x1, y1] of [[694, 276, 753, 277], [536, 337, 537, 397], [587, 337, 588, 397], [639, 337, 640, 397]]) B(p, x0, y0, x1, y1, 50, 50.6, seam, b);
+    for (const [x, y] of [[694, 199], [774, 199], [534, 416], [774, 416], [534, 338], [686, 338]]) B(p, x - 2, y - 2, x + 2, y + 2, 0, 8, M.black, b); }
   // white gloss square coffee table, two tiers
   RB(p, 565, 185, 665, 285, 22, 34, M.white, b, .015); B(p, 575, 195, 655, 275, 0, 22, M.white, b);
   // champagne pendant over the coffee table
@@ -1252,6 +1270,14 @@ function desk(p, base, r, chairAt, faceTo) {
   { const p = kitBefore;
   // sink wall (west): cream gloss base units, light grey quartz top, white glass splashback
   B(p, 16, 320, 76, 699, 10, 88, M.kCream, b); B(p, 16, 318, 79, 699, 88, 92, M.kTop, b);
+  for (let y = 320; y < 699; y += 30) B(p, 76, y - .2, 76.5, y + .2, 10, 88, M.black, b);
+  B(p, 76, 320, 76.5, 699, 48.8, 49.2, M.black, b);
+  // on the counter: kettle, fruit bowl, cutting board, coffee machine, dish soap by the sink
+  CY(p, 40, 610, 8, 92, 113, M.steel, b, 18, 9); CY(p, 40, 610, 3, 113, 116, M.black, b, 10);
+  CY(p, 50, 440, 13, 92, 98, M.white, b, 24, 8); for (const [dx, dy, c] of [[-4, -2, 0xd8a03a], [3, 3, 0xb83a2a], [2, -5, 0x9ab04a], [-2, 5, 0xd8a03a]]) { const f = new THREE.Mesh(new THREE.SphereGeometry(.04, 12, 8), std({ color: c, roughness: .5 })); f.position.set(wx(50 + dx), b + 1.0, wz(440 + dy)); p.add(f); }
+  B(p, 18, 545, 21, 585, 92, 128, M.oak, b);
+  B(p, 22, 655, 52, 680, 92, 128, M.black, b); B(p, 30, 662, 44, 672, 98, 104, M.steel, b);
+  CY(p, 30, 535, 2.5, 92, 112, std({ color: 0x8fb34a, roughness: .2, transparent: true, opacity: .85 }), b, 10);
   B(p, 18, 320, 74, 699, 0, 10, M.skirt, b);
   for (let y = 320; y < 690; y += 60) {
     if (y + 30 > 545 && y + 30 < 605) continue;
@@ -1604,8 +1630,8 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 470, 760, 530, 1022, 0, 250, M.wenge, b);
   for (const z of [40, 80, 120, 160, 200]) B(p, 529, 762, 531, 860, z, z + 2, M.black, b);
   B(p, 530, 860, 531.5, 1020, 2, 248, std({ color: 0xd9d4ca, roughness: .4 }), b); B(p, 530, 939, 532, 941, 2, 248, M.wenge, b);
-  B(p, 716, 627, 776, 668, 0, 52, M.wenge, b);
-  onWall(B(p, 722, 627, 772, 660, 145, 190, M.wenge, b), b, 145, 190);
+  B(p, 656, 627, 776, 668, 0, 52, M.wenge, b); B(p, 715.7, 667.9, 716.3, 668.4, 2, 50, M.black, b);
+  onWall(B(p, 662, 627, 772, 660, 145, 190, M.wenge, b), b, 145, 190);
   onWall(B(p, 722, 1022, 758, 1024, 148, 175, std({ color: 0x3f6b8c, roughness: .6 }), b), b, 148, 175);
   onWall(B(p, 560, 1018, 712, 1021, 236, 239, M.black, b), b, 236, 239);
   for (let x = 563; x < 710; x += 6) { const m = new THREE.Mesh(UNIT, M.sheer); m.scale.set(.065, 1.85, .006); m.position.set(wx(x + 3), b + 1.43, wz(1015 - ((x / 6) % 2) * 2)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); m.renderOrder = 3; p.add(m); onWall(m, b, 50, 236); }
