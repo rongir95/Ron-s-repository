@@ -1082,21 +1082,36 @@ function bed(p, base, [X0, Y0, X1, Y1], head, duvet) {
   RB(p, X0 + 2, Y0 + 2, X1 - 2, Y1 - 2, 30, 52, M.linen, base, .05);
   const horiz = head === 'W' || head === 'E', len = horiz ? X1 - X0 : Y1 - Y0, wid = horiz ? Y1 - Y0 : X1 - X0;
   const sub = (a, b, inset = 1) => head === 'W' ? [X0 + a, Y0 + inset, X0 + b, Y1 - inset] : head === 'E' ? [X1 - b, Y0 + inset, X1 - a, Y1 - inset] : head === 'N' ? [X0 + inset, Y0 + a, X1 - inset, Y0 + b] : [X0 + inset, Y1 - b, X1 - inset, Y1 - a];
-  RB(p, ...sub(58, len + 3, -3), 47, 57, duvet, base, .05);
-  RB(p, ...sub(58, 80, -3.5), 55, 59, M.linen, base, .02);
+  const D = sub(58, len + 3, -3);
+  RB(p, ...D, 47, 57, duvet, base, .05);
+  // duvet draping over both long sides and the foot
+  const [a0, b0, a1, b1] = D;
+  if (horiz) { RB(p, a0, b0 - 1.5, a1, b0 + .5, 24, 56, duvet, base, .008); RB(p, a0, b1 - .5, a1, b1 + 1.5, 24, 56, duvet, base, .008);
+    head === 'W' ? RB(p, a1 - .5, b0 - 1, a1 + 1.5, b1 + 1, 24, 56, duvet, base, .008) : RB(p, a0 - 1.5, b0 - 1, a0 + .5, b1 + 1, 24, 56, duvet, base, .008); }
+  else { RB(p, a0 - 1.5, b0, a0 + .5, b1, 24, 56, duvet, base, .008); RB(p, a1 - .5, b0, a1 + 1.5, b1, 24, 56, duvet, base, .008);
+    head === 'N' ? RB(p, a0 - 1, b1 - .5, a1 + 1, b1 + 1.5, 24, 56, duvet, base, .008) : RB(p, a0 - 1, b0 - 1.5, a1 + 1, b0 + .5, 24, 56, duvet, base, .008); }
+  RB(p, ...sub(58, 80, -3.5), 55, 59.5, M.linen, base, .02);
+  // bed legs
+  for (const [x, y] of [[X0 + 4, Y0 + 4], [X1 - 4, Y0 + 4], [X0 + 4, Y1 - 4], [X1 - 4, Y1 - 4]]) B(p, x - 2, y - 2, x + 2, y + 2, 0, 6, M.black, base);
   const n = wid > 140 ? 2 : 1, seg = (wid - 12) / n;
   for (let i = 0; i < n; i++) {
     const c0 = 6 + i * seg + 2, c1 = 6 + (i + 1) * seg - 2;
     const r = head === 'W' ? [X0 + 8, Y0 + c0, X0 + 48, Y0 + c1] : head === 'E' ? [X1 - 48, Y0 + c0, X1 - 8, Y0 + c1] : head === 'N' ? [X0 + c0, Y0 + 8, X0 + c1, Y0 + 48] : [X0 + c0, Y1 - 48, X0 + c1, Y1 - 8];
-    RB(p, ...r, 51, 65, M.white, base, .06);
+    RB(p, ...r, 51, 64, M.white, base, .065);
+    const r2 = head === 'W' ? [r[0] + 10, r[1] + 3, r[2] + 8, r[3] - 3] : head === 'E' ? [r[0] - 8, r[1] + 3, r[2] - 10, r[3] - 3] : head === 'N' ? [r[0] + 3, r[1] + 10, r[2] - 3, r[3] + 8] : [r[0] + 3, r[1] - 8, r[2] - 3, r[3] - 10];
+    RB(p, ...r2, 58, 70, duvet, base, .065);
   }
   const hb = head === 'W' ? [X0 - 7, Y0 - 4, X0, Y1 + 4] : head === 'E' ? [X1, Y0 - 4, X1 + 7, Y1 + 4] : head === 'N' ? [X0 - 4, Y0 - 7, X1 + 4, Y0] : [X0 - 4, Y1, X1 + 4, Y1 + 7];
   RB(p, ...hb, 0, 105, M.headboard, base, .025);
+  // upholstered headboard: two padded panels
+  const hp = head === 'W' ? [X0 - 1, Y0 + 2, X0 + 1, Y1 - 2] : head === 'E' ? [X1 - 1, Y0 + 2, X1 + 1, Y1 - 2] : head === 'N' ? [X0 + 2, Y0 - 1, X1 - 2, Y0 + 1] : [X0 + 2, Y1 - 1, X1 - 2, Y1 + 1];
+  RB(p, ...hp, 60, 100, M.headboard, base, .01);
 }
 function chair(p, base, X, Y, toX, toY, mat = M.oak, seatMat = M.fabric2) {
   const g = local(p, X, Y, base, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y)));
-  lb(g, .44, .05, .44, 0, .45, 0, seatMat); lb(g, .44, .42, .04, 0, .68, -.2, mat);
-  for (const [a, b] of [[-.19, -.19], [.19, -.19], [-.19, .19], [.19, .19]]) lb(g, .035, .45, .035, a, .225, b, mat);
+  const seat = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.44, .06, .44, 3, .02), seatMat)); seat.position.set(0, .46, 0); g.add(seat);
+  const back = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.42, .36, .035, 3, .012), mat)); back.position.set(0, .7, -.2); back.rotation.x = -.1; g.add(back);
+  for (const [a, b] of [[-.19, -.19], [.19, -.19], [-.19, .19], [.19, .19]]) { const l = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.013, .018, .45, 8), mat)); l.position.set(a, .225, b); g.add(l); }
 }
 function toilet(p, base, X, Y, toX, toY) {
   const g = local(p, X, Y, base, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y)));
@@ -1141,6 +1156,12 @@ function wardrobe(p, base, r, horizontal) {
   for (let i = 1; i < n; i++) {
     if (horizontal) B(p, X0 + (X1 - X0) * i / n - .4, Y0 - .5, X0 + (X1 - X0) * i / n + .4, Y1 + .5, 2, 233, M.black, base);
     else B(p, X0 - .5, Y0 + (Y1 - Y0) * i / n - .4, X1 + .5, Y0 + (Y1 - Y0) * i / n + .4, 2, 233, M.black, base);
+  }
+  // bar handles beside each door split, both faces (only the room-facing one is seen)
+  for (let i = 0; i < n; i++) {
+    const c = (i + .5) / n, off = (i % 2 ? -1 : 1) * .38 / n;
+    if (horizontal) { const x = X0 + (X1 - X0) * (c + off); for (const y of [Y0 - 1.5, Y1]) B(p, x - .6, y, x + .6, y + 1.5, 95, 135, M.steel, base); }
+    else { const y = Y0 + (Y1 - Y0) * (c + off); for (const x of [X0 - 1.5, X1]) B(p, x, y - .6, x + 1.5, y + .6, 95, 135, M.steel, base); }
   }
 }
 function desk(p, base, r, chairAt, faceTo) {
@@ -2097,7 +2118,7 @@ function enterWalk(id) {
   const eye = new THREE.Vector3(wx(ex), F[r.f].base + EYE, wz(ey));
   setWalkControls(true); camera.fov = 70; camera.updateProjectionMatrix();
   flyTo(eye.clone().sub(look.normalize().multiplyScalar(.05)), eye, 1.4);
-  document.getElementById('card').hidden = true;
+  document.getElementById('card').hidden = true; ROOMS.forEach(q => q.mesh.material = q.baseMat);
   document.getElementById('walkName').textContent = r.name; document.getElementById('walkBar').hidden = false;
   document.getElementById('hint').textContent = 'גרירה להסתובבות · לחיצה על הרצפה למעבר לשם · לחיצה על דלת לכניסה לחדר · לחיצה על המדרגות לקומה השנייה · Esc ליציאה';
 }
@@ -2179,7 +2200,8 @@ function selectRoom(id, fly) {
   if (!id) { card.hidden = true; return; }
   const r = ROOMS.find(q => q.id === id);
   if (!r.hl) { r.hl = r.baseMat.clone(); r.hl.emissive = new THREE.Color(0x2f6fb0); r.hl.emissiveIntensity = .35; }
-  r.mesh.material = r.hl; r.el.classList.add('on');
+  if (!focus && !walking) r.mesh.material = r.hl; // no blue tint on the floor in the single-room or standing views
+  r.el.classList.add('on');
   document.getElementById('cFloor').textContent = r.f === 0 ? 'קומת קרקע' : 'קומה א׳';
   document.getElementById('cName').textContent = r.name;
   document.getElementById('cDims').textContent = `${r.dims[0]} × ${r.dims[1]} ס״מ`;
