@@ -665,6 +665,9 @@ const M = {
   screen: std({ color: 0x0b0d10, roughness: .08, metalness: .3, envMapIntensity: 1.2 }),
   switchPlate: std({ color: 0xf7f6f2, roughness: .4 }),
   switchKey: std({ color: 0xe8e6e0, roughness: .35 }),
+  shutter: std({ map: (() => { const c = document.createElement('canvas'); c.width = 16; c.height = 128; const x = c.getContext('2d');
+    for (let y = 0; y < 128; y += 8) { const gr = x.createLinearGradient(0, y, 0, y + 8); gr.addColorStop(0, '#9a8a74'); gr.addColorStop(.6, '#7a6a56'); gr.addColorStop(1, '#4a3e32'); x.fillStyle = gr; x.fillRect(0, y, 16, 8); }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapT = THREE.RepeatWrapping; t.repeat.set(1, 3); return t; })(), roughness: .6, side: THREE.DoubleSide }),
   skirt: std({ color: 0x75787a, roughness: .45 }),
   lamDark: std({ map: T.lamDark, roughness: .7, envMapIntensity: .12 }),
   lamGrey: std({ map: T.lamGrey, roughness: .7, envMapIntensity: .12 }),
@@ -1015,6 +1018,7 @@ function opening(p, a, ux, uy, theta, op, o) {
     if (w > 1.0) lb(g, 0.045, hgt - 2 * fw, 0.06, 0, s + hgt / 2, fz, M.alu);
     // roller-shutter box, a staple of Israeli windows
     lb(g, w, 0.16, t * .55, 0, hd + 0.08, -os * t * 0.15, M.trim).castShadow = false;
+    { const sd = Math.min(hgt * .3, .45); const sh = new THREE.Mesh(new THREE.PlaneGeometry(w - 2 * fw, sd), M.shutter); sh.position.set(0, hd - fw - sd / 2, os * (t / 2 - .015)); if (os < 0) sh.rotation.y = Math.PI; g.add(sh); }
   }
   if (op.type !== 'front' && op.type !== 'utility') { const hy = op.type === 'slide' ? 1.05 : s + hgt * .5; lb(g, .022, .14, .025, (op.type === 'slide' ? .05 : w / 2 - fw - .03), hy, fz - os * .055, M.black); }
   if (s > 0) { lb(g, w + 0.08, 0.04, 0.09, 0, s - 0.02, os * (t / 2 + 0.03), M.sillStone); lb(g, w, 0.025, 0.07, 0, s - 0.012, -os * (t / 2 - 0.02), M.sillStone); }
@@ -1786,7 +1790,11 @@ function desk(p, base, r, chairAt, faceTo) {
   { const p = bedBefore; panelTarget = bedBefore;
   panel(94.5, 19.5, 95.5, 309, 7, 274, M.wallpaper2);
   bed(p, b, [96, 76, 306, 256], 'W', M.bedspread);
-  B(p, 96, 262, 140, 304, 0, 52, M.grayWood, b); CY(p, 118, 283, 9, 52, 80, M.linen, b, 16, 6);
+  B(p, 96, 262, 140, 304, 4, 52, M.grayWood, b); B(p, 98, 264, 138, 302, 0, 4, M.black, b);
+  B(p, 140, 264, 140.6, 302, 27.7, 28.3, M.black, b); for (const z of [16, 40]) B(p, 140.4, 278, 141.6, 288, z - .8, z + .8, M.steel, b);
+  { const lp = new THREE.LatheGeometry([[0, 0], [.06, 0], [.065, .02], [.03, .05], [.045, .14], [.035, .2], [.012, .22], [.012, .26], [0, .26]].map(([x, y]) => new THREE.Vector2(x, y)), 24);
+    const base = shadowy(new THREE.Mesh(lp, std({ color: 0xece6da, roughness: .3 }))); base.position.set(wx(118), b + .52, wz(283)); p.add(base);
+    const shade = new THREE.Mesh(new THREE.CylinderGeometry(.09, .13, .17, 24, 1, true), std({ color: 0xf2ece0, roughness: 1, side: THREE.DoubleSide, emissive: 0x2a2010, emissiveIntensity: .2 })); shade.position.set(wx(118), b + .52 + .3, wz(283)); p.add(shade); }
   // light grey-wood chest of drawers on the east wall, rustic square clock above it, standing oval mirror
   B(p, 406, 125, 452, 235, 0, 102, M.grayWood, b);
   for (let k = 1; k < 5; k++) B(p, 405.5, 127, 406, 233, k * 20, k * 20 + .6, M.black, b);
@@ -2264,11 +2272,27 @@ function desk(p, base, r, chairAt, faceTo) {
   // car in the parking bay (one of the two spaces)
   for (const [cx, col] of [[40, M.car], [540, null]]) if (col) {
     const g = local(p, cx, 1255, GROUND + .02);
-    const body = shadowy(new THREE.Mesh(new RoundedBoxGeometry(1.8, .62, 4.35, 3, .14), M.car)); body.position.y = .55; g.add(body);
-    const cab = shadowy(new THREE.Mesh(new RoundedBoxGeometry(1.62, .55, 2.3, 3, .16), M.car)); cab.position.set(0, 1.06, -.1); g.add(cab);
-    const gl = new THREE.Mesh(new RoundedBoxGeometry(1.64, .4, 2.1, 2, .1), std({ color: 0x1c2733, roughness: .1, metalness: .3, envMapIntensity: 1.4 })); gl.position.set(0, 1.08, -.1); g.add(gl);
-    for (const [x, z] of [[-.82, 1.35], [.82, 1.35], [-.82, -1.35], [.82, -1.35]]) { const w = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.33, .33, .24, 20), M.tyre)); w.rotation.z = Math.PI / 2; w.position.set(x, .33, z); g.add(w); }
-    for (const x of [-.6, .6]) { const l = new THREE.Mesh(UNIT, M.lampHead); l.scale.set(.3, .08, .02); l.position.set(x, .62, 2.18); g.add(l); }
+    // side profile of a family hatchback, extruded across the width
+    const sh = new THREE.Shape(), P = [[-2.17, .32], [-2.2, .62], [-2.05, .86], [-1.25, .92], [-.75, 1.42], [.55, 1.45], [1.25, .98], [2.05, .88], [2.18, .62], [2.15, .32]];
+    sh.moveTo(P[0][0], P[0][1]); for (const [x, y] of P.slice(1)) sh.lineTo(x, y);
+    for (const cx2 of [1.35, -1.35]) { sh.lineTo(cx2 + .42, .32); sh.absarc(cx2, .33, .42, 0, Math.PI, false); }
+    sh.lineTo(P[0][0], P[0][1]);
+    const bg = new THREE.ExtrudeGeometry(sh, { depth: 1.76, bevelEnabled: true, bevelThickness: .06, bevelSize: .05, bevelSegments: 4, curveSegments: 16 });
+    bg.translate(0, 0, -.88); bg.rotateY(-Math.PI / 2);
+    const body = shadowy(new THREE.Mesh(bg, M.car)); g.add(body);
+    const glassM = std({ color: 0x141c26, roughness: .05, metalness: .4, envMapIntensity: 1.6, side: THREE.DoubleSide });
+    const gs = new THREE.Shape([[-1.15, .96], [-.72, 1.37], [.5, 1.4], [1.12, 1.0]].map(([x, y]) => new THREE.Vector2(x, y)));
+    for (const side of [-1, 1]) { const m = new THREE.Mesh(new THREE.ShapeGeometry(gs), glassM); m.rotation.y = -Math.PI / 2; m.position.x = side * .95; g.add(m); }
+    const ws = new THREE.Mesh(new THREE.PlaneGeometry(1.62, .82), glassM); ws.position.set(0, 1.275, .945); ws.rotation.x = -.98; g.add(ws);
+    const rs = new THREE.Mesh(new THREE.PlaneGeometry(1.55, .68), glassM); rs.position.set(0, 1.225, -1.05); rs.rotation.x = -2.356; g.add(rs);
+    const rim = std({ color: 0xc8ccd0, roughness: .25, metalness: .9 });
+    for (const [x, z] of [[-.82, 1.35], [.82, 1.35], [-.82, -1.35], [.82, -1.35]]) {
+      const w = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.33, .33, .22, 28), M.tyre)); w.rotation.z = Math.PI / 2; w.position.set(x, .33, z); g.add(w);
+      const r2 = new THREE.Mesh(new THREE.CylinderGeometry(.21, .21, .23, 20), rim); r2.rotation.z = Math.PI / 2; r2.position.set(x, .33, z); g.add(r2); }
+    for (const x of [-.98, .98]) { const mr = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.12, .1, .18, 2, .03), M.car)); mr.position.set(x, 1.0, .75); g.add(mr); }
+    for (const x of [-.62, .62]) { const l = new THREE.Mesh(new RoundedBoxGeometry(.32, .1, .04, 2, .02), M.lampHead); l.position.set(x, .72, 2.22); g.add(l);
+      const t = new THREE.Mesh(new RoundedBoxGeometry(.3, .09, .04, 2, .02), std({ color: 0x8a1010, roughness: .3, emissive: 0x300000 })); t.position.set(x, .8, -2.22); g.add(t); }
+    const grille = new THREE.Mesh(new RoundedBoxGeometry(.7, .14, .03, 2, .02), M.black); grille.position.set(0, .55, 2.24); g.add(grille);
   }
   // street lamp + house-number light by the entrance
   {
@@ -2926,6 +2950,17 @@ document.body.appendChild(compass);
     const core = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshStandardMaterial({ color: o.material.color.clone().multiplyScalar(.55), roughness: 1 }));
     core.scale.set(o.scale.x * r * .55, o.scale.y * r * .55, o.scale.z * r * .55); core.position.copy(o.position); core.castShadow = true; im.parent.add(core);
   }
+}
+/* ---------- grass tufts on the lawn strip and the yard ---------- */
+{
+  const blade = new THREE.ConeGeometry(.012, .14, 3); blade.translate(0, .07, 0);
+  const n = 6000, im = new THREE.InstancedMesh(blade, new THREE.MeshStandardMaterial({ color: 0x6f9a48, roughness: .9 }), n), d = new THREE.Object3D(), col = new THREE.Color();
+  let k = 0; const areas = [[-175, -330, 0, 1000, 3000], [-700, -900, 1500, -600, 3000]];
+  for (const [x0, y0, x1, y1, cnt] of areas) for (let i = 0; i < cnt && k < n; i++, k++) {
+    d.position.set(wx(x0 + rnd() * (x1 - x0)), GROUND + (x0 === -175 ? .12 : 0), wz(y0 + rnd() * (y1 - y0)));
+    d.rotation.set((rnd() - .5) * .5, rnd() * 6.28, (rnd() - .5) * .5); d.scale.setScalar(.6 + rnd() * .9); d.updateMatrix(); im.setMatrixAt(k, d.matrix);
+    col.setHSL(.24 + rnd() * .05, .45, .28 + rnd() * .14); im.setColorAt(k, col); }
+  im.count = k; site.add(im);
 }
 const zOutBtn = document.getElementById('zOut');
 // high quality: ambient occlusion (soft contact shadows in corners and under furniture)
