@@ -9,7 +9,7 @@
   --paper: rgba(250,249,245,.88);
   --paper-solid:#faf9f5;
   --ink:#1d2430;
-  --muted:#5d6775;
+  --muted:#3f4752;
   --line:rgba(29,36,48,.14);
   --accent:#5b5ff5;
   --accent-grad:linear-gradient(135deg,#4f8dff,#8b5cf6);
@@ -58,7 +58,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .brand .sub{color:var(--muted);font-size:13px}
 .stats{display:none;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .stat b{display:block;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
-.stat span{font-size:11px;color:var(--muted)}
+.stat span{font-size:11.5px;font-weight:500;color:var(--ink);opacity:.72}
 
 .tools{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px));padding:8px;display:flex;flex-direction:column;gap:4px;min-width:170px}
 .tools h2{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:500;margin:6px 8px 2px}
@@ -214,7 +214,8 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 :root{--glass:linear-gradient(140deg,rgba(255,255,255,.62),rgba(255,255,255,.30));--glass-edge:rgba(255,255,255,.65);--glass-hi:rgba(255,255,255,.9);--glass-shadow:0 10px 40px rgba(20,30,50,.18),0 2px 8px rgba(20,30,50,.08);--track:rgba(118,118,128,.16);--pill:#ffffff;--pill-ink:#1d2430}
 :root[data-night="1"]{--glass:linear-gradient(140deg,rgba(44,52,68,.62),rgba(20,26,38,.42));--glass-edge:rgba(255,255,255,.16);--glass-hi:rgba(255,255,255,.22);--glass-shadow:0 10px 40px rgba(0,0,0,.45);--track:rgba(255,255,255,.1);--pill:rgba(255,255,255,.18);--pill-ink:#fff}
 .panel{background:var(--glass)!important;backdrop-filter:blur(26px) saturate(1.9);-webkit-backdrop-filter:blur(26px) saturate(1.9);border:1px solid var(--glass-edge)!important;box-shadow:inset 0 1px 0 var(--glass-hi),inset 0 -1px 0 rgba(255,255,255,.12),var(--glass-shadow)!important;border-radius:22px}
-.tools{width:184px;min-width:0;padding:7px;gap:2px}
+.tools{width:232px;min-width:0;padding:7px;gap:2px;overflow-x:hidden}
+.tools .seg button{white-space:nowrap;padding:6px 4px}
 .tools .tbtn{font-size:12.5px;padding:7px 8px}
 .views .tbtn{padding:7px 4px}
 .thead{display:flex;align-items:center;gap:6px;margin-bottom:4px}
@@ -293,6 +294,17 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 @media (max-width:760px){.mbtn .ic{display:none}}
 .pinpop .pinx{all:unset;cursor:pointer;font-size:20px;line-height:1;color:var(--muted);padding:2px 6px;position:absolute;top:6px;left:6px;z-index:1}
 .pinpop textarea{margin-top:22px}
+.zoom button{position:relative}
+.zoom button[data-tip]::after{content:attr(data-tip);position:absolute;left:calc(100% + 12px);top:50%;transform:translate(-4px,-50%);white-space:nowrap;padding:6px 10px;border-radius:9px;font:500 12.5px var(--f-ui);color:#fff;background:rgba(29,29,31,.88);box-shadow:0 4px 14px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;z-index:30}
+@media (hover:hover){.zoom button[data-tip]:hover::after{opacity:1;transform:translate(0,-50%)}}
+.zoom button[data-tip]:focus-visible::after{opacity:1;transform:translate(0,-50%)}
+.card .x,.planner .x,.pinpop .pinx,.collapse{box-sizing:border-box;width:28px;height:28px;padding:0!important;display:grid!important;place-items:center;border-radius:50%!important;background:rgba(120,120,128,.18);color:var(--ink)!important;font-size:19px;line-height:1;transition:background .2s,transform .2s}
+.card .x:hover,.planner .x:hover,.pinpop .pinx:hover,.collapse:hover{background:rgba(120,120,128,.3)}
+:root[data-night="1"] .card .x,:root[data-night="1"] .planner .x,:root[data-night="1"] .pinpop .pinx,:root[data-night="1"] .collapse{background:rgba(255,255,255,.14)}
+.card .clink{left:46px!important;top:10px!important}
+.card .x svg{width:15px;height:15px}
+.lbl span{display:none}
+body.tooling .lbl{pointer-events:none}
 body.zshift .zoom{left:var(--zl)!important}
 body.zshift .compass{left:calc(var(--zl) + 62px)!important}
 body.zhide .zoom,body.zhide .compass{opacity:0;pointer-events:none}
@@ -1743,8 +1755,8 @@ function desk(p, base, r, chairAt, faceTo) {
   fridgeFD(p, b);
   B(p, 199, 640, 289, 699, 190, 249, M.kCream, b); handleX(225, 263, 640, 194);
   // breakfast bar in walnut veneer with a waterfall end, running north–south between kitchen and living
-  BU(200, 334, 276, 518, 95, 100, M.veneer, p);
-  BU(200, 510, 276, 518, 0, 95, M.veneer, p);
+  BU(200, 300, 276, 488, 95, 100, M.veneer, p); // north end rests well onto the bordeaux peninsula
+  BU(200, 480, 276, 488, 0, 95, M.veneer, p);
   // bordeaux gloss island with a grey top, at the north end of the bar, reaching towards the living room
   // bordeaux peninsula: runs from the cooktop counter on the west wall eastwards, closing the north end of the kitchen
   // bordeaux peninsula, measured-plan coordinates (body and top together)
@@ -1752,7 +1764,7 @@ function desk(p, base, r, chairAt, faceTo) {
    B(p, 129.7, 352, 130.3, 352.6, 10, 86, M.black, b), B(p, 189.7, 352, 190.3, 352.6, 10, 86, M.black, b), B(p, 69, 352, 220, 352.6, 47.7, 48.3, M.black, b),
    ...[[160, 80], [160, 40], [210, 80], [210, 40]].map(([x, z]) => B(p, x - 15, 352.6, x + 15, 354, z - .8, z + .8, M.steel, b)),
    B(p, 211, 350, 221, 356, 92, 95, M.steel, b)].forEach(m => m.userData.noRemap = true);
-  for (const y of [430, 485]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
+  for (const y of [400, 455]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
   // two white square-frame pendants over the bar
   B(p, 225, 370, 249, 470, 276, 280, M.white, b);
   for (const [y, z] of [[395, 175], [445, 188]]) {
@@ -1793,8 +1805,8 @@ function desk(p, base, r, chairAt, faceTo) {
     for (const x of [244]) B(p, x - .3, 639.4, x + .3, 640, 190, C - 2, M.espresso, b);
     // white peninsula with a white quartz top, light-oak breakfast bar resting on it
     [B(p, 69, 290, 273, 352, 8, 88, M.kWhite, b), B(p, 71, 292, 271, 350, 0, 8, M.kWhite, b), B(p, 69, 286, 281, 356, 88, 92, M.qWhite, b)].forEach(m => m.userData.noRemap = true);
-    BU(200, 334, 276, 518, 95, 100, M.oakLight, p); BU(200, 510, 276, 518, 0, 95, M.oakLight, p);
-    for (const y of [430, 485]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
+    BU(200, 300, 276, 488, 95, 100, M.oakLight, p); BU(200, 480, 276, 488, 0, 95, M.oakLight, p);
+    for (const y of [400, 455]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
     // white dome pendants over the bar
     for (const y of [395, 465]) {
       CY(p, 238, y, .3, 210, 279, M.black, b, 6); CY(p, 238, y, 4, 277, 279, M.white, b, 14);
@@ -2465,8 +2477,9 @@ function desk(p, base, r, chairAt, faceTo) {
     const pv = new THREE.Vector3(wx(735), 0, wz(-290)), Y = new THREE.Vector3(0, 1, 0), a = -Math.PI / 2, shift = new THREE.Vector3(.08, 0, 1.4);
     for (const o of p.children.slice(n0)) { o.position.sub(pv).applyAxisAngle(Y, a).add(pv).add(shift); o.rotation.y += a; } }
   // glass-top table with white garden chairs
-  B(p, 470, -230, 630, -140, 72, 74, M.glass); for (const [x, y] of [[472, -228], [628, -228], [472, -142], [628, -142]]) B(p, x - 2, y - 2, x + 2, y + 2, 0, 72, M.alu);
-  B(p, 470, -230, 630, -226, 68, 72, M.alu); B(p, 470, -144, 630, -140, 68, 72, M.alu);
+  const TX = -80; // moved west, away from the barbecue
+  B(p, 470 + TX, -230, 630 + TX, -140, 72, 74, M.glass); for (const [x, y] of [[472, -228], [628, -228], [472, -142], [628, -142]]) B(p, x + TX - 2, y - 2, x + TX + 2, y + 2, 0, 72, M.alu);
+  B(p, 470 + TX, -230, 630 + TX, -226, 68, 72, M.alu); B(p, 470 + TX, -144, 630 + TX, -140, 68, 72, M.alu);
   const resin = std({ color: 0xf2f2ef, roughness: .45 }), resinDS = resin.clone(); resinDS.side = THREE.DoubleSide;
   const gardenChair = (X, Y, tx, ty) => {
     const g = local(p, X, Y, 0, Math.atan2(wx(tx) - wx(X), wz(ty) - wz(Y)));
@@ -2475,7 +2488,7 @@ function desk(p, base, r, chairAt, faceTo) {
     for (const sx of [-1, 1]) { const arm = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.05, .03, .42, 2, .012), resin)); arm.position.set(sx * .24, .64, 0); g.add(arm);
       for (const sz of [-1, 1]) { const l = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.018, .022, sz < 0 ? .64 : .64, 8), resin)); l.position.set(sx * .22, .32, sz * .19); l.rotation.x = sz * .06; g.add(l); } }
   };
-  for (const [X, Y, tx, ty] of [[510, -110, 510, -185], [590, -110, 590, -185], [510, -260, 510, -185], [650, -185, 550, -185]]) gardenChair(X, Y, tx, ty);
+  for (const [X, Y, tx, ty] of [[510, -110, 510, -185], [590, -110, 590, -185], [510, -260, 510, -185], [650, -185, 550, -185]]) gardenChair(X + TX, Y, tx + TX, ty);
   // retractable awning over the slider, flood lights under it
   { const g = local(p, 406, 12.5, 2.62); lb(g, 3.2, .2, .2, 0, 0, -.1, std({ color: 0xe8e2d4, roughness: .5 }));
     for (const x of [-1.2, 1.2]) lb(g, .1, .15, .3, x, -.15, -.2, std({ color: 0xd8d2c4, roughness: .5 })); }
@@ -2945,6 +2958,8 @@ function setCardNote(t) {
 }
 document.getElementById('cMore').addEventListener('click', () => { const n = document.getElementById('cNote'), m = document.getElementById('cMore'), open = n.classList.toggle('clamp'); m.textContent = open ? 'קראו עוד' : 'פחות'; m.setAttribute('aria-expanded', !open); });
 function cFocusText(t) { const b = document.getElementById('cFocus'), i = b.querySelector('.ic'); b.textContent = t; if (i) b.prepend(i); }
+// hover tooltips on the tool stack (replace the slow native title)
+document.querySelectorAll('.zoom button').forEach(b => { const t = b.getAttribute('title') || b.getAttribute('aria-label'); if (t) { b.dataset.tip = t; b.removeAttribute('title'); } });
 // small line icons for the menus
 {
   const P = {
@@ -3379,7 +3394,8 @@ document.body.appendChild(compass);
   /* ---- tool modes ---- */
   let tool = null;
   // while measuring or pinning the view holds still: no drag-rotate or auto-rotate (wheel zoom and right-drag pan still work)
-  const lockView = on => { controls.enableRotate = !on; controls.autoRotate = !on && state.rotate; if (on) camTween = null; };
+  renderer.domElement.addEventListener('dblclick', e => { if (tool) e.stopImmediatePropagation(); }, true);
+  const lockView = on => { document.body.classList.toggle('tooling', on); controls.enableRotate = !on; controls.autoRotate = !on && state.rotate; if (on) camTween = null; };
   const setTool = t => { tool = tool === t ? null : t; document.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-pressed', b.dataset.tool === tool));
     renderer.domElement.style.cursor = tool ? 'crosshair' : ''; lockView(!!tool);
     if (tool === 'measure') toast('מדידה: לחיצה על שתי נקודות · לחיצה על קיר מראה את שטחו'); if (tool === 'pin') toast('הערה: לחיצה על מקום במודל כדי להצמיד הערה');
@@ -3457,8 +3473,9 @@ document.body.appendChild(compass);
   let dn = null;
   renderer.domElement.addEventListener('pointerdown', e => { dn = [e.clientX, e.clientY]; }, true);
   renderer.domElement.addEventListener('pointerup', e => {
-    if (!tool || !dn || Math.hypot(e.clientX - dn[0], e.clientY - dn[1]) > 10) return;
-    e.stopImmediatePropagation(); const h = surfHit(e); if (!h) return;
+    if (!tool) return; e.stopImmediatePropagation(); // while a tool is on, a click never navigates
+    if (!dn || Math.hypot(e.clientX - dn[0], e.clientY - dn[1]) > 10) return;
+    const h = surfHit(e); if (!h) return;
     if (tool === 'measure') measureClick(h); else { addPin(h.point); tool = null; lockView(false); document.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-pressed', false)); renderer.domElement.style.cursor = ''; }
   }, true);
 
