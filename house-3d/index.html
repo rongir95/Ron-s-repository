@@ -271,7 +271,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   body:has(.tools.min) .zoom,body:has(.tools.min) .compass{bottom:calc(140px + env(safe-area-inset-bottom,0px))!important}
 }
 @media (min-width:761px){.tools:not(.min){max-height:calc(100dvh - 32px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto;scrollbar-width:thin}}
-.ic{display:inline-grid;place-items:center;flex:none;width:18px;height:18px;color:var(--accent);opacity:.9}
+.ic{display:inline-grid;place-items:center;flex:none;width:18px;height:18px;color:var(--ink);opacity:.8}
 .ic svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tbtn:has(>.ic){justify-content:flex-start}
 .tbtn>.sw,.tbtn>.chev{margin-inline-start:auto}
@@ -289,8 +289,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 :root[data-night="1"] .cbtn.alt{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.18);color:var(--ink)}
 .mbtn .ic{color:currentColor;width:16px;height:16px}
 .mbtn .ic svg{width:16px;height:16px}
-.seg button[aria-pressed="true"] .ic,.tabs button[aria-selected="true"] .ic{color:var(--accent)}
-:root[data-night="1"] .ic{color:#9fa2ff}
+.seg button[aria-pressed="true"] .ic,.tabs button[aria-selected="true"] .ic{opacity:1}
 @media (max-width:760px){.mbtn .ic{display:none}}
 .pinpop .pinx{all:unset;cursor:pointer;font-size:20px;line-height:1;color:var(--muted);padding:2px 6px;position:absolute;top:6px;left:6px;z-index:1}
 .pinpop textarea{margin-top:22px}
