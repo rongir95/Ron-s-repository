@@ -3574,7 +3574,7 @@ gtao.updateGtaoMaterial({ radius: .35, distanceExponent: 1.5, thickness: 1, scal
 gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 10, rings: 3, samples: 16 });
 gtao.blendIntensity = .9;
 composer.addPass(gtao); composer.addPass(new OutputPass());
-state.hq = innerWidth > 760; window.__composer = composer;
+state.hq = false; window.__composer = composer; // high quality only when switched on
 { const el = document.getElementById('tHQ'); el.setAttribute('aria-pressed', state.hq); el.addEventListener('click', () => { state.hq = !state.hq; el.setAttribute('aria-pressed', state.hq); }); }
 const clock = new THREE.Clock(); const lastCam = new THREE.Vector3(), lastTgt = new THREE.Vector3(); let stillFrames = 0;
 renderer.setAnimationLoop(() => {
