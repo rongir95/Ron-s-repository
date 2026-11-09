@@ -1360,7 +1360,8 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 17, 333, 64, 407, 160, 166, M.steel, b); B(p, 17, 352, 44, 388, 166, 250, M.concreteDoor, b);   // chimney hood with a concrete-look chimney
   for (const [y0, y1, z1] of [[575, 699, 150], [435, 575, 104]]) B(p, 16.5, y0, 17.5, y1, 92, z1, M.backsplash, b);
   B(p, 16, 698, 136, 699, 92, 150, M.backsplash, b);
-  { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.15, .58), M.printGlass); m.rotation.y = Math.PI / 2; m.position.set(wx(17.6), b + 1.21, wz(377.5)); p.add(m); }
+  { // printed glass splashback behind the hob, running to the north end of the wall (measured-plan coordinates)
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(1.3, .58), M.printGlass); m.rotation.y = Math.PI / 2; m.position.set(wx(25.8), b + 1.21, wz(390)); m.userData.noRemap = true; p.add(m); }
   B(p, 17.5, 592, 19, 632, 132, 136, M.black, b);                                                      // knife rail
   for (let k = 0; k < 4; k++) B(p, 18.5, 596 + k * 9, 19.5, 598 + k * 9, 112, 132, M.steel, b);
   // short run on the south wall with two bordeaux wall cabinets above it
