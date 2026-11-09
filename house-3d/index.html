@@ -952,8 +952,8 @@ function buildOutline(p, poly, opsByEdge, o) {
 
 /* ---------------- house data ---------------- */
 // measured from the sales plans: room sizes as written on the plans, 25 cm outer walls downstairs (40 cm on the south), 30 cm upstairs, 22 cm party wall
-const OUT0 = [[255, 12.5], [PARTY, 12.5], [PARTY, 972], [267.5, 972], [267.5, 842], [115, 693.5], [12.5, 693.5], [12.5, 308.5], [67.5, 308.5], [67.5, 38.5], [255, 38.5]];
-const OUT1 = [[60, 15], [482.5, 15], [482.5, 80], [PARTY, 80], [PARTY, 977], [470, 977], [470, 1031], [95, 1031], [95, 735], [15, 735], [15, 321], [60, 321]];
+const OUT0 = [[255, 12.5], [PARTY, 12.5], [PARTY, 972], [267.5, 972], [267.5, 842], [115, 701], [12.5, 701], [12.5, 312.5], [67.5, 312.5], [67.5, 42.5], [255, 42.5]]; // west side 300 + 417 + 275 = 992 (scanned plan)
+const OUT1 = [[60, 15], [482.5, 15], [482.5, 80], [PARTY, 80], [PARTY, 977], [470, 977], [470, 1031], [95, 1031], [95, 735], [15, 735], [15, 313.5], [60, 313.5]]; // laundry-side recess starts 300 from the north face
 const W = (at, w, sill = 90, head = 220) => ({ type: 'win', at, w, sill, head });
 const D = (at, w = 80, head = 210, hs = 1) => ({ type: 'door', at, w, sill: 0, head, hs }); // hs: which side the handle is on
 const OPS0 = {
@@ -972,8 +972,8 @@ const OPS1 = {
 };
 const ROOMS = [
   { id: 'living', f: 0, name: 'סלון', dims: [510, 397], rect: [270, 25, 780, 422], old: [260, 47.5, 779.5, 425], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט עץ חם, קיר טלוויזיה בטיח בגוון גריז׳ עם מדף אגוז צף ומזנון אגוז תלוי, ספה פינתית בבד בוקלה בהיר עם כריות זית וטרקוטה, שטיח ג׳וטה, שולחן קפה מאגוז ומנורת פאות ברונזה.', note: 'דלת הזזה לחצר עם וילונות וואל, ומימינה על אותו קיר קיר הטלוויזיה עם פאנל חרדל ומזנון לבן צף. ספת עור פינתית בבז׳ לאורך הקיר המשותף, שולחן קפה לבן ומנורה תלויה.' },
-  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [25, 321, 275, 681], old: [16.5, 301, 290, 692.5], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, ארונות אלון עד התקרה בקיר המקרר עם מגדל תנורים ונישה מוארת, ארונות תחתונים לבנים עם משטח לבן, מדפי אלון צפים במקום הקולט, אי לבן עם בר אלון ומנורות כיפה לבנות. בלי הגבס בתקרה.', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, וחלק בורדו שיוצא מקיר הכיריים וסוגר את המטבח מצפון.', spots: true },
-  { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [80, 51, 270, 296], old: [75.5, 47.5, 260, 301], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, בלי הגבס בתקרה, וחלון מוגדל לרוחב 160 ס״מ במקום שבו הייתה דלת המחסן.', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
+  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [25, 325, 275, 685], old: [16.5, 301, 290, 692.5], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, ארונות אלון עד התקרה בקיר המקרר עם מגדל תנורים ונישה מוארת, ארונות תחתונים לבנים עם משטח לבן, מדפי אלון צפים במקום הקולט, אי לבן עם בר אלון ומנורות כיפה לבנות. בלי הגבס בתקרה.', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, וחלק בורדו שיוצא מקיר הכיריים וסוגר את המטבח מצפון.', spots: true },
+  { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [80, 55, 270, 300], old: [75.5, 47.5, 260, 301], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, בלי הגבס בתקרה, וחלון מוגדל לרוחב 160 ס״מ במקום שבו הייתה דלת המחסן.', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
   { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 395], rect: [285, 432, 435, 827], old: [302, 431, 435, 824], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, והנמכת הגבס בתקרה הוסרה (בלי פתח המיזוג), כך שהתקרה גבוהה יותר.', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
   { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [280, 837, 435, 952], old: [294.5, 836, 435, 947.5], mat: 'slate', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק ירוקים בגובה 1.2 מ׳ וצבע לבן מעליהם, ריצוף טרצו, אסלה תלויה עם מיכל סמוי, נישת עץ מוארת מעל האסלה, כיור תלוי קטן ומראה מעוגלת עם תאורה אחורית.', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
   { id: 'mamad', f: 0, name: 'ממ״ד · חדר אחסון', dims: [315, 305], rect: [465, 647, 780, 952], old: [465, 640, 779.5, 947.5], mat: 'tile', note: 'מרחב מוגן דירתי מבטון מזוין שמשמש כחדר אחסון, עם מדפים לאורך הקירות. הכניסה מהמעבר שמתחת למדרגות.' },
@@ -1001,13 +1001,13 @@ const roomMeshes = [];
 /* ground slab + walls */
 const slab0 = offsetPoly(OUT0, 12.5);
 const groundSlab = slab(F[0].shell, slab0, 0, 0.45, M.tile, M.concrete); // its top shows in passages not covered by a room floor
-buildOutline(F[0].shell, OUT0, OPS0, { t: 25, tEdge: { 1: 22, 2: 40, 10: 30 }, base: 0, h: L1 * 100, outMat: M.stone, inMat: M.interior });
+buildOutline(F[0].shell, OUT0, OPS0, { t: 25, tEdge: { 1: 22, 2: 40, 5: 32, 10: 30 }, base: 0, h: L1 * 100, outMat: M.stone, inMat: M.interior });
 const I = (a, b, ops = [], t = 12, extra = {}) => wall(F[0].shell, a, b, Object.assign({ t, base: 0, h: (L1 - .3) * 100, ops, inMat: M.interior }, extra));
 // the former storage room's inner walls were demolished; its space now opens onto the living area
 { // dining window (where the storage door was): 75 cm today, enlarged to 160 cm in the renovation
   const before = new THREE.Group(), after = new THREE.Group(); after.visible = false; F[0].shell.add(before, after);
   renoSets.push({ room: 'dining-window', before, after });
-  const o = { t: 25, base: 0, h: L1 * 100, outSide: -1 }, a = [67.5, 308.5];
+  const o = { t: 25, base: 0, h: L1 * 100, outSide: -1 }, a = [67.5, 312.5];
   const fill = (Y0, Y1, z0, z1) => { onWall(B(before, 55, Y0, 67.5, Y1, z0, z1, M.stone), 0, z0, z1); onWall(B(before, 67.5, Y0, 80, Y1, z0, z1, M.interior), 0, z0, z1); };
   fill(93, 135.5, 60, 220); fill(210.5, 253, 60, 220); fill(135.5, 210.5, 60, 102); fill(135.5, 210.5, 210, 220);
   opening(before, a, 0, -1, Math.PI / 2, W(135.5, 75, 102, 210), o);
@@ -1021,8 +1021,8 @@ const I = (a, b, ops = [], t = 12, extra = {}) => wall(F[0].shell, a, b, Object.
 I([267.5, 832], [450, 832], [D(130, 70, 210, -1)], 10);                 // guest WC
 I([450, 632], [450, 972], [], 30);                                       // safe room, reinforced
 I([450, 632], [PARTY, 632], [D(95, 85)], 30, { h: L1 * 100 });         // full height: under the stair void it meets the upper wall
-I([115, 693.5], [280, 693.5], [], 10);                                   // kitchen / entrance
-I([280, 609], [280, 693.5], [], 10);                                     // corridor along the kitchen
+I([115, 690], [280, 690], [], 10);                                   // kitchen / entrance
+I([280, 609], [280, 690], [], 10);                                     // corridor along the kitchen
 
 /* first floor slab (with stair void) + walls */
 const SLAB1 = [[0, 296], [45, 296], [45, 0], [802, 0], [802, 992], [475, 992], [475, 1046], [80, 1046], [80, 741], [0, 741]];
@@ -1030,7 +1030,7 @@ const VOID1 = [[470, 435], [780, 435], [780, 627], [470, 627]];
 slab(F[1].shell, SLAB1, L1, 0.3, M.parquet, M.slabSide, [VOID1]);
 // white plaster ceiling for the ground floor, just under the slab
 slab(F[1].shell, SLAB1, L1 - 0.299, 0.006, M.ceiling, M.ceiling, [VOID1]);
-buildOutline(F[1].shell, OUT1, OPS1, { t: 30, tEdge: { 1: 25, 3: 22, 5: 10 }, base: L1, h: H2 * 100, outMat: M.plaster, inMat: M.interior });
+buildOutline(F[1].shell, OUT1, OPS1, { t: 30, tEdge: { 1: 25, 3: 22, 5: 10, 10: 27 }, base: L1, h: H2 * 100, outMat: M.plaster, inMat: M.interior });
 // strip of flat roof over the living room, in front of Guy's room
 B(F[1].shell, 495, 0, 802, 65, 0, 1.5, M.cap, L1);
 const J = (a, b, ops = [], t = 12) => wall(F[1].shell, a, b, { t, base: L1, h: H2 * 100, ops, inMat: M.interior });
