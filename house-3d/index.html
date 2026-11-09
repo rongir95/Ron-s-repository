@@ -305,13 +305,18 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .card .x svg{width:15px;height:15px}
 .lbl span{display:none}
 .brand .sub{display:none!important}
+.brand h1{margin-top:14px!important}
+.brand .eyebrow{min-height:28px;display:flex;align-items:center}
 .brand.showstats .sub{display:block!important;margin-top:8px}
 .collapse{transition:background .2s!important}
 @media (min-width:761px){
   .modes{left:auto!important;right:max(16px,env(safe-area-inset-right,0px));transform:none!important}
-  .zoom{bottom:calc(74px + env(safe-area-inset-bottom,0px))!important}
-  .compass{left:calc(max(16px,env(safe-area-inset-left,0px)) + 2px)!important;bottom:calc(18px + env(safe-area-inset-bottom,0px))!important}
-  body.zshift .compass{left:calc(var(--zl) + 2px)!important}
+  .zoom{bottom:calc(18px + env(safe-area-inset-bottom,0px))!important;flex-direction:row;align-items:center}
+  .zoom hr{border-top:0;border-left:1px solid var(--line);margin:6px 0;height:24px}
+  .zoom button[data-tip]::after{left:50%;top:auto;bottom:calc(100% + 12px);transform:translate(-50%,4px)}
+  @media (hover:hover){.zoom button[data-tip]:hover::after{transform:translate(-50%,0)}}
+  .compass{left:calc(max(16px,env(safe-area-inset-left,0px)) + 196px)!important;bottom:calc(20px + env(safe-area-inset-bottom,0px))!important}
+  body.zshift .compass{left:calc(var(--zl) + 196px)!important}
   .card{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 }
 body.tooling .lbl{pointer-events:none}
@@ -380,6 +385,7 @@ body.zhide .zoom,body.zhide .compass{opacity:0;pointer-events:none}
     <button class="tbtn" id="tNight" aria-pressed="false">תאורת לילה <span class="sw"></span></button>
     <button class="tbtn" id="tLabels" aria-pressed="true">שמות חדרים <span class="sw"></span></button>
     <button class="tbtn" id="tNeighbor" aria-pressed="true">יחידה שכנה A-2 <span class="sw"></span></button>
+    <button class="tbtn" id="tCars" aria-pressed="true">מכוניות <span class="sw"></span></button>
     <button class="tbtn" id="tRotate" aria-pressed="false">סיבוב אוטומטי <span class="sw"></span></button>
     <button class="tbtn" id="tHQ" aria-pressed="true">איכות גבוהה <span class="sw"></span></button>
     <h2>שכבות</h2>
@@ -496,7 +502,7 @@ const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(s
 
 /* ---------------- renderer / scene ---------------- */
 const stage = document.getElementById('stage');
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', logarithmicDepthBuffer: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
@@ -806,6 +812,19 @@ T.herring = (() => {
   for (let j = -3; j <= 3; j++) for (let k = -P; k < 2 * P; k++) { const ox = j * L, oy = -j * L; plank(k + ox, k + oy, L, 1); plank(k + L + ox, k + 1 - L + oy, 1, L); }
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1 / 1.2, 1 / 1.2); t.rotation = Math.PI / 4; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
 })();
+// split-face ledgestone wallpaper, drawn so it tiles with no visible seams (stones wrap across the edges)
+T.ledge = (() => { const S = 1024, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d'); let sd = 9127; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647; // own generator, so the rest of the seeded scene is unchanged
+  g.fillStyle = '#9a958d'; g.fillRect(0, 0, S, S);
+  const rows = []; let y = 0; while (y < S) { const h = Math.min(S - y, 22 + ((r() * 4) | 0) * 8); rows.push([y, h]); y += h; }
+  if (rows.length > 1 && rows[rows.length - 1][1] < 18) { const l = rows.pop(); rows[rows.length - 1][1] += l[1]; }
+  for (const [y0, h] of rows) { let x = r() * S, end = x + S;
+    while (x < end) { const w = Math.min(end - x, 90 + r() * 260), l = 62 + r() * 22, hue = 30 + r() * 14, sat = 4 + r() * 9;
+      for (const ox of [0, -S]) { const X = x + ox; if (X + w < 0 || X > S) continue;
+        const gr = g.createLinearGradient(0, y0, 0, y0 + h); gr.addColorStop(0, hsl(hue, sat, l + 6)); gr.addColorStop(1, hsl(hue, sat, l - 8));
+        g.fillStyle = gr; g.fillRect(X + 1.5, y0 + 1.5, w - 3, h - 3);
+        for (let k = 0; k < w * h / 60; k++) { g.fillStyle = `rgba(${r() < .5 ? '40,36,30' : '255,252,245'},${.05 + r() * .08})`; g.fillRect(X + r() * w, y0 + r() * h, 2 + r() * 9, 1 + r() * 2); } }
+      x += w; } }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1 / 1.2, 1 / 1.2); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t; })();
 T.tealStack = canvasTex(512, (g, s) => {
   g.fillStyle = '#dfe2df'; g.fillRect(0, 0, s, s); const tw = s / 8, th = s / 2;
   for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) { const l = 34 + (rnd() - .5) * 5; const gr = g.createLinearGradient(i * tw, 0, i * tw + tw, 0); gr.addColorStop(0, hsl(178, 30, l + 3)); gr.addColorStop(1, hsl(178, 30, l - 2)); g.fillStyle = gr; g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3); }
@@ -938,7 +957,7 @@ const M = {
   treadWood: std({ map: T.tread, roughness: .45 }),
   railing: std({ color: 0x8c9094, roughness: .45, metalness: .5 }),
   hallTile: std({ map: T.tile, roughness: .4 }),
-  stoneStrip: std({ map: photoTex(PHOTO_BRICK, 1 / 1.1, 1 / 1.1), roughness: .85 }),
+  stoneStrip: std({ map: T.ledge, roughness: .85 }),
   sheer: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false }),
   champagne: std({ color: 0xd8ccb4, roughness: .35, metalness: .6 }),
   kCream: std({ color: 0xece3d1, roughness: .2, envMapIntensity: .7 }),
@@ -1386,7 +1405,7 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
   // as in the photos: solid white stairs with dark wenge treads and grey metal railings
   for (let i = 0; i < 9; i++) { // flight 1
     const xa = 452 + i * tr, top = (i + 1) * R;
-    if (xa + tr > 590) { B(p, xa, 430, xa + tr, 434, 0, top - 4, M.interior); B(p, xa, 434, xa + tr, 521, top - 14, top - 4, M.interior); } else B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.treadWood).userData.stair = true;
+    if (xa + tr > 590) { B(p, xa, 430, xa + tr, 434, 0, top - 4, M.interior); B(p, xa, 434, xa + tr, 521, top - R - 2, top - 4, M.interior); } else B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.treadWood).userData.stair = true;
   }
   // landing block, with an open storage recess cut into it from the passage side
   B(p, 700, 430, 778, 434, 0, 9 * R - 4, M.interior); B(p, 700, 616, 778, 618, 0, 9 * R - 4, M.interior);
@@ -2591,7 +2610,7 @@ function desk(p, base, r, chairAt, faceTo) {
   // car in the parking bay (one of the two spaces)
   // two cars: a white compact electric SUV (Kona Electric proportions) and a dark-grey hatchback (i30 proportions)
   const carModel = (cx, cy, spec) => {
-    const g = local(p, cx, cy, GROUND + .02);
+    const g = local(p, cx, cy, GROUND + .02); (globalThis.__cars ||= []).push(g);
     const paint = std({ color: spec.color, roughness: .18, metalness: .45, envMapIntensity: 1.3 });
     const glassM = std({ color: 0x10161e, roughness: .04, metalness: .5, envMapIntensity: 1.8, side: THREE.DoubleSide });
     const clad = std({ color: 0x1b1c1f, roughness: .7 }), chrome = std({ color: 0xd8dbe0, roughness: .12, metalness: 1 });
@@ -2980,6 +2999,7 @@ const tog = (id, key, fn) => { const el = document.getElementById(id); el.addEve
 tog('tNight', 'night', applyNight);
 tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
+state.cars = true; tog('tCars', 'cars', () => (globalThis.__cars || []).forEach(c => c.visible = state.cars));
 tog('tRotate', 'rotate', () => controls.autoRotate = state.rotate);
 document.getElementById('cardX').addEventListener('click', () => selectRoom(null));
 // room note: two lines, with "read more"
@@ -3029,7 +3049,7 @@ document.querySelectorAll('.zoom button').forEach(b => { const t = b.getAttribut
   };
   const add = (el, k) => { if (!el || el.querySelector(':scope>.ic')) return; const i = document.createElement('span'); i.className = 'ic'; i.setAttribute('aria-hidden', 'true'); i.innerHTML = `<svg viewBox="0 0 24 24">${P[k]}</svg>`; el.prepend(i); };
   const q = s => document.querySelector(s);
-  [['#tNight', 'night'], ['#tLabels', 'labels'], ['#tNeighbor', 'neighbor'], ['#tRotate', 'rotate'], ['#tHQ', 'hq'], ['#tPins', 'pin'], ['#tElec', 'elec'], ['#tPlumb', 'plumb'], ['#tTour', 'tour'], ['#tDash', 'dash'], ['#tPlanner', 'planner'],
+  [['#tNight', 'night'], ['#tLabels', 'labels'], ['#tNeighbor', 'neighbor'], ['#tCars', 'car'], ['#tRotate', 'rotate'], ['#tHQ', 'hq'], ['#tPins', 'pin'], ['#tElec', 'elec'], ['#tPlumb', 'plumb'], ['#tTour', 'tour'], ['#tDash', 'dash'], ['#tPlanner', 'planner'],
    ['[data-view=street]', 'street'], ['[data-view=garden]', 'garden'], ['[data-view=top]', 'top'], ['[data-view=iso]', 'iso'], ['[data-walkout=garden]', 'walk'], ['[data-walkout=front]', 'car'],
    ['[data-tab=view]', 'eye'], ['[data-tab=set]', 'gear'], ['[data-reno=before]', 'before'], ['[data-reno=after]', 'after'], ['[data-reno=split]', 'split'],
    ['[data-mode=full]', 'full'], ['[data-mode=ground]', 'ground'], ['[data-mode=first]', 'first'], ['[data-mode=exploded]', 'exploded'],
