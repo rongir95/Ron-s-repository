@@ -1687,9 +1687,11 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let x = 558; x < 720; x += 6) { const m = new THREE.Mesh(UNIT, M.sheer); m.scale.set(.065, 1.8, .006); m.position.set(wx(x + 3), b + 1.42, wz(68 + ((x / 6) % 2) * 2)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); m.renderOrder = 3; p.add(m); onWall(m, b, 52, 232); }
   { const g = new THREE.Mesh(new THREE.IcosahedronGeometry(.22, 0), new THREE.MeshStandardMaterial({ color: 0xffffff, wireframe: true })); g.position.set(wx(622), b + 2.15, wz(235)); p.add(g); CY(p, 622, 235, .3, 237, 274, M.white, b, 6); }
   // tall concrete-look wardrobe against the south wall, just past the door swing, its doors facing the doorway
-  B(p, 542, 341, 720, 403, 0, 255, M.concreteDoor, b);
-  for (const x of [601, 660]) B(p, x - .3, 340.4, x + .3, 341, 2, 253, M.black, b);
-  for (const x of [596, 606, 655, 665]) B(p, x - .6, 338.5, x + .6, 341, 100, 140, M.steel, b);
+  { // measured-plan coordinates: against the south wall, past the door swing
+    const w = [B(p, 540, 362, 718, 424, 0, 255, M.concreteDoor, b)];
+    for (const x of [599, 658]) w.push(B(p, x - .3, 361.4, x + .3, 362, 2, 253, M.black, b));
+    for (const x of [594, 604, 653, 663]) w.push(B(p, x - .6, 359.5, x + .6, 362, 100, 140, M.steel, b));
+    w.forEach(m => m.userData.noRemap = true); }
   // ---- Ron's room, from the photos: beach mural on the party wall, bed under the window, dark wardrobe on the west wall ----
   { const m = new THREE.Mesh(boxUV(.01, 2.74, 3.98, 0, 0), M.muralRon); m.position.set(wx(779), b + 1.37, wz(825)); onWall(m, b, 0, 274);
     const mb = new THREE.Group(), ma = new THREE.Group(); ma.visible = false; p.add(mb, ma); mb.add(m); renoSets.push({ room: 'bed3-mural', before: mb, after: ma }); // mural removed in the renovation
@@ -1938,6 +1940,7 @@ function desk(p, base, r, chairAt, faceTo) {
     for (const list of groups.values()) { const toward = Math.sin(list[0].rotation.y) > 0; const x = toward ? Math.max(...list.map(g => g.position.x)) : Math.min(...list.map(g => g.position.x)); list.forEach(g => g.position.x = x); }
   }
   for (const r of ROOMS) if (r.eye && r.old) r.eye = [axis(r.eye[0], r.old[0], r.old[2], r.rect[0], r.rect[2]), axis(r.eye[1], r.old[1], r.old[3], r.rect[1], r.rect[3])];
+  ROOMS.find(r => r.id === 'bed2').eye = [640, 330]; // standing point clear of the wardrobe
 }
 /* ---------------- roof ---------------- */
 {
