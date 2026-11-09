@@ -686,6 +686,12 @@ const M = {
   olive: std({ color: 0x6b5a3a, roughness: .95 }),
   wallpaper2: std({ map: T.plaster, color: 0xdccdb2, roughness: .95 }),
   dotGlass: new THREE.MeshStandardMaterial({ color: 0xe9eef0, roughness: .2, transparent: true, opacity: .45, depthWrite: false, side: THREE.DoubleSide }),
+  printGlass: std({ map: (() => { const c = document.createElement('canvas'); c.width = 512; c.height = 256; const g = c.getContext('2d');
+    g.fillStyle = '#f4f2ee'; g.fillRect(0, 0, 512, 256);
+    const blob = (x, y, r, col) => { const gr = g.createRadialGradient(x - r * .3, y - r * .3, r * .1, x, y, r); gr.addColorStop(0, '#fff8'); gr.addColorStop(.3, col); gr.addColorStop(1, '#0003'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 6.3); g.fill(); };
+    blob(90, 150, 55, '#c8202a'); g.fillStyle = '#c8202a'; g.fillRect(80, 60, 20, 50); blob(150, 200, 30, '#e0a020'); blob(40, 210, 26, '#8a3a1a');
+    blob(330, 140, 40, '#d8c070'); blob(390, 120, 30, '#6a4a2a'); blob(430, 170, 34, '#7a3a2a'); g.strokeStyle = '#8a6a3a'; g.lineWidth = 10; g.beginPath(); g.moveTo(360, 40); g.lineTo(420, 120); g.stroke();
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })(), roughness: .08, envMapIntensity: .8 }),
   ochre: std({ color: 0xc19f48, roughness: .85 }),
   leather: std({ color: 0xc4b49c, roughness: .6 }),
   treadWood: std({ map: T.tread, roughness: .45 }),
@@ -1330,17 +1336,18 @@ function desk(p, base, r, chairAt, faceTo) {
   CY(p, 30, 535, 2.5, 92, 112, std({ color: 0x8fb34a, roughness: .2, transparent: true, opacity: .85 }), b, 10);
   B(p, 18, 320, 74, 699, 0, 10, M.skirt, b);
   for (let y = 320; y < 690; y += 60) {
-    if (y + 30 > 545 && y + 30 < 605) continue;
+    if (y + 30 > 405 && y + 30 < 465) continue;
     B(p, 76, y - .3, 76.6, y + .3, 10, 88, M.black, b);
     handleY(76, y + 12, y + 48, 80); handleY(76, y + 12, y + 48, 47);
   }
-  B(p, 76, 545, 77.5, 605, 10, 86, M.steel, b); B(p, 76.5, 547, 78, 603, 79, 85, M.black, b);       // dishwasher
+  B(p, 76, 405, 77.5, 465, 10, 86, M.steel, b); B(p, 76.5, 407, 78, 463, 79, 85, M.black, b);       // dishwasher, between the sink and the hob
   B(p, 26, 472, 68, 538, 86, 92.5, M.steel, b);                                                        // undermount sink
   CY(p, 22, 505, 1.5, 92, 128, M.steel, b, 8); B(p, 21, 504, 42, 506, 126, 128, M.steel, b);
   B(p, 22, 340, 70, 400, 92, 93, M.black, b);                                                          // induction hob
-  B(p, 17, 333, 64, 407, 160, 166, M.steel, b); B(p, 17, 352, 44, 388, 166, 250, M.steel, b);          // chimney hood
-  for (const [y0, y1, z1] of [[320, 435, 150], [575, 699, 150], [435, 575, 104]]) B(p, 16.5, y0, 17.5, y1, 92, z1, M.backsplash, b);
+  B(p, 17, 333, 64, 407, 160, 166, M.steel, b); B(p, 17, 352, 44, 388, 166, 250, M.concreteDoor, b);   // chimney hood with a concrete-look chimney
+  for (const [y0, y1, z1] of [[575, 699, 150], [435, 575, 104]]) B(p, 16.5, y0, 17.5, y1, 92, z1, M.backsplash, b);
   B(p, 16, 698, 136, 699, 92, 150, M.backsplash, b);
+  { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.15, .58), M.printGlass); m.rotation.y = Math.PI / 2; m.position.set(wx(17.6), b + 1.21, wz(377.5)); p.add(m); }
   B(p, 17.5, 592, 19, 632, 132, 136, M.black, b);                                                      // knife rail
   for (let k = 0; k < 4; k++) B(p, 18.5, 596 + k * 9, 19.5, 598 + k * 9, 112, 132, M.steel, b);
   // short run on the south wall with two bordeaux wall cabinets above it
@@ -1365,6 +1372,9 @@ function desk(p, base, r, chairAt, faceTo) {
   // bordeaux peninsula: runs from the cooktop counter on the west wall eastwards, closing the north end of the kitchen
   B(p, 76, 270, 280, 332, 8, 88, M.kRed, b); B(p, 78, 272, 278, 330, 0, 8, M.white, b);
   B(p, 76, 266, 284, 334, 88, 92, M.kTop, b);
+  for (const x of [100, 160]) { B(p, x - .3, 332, x + .3, 332.6, 10, 86, M.black, b); } B(p, 76, 332, 200, 332.6, 47.7, 48.3, M.black, b);
+  for (const [x, z] of [[130, 80], [130, 40], [180, 80], [180, 40]]) handleX(x - 15, x + 15, 334, z);
+  B(p, 218, 330, 228, 336, 92, 95, M.steel, b);
   for (const y of [390, 460]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
   // two white square-frame pendants over the bar
   B(p, 225, 370, 249, 470, 276, 280, M.white, b);
