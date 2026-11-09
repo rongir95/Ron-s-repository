@@ -686,7 +686,7 @@ const M = {
   teal: std({ color: 0x18768a, roughness: .35 }),
   wenge: std({ color: 0x3d2a20, roughness: .45 }),
   grayWood: std({ color: 0xa69a8c, roughness: .6 }),
-  olive: std({ color: 0x6b5a3a, roughness: .95 }),
+  olive: std({ color: 0x9a8270, roughness: .95 }),
   wallpaper2: std({ map: T.plaster, color: 0xdccdb2, roughness: .95 }),
   dotGlass: new THREE.MeshStandardMaterial({ color: 0xe9eef0, roughness: .2, transparent: true, opacity: .45, depthWrite: false, side: THREE.DoubleSide }),
   printGlass: std({ map: (() => { const c = document.createElement('canvas'); c.width = 512; c.height = 256; const g = c.getContext('2d');
@@ -695,6 +695,8 @@ const M = {
     blob(90, 150, 55, '#c8202a'); g.fillStyle = '#c8202a'; g.fillRect(80, 60, 20, 50); blob(150, 200, 30, '#e0a020'); blob(40, 210, 26, '#8a3a1a');
     blob(330, 140, 40, '#d8c070'); blob(390, 120, 30, '#6a4a2a'); blob(430, 170, 34, '#7a3a2a'); g.strokeStyle = '#8a6a3a'; g.lineWidth = 10; g.beginPath(); g.moveTo(360, 40); g.lineTo(420, 120); g.stroke();
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })(), roughness: .08, envMapIntensity: .8 }),
+  greige: std({ color: 0xcfc8bb, roughness: .6 }),
+  closetFloor: std({ map: lamTex(30, 6, 58, 8), roughness: .55 }),
   ochre: std({ color: 0xc19f48, roughness: .85 }),
   leather: std({ color: 0xc4b49c, roughness: .6 }),
   treadWood: std({ map: T.tread, roughness: .45 }),
@@ -948,7 +950,7 @@ function buildOutline(p, poly, opsByEdge, o) {
     const nX = -dy / len, nY = dx / len; const mid = [(a[0] + b[0]) / 2 + nX * 40, (a[1] + b[1]) / 2 + nY * 40];
     const outSide = inPoly(mid, poly) ? -1 : 1;
     const party = a[0] === PARTY && b[0] === PARTY;
-    wall(p, a, b, Object.assign({}, o, { outSide, ops: opsByEdge[i] || [], outMat: party ? M.plaster : o.outMat, h: o.h, t: (o.tEdge && o.tEdge[i]) || o.t }));
+    wall(p, a, b, Object.assign({}, o, { outSide, ops: opsByEdge[i] || [], outMat: party ? M.plaster : (o.outEdge && o.outEdge[i]) || o.outMat, h: o.h, t: (o.tEdge && o.tEdge[i]) || o.t }));
   }
 }
 
@@ -982,7 +984,7 @@ const ROOMS = [
   { id: 'bed1', f: 1, name: 'חדר הורים', dims: [395, 285], rect: [75, 30, 470, 315], old: [94.5, 19.5, 452, 309], mat: 'laminate', afterNote: 'אחרי השיפוץ: רצפת הלמינציה נשארת. קיר טאופ מאחורי המיטה עם שתי הדפסים מופשטים, מיטה מרופדת בבז׳ עם מצעים בהירים, מנורות גליל שחורות משני הצדדים, מנורת תקרה עגולה, שטיח ג׳וטה, שידה בטאופ עם מראה עגולה ופאנל רפפות אלון, וילונות פשתן.', eye: [300, 230], look: [-1, -.25], note: 'רצפת למינציה, קיר טפט מאחורי המיטה, שידת מגירות ושעון על הקיר המזרחי, מראה עומדת ומנורת תוף. דלתות למקלחת ולחדר הארונות.' },
   { id: 'bed2', f: 1, name: 'החדר של גיא', dims: [285, 330], rect: [495, 95, 780, 425], old: [464, 70.5, 779.5, 399], mat: 'lamOak', eye: [610, 350], look: [.2, -1], note: 'רצפת למינציה בגוון אלון, מיטה לאורך הקיר המערבי, שולחן כתיבה בצורת L מתחת לחלון עם מדפים בטורקיז, ארון גבוה בגימור בטון ליד הדלת ומנורה גאומטרית לבנה.' },
   { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [30, 327, 210, 497], old: [22.5, 321, 188, 490], mat: 'ensFloor', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק בטורקיז־ירוק במקלחון עם נישה מוארת וראש גשם שחור, טרצו בשאר הקירות וברצפה, אסלה תלויה ומעליה ארונית אלון עם נישה פתוחה, ארון כיור אלון עם כיור מונח ומראה מעוגלת עם תאורה.', eye: [150, 340], look: [-.4, 1], note: 'אריחים לבנים מבריקים עם פס פסיפס, ארון כיור תלוי בטורקיז, מראה מקושתת ומקלחון זכוכית עם ראש גשם.' },
-  { id: 'closet', f: 1, name: 'חדר ארונות', dims: [145, 170], rect: [220, 327, 365, 497], old: [200, 321, 359, 490], mat: 'laminate', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
+  { id: 'closet', f: 1, name: 'חדר ארונות', dims: [145, 170], rect: [220, 327, 365, 497], old: [200, 321, 359, 490], mat: 'closetFloor', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
   { id: 'bath', f: 1, name: 'חדר רחצה אחים', dims: [315, 220], rect: [30, 509, 345, 729], old: [22.5, 502, 359, 724], mat: 'bathFloor', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: מקלחון עם מסגרת שחורה במקום האמבטיה, אריחי סטאק בז׳ בגובה 1.2 מ׳, טרצו ברצפה, מכונת כביסה מתחת לארון אלון גבוה, אסלה תלויה מתחת לארונית אלון עם נישה מוארת, ארון כיור אלון ארוך עם כיור מונח, מראה מקושתת שחורה ומנורת קיר.', eye: [330, 612], look: [-1, 0], note: 'אריחי שמנת עם אריחים חומים, ארון כיור ארוך בוונגה עם מראה וארון גבוה, אמבטיה עם מחיצת זכוכית, מכונת כביסה מתחת לארון גבוה.' },
   { id: 'hall', f: 1, name: 'מסדרון', dims: [90, 400], rect: [375, 327, 465, 729], old: [371, 321, 452, 724], mat: 'hallTile', note: 'מחבר בין המדרגות לכל חדרי הקומה. בתקרה פתח עלייה לגג.' },
   { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [475, 637, 780, 962], old: [468, 626, 779.5, 1017.5], mat: 'lamGrey', afterNote: 'אחרי השיפוץ: טפט הדקלים על הקיר המשותף מוסר והקיר צבוע לבן. שאר החדר נשאר כמו היום.', eye: [520, 700], look: [1, .55], note: 'טפט חוף עם דקלים על הקיר המשותף, מיטה מתחת לחלון, ארון כהה עם דלתות הזזה ומדפים פתוחים, שידה ומדף קיר כהים ומנורת כדור קלועה. רצפת למינציה אפורה כהה.' },
@@ -1032,7 +1034,7 @@ const VOID1 = [[470, 435], [780, 435], [780, 627], [470, 627]];
 slab(F[1].shell, SLAB1, L1, 0.3, M.parquet, M.slabSide, [VOID1]);
 // white plaster ceiling for the ground floor, just under the slab
 slab(F[1].shell, SLAB1, L1 - 0.299, 0.006, M.ceiling, M.ceiling, [VOID1]);
-buildOutline(F[1].shell, OUT1, OPS1, { t: 30, tEdge: { 1: 25, 3: 22, 5: 10, 10: 27 }, base: L1, h: H2 * 100, outMat: M.plaster, inMat: M.interior });
+buildOutline(F[1].shell, OUT1, OPS1, { t: 30, tEdge: { 1: 25, 3: 22, 5: 10, 10: 27 }, outEdge: { 1: M.stone, 2: M.stone }, base: L1, h: H2 * 100, outMat: M.plaster, inMat: M.interior });
 // strip of flat roof over the living room, in front of Guy's room
 B(F[1].shell, 495, 0, 802, 65, 0, 1.5, M.cap, L1);
 const J = (a, b, ops = [], t = 12) => wall(F[1].shell, a, b, { t, base: L1, h: H2 * 100, ops, inMat: M.interior });
@@ -1073,6 +1075,11 @@ for (const r of ROOMS) {
   }
 }
 
+{ const p = F[1].shell, b = L1, cz = H2 * 100;
+  const n = B(p, 385, 345, 455, 410, cz - 4, cz, M.white, b); n.userData.noRemap = true;
+  B(p, 393, 353, 447, 402, cz - 4.4, cz - 4, M.fixture, b).userData.noRemap = true;
+  B(p, 385, 600, 455, 670, cz - .6, cz, M.trim, b).userData.noRemap = true;
+  onWall(B(p, 470.5, 336, 472, 376, 150, 200, M.white, b), b, 150, 200); }
 /* ---------------- stairs (U-shaped, 18 risers) ---------------- */
 const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
 {
@@ -1572,27 +1579,37 @@ function desk(p, base, r, chairAt, faceTo) {
     pan(330, 837, 345, 840, 70, 72, M.brushed); onWall(CY(p, 337, 842, 5, 63, 74, M.white, b, 16), b, 63, 74);
     CY(p, 338, 932, 11, 0, 33, M.brushed, b, 20); CY(p, 338, 932, 11, 33, 36, M.nicheWood, b, 20);
   }
-  // safe room used as a storage room: metal shelving along the side walls, window kept clear
-  const box = std({ color: 0xc39a6b, roughness: .95 }), bin = std({ color: 0x5f7f99, roughness: .6 });
-  const shelving = (X0, Y0, X1, Y1) => {
-    const alongY = (Y1 - Y0) > (X1 - X0);
-    for (const z of [8, 50, 92, 134, 176]) B(p, X0, Y0, X1, Y1, z, z + 2.5, M.steel, b);
-    for (const [x, y] of [[X0, Y0], [X1, Y0], [X0, Y1], [X1, Y1]]) B(p, x - 1.5, y - 1.5, x + 1.5, y + 1.5, 0, 200, M.alu, b);
-    for (const z of [10.5, 52.5, 94.5, 136.5]) {
-      let t = (alongY ? Y0 : X0) + 3; const end = (alongY ? Y1 : X1) - 3;
-      while (t < end - 25) {
-        const len = 28 + rnd() * 22, hgt = 22 + rnd() * 14, m = rnd() > .35 ? box : bin;
-        if (alongY) B(p, X0 + 3, t, X1 - 3, Math.min(t + len, end), z, z + hgt, m, b);
-        else B(p, t, Y0 + 3, Math.min(t + len, end), Y1 - 3, z, z + hgt, m, b);
-        t += len + 4 + rnd() * 6;
-      }
-    }
-  };
-  shelving(735, 650, 778, 935);
-  shelving(468, 700, 512, 935);
-  shelving(620, 650, 728, 692);
-  for (const [x, y, w, d, h] of [[560, 860, 50, 40, 40], [565, 865, 40, 32, 34], [640, 820, 60, 45, 45]]) B(p, x, y, x + w, y + d, h === 34 ? 40 : 0, h === 34 ? 74 : h, box, b);
-  RB(p, 660, 880, 700, 935, 0, 65, M.black, b, .04);
+  // safe room used as a storage room, from the photos (measured-plan coordinates)
+  { const p = new THREE.Group(); p.userData.noRemap = true; F[0].furn.add(p);
+    const greenC = std({ color: 0x4a5649, roughness: .6 }), woodC = std({ color: 0x6b4527, roughness: .6 }), stuff = () => std({ color: new THREE.Color().setHSL(rnd(), .3 + rnd() * .4, .35 + rnd() * .35), roughness: .8 });
+    // green low cabinets along the east wall with things piled on top
+    B(p, 735, 690, 780, 890, 4, 78, greenC, b); B(p, 735, 690, 780, 890, 0, 4, M.black, b);
+    for (const y of [756, 823]) B(p, 734.5, y - .3, 735, y + .3, 6, 76, M.black, b);
+    for (let y = 695; y < 885; y += 18 + rnd() * 10) B(p, 740 + rnd() * 8, y, 776, y + 12 + rnd() * 10, 78, 82 + rnd() * 28, stuff(), b);
+    // tall wooden bookshelf and a glass-front china cabinet on the south wall, east of the window
+    B(p, 732, 908, 780, 952, 0, 205, woodC, b); for (const z of [40, 80, 120, 160]) B(p, 733, 909, 779, 951, z, z + 2, woodC, b);
+    for (const z of [42, 82, 122, 162]) for (let x = 735; x < 776; x += 7 + rnd() * 5) B(p, x, 915, x + 5, 948, z, z + 15 + rnd() * 18, stuff(), b);
+    B(p, 652, 910, 730, 952, 0, 195, woodC, b); B(p, 656, 909.5, 726, 910, 20, 188, M.glass, b); B(p, 690.6, 909, 691.4, 910, 20, 188, woodC, b);
+    for (const z of [60, 105, 150]) B(p, 656, 912, 726, 950, z, z + 1.5, M.glass, b);
+    for (let k = 0; k < 8; k++) B(p, 735 + rnd() * 30, 912, 760 + rnd() * 18, 950, 205 + k * 0, 215 + rnd() * 30, stuff(), b);
+    for (let k = 0; k < 4; k++) B(p, 655 + k * 18, 913, 668 + k * 18, 948, 195, 205 + rnd() * 25, stuff(), b);
+    // brown net curtain on a rod over the window
+    B(p, 520, 948, 660, 950, 232, 235, M.wood, b);
+    { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 1.9), std({ color: 0x8a5f45, roughness: 1, transparent: true, opacity: .6, side: THREE.DoubleSide })); m.position.set(wx(590), b + 1.35, wz(946)); p.add(m); }
+    // black mini fridge west of the window, stack of white garden chairs, rolled rug in the corner
+    B(p, 468, 896, 516, 950, 0, 86, std({ color: 0x1c1d20, roughness: .3, metalness: .3 }), b);
+    for (let k = 0; k < 5; k++) chair(p, b + k * .05, 610, 880, 610, 800, M.white, M.white);
+    CY(p, 768, 668, 7, 0, 175, M.jute, b, 16);
+    // ceiling AC cassette and the round filter vent above the door
+    B(p, 590, 760, 650, 820, 266, 270, M.white, b); B(p, 595, 765, 645, 815, 265.5, 266, M.alu, b);
+    { const v = CY(p, 545, 648.5, 14, 0, 1.5, M.white, b, 28); v.rotation.x = Math.PI / 2; v.position.y = b + 2.35; }
+    B(p, 535, 648, 555, 650, 225, 245, M.alu, b);
+  }
+  // photos stuck on the outside of the safe-room door (passage side)
+  { const c = document.createElement('canvas'); c.width = 256; c.height = 512; const g = c.getContext('2d'); g.fillStyle = '#f4f2ee'; g.fillRect(0, 0, 256, 512);
+    for (let y = 20; y < 470; y += 34) for (let x = 20 + (y % 2) * 8; x < 230; x += 36) { g.fillStyle = hsl(rnd() * 360, 30, 30 + rnd() * 40); g.fillRect(x, y, 30, 28); }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(.78, 1.9), std({ map: t, roughness: .6 })); m.rotation.y = Math.PI; m.position.set(wx(545), 1.05, wz(629.5)); m.userData.noRemap = true; F[0].furn.add(m); }
 }
 
 /* first floor furniture */
@@ -1665,7 +1682,7 @@ function desk(p, base, r, chairAt, faceTo) {
   panelTarget = null;
   // walk-in closet: white open shelving on three sides, wood-framed sliding door
   const shelves = (X0, Y0, X1, Y1, hang) => {
-    for (const z of [0, 40, 80, 120, 160, 200, 232]) B(p, X0, Y0, X1, Y1, z, z + 2, M.white, b);
+    for (const z of [0, 40, 80, 120, 160, 200, 232]) B(p, X0, Y0, X1, Y1, z, z + 2, M.greige, b);
     const alongY = Y1 - Y0 > X1 - X0;
     for (const z of hang ? [] : [2, 42, 82, 122, 162, 202]) {
       let t = (alongY ? Y0 : X0) + 3; const end = (alongY ? Y1 : X1) - 3;
