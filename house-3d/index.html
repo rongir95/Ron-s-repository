@@ -162,6 +162,20 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .varbox .vseg{grid-template-columns:1fr 1fr;width:150px}.varbox .vseg button{padding:4px;font-size:12px}
 .varbox label{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .varbox select{font:13px var(--f-ui);border-radius:8px;border:1px solid var(--line);padding:3px 6px;background:var(--paper-solid);color:var(--ink)}
+.card p.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .more{all:unset;cursor:pointer;font:600 12px var(--f-ui);color:var(--ink);opacity:.7;margin-top:2px;text-decoration:underline;text-underline-offset:3px}
+.card .more:hover{opacity:1}
+.card .clink{left:40px;top:12px;display:grid;place-items:center}
+.card .clink:hover,.card .x:hover{color:var(--ink)}
+.cbrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.cbrow .cbtn{margin:0!important;padding:9px 6px;font-size:12.5px;gap:5px}
+.vtog{all:unset;box-sizing:border-box;cursor:pointer;display:flex;width:100%;justify-content:space-between;align-items:center;margin-top:10px;padding:8px 2px 0;border-top:1px solid var(--line);font:600 12.5px var(--f-ui);color:var(--muted)}
+.vtog .chev{font-size:18px;line-height:1;transition:transform .2s}
+.vtog[aria-expanded="true"] .chev{transform:rotate(-90deg)}
+.vtog:hover{color:var(--ink)}
+.varbox{margin-top:6px!important;padding-top:0!important;border-top:0!important}
+.varbox select.roomsel{background-color:var(--track);border:0}
+.varbox .roomsel{width:150px;margin:0;padding:6px 10px;font-size:12.5px;flex:none}
 .linkout{width:100%;margin-top:6px;font:12px monospace;direction:ltr}
 .hint{position:fixed;left:50%;transform:translateX(-50%);top:calc(116px + env(safe-area-inset-top,0px));max-width:min(560px,calc(100% - 640px));font-size:12px;color:var(--muted);padding:6px 14px;border-radius:999px;text-align:center;transition:opacity .6s;pointer-events:none}
 .hint.fade{opacity:0}
@@ -379,21 +393,22 @@ body.zhide .zoom,body.zhide .compass{opacity:0;pointer-events:none}
 
 <div class="card panel" id="card" hidden>
   <button class="x" id="cardX" aria-label="סגירה">×</button>
+  <button class="x clink" id="cLink" aria-label="שיתוף קישור לחדר" title="שיתוף קישור לחדר"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M8 11H6a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <div class="floor" id="cFloor"></div>
   <h3 id="cName"></h3>
   <dl>
     <dt>מידות פנים</dt><dd id="cDims"></dd>
     <dt>שטח</dt><dd id="cArea"></dd>
   </dl>
-  <p id="cNote"></p>
-  <button class="cbtn" id="cFocus">הצגת החדר הזה בלבד</button>
-  <button class="cbtn alt" id="cWalk">עמידה בתוך החדר</button>
+  <p id="cNote" class="clamp"></p>
+  <button class="more" id="cMore" hidden aria-expanded="false">קראו עוד</button>
+  <div class="cbrow"><button class="cbtn" id="cFocus">החדר בלבד</button><button class="cbtn alt" id="cWalk">כניסה לחדר</button></div>
+  <button class="vtog" id="varTog" hidden aria-expanded="false"><span>גרסאות לשיפוץ</span><span class="chev">›</span></button>
   <div class="varbox" id="varBox" hidden>
-    <div class="vhead">גרסאות לשיפוץ <div class="seg vseg"><button data-var="a" aria-pressed="true">גרסה א׳</button><button data-var="b" aria-pressed="false">גרסה ב׳</button></div></div>
-    <label>רצפה <select id="varFloor"></select></label>
-    <label>צבע קירות <select id="varWall"></select></label>
+    <div class="vhead">גרסה <div class="seg vseg"><button data-var="a" aria-pressed="true">גרסה א׳</button><button data-var="b" aria-pressed="false">גרסה ב׳</button></div></div>
+    <label>רצפה <select id="varFloor" class="roomsel"></select></label>
+    <label>צבע קירות <select id="varWall" class="roomsel"></select></label>
   </div>
-  <button class="cbtn alt" id="cLink">העתקת קישור לחדר</button>
   <input id="linkOut" class="linkout" readonly hidden aria-label="קישור לחדר">
 </div>
 
@@ -1314,7 +1329,7 @@ for (const r of ROOMS) {
   const g = new THREE.PlaneGeometry(w, d); g.rotateX(-Math.PI / 2);
   const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * w + x0 / 100, uv.getY(i) * d - y1 / 100);
   const m = new THREE.Mesh(g, M[r.mat]); m.receiveShadow = true;
-  m.position.set(wx((x0 + x1) / 2), fl.base + 0.004, wz((y0 + y1) / 2));
+  m.position.set(wx((x0 + x1) / 2), fl.base + 0.004 + (ROOMS.indexOf(r) % 4) * 0.002, wz((y0 + y1) / 2)); // staggered so overlapping room floors never share a plane
   m.userData.room = r.id; r.mesh = m; r.baseMat = M[r.mat]; fl.shell.add(m); roomMeshes.push(m);
   if (r.id === 'balcony') B(fl.shell, x0 - 6, y0 - 4, x1 + 2, y1 + 4, -15, 0, M.slabSide, fl.base);
   const el = document.createElement('div'); el.className = 'lbl'; el.innerHTML = `<b>${r.name}</b><span>${r.dims[0]}×${r.dims[1]}</span>`;
@@ -1758,7 +1773,8 @@ function desk(p, base, r, chairAt, faceTo) {
     for (let y = 320; y < 690; y += 60) B(p, 76, y + 2, 77, y + 58, 84, 85, M.black, b);
     B(p, 26, 472, 68, 538, 86, 92.5, M.steel, b); CY(p, 22, 505, 1.5, 92, 128, M.black, b, 8); B(p, 21, 504, 40, 506, 126, 128, M.black, b);
     B(p, 22, 340, 70, 400, 92, 93, M.black, b);
-    for (const [y0, y1, z1] of [[320, 435, 150], [575, 699, 150], [435, 575, 104]]) B(p, 16.5, y0, 17.5, y1, 92, z1, M.backsplash, b);
+    // splashback in measured coordinates around the window (y 442–582, sill 105): full height beside it, up to the sill below it
+    for (const [y0, y1, z1] of [[325, 441, 150], [583, 685, 150], [441, 583, 104]]) B(p, 25, y0, 26, y1, 92, z1, M.backsplash, b).userData.noRemap = true;
     // floating oak shelves where the hood used to be, with jars, bowls and a plant
     for (const z of [160, 200]) B(p, 16, 325, 42, 412, z, z + 4, M.oakLight, b);
     for (let y = 335; y < 390; y += 9) CY(p, 28, y, 3, 164, 175, std({ color: new THREE.Color().setHSL(.05 + rnd() * .1, .6, .35 + rnd() * .2), roughness: .4 }), b, 10);
@@ -2633,7 +2649,7 @@ const VIEWS = {
 function orbitMax() { return state.mode === 'ground' || state.mode === 'first' ? 26 : ORBIT.max; }
 function setMode(m, keepFocus) {
   if (walking && !keepFocus) exitWalk(false);
-  if (focus && !keepFocus) { focus = null; clearFocusFilters(); if (autoWalls) { state.walls = 'full'; autoWalls = false; } document.getElementById('focusBar').hidden = true; cFocusText('הצגת החדר הזה בלבד'); document.getElementById('roomSel').value = ''; }
+  if (focus && !keepFocus) { focus = null; clearFocusFilters(); if (autoWalls) { state.walls = 'full'; autoWalls = false; } document.getElementById('focusBar').hidden = true; cFocusText('החדר בלבד'); document.getElementById('roomSel').value = ''; }
   state.mode = m;
   if (!walking) controls.maxDistance = orbitMax();
   document.querySelectorAll('.mbtn').forEach(b => b.setAttribute('aria-selected', b.dataset.mode === m));
@@ -2765,7 +2781,7 @@ function focusRoom(id) {
   applyWalls(); applyLabels(); selectRoom(id, false);
   document.getElementById('focusName').textContent = r.name;
   document.getElementById('focusBar').hidden = false;
-  cFocusText('חזרה לכל הבית');
+  cFocusText('חזרה לבית');
   document.getElementById('roomSel').value = id;
   const w = (rect[2] - rect[0]) / 100, d = (rect[3] - rect[1]) / 100, base = F[r.f].base;
   const tgt = new THREE.Vector3(wx((rect[0] + rect[2]) / 2), base + .5, wz((rect[1] + rect[3]) / 2));
@@ -2886,7 +2902,7 @@ function exitFocus(restoreMode = true) {
   focus = null; clearFocusFilters();
   if (autoWalls) { state.walls = 'full'; autoWalls = false; }
   document.getElementById('focusBar').hidden = true;
-  cFocusText('הצגת החדר הזה בלבד');
+  cFocusText('החדר בלבד');
   document.getElementById('roomSel').value = '';
   if (restoreMode) { setMode(prevMode); if (prevCam) flyTo(prevCam[0], prevCam[1], 1.1); } else { applyWalls(); applyLabels(); }
 }
@@ -2902,7 +2918,7 @@ function selectRoom(id, fly) {
   document.getElementById('cName').textContent = r.name;
   document.getElementById('cDims').textContent = `${r.dims[0]} × ${r.dims[1]} ס״מ`;
   document.getElementById('cArea').textContent = `${(r.dims[0] * r.dims[1] / 1e4).toFixed(1)} מ״ר`;
-  document.getElementById('cNote').textContent = state.reno && r.afterNote ? r.afterNote : r.note;
+  setCardNote(state.reno && r.afterNote ? r.afterNote : r.note);
   card.hidden = false;
   if (fly) {
     const [x0, y0, x1, y1] = r.rect, base = r.f === 0 ? 0 : L1 + (state.mode === 'exploded' ? targets.f1 : 0);
@@ -2922,6 +2938,13 @@ tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
 tog('tRotate', 'rotate', () => controls.autoRotate = state.rotate);
 document.getElementById('cardX').addEventListener('click', () => selectRoom(null));
+// room note: two lines, with "read more"
+function setCardNote(t) {
+  const n = document.getElementById('cNote'), m = document.getElementById('cMore');
+  n.textContent = t || ''; n.classList.add('clamp'); m.setAttribute('aria-expanded', 'false'); m.textContent = 'קראו עוד';
+  requestAnimationFrame(() => { m.hidden = n.scrollHeight <= n.clientHeight + 2; });
+}
+document.getElementById('cMore').addEventListener('click', () => { const n = document.getElementById('cNote'), m = document.getElementById('cMore'), open = n.classList.toggle('clamp'); m.textContent = open ? 'קראו עוד' : 'פחות'; m.setAttribute('aria-expanded', !open); });
 function cFocusText(t) { const b = document.getElementById('cFocus'), i = b.querySelector('.ic'); b.textContent = t; if (i) b.prepend(i); }
 // small line icons for the menus
 {
@@ -2965,7 +2988,7 @@ function cFocusText(t) { const b = document.getElementById('cFocus'), i = b.quer
    ['[data-tab=view]', 'eye'], ['[data-tab=set]', 'gear'], ['[data-reno=before]', 'before'], ['[data-reno=after]', 'after'], ['[data-reno=split]', 'split'],
    ['[data-mode=full]', 'full'], ['[data-mode=ground]', 'ground'], ['[data-mode=first]', 'first'], ['[data-mode=exploded]', 'exploded'],
    ['[data-walls=full]', 'wallFull'], ['[data-walls=low]', 'wallLow'], ['[data-walls=none]', 'wallNone'],
-   ['#cFocus', 'target'], ['#cWalk', 'walk'], ['#cLink', 'link']].forEach(([s, k]) => add(q(s), k));
+   ['#cFocus', 'target'], ['#cWalk', 'walk']].forEach(([s, k]) => add(q(s), k));
 }
 { const b = document.getElementById('statBtn'), br = document.getElementById('brandP'); b.addEventListener('click', () => { const on = br.classList.toggle('showstats'); b.setAttribute('aria-expanded', on); b.textContent = on ? 'נתוני הבית ▴' : 'נתוני הבית ▾'; }); }
 document.querySelector('#toolsP .thead').addEventListener('click', e => { const t = document.getElementById('toolsP'); if (t.classList.contains('min') && !e.target.closest('.collapse')) t.querySelector('.collapse').click(); });
@@ -3461,11 +3484,12 @@ document.body.appendChild(compass);
   async function saveVariant(id) { try { localStorage.setItem('variants', JSON.stringify(variants)); } catch (e) {} if (db) try { await db.collection('variants').doc(id).set(variants[id]); } catch (e) { toast('הגרסה נשמרה רק בדפדפן הזה'); } }
   function renderVarUI() {
     const box = $('varBox'), id = state.sel, r = id && ROOMS.find(q => q.id === id);
-    if (!r || r.outdoor) { box.hidden = true; return; } box.hidden = false;
+    const tg = $('varTog'); if (!r || r.outdoor) { box.hidden = true; tg.hidden = true; return; } tg.hidden = false; box.hidden = tg.getAttribute('aria-expanded') !== 'true';
     const v = variants[id] || (variants[id] = { active: 'a', a: { floor: r.afterMat || r.mat, wall: '' }, b: { floor: r.afterMat || r.mat, wall: '' } });
     box.querySelectorAll('[data-var]').forEach(b => b.setAttribute('aria-pressed', b.dataset.var === v.active));
     const o = v[v.active]; $('varFloor').value = o.floor in VAR_FLOORS ? o.floor : 'herring'; $('varWall').value = o.wall || '';
   }
+  $('varTog').addEventListener('click', () => { const tg = $('varTog'), on = tg.getAttribute('aria-expanded') !== 'true'; tg.setAttribute('aria-expanded', on); $('varBox').hidden = !on; });
   for (const [k, n] of Object.entries(VAR_FLOORS)) $('varFloor').add(new Option(n, k)); for (const [k, n] of Object.entries(VAR_WALLS)) $('varWall').add(new Option(n, k));
   $('varBox').querySelectorAll('[data-var]').forEach(b => b.addEventListener('click', () => { const v = variants[state.sel]; v.active = b.dataset.var; if (!state.reno) setReno(true); applyVariant(state.sel); renderVarUI(); saveVariant(state.sel); }));
   $('varFloor').addEventListener('change', () => { const v = variants[state.sel]; v[v.active].floor = $('varFloor').value; if (!state.reno) setReno(true); applyVariant(state.sel); saveVariant(state.sel); });
@@ -3477,6 +3501,7 @@ document.body.appendChild(compass);
   const BASE = 'https://claude.ai/artifact/GaV1fQwQ9szhgczVGzKTfs';
   $('cLink').addEventListener('click', async () => {
     const link = `${BASE}#room-${state.sel}-${state.reno ? 'after' : 'before'}`;
+    if (navigator.share && matchMedia('(pointer:coarse)').matches) { try { await navigator.share({ title: ROOMS.find(r => r.id === state.sel)?.name || 'בית גירשביץ׳', url: link }); return; } catch (e) { if (e.name === 'AbortError') return; } }
     try { await navigator.clipboard.writeText(link); toast('הקישור הועתק'); } catch (e) { $('linkOut').hidden = false; $('linkOut').value = link; $('linkOut').select(); }
   });
   function fromHash() { const m = /^#room-([a-z0-9]+)(?:-(before|after))?$/.exec(location.hash); if (!m || !ROOMS.find(r => r.id === m[1])) return; setReno(m[2] === 'after'); focusRoom(m[1]); }
@@ -3546,6 +3571,7 @@ renderer.setAnimationLoop(() => {
     if (t >= 1) camTween = null;
   }
   if (photo) { controls.update(); if (photoFrame()) return; } else { keyWalk(dt); controls.update(); }
+  { const nr = walking ? .15 : Math.min(.6, Math.max(.1, camera.position.distanceTo(controls.target) * .08)); if (Math.abs(camera.near - nr) > .02) { camera.near = nr; camera.updateProjectionMatrix(); } } // depth precision: keep the near plane as far out as the view allows
   { const d = camera.getWorldDirection(new THREE.Vector3()); compass.firstChild.style.transform = `rotate(${Math.atan2(d.x, -d.z) * -180 / Math.PI}deg)`; }
   { // grey out "−" when no further zoom-out is possible
     const out = walking ? camera.fov >= 114.9 && controls.maxDistance >= walkRoomMaxBack() - .01
