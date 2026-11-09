@@ -805,6 +805,7 @@ const M = {
     blob(90, 150, 55, '#c8202a'); g.fillStyle = '#c8202a'; g.fillRect(80, 60, 20, 50); blob(150, 200, 30, '#e0a020'); blob(40, 210, 26, '#8a3a1a');
     blob(330, 140, 40, '#d8c070'); blob(390, 120, 30, '#6a4a2a'); blob(430, 170, 34, '#7a3a2a'); g.strokeStyle = '#8a6a3a'; g.lineWidth = 10; g.beginPath(); g.moveTo(360, 40); g.lineTo(420, 120); g.stroke();
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })(), roughness: .08, envMapIntensity: .8 }),
+  pathSlab: std({ map: canvasTex(256, (g, s) => { g.fillStyle = '#d6d2c8'; g.fillRect(0, 0, s, s); speckle(g, s, 5000, .07); speckle(g, s, 2500, .25, true); }, .8), roughness: .85 }),
   greige: std({ color: 0xcfc8bb, roughness: .6 }),
   closetFloor: std({ map: lamTex(30, 6, 58, 8), roughness: .55 }),
   ochre: std({ color: 0xc19f48, roughness: .85 }),
@@ -2357,6 +2358,7 @@ function desk(p, base, r, chairAt, faceTo) {
   flat(-175, 980, 300, 1060, -0.03, M.sillStone);   // light stone slabs at the entrance
   // two-car parking pad across the front, no roof, running right to the party line
   flat(-200, 1060, 785, 1450, -0.028, M.pavers2);
+  for (let y = 1065; y < 1440; y += 52) flat(-190, y, -110, y + 46, -0.022, M.pathSlab);   // stepping-slab path from the gate to the door
   for (const X of [-200, 290, 785]) flat(X - 4, 1110, X + 4, 1440, -0.02, M.line);
   // outdoor storage shed at the far right of the parking, against the party line, doors facing the parking
   { const shed = std({ color: 0xe8e1d0, roughness: .6 }), trimS = std({ color: 0x8a8580, roughness: .6 });
@@ -2370,16 +2372,15 @@ function desk(p, base, r, chairAt, faceTo) {
   // neighbour's grey slatted fence along the party line beside the parking
   for (let z = 10; z < 175; z += 22) B(p, 788, 980, 794, 1440, z, z + 16, std({ color: 0x8e9196, roughness: .6, metalness: .3 }));
   // big green bush beside the entrance path, EV charger and lantern on the facade
-  { const bush = std({ color: 0x3f6a2e, roughness: .9, flatShading: true }); for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.55 + rnd() * .25, 1), bush)); m.position.set(wx(-130 + (rnd() - .5) * 70), .5 + rnd() * .9, wz(1060 + (rnd() - .5) * 80)); p.add(m); } }
+  { const bush = std({ color: 0x3f6a2e, roughness: .9, flatShading: true }); for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.55 + rnd() * .25, 1), bush)); m.position.set(wx(-45 + (rnd() - .5) * 50), .5 + rnd() * .9, wz(1015 + (rnd() - .5) * 40)); // beside the path, not on it p.add(m); } }
   B(p, 330, 972, 350, 980, 110, 140, std({ color: 0xdfe3e6, roughness: .4 }));
   // black slatted sliding gate on the street side, open across the shed
   // street side: fixed slatted fence, a pedestrian gate, then the wide electric sliding gate for the cars (black horizontal slats)
   const slats = (X0, X1, z1 = 175) => { for (let z = 10; z < z1; z += 16) B(p, X0, 1440, X1, 1446, z, z + 11, M.black); };
-  for (const X of [-200, 0, 100, 785]) B(p, X - 5, 1437, X + 5, 1449, 0, 185, M.black);
-  slats(-195, -5);                                                             // fixed fence
-  slats(4, 96, 170); B(p, 4, 1440, 96, 1446, 168, 172, M.black); B(p, 4, 1440, 8, 1446, 10, 170, M.black); B(p, 92, 1440, 96, 1446, 10, 170, M.black);   // pedestrian gate
-  B(p, 80, 1446, 84, 1450, 95, 110, M.steel); B(p, 80, 1436, 84, 1440, 95, 110, M.steel);
-  slats(105, 780); B(p, 105, 1446, 780, 1450, 0, 6, M.alu);                     // electric gate on its track
+  for (const X of [-200, -100, 785]) B(p, X - 5, 1437, X + 5, 1449, 0, 185, M.black);
+  slats(-196, -104, 170); B(p, -196, 1440, -104, 1446, 168, 172, M.black); B(p, -196, 1440, -192, 1446, 10, 170, M.black); B(p, -108, 1440, -104, 1446, 10, 170, M.black);   // pedestrian gate, far left
+  B(p, -124, 1446, -120, 1450, 95, 110, M.steel); B(p, -124, 1436, -120, 1440, 95, 110, M.steel);
+  slats(-95, 780); B(p, -95, 1446, 780, 1450, 0, 6, M.alu);                     // electric gate on its track
   B(p, 770, 1449, 790, 1460, 0, 40, std({ color: 0x3a3c40, roughness: .5 }));  // gate motor
   flat(-2000, 1450, 2000, 1620, -0.02, M.concrete);
   B(p, -2000, 1612, 2000, 1628, -15, 1, M.sillStone);
