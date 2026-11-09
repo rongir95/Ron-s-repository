@@ -1452,7 +1452,8 @@ function desk(p, base, r, chairAt, faceTo) {
   const kitBefore = new THREE.Group(); kitBefore.userData.reno = 'before'; p.add(kitBefore); renoSets.push({ room: 'kitchen', before: kitBefore });
   { const p = kitBefore;
   // sink wall (west): cream gloss base units, light grey quartz top, white glass splashback
-  B(p, 16, 320, 76, 699, 10, 88, M.kCream, b); B(p, 16, 318, 79, 699, 88, 92, M.kTop, b);
+  for (const [y0, y1, z1] of [[320, 472, 88], [538, 699, 88], [472, 538, 71]]) B(p, 16, y0, 76, y1, 10, z1, M.kCream, b); B(p, 68, 472, 76, 538, 71, 88, M.kCream, b);
+  for (const [x0, y0, x1, y1] of [[16, 318, 79, 472], [16, 538, 79, 699], [16, 472, 26, 538], [68, 472, 79, 538]]) B(p, x0, y0, x1, y1, 88, 92, M.kTop, b); // worktop with the sink cut-out
   for (let y = 320; y < 699; y += 30) B(p, 76, y - .2, 76.5, y + .2, 10, 88, M.black, b);
   B(p, 76, 320, 76.5, 699, 48.8, 49.2, M.black, b);
   // on the counter: kettle, fruit bowl, cutting board, coffee machine, dish soap by the sink
@@ -1468,8 +1469,18 @@ function desk(p, base, r, chairAt, faceTo) {
     handleY(76, y + 12, y + 48, 80); handleY(76, y + 12, y + 48, 47);
   }
   B(p, 76, 405, 77.5, 465, 10, 86, M.steel, b); B(p, 76.5, 407, 78, 463, 79, 85, M.black, b);       // dishwasher, between the sink and the hob
-  B(p, 26, 472, 68, 538, 86, 92.5, M.steel, b);                                                        // undermount sink
-  CY(p, 22, 505, 1.5, 92, 128, M.steel, b, 8); B(p, 21, 504, 42, 506, 126, 128, M.steel, b);
+  // light-grey composite sink, recessed into the top, with a tall chrome pull-down mixer (as in the photos)
+  { const sinkM = std({ color: 0xd9d8d3, roughness: .5 });
+    for (const [x0, y0, x1, y1] of [[26, 472, 68, 476], [26, 534, 68, 538], [26, 476, 30, 534], [64, 476, 68, 534]]) B(p, x0, y0, x1, y1, 91.6, 92.4, sinkM, b);
+    { const inner = std({ color: 0xbebcb6, roughness: .55, side: THREE.BackSide }); const bowl = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.34, .2, .58), inner)); bowl.position.set(wx(47), b + .82, wz(505)); p.add(bowl); }
+    CY(p, 47, 505, 2, 71.9, 72.1, M.steel, b, 12);
+    const fz = b + .925, fx = wx(20), fy = wz(505);
+    const base = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.025, .028, .05, 20), M.steel)); base.position.set(fx, fz + .025, fy); p.add(base);
+    const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, .25, 0), new THREE.Vector3(.04, .36, 0), new THREE.Vector3(.14, .37, 0), new THREE.Vector3(.2, .3, 0), new THREE.Vector3(.21, .24, 0)]);
+    const neck = shadowy(new THREE.Mesh(new THREE.TubeGeometry(curve, 40, .014, 12), M.steel)); neck.position.set(fx, fz + .05, fy); p.add(neck);
+    const head = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.018, .016, .07, 16), M.steel)); head.position.set(fx + .21, fz + .05 + .2, fy); p.add(head);
+    const lever = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.012, .012, .08), M.steel)); lever.position.set(fx, fz + .13, fy + .05); lever.rotation.x = -.4; p.add(lever);
+    [base, neck, head, lever].forEach(m => m.userData.noRemap = false); }
   B(p, 22, 340, 70, 400, 92, 93, M.black, b);                                                          // induction hob
   B(p, 17, 333, 64, 407, 160, 166, M.steel, b); B(p, 17, 352, 44, 388, 166, 250, M.concreteDoor, b);   // chimney hood with a concrete-look chimney
   for (const [y0, y1, z1] of [[575, 699, 150], [435, 575, 104]]) B(p, 16.5, y0, 17.5, y1, 92, z1, M.backsplash, b);
