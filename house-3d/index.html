@@ -1144,7 +1144,7 @@ function slab(p, poly, top, thick, capMat, sideMat, holes = []) {
 /* ---------------- walls & openings ---------------- */
 function wall(p, a, b, o) {
   const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len;
-  const theta = Math.atan2(-dy, dx), t = o.t, h = o.h, ext = t / 2;
+  const theta = Math.atan2(-dy, dx), t = o.t, h = o.h, ext = t / 2 - .25; // stop 2.5 mm short so a wall's end cap never shares a plane with the face of the wall it meets
   const outSide = o.outSide || 0;
   const pz = outSide === 1 ? o.outMat : (o.inMatPz || o.inMat), nz = outSide === -1 ? o.outMat : (o.inMatNz || o.inMat);
   const end = o.inMat; // window and door reveals are plastered on the inside
@@ -1178,7 +1178,7 @@ function wall(p, a, b, o) {
   for (const op of ops) opening(p, a, ux, uy, theta, op, o);
 }
 function opening(p, a, ux, uy, theta, op, o) {
-  const g = new THREE.Group(); g.position.set(wx(a[0] + ux * op.at), o.base, wz(a[1] + uy * op.at)); g.rotation.y = theta; p.add(g); openingGroups.push(g); g.userData.plan = [a[0] + ux * op.at, a[1] + uy * op.at];
+  const g = new THREE.Group(); g.position.set(wx(a[0] + ux * op.at), o.base, wz(a[1] + uy * op.at)); g.rotation.y = theta; p.add(g); openingGroups.push(g); g.userData.plan = [a[0] + ux * op.at, a[1] + uy * op.at]; g.userData.opType = op.type; g.userData.opF = o.base > 1 ? 1 : 0;
   if (op.type === 'hole') return;
   if (op.type === 'front') g.userData.entry = { room: 'foyer', eye: [300, 770], look: [.25, -1] };
   if (op.type === 'slide' && o.base === 0) g.userData.entry = { room: 'living', eye: [406, 90], look: [.3, 1] };
@@ -1422,10 +1422,10 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
     const g = local(F[0].furn, 200, 695, 0, 0); g.userData.noRemap = true;
     lb(g, .9, .1, .025, 0, 1.72, .013, M.oak);
     for (let k = 0; k < 5; k++) { const x = -.36 + k * .18; lb(g, .02, .02, .09, x, 1.7, .07, M.black);
-      if (k !== 2) { const c = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.32, .78, .12, 3, .04), std({ color: [0x2b2f36, 0x5a4636, 0x1f2a3a, 0x6b6f72, 0x3a2f2a][k], roughness: 1 }))); c.position.set(x, 1.27, .1); c.rotation.z = (rnd() - .5) * .1; g.add(c); } }
+      if (k !== 2) { const c = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.32, .78, .12, 3, .04), std({ color: [0x2b2f36, 0x5a4636, 0x1f2a3a, 0x6b6f72, 0x3a2f2a][k], roughness: 1 }))); c.position.set(x, 1.27, .1 + k * .022); c.rotation.z = (rnd() - .5) * .1; g.add(c); } }
     const bag = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.28, .3, .1, 3, .03), std({ color: 0xd8b9a0, roughness: .8 }))); bag.position.set(0, 1.45, .09); g.add(bag);
     // small shoe cabinet under it
-    lb(g, .8, .45, .3, 0, .225, .16, M.white); lb(g, .78, .005, .29, 0, .23, .31, M.black); }
+    lb(g, .8, .45, .3, 0, .225, .16, M.white); lb(g, .78, .006, .004, 0, .23, .312, M.black); } // drawer gap on the front face
   { // open storage recess under the landing: white shelves with boxes, baskets and folded things
     const d = [], shelf = std({ color: 0xf2f0ea, roughness: .5 }), stuff = () => std({ color: new THREE.Color().setHSL(rnd(), .2 + rnd() * .3, .35 + rnd() * .4), roughness: .8 });
     for (const z of [32, 72, 112]) d.push(B(p, 701, 529, 775, 615, z, z + 2, shelf, 0));
@@ -2503,7 +2503,7 @@ function desk(p, base, r, chairAt, faceTo) {
   flat(-215, -470, 791, -330, -0.035, M.turf); flat(-215, -330, 180, 12, -0.035, M.turf);   // lawn around the deck
   // artificial lawn strip along the west side of the house, white gravel along the fence
   flat(-175, -330, 0, 1010, -0.03, M.turf);
-  flat(-215, -330, -175, 1010, -0.035, M.gravel);
+  flat(-215, -330, -175, 1010, -0.022, M.gravel); // sits just above the lawn it overlaps (no shared plane)
   for (let Y = -250; Y < 950; Y += 160) { CY(p, -185, Y, 2, -15, 35, M.black, 0, 8); CY(p, -185, Y, 4, 30, 40, M.lampHead, 0, 10); }
   // brick barbecue with a chimney in the north-east corner of the deck
   { const n0 = p.children.length;
@@ -2910,8 +2910,11 @@ function walkRoomMaxBack() {
 // floor point under the pointer, only when nothing (wall, furniture) is in front of it
 function walkFloorHit(e) {
   ptr.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(ptr, camera);
-  const hits = ray.intersectObjects([F[0].group, F[1].group], true).filter(h => visibleChain(h.object) && h.object.material !== M.glass && h.object.material !== M.sheer && h.object.material !== M.dotGlass && !h.object.isPoints && h.object !== walkRing && !h.object.userData.rail);
-  const h = hits[0]; if (!h) return null;
+  const hits = ray.intersectObjects([F[0].group, F[1].group, site], true).filter(h => visibleChain(h.object) && h.object.material !== M.glass && h.object.material !== M.sheer && h.object.material !== M.dotGlass && !h.object.isPoints && h.object !== walkRing && !h.object.userData.rail);
+  let h = hits[0]; if (!h) return null;
+  { const cur = ROOMS.find(r => r.id === walking.id); if (cur && cur.outdoor && !h.object.userData.stair && !h.object.userData.room) { // outside, look past chairs and plants to the ground behind the click
+      let en = null; for (let o = h.object; o; o = o.parent) if (o.userData.entry || o.userData.doorInfo) en = o;
+      if (!en) h = hits.find(x => x.point.y < .3) || h; } }
   if (h.object.userData.stair) return { point: h.point, stair: true };
   for (let o = h.object; o; o = o.parent) if (o.userData.entry) { // front door / garden slider: step through, in or out
     const en = o.userData.entry, cur = ROOMS.find(r => r.id === walking.id), out = en.room === 'living' ? ['garden', [406, -70], [0, -1]] : ['front', [190, 1040], [.2, 1]];
@@ -2931,6 +2934,11 @@ function walkFloorHit(e) {
     return { point: new THREE.Vector3(wx(tgt[0]), F[di.f].base, wz(tgt[1])), room: room.id, door: true, look: new THREE.Vector3(tgt[0] - other[0], 0, tgt[1] - other[1]) };
   }
   if (h.object.userData.room) return { point: h.point, room: h.object.userData.room };
+  { // outside: grass, paving, deck or path — walk there within the garden, side path or parking
+    const cur = ROOMS.find(r => r.id === walking.id);
+    if (cur && cur.outdoor && h.point.y < .5) { const X = (h.point.x + CX) * 100, Y = (h.point.z + CZ) * 100;
+      const r = ROOMS.find(q => q.outdoor && X >= q.rect[0] && X <= q.rect[2] && Y >= q.rect[1] && Y <= q.rect[3]);
+      if (r) return { point: new THREE.Vector3(h.point.x, 0, h.point.z), room: r.id }; } }
   // furniture standing on the floor: walk to its foot if it is close to the floor
   return null;
 }
@@ -3179,6 +3187,13 @@ renderer.domElement.addEventListener('pointerup', e => {
     ptr.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(ptr, camera);
     const hit = ray.intersectObjects([F[0].group], true).find(h => visibleChain(h.object));
     for (let o = hit && hit.object; o; o = o.parent) if (o.userData.entry) { const en = o.userData.entry; enterWalk(en.room, en.eye, en.look); return; }
+    // a window: step into the room behind it
+    for (let o = hit && hit.object; o; o = o.parent) if (o.userData.opType === 'win' || o.userData.opType === 'hole') {
+      const [X, Y] = o.userData.plan, f = o.userData.opF, near = r => X >= r.rect[0] - 50 && X <= r.rect[2] + 50 && Y >= r.rect[1] - 50 && Y <= r.rect[3] + 50;
+      const dc = r => ((r.rect[0] + r.rect[2]) / 2 - X) ** 2 + ((r.rect[1] + r.rect[3]) / 2 - Y) ** 2;
+      const room = ROOMS.filter(r => r.f === f && !r.outdoor && near(r)).sort((a, b) => dc(a) - dc(b))[0];
+      if (room) { if (state.mode === 'ground' && f === 1) setMode('full'); enterWalk(room.id); return; }
+    }
   }
   if (walking) {
     const h = walkFloorHit(e); if (!h) return;
