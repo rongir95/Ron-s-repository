@@ -256,6 +256,34 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   .compass{top:auto!important;bottom:calc(440px + env(safe-area-inset-bottom,0px))!important;right:auto!important;left:max(12px,env(safe-area-inset-left,0px))!important}
   body:has(.tools.min) .zoom,body:has(.tools.min) .compass{bottom:calc(140px + env(safe-area-inset-bottom,0px))!important}
 }
+@media (min-width:761px){.tools:not(.min){max-height:calc(100dvh - 32px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto;scrollbar-width:thin}}
+.ic{display:inline-grid;place-items:center;flex:none;width:18px;height:18px;color:var(--accent);opacity:.9}
+.ic svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tbtn:has(>.ic){justify-content:flex-start}
+.tbtn>.sw,.tbtn>.chev{margin-inline-start:auto}
+.views .tbtn:has(>.ic){justify-content:center;gap:6px}
+.tabs button,.seg button,.cbtn,.mbtn{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.cbtn{display:flex}
+.tabs button .ic,.seg button .ic{width:15px;height:15px;color:currentColor}
+.tabs button .ic svg,.seg button .ic svg{width:15px;height:15px}
+.cbtn .ic{color:currentColor}
+.cbtn:not(.alt){background:rgba(29,29,31,.88)!important;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.12)}
+.cbtn:not(.alt):hover{background:rgba(29,29,31,.95)!important}
+.cbtn.alt{background:rgba(255,255,255,.45)!important;color:var(--ink);border:1px solid rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+.cbtn.alt:hover{background:rgba(255,255,255,.65)!important}
+:root[data-night="1"] .cbtn:not(.alt){background:rgba(255,255,255,.9)!important;color:#1d1d1f}
+:root[data-night="1"] .cbtn.alt{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.18);color:var(--ink)}
+.mbtn .ic{color:currentColor;width:16px;height:16px}
+.mbtn .ic svg{width:16px;height:16px}
+.seg button[aria-pressed="true"] .ic,.tabs button[aria-selected="true"] .ic{color:var(--accent)}
+:root[data-night="1"] .ic{color:#9fa2ff}
+@media (max-width:760px){.mbtn .ic{display:none}}
+.pinpop .pinx{all:unset;cursor:pointer;font-size:20px;line-height:1;color:var(--muted);padding:2px 6px;position:absolute;top:6px;left:6px;z-index:1}
+.pinpop textarea{margin-top:22px}
+body.zshift .zoom{left:var(--zl)!important}
+body.zshift .compass{left:calc(var(--zl) + 62px)!important}
+body.zhide .zoom,body.zhide .compass{opacity:0;pointer-events:none}
+.zoom,.compass{transition:opacity .2s}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -387,7 +415,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 
 <div class="photobar panel" id="photoBar" hidden><span id="photoTxt">מכין את הסצנה…</span><div class="pbar"><i id="photoProg"></i></div><button class="mbtn" id="photoClose">סגירה</button></div>
 
-<div class="pinpop panel" id="pinPop" hidden><textarea id="pinText" rows="3" placeholder="למשל: להזיז את השקע 20 ס״מ שמאלה"></textarea><div class="pinrow"><small id="pinMeta"></small><button id="pinDone" hidden>סמן כטופל</button><button id="pinDel" hidden>מחיקה</button><button id="pinCancel">ביטול</button><button id="pinSave" class="primary">שמירה</button></div></div>
+<div class="pinpop panel" id="pinPop" hidden><button class="x pinx" id="pinX" aria-label="סגירה">×</button><textarea id="pinText" rows="3" placeholder="למשל: להזיז את השקע 20 ס״מ שמאלה"></textarea><div class="pinrow"><small id="pinMeta"></small><button id="pinDone" hidden>סמן כטופל</button><button id="pinDel" hidden>מחיקה</button><button id="pinCancel">ביטול</button><button id="pinSave" class="primary">שמירה</button></div></div>
 <div class="tourbar panel" id="tourBar" hidden><span id="tourTxt"></span><button id="tourNext">הבא ›</button><button id="tourStop">סיום</button></div>
 <div class="toast panel" id="toast" hidden></div>
 
@@ -794,8 +822,8 @@ const M = {
   shutter: std({ map: (() => { const c = document.createElement('canvas'); c.width = 16; c.height = 128; const x = c.getContext('2d');
     for (let y = 0; y < 128; y += 8) { const gr = x.createLinearGradient(0, y, 0, y + 8); gr.addColorStop(0, '#9a8a74'); gr.addColorStop(.6, '#7a6a56'); gr.addColorStop(1, '#4a3e32'); x.fillStyle = gr; x.fillRect(0, y, 16, 8); }
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapT = THREE.RepeatWrapping; t.repeat.set(1, 3); return t; })(), roughness: .6, side: THREE.DoubleSide }),
-  skirtWhite: std({ color: 0xf7f6f2, roughness: .35, envMapIntensity: .7 }),
-  skirt: std({ color: 0x75787a, roughness: .45 }),
+  skirtWhite: std({ color: 0xf7f6f2, roughness: .35, envMapIntensity: .7, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 }),
+  skirt: std({ color: 0x75787a, roughness: .45, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 }),
   lamDark: std({ map: T.lamDark, roughness: .7, envMapIntensity: .12 }),
   lamGrey: std({ map: T.lamGrey, roughness: .7, envMapIntensity: .12 }),
   lamOak: std({ map: T.lamOak, roughness: .45 }),
@@ -2601,10 +2629,13 @@ const VIEWS = {
   garden: () => [new THREE.Vector3(5.5, 4.6, -17), new THREE.Vector3(0.6, 2.6, 0)],
   top: () => [new THREE.Vector3(0.6, 30, 0.42), new THREE.Vector3(0.6, 0, 0.4)],
 };
+// a single floor caps the zoom-out so the view stays on that floor
+function orbitMax() { return state.mode === 'ground' || state.mode === 'first' ? 26 : ORBIT.max; }
 function setMode(m, keepFocus) {
   if (walking && !keepFocus) exitWalk(false);
-  if (focus && !keepFocus) { focus = null; clearFocusFilters(); if (autoWalls) { state.walls = 'full'; autoWalls = false; } document.getElementById('focusBar').hidden = true; document.getElementById('cFocus').textContent = 'הצגת החדר הזה בלבד'; document.getElementById('roomSel').value = ''; }
+  if (focus && !keepFocus) { focus = null; clearFocusFilters(); if (autoWalls) { state.walls = 'full'; autoWalls = false; } document.getElementById('focusBar').hidden = true; cFocusText('הצגת החדר הזה בלבד'); document.getElementById('roomSel').value = ''; }
   state.mode = m;
+  if (!walking) controls.maxDistance = orbitMax();
   document.querySelectorAll('.mbtn').forEach(b => b.setAttribute('aria-selected', b.dataset.mode === m));
   F[1].group.visible = m !== 'ground';
   roofG.visible = m === 'full' || m === 'exploded';
@@ -2734,7 +2765,7 @@ function focusRoom(id) {
   applyWalls(); applyLabels(); selectRoom(id, false);
   document.getElementById('focusName').textContent = r.name;
   document.getElementById('focusBar').hidden = false;
-  document.getElementById('cFocus').textContent = 'חזרה לכל הבית';
+  cFocusText('חזרה לכל הבית');
   document.getElementById('roomSel').value = id;
   const w = (rect[2] - rect[0]) / 100, d = (rect[3] - rect[1]) / 100, base = F[r.f].base;
   const tgt = new THREE.Vector3(wx((rect[0] + rect[2]) / 2), base + .5, wz((rect[1] + rect[3]) / 2));
@@ -2754,7 +2785,7 @@ function setWalkControls(on) {
     controls.minDistance = controls.maxDistance = .05; controls.enablePan = false; controls.enableZoom = false;
     controls.minPolarAngle = Math.PI * .12; controls.maxPolarAngle = Math.PI * .88; controls.rotateSpeed = -.35;
   } else {
-    controls.minDistance = ORBIT.min; controls.maxDistance = ORBIT.max; controls.enablePan = true; controls.enableZoom = true;
+    controls.minDistance = ORBIT.min; controls.maxDistance = orbitMax(); controls.enablePan = true; controls.enableZoom = true;
     controls.minPolarAngle = ORBIT.minPolar; controls.maxPolarAngle = ORBIT.maxPolar; controls.rotateSpeed = 1;
     camera.fov = ORBIT.fov; camera.updateProjectionMatrix();
   }
@@ -2855,7 +2886,7 @@ function exitFocus(restoreMode = true) {
   focus = null; clearFocusFilters();
   if (autoWalls) { state.walls = 'full'; autoWalls = false; }
   document.getElementById('focusBar').hidden = true;
-  document.getElementById('cFocus').textContent = 'הצגת החדר הזה בלבד';
+  cFocusText('הצגת החדר הזה בלבד');
   document.getElementById('roomSel').value = '';
   if (restoreMode) { setMode(prevMode); if (prevCam) flyTo(prevCam[0], prevCam[1], 1.1); } else { applyWalls(); applyLabels(); }
 }
@@ -2891,6 +2922,51 @@ tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
 tog('tRotate', 'rotate', () => controls.autoRotate = state.rotate);
 document.getElementById('cardX').addEventListener('click', () => selectRoom(null));
+function cFocusText(t) { const b = document.getElementById('cFocus'), i = b.querySelector('.ic'); b.textContent = t; if (i) b.prepend(i); }
+// small line icons for the menus
+{
+  const P = {
+    night: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+    labels: '<path d="M3 11.5V4h7.5L21 14.5 13.5 22z"/><circle cx="7.5" cy="8" r="1.4"/>',
+    neighbor: '<path d="M2 20V11l5-4 5 4v9M12 20V11l5-4 5 4v9M1 20h22M5.5 20v-4h3v4M15.5 20v-4h3v4"/>',
+    rotate: '<path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5"/>',
+    hq: '<path d="M12 3l1.9 5.6L19.5 10.5 13.9 12.4 12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/><path d="M19 17v4M17 19h4"/>',
+    pin: '<path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.2"/>',
+    elec: '<path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12z"/>',
+    plumb: '<path d="M12 3s6 6.8 6 11a6 6 0 0 1-12 0c0-4.2 6-11 6-11z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5"/>',
+    tour: '<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z"/>',
+    dash: '<rect x="3" y="3" width="8" height="9" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="14" width="8" height="7" rx="1.5"/>',
+    planner: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
+    street: '<path d="M3 21V10l9-7 9 7v11z"/><path d="M10 21v-6h4v6"/>',
+    garden: '<path d="M12 22v-6"/><path d="M12 16c-4 0-6-2.5-6-5.5S8.5 4 12 3c3.5 1 6 4.5 6 7.5S16 16 12 16z"/>',
+    top: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 12h9v8M13 4v4"/>',
+    iso: '<path d="M12 2.5l8.5 4.8v9.4L12 21.5l-8.5-4.8V7.3z"/><path d="M12 12l8.5-4.7M12 12v9.5M12 12 3.5 7.3"/>',
+    walk: '<circle cx="13" cy="4.5" r="1.7"/><path d="M9 21l2.5-6.5L15 17v4M7.5 12l3-3.5h3l3 3.5M10.5 8.5 11.5 14.5"/>',
+    car: '<path d="M3.5 16v-4l2-5h13l2 5v4z"/><path d="M3.5 16v2.5h3V16M17.5 16v2.5h3V16M7 12.5h.01M17 12.5h.01"/>',
+    eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+    gear: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+    before: '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1M3.5 4v5h5"/><path d="M12 8v4.5l3 2"/>',
+    after: '<path d="M12 3l1.9 5.6L19.5 10.5 13.9 12.4 12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/>',
+    split: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 3v18"/>',
+    full: '<path d="M3 21V10l9-7 9 7v11zM3 14.5h18"/>',
+    ground: '<path d="M3 21V10l9-7 9 7v11z" stroke-opacity=".35"/><path d="M3 14.5h18V21H3z"/>',
+    first: '<path d="M3 21V10l9-7 9 7v11z" stroke-opacity=".35"/><path d="M3 14.5V10l9-7 9 7v4.5z"/>',
+    exploded: '<path d="M12 2.5 21 7l-9 4.5L3 7z"/><path d="M3 13l9 4.5 9-4.5M3 17.5 12 22l9-4.5"/>',
+    target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
+    link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+    wallFull: '<rect x="4" y="4" width="16" height="16" rx="1.5"/>',
+    wallLow: '<path d="M4 20h16v-7H4z"/><path d="M4 4h16" stroke-opacity=".35" stroke-dasharray="2 2"/>',
+    wallNone: '<path d="M4 20h16"/><path d="M4 4h16v16" stroke-opacity=".3" stroke-dasharray="2 2"/>',
+  };
+  const add = (el, k) => { if (!el || el.querySelector(':scope>.ic')) return; const i = document.createElement('span'); i.className = 'ic'; i.setAttribute('aria-hidden', 'true'); i.innerHTML = `<svg viewBox="0 0 24 24">${P[k]}</svg>`; el.prepend(i); };
+  const q = s => document.querySelector(s);
+  [['#tNight', 'night'], ['#tLabels', 'labels'], ['#tNeighbor', 'neighbor'], ['#tRotate', 'rotate'], ['#tHQ', 'hq'], ['#tPins', 'pin'], ['#tElec', 'elec'], ['#tPlumb', 'plumb'], ['#tTour', 'tour'], ['#tDash', 'dash'], ['#tPlanner', 'planner'],
+   ['[data-view=street]', 'street'], ['[data-view=garden]', 'garden'], ['[data-view=top]', 'top'], ['[data-view=iso]', 'iso'], ['[data-walkout=garden]', 'walk'], ['[data-walkout=front]', 'car'],
+   ['[data-tab=view]', 'eye'], ['[data-tab=set]', 'gear'], ['[data-reno=before]', 'before'], ['[data-reno=after]', 'after'], ['[data-reno=split]', 'split'],
+   ['[data-mode=full]', 'full'], ['[data-mode=ground]', 'ground'], ['[data-mode=first]', 'first'], ['[data-mode=exploded]', 'exploded'],
+   ['[data-walls=full]', 'wallFull'], ['[data-walls=low]', 'wallLow'], ['[data-walls=none]', 'wallNone'],
+   ['#cFocus', 'target'], ['#cWalk', 'walk'], ['#cLink', 'link']].forEach(([s, k]) => add(q(s), k));
+}
 { const b = document.getElementById('statBtn'), br = document.getElementById('brandP'); b.addEventListener('click', () => { const on = br.classList.toggle('showstats'); b.setAttribute('aria-expanded', on); b.textContent = on ? 'נתוני הבית ▴' : 'נתוני הבית ▾'; }); }
 document.querySelector('#toolsP .thead').addEventListener('click', e => { const t = document.getElementById('toolsP'); if (t.classList.contains('min') && !e.target.closest('.collapse')) t.querySelector('.collapse').click(); });
 { const tabs = document.querySelectorAll('[data-tab]'), panes = document.querySelectorAll('[data-pane]');
@@ -3161,6 +3237,24 @@ function keyWalk(dt) {
 // compass: shows where north is (the garden side faces north-west in the plans; north = -Z here)
 const compass = document.createElement('div'); compass.className = 'compass panel'; compass.innerHTML = '<svg viewBox="0 0 40 40" width="34" height="34"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-opacity=".25"/><path d="M20 5 L25 20 L20 17 L15 20Z" fill="#c0392b"/><path d="M20 35 L25 20 L20 23 L15 20Z" fill="currentColor" fill-opacity=".5"/><text x="20" y="4.5" font-size="6" text-anchor="middle" fill="currentColor">N</text></svg>';
 document.body.appendChild(compass);
+// keep the zoom stack + compass clear of the open menu: slide them beside it, or hide them on narrow screens
+{
+  const tp = document.getElementById('toolsP'), zm = document.querySelector('.zoom'), B = document.body;
+  const hit = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+  const fix = () => {
+    B.classList.remove('zshift', 'zhide');
+    if (tp.classList.contains('min')) return;
+    const t = tp.getBoundingClientRect(), z = zm.getBoundingClientRect(), c = compass.getBoundingClientRect();
+    if (!hit(t, z) && !hit(t, c)) return;
+    const zl = t.right + 12;
+    if (zl + 120 < innerWidth) { B.style.setProperty('--zl', zl + 'px'); B.classList.add('zshift'); }
+    else B.classList.add('zhide');
+  };
+  addEventListener('resize', fix);
+  new ResizeObserver(fix).observe(tp);
+  new MutationObserver(fix).observe(tp, { attributes: true, attributeFilter: ['class'] });
+  requestAnimationFrame(fix);
+}
 /* ---------- flooring planner: areas from the plan, material per room, quantities and cost ---------- */
 {
   const MATS = {
@@ -3262,8 +3356,10 @@ document.body.appendChild(compass);
 
   /* ---- tool modes ---- */
   let tool = null;
+  // while measuring or pinning the view holds still: no drag-rotate or auto-rotate (wheel zoom and right-drag pan still work)
+  const lockView = on => { controls.enableRotate = !on; controls.autoRotate = !on && state.rotate; if (on) camTween = null; };
   const setTool = t => { tool = tool === t ? null : t; document.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-pressed', b.dataset.tool === tool));
-    renderer.domElement.style.cursor = tool ? 'crosshair' : '';
+    renderer.domElement.style.cursor = tool ? 'crosshair' : ''; lockView(!!tool);
     if (tool === 'measure') toast('מדידה: לחיצה על שתי נקודות · לחיצה על קיר מראה את שטחו'); if (tool === 'pin') toast('הערה: לחיצה על מקום במודל כדי להצמיד הערה');
     if (!tool) clearMeasure(); };
   document.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
@@ -3302,7 +3398,7 @@ document.body.appendChild(compass);
   }
   function applyPinVisibility() { pinLayer.children.forEach(o => { const p = o.userData.pin; const f = p.y > L1 - .05 ? 1 : 0;
     o.visible = state.showPins && (state.mode === 'full' || state.mode === 'exploded' || (state.mode === 'ground' ? f === 0 : f === 1)); }); }
-  state.showPins = true;
+  state.showPins = false; $('tPins').setAttribute('aria-pressed', 'false');
   const savePinsLocal = () => { if (db) return; try { localStorage.setItem('pins', JSON.stringify([...pins])); } catch (e) {} };
   async function addPin(pt) {
     const pop = $('pinPop'); pop.hidden = false; $('pinText').value = ''; $('pinText').focus(); $('pinDel').hidden = true; $('pinDone').hidden = true;
@@ -3310,12 +3406,14 @@ document.body.appendChild(compass);
   }
   function openPin(id) { const p = pins.get(id), pop = $('pinPop'); pop.hidden = false; pop.dataset.id = id; $('pinText').value = p.text; $('pinDel').hidden = false; $('pinDone').hidden = false;
     $('pinDone').textContent = p.done ? 'סמן כפתוח' : 'סמן כטופל'; $('pinMeta').textContent = p.ts ? new Date(p.ts).toLocaleDateString('he-IL') : ''; }
-  $('pinCancel').addEventListener('click', () => $('pinPop').hidden = true);
+  $('pinCancel').addEventListener('click', () => $('pinPop').hidden = true); $('pinX').addEventListener('click', () => $('pinPop').hidden = true);
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !$('pinPop').hidden) $('pinPop').hidden = true; });
   $('pinSave').addEventListener('click', async () => {
     const pop = $('pinPop'), text = $('pinText').value.trim(); if (!text) { pop.hidden = true; return; }
     const id = pop.dataset.id; pop.hidden = true;
     if (id) { const p = { ...pins.get(id), text }; pins.set(id, p); drawPins(); if (db) try { await pinsCol.doc(id).update({ text }); } catch (e) { toast('לא ניתן לשמור. אין הרשאת עריכה'); } else savePinsLocal(); return; }
     const [x, y, z] = JSON.parse(pop.dataset.pt), p = { x, y, z, text, done: false, ts: Date.now(), by: myId || '' };
+    if (!state.showPins) $('tPins').click();
     if (db) { try { await pinsCol.add(p); } catch (e) { toast('לא ניתן לשמור. אין הרשאת עריכה'); } }
     else { pins.set('l' + Date.now(), p); drawPins(); savePinsLocal(); }
     toast('ההערה נשמרה');
@@ -3337,9 +3435,9 @@ document.body.appendChild(compass);
   let dn = null;
   renderer.domElement.addEventListener('pointerdown', e => { dn = [e.clientX, e.clientY]; }, true);
   renderer.domElement.addEventListener('pointerup', e => {
-    if (!tool || !dn || Math.hypot(e.clientX - dn[0], e.clientY - dn[1]) > 6) return;
+    if (!tool || !dn || Math.hypot(e.clientX - dn[0], e.clientY - dn[1]) > 10) return;
     e.stopImmediatePropagation(); const h = surfHit(e); if (!h) return;
-    if (tool === 'measure') measureClick(h); else { addPin(h.point); tool = null; document.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-pressed', false)); renderer.domElement.style.cursor = ''; }
+    if (tool === 'measure') measureClick(h); else { addPin(h.point); tool = null; lockView(false); document.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-pressed', false)); renderer.domElement.style.cursor = ''; }
   }, true);
 
   /* ---- room variants: two named options per room, floor and wall colour, switched in place ---- */
@@ -3428,7 +3526,7 @@ document.body.appendChild(compass);
 
 const zOutBtn = document.getElementById('zOut');
 // high quality: ambient occlusion (soft contact shadows in corners and under furniture)
-const composer = new EffectComposer(renderer);
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth * renderer.getPixelRatio(), innerHeight * renderer.getPixelRatio(), { type: THREE.HalfFloatType, samples: 4 })); // multisampled, so edges stay smooth when AO kicks in
 composer.addPass(new RenderPass(scene, camera));
 const gtao = new GTAOPass(scene, camera, innerWidth, innerHeight);
 gtao.updateGtaoMaterial({ radius: .35, distanceExponent: 1.5, thickness: 1, scale: 1.2, samples: 16, distanceFallOff: 1 });
