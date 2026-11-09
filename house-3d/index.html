@@ -997,14 +997,16 @@ function opening(p, a, ux, uy, theta, op, o) {
     const lw = w - 2 * fw, lh = hgt - fw - 0.01;
     const leaf = lb(g, lw, lh, 0.055, 0, lh / 2, fz, op.type === 'utility' ? M.cabinetDark : M.doorDark);
     if (op.type === 'front') {
-      // glazed strip on the hinge side, with a lower raised panel
-      const gx = lw / 2 - 0.17, gw = 0.2;
-      const gl = new THREE.Mesh(UNIT, M.glass); gl.scale.set(gw, 1.05, 0.06); gl.position.set(gx, 1.45, fz); gl.renderOrder = 2; g.add(gl);
-      for (const dy of [-0.18, 0.18]) lb(g, gw, 0.012, 0.064, gx, 1.45 + dy, fz, M.doorDark);
-      lb(g, 0.012, 1.05, 0.064, gx, 1.45, fz, M.doorDark);
-      lb(g, lw - 0.16, 0.6, 0.062, 0, 0.45, fz, M.alu);
-      lb(g, lw - 0.2, 0.56, 0.066, 0, 0.45, fz, M.doorDark);
-      lb(g, 0.13, 0.025, 0.04, -lw / 2 + 0.1, 1.02, fz + os * 0.05, M.steel); lb(g, 0.13, 0.025, 0.04, -lw / 2 + 0.1, 1.02, fz - os * 0.05, M.steel);
+      // plain charcoal steel security door: thin pressed border, silver lever and round cylinder, peephole, security bar on the inside
+      for (const sd of [1, -1]) { const z = fz + sd * .029;
+        lb(g, lw - .12, .008, .004, 0, .12, z, M.black); lb(g, lw - .12, .008, .004, 0, lh - .1, z, M.black);
+        lb(g, .008, lh - .22, .004, -lw / 2 + .06, lh / 2 + .01, z, M.black); lb(g, .008, lh - .22, .004, lw / 2 - .06, lh / 2 + .01, z, M.black);
+        const hx = -lw / 2 + .1, zz = fz + sd * .05;
+        lb(g, .06, .07, .012, hx, 1.03, fz + sd * .032, M.steel);
+        lb(g, .13, .022, .024, hx + sd * 0 + .055, 1.03, zz, M.steel);
+        { const c = new THREE.Mesh(new THREE.CylinderGeometry(.022, .022, .014, 20), M.steel); c.rotation.x = Math.PI / 2; c.position.set(hx, .93, fz + sd * .034); g.add(c); }
+        { const ph = new THREE.Mesh(new THREE.CylinderGeometry(.01, .01, .012, 12), M.steel); ph.rotation.x = Math.PI / 2; ph.position.set(0, 1.55, fz + sd * .033); g.add(ph); } }
+      lb(g, .5, .02, .03, -lw / 2 + .3, 1.62, fz - os * .045, M.steel); lb(g, .04, .06, .04, -lw / 2 + .06, 1.62, fz - os * .045, M.steel);
     }
     leaf.castShadow = true;
   } else if (op.type === 'slide') {
@@ -1191,7 +1193,19 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
     const xa = 452 + i * tr, top = (i + 1) * R;
     B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.treadWood).userData.stair = true;
   }
-  B(p, 700, 432, 778, 618, 0, 9 * R - 4, M.interior); B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing
+  B(p, 700, 432, 778, 618, 0, 9 * R - 4, M.interior);
+  { // coat rack on the angled wall beside the front door, coats and bags hanging on it (entrance photos)
+    const g = local(F[0].furn, 172, 754, 0, 2.395); g.userData.noRemap = true;
+    lb(g, .9, .1, .025, 0, 1.72, .013, M.oak);
+    for (let k = 0; k < 5; k++) { const x = -.36 + k * .18; lb(g, .02, .02, .09, x, 1.7, .07, M.black);
+      if (k !== 2) { const c = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.32, .78, .12, 3, .04), std({ color: [0x2b2f36, 0x5a4636, 0x1f2a3a, 0x6b6f72, 0x3a2f2a][k], roughness: 1 }))); c.position.set(x, 1.27, .1); c.rotation.z = (rnd() - .5) * .1; g.add(c); } }
+    const bag = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.28, .3, .1, 3, .03), std({ color: 0xd8b9a0, roughness: .8 }))); bag.position.set(0, 1.45, .09); g.add(bag);
+    // small shoe cabinet under it
+    lb(g, .8, .45, .3, 0, .225, .16, M.white); lb(g, .78, .005, .29, 0, .23, .31, M.black); }
+  { // small storage cut under the landing, opening onto the passage: flush white door with a black handle
+    const d = [B(p, 698.6, 534, 700, 610, 3, 9 * R - 14, M.trim, 0)];
+    for (const [y0, y1, z0, z1] of [[533, 534, 2, 9 * R - 13], [610, 611, 2, 9 * R - 13], [533, 611, 9 * R - 14, 9 * R - 13]]) d.push(B(p, 698.8, y0, 700, y1, z0, z1, M.black, 0));
+    d.push(B(p, 697.6, 540, 698.6, 552, 92, 94, M.black, 0)); d.forEach(m => m.userData.noRemap = true); } B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing
   // stone-look strip cladding on the tall landing wall, a wall clock, a floor vase; framed pictures along the flight
   { // brick-strip wallpaper over the whole tall landing wall, both storeys
     const m = new THREE.Mesh(boxUV(.01, 3.1, 1.88, 4.31, 0), M.stoneStrip); m.position.set(wx(779.4), 1.5, wz(525)); m.scale.y = L1 / 3.1; p.add(m); onWall(m, 0, 0, L1 * 100);
@@ -1480,8 +1494,6 @@ function desk(p, base, r, chairAt, faceTo) {
   // sink wall (west): cream gloss base units, light grey quartz top, white glass splashback
   for (const [y0, y1, z1] of [[320, 472, 88], [538, 699, 88], [472, 538, 71]]) B(p, 16, y0, 76, y1, 10, z1, M.kCream, b); B(p, 68, 472, 76, 538, 71, 88, M.kCream, b);
   for (const [x0, y0, x1, y1] of [[16, 318, 79, 472], [16, 538, 79, 699], [16, 472, 26, 538], [68, 472, 79, 538]]) B(p, x0, y0, x1, y1, 88, 92, M.kTop, b); // worktop with the sink cut-out
-  for (let y = 320; y < 699; y += 30) B(p, 76, y - .2, 76.5, y + .2, 10, 88, M.black, b);
-  B(p, 76, 320, 76.5, 699, 48.8, 49.2, M.black, b);
   // on the counter: kettle, fruit bowl, cutting board, coffee machine, dish soap by the sink
   CY(p, 40, 610, 8, 92, 113, M.steel, b, 18, 9); CY(p, 40, 610, 3, 113, 116, M.black, b, 10);
   CY(p, 50, 440, 13, 92, 98, M.white, b, 24, 8); for (const [dx, dy, c] of [[-4, -2, 0xd8a03a], [3, 3, 0xb83a2a], [2, -5, 0x9ab04a], [-2, 5, 0xd8a03a]]) { const f = new THREE.Mesh(new THREE.SphereGeometry(.04, 12, 8), std({ color: c, roughness: .5 })); f.position.set(wx(50 + dx), b + 1.0, wz(440 + dy)); p.add(f); }
@@ -1489,10 +1501,11 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 22, 655, 52, 680, 92, 128, M.black, b); B(p, 30, 662, 44, 672, 98, 104, M.steel, b);
   CY(p, 30, 535, 2.5, 92, 112, std({ color: 0x8fb34a, roughness: .2, transparent: true, opacity: .85 }), b, 10);
   B(p, 18, 320, 74, 699, 0, 10, M.skirt, b);
-  for (let y = 320; y < 690; y += 60) {
-    if (y + 30 > 405 && y + 30 < 465) continue;
-    B(p, 76, y - .3, 76.6, y + .3, 10, 88, M.black, b);
-    handleY(76, y + 12, y + 48, 80); handleY(76, y + 12, y + 48, 47);
+  // door fronts: two doors left of the dishwasher, three to its right, then the corner
+  for (const [y0, y1, drawers] of [[320, 362, 0], [362, 405, 0], [465, 525, 0], [525, 585, 1], [585, 640, 1]]) {
+    B(p, 76, y0 - .25, 76.5, y0 + .25, 10, 88, M.black, b); B(p, 76, y1 - .25, 76.5, y1 + .25, 10, 88, M.black, b);
+    if (drawers) { for (const z of [36, 62]) B(p, 76, y0, 76.5, y1, z - .25, z + .25, M.black, b); for (const z of [84, 58, 32]) handleY(76, y0 + 8, y1 - 8, z); }
+    else handleY(76, y0 + 6, y1 - 6, 82);
   }
   B(p, 76, 405, 77.5, 465, 10, 86, M.steel, b); B(p, 76.5, 407, 78, 463, 79, 85, M.black, b);       // dishwasher, between the sink and the hob
   // light-grey composite sink, recessed into the top, with a tall chrome pull-down mixer (as in the photos)
@@ -2272,7 +2285,6 @@ function desk(p, base, r, chairAt, faceTo) {
   // big green bush beside the entrance path, EV charger and lantern on the facade
   { const bush = std({ color: 0x3f6a2e, roughness: .9, flatShading: true }); for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.55 + rnd() * .25, 1), bush)); m.position.set(wx(-130 + (rnd() - .5) * 70), .5 + rnd() * .9, wz(1060 + (rnd() - .5) * 80)); p.add(m); } }
   B(p, 330, 972, 350, 980, 110, 140, std({ color: 0xdfe3e6, roughness: .4 }));
-  B(p, 268, 760, 276, 768, 230, 255, M.black);
   // black slatted sliding gate on the street side, open across the shed
   for (let z = 10; z < 175; z += 16) B(p, 450, 1440, 785, 1446, z, z + 11, M.black); for (const X of [450, 785]) B(p, X - 4, 1438, X + 4, 1448, 0, 180, M.black);
   flat(-2000, 1450, 2000, 1620, -0.02, M.concrete);
