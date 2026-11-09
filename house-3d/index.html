@@ -138,7 +138,10 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .renobar{position:fixed;left:50%;transform:translateX(-50%);top:calc(16px + env(safe-area-inset-top,0px));width:270px;padding:4px!important;z-index:3}
 .renobar button{padding:7px 6px;font-weight:600}
 @media (max-width:760px){.renobar{bottom:auto;top:calc(150px + env(safe-area-inset-top,0px));width:calc(100% - 24px);max-width:320px}}
-.statbtn{all:unset;cursor:pointer;margin-top:6px;font-size:12px;font-weight:600;color:var(--accent)}
+.statbtn{all:unset;cursor:pointer;margin-top:6px;font-size:12.5px;font-weight:600;color:var(--ink);opacity:.8;display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;background:rgba(120,120,128,.16)}
+.statbtn:hover{opacity:1}
+.statbtn .schev{transition:transform .2s}
+.statbtn[aria-expanded="true"] .schev{transform:rotate(180deg)}
 .brand.showstats .stats{display:flex}
 .brand.min .statbtn{display:none}
 .cbtn:not(.alt){background:var(--accent-grad)!important;box-shadow:0 4px 14px rgba(91,95,245,.3)}
@@ -305,6 +308,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .card .x svg{width:15px;height:15px}
 .lbl span{display:none}
 .brand .sub{display:none!important}
+.tbtn .chev.ext{display:grid;place-items:center;opacity:.75}
 .brand h1{margin-top:14px!important}
 .brand .eyebrow{min-height:28px;display:flex;align-items:center}
 .brand.showstats .sub{display:block!important;margin-top:8px}
@@ -338,7 +342,7 @@ body.zhide .zoom,body.zhide .compass{opacity:0;pointer-events:none}
   <button class="collapse" data-col="brandP" aria-label="כיווץ" aria-expanded="true"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <div class="eyebrow">יקנעם · דגם A-1</div>
   <h1>בית גירשביץ׳</h1>
-  <button class="statbtn" id="statBtn" aria-expanded="false">נתוני הבית ▾</button>
+  <button class="statbtn" id="statBtn" aria-expanded="false">נתוני הבית <svg class="schev" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <div class="sub">דירה 29 · בית דו-משפחתי בשתי קומות עם חצר צמודה</div>
   <div class="stats">
     <div class="stat"><b id="sG">—</b><span>קומת קרקע, מ״ר</span></div>
@@ -394,7 +398,7 @@ body.zhide .zoom,body.zhide .compass{opacity:0;pointer-events:none}
     <button class="tbtn" id="tPlumb" aria-pressed="false">אינסטלציה <span class="sw"></span></button>
     <h2>כלים</h2>
     <button class="tbtn wide" id="tTour">סיור מודרך <span class="chev">›</span></button>
-    <a class="tbtn wide" id="tDash" href="https://shiputz-chi.vercel.app/" target="_blank" rel="noopener">דשבורד השיפוץ <span class="chev">↗</span></a>
+    <a class="tbtn wide" id="tDash" href="https://shiputz-chi.vercel.app/" target="_blank" rel="noopener">דשבורד השיפוץ <span class="chev ext"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M14 4h6v6M20 4l-8.5 8.5M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
     <button class="tbtn wide" id="tPlanner">מתכנן ריצוף <span class="chev">›</span></button>
   </section>
 </aside>
@@ -1161,10 +1165,10 @@ function wall(p, a, b, o) {
     if (o.base === 0 && z0 === 0 && !o.noSkirt) {
       // inside faces only: both sides of an interior wall, the room side of an exterior one
       const dep = outSide ? t / 2 + 0.8 : t + 1.6, off = outSide ? -outSide * dep / 2 : 0;
-      const k = shadowy(new THREE.Mesh(UNIT, M.skirt)); k.userData.skirt = true; skirts.push(k); k.scale.set((e - s) / 100, 0.07, dep / 100);
+      const k = shadowy(new THREE.Mesh(UNIT, M.skirt)); k.userData.skirt = true; skirts.push(k); const sh = 0.07 + (skirts.length % 3) * 0.0015; k.scale.set((e - s) / 100, sh, dep / 100); // heights differ by 1.5 mm so boards meeting at a corner never share a top face
       const ox = -uy * off, oy = ux * off;
-      k.position.set(wx(a[0] + ux * c + ox), 0.035, wz(a[1] + uy * c + oy)); k.rotation.y = theta; p.add(k);
-      k.userData.wall = { base: 0, y0: 0, y1: 0.07, sy: 0.07 }; wallPieces.push(k);
+      k.position.set(wx(a[0] + ux * c + ox), sh / 2, wz(a[1] + uy * c + oy)); k.rotation.y = theta; p.add(k);
+      k.userData.wall = { base: 0, y0: 0, y1: sh, sy: sh }; wallPieces.push(k);
       k.userData.seg = [a[0] + ux * s + ox, a[1] + uy * s + oy, a[0] + ux * e + ox, a[1] + uy * e + oy, k.position.x, k.position.z];
     }
   }
@@ -1369,7 +1373,8 @@ J([470, 632], [780, 632], [], 10);                                       // Ron'
 
 /* room floors, labels, ceiling lights */
 for (const r of ROOMS) {
-  const fl = F[r.f], [x0, y0, x1, y1] = r.rect, w = (x1 - x0) / 100, d = (y1 - y0) / 100;
+  // floors run 3 cm under the surrounding walls so no hairline gap shows (and sparkles) where wall meets floor
+  const ext = r.outdoor ? 0 : 3, fl = F[r.f], [x0, y0, x1, y1] = [r.rect[0] - ext, r.rect[1] - ext, r.rect[2] + ext, r.rect[3] + ext], w = (x1 - x0) / 100, d = (y1 - y0) / 100;
   const g = new THREE.PlaneGeometry(w, d); g.rotateX(-Math.PI / 2);
   // UVs in the same world mapping as the floor slab (u = X, v = Y in metres, centred), so herringbone runs on unbroken across rooms and passages
   const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, (x0 + uv.getX(i) * (x1 - x0)) / 100 - CX, (y1 - uv.getY(i) * (y1 - y0)) / 100 - CZ);
@@ -1627,7 +1632,7 @@ function desk(p, base, r, chairAt, faceTo) {
   { // wine bottles lying in the cubbies, necks facing the room
     const glassG = std({ color: 0x1f3a24, roughness: .15, envMapIntensity: 1.2 }), glassR = std({ color: 0x3a1418, roughness: .15, envMapIntensity: 1.2 }), cap = std({ color: 0xb08a3a, roughness: .4, metalness: .6 });
     for (let z = 15; z < 78; z += 11) for (let y = 142; y < 177; y += 10) { if (rnd() < .2) continue;
-      const g = new THREE.Group(); g.position.set(wx(767), b + z / 100, wz(y)); g.rotation.z = Math.PI / 2; p.add(g);
+      const g = new THREE.Group(); g.position.set(wx(762), b + z / 100, wz(y)); g.rotation.z = Math.PI / 2; p.add(g); // caps stand clear of the cabinet face (no flicker)
       const body = new THREE.Mesh(new THREE.CylinderGeometry(.036, .036, .2, 14), rnd() > .5 ? glassG : glassR); body.position.y = .02; g.add(body);
       const neck = new THREE.Mesh(new THREE.CylinderGeometry(.014, .03, .1, 12), body.material); neck.position.y = .17; g.add(neck);
       const c = new THREE.Mesh(new THREE.CylinderGeometry(.015, .015, .03, 10), cap); c.position.y = .235; g.add(c); } }
@@ -3056,7 +3061,7 @@ document.querySelectorAll('.zoom button').forEach(b => { const t = b.getAttribut
    ['[data-walls=full]', 'wallFull'], ['[data-walls=low]', 'wallLow'], ['[data-walls=none]', 'wallNone'],
    ['#cFocus', 'target'], ['#cWalk', 'walk']].forEach(([s, k]) => add(q(s), k));
 }
-{ const b = document.getElementById('statBtn'), br = document.getElementById('brandP'); b.addEventListener('click', () => { const on = br.classList.toggle('showstats'); b.setAttribute('aria-expanded', on); b.textContent = on ? 'נתוני הבית ▴' : 'נתוני הבית ▾'; }); }
+{ const b = document.getElementById('statBtn'), br = document.getElementById('brandP'); b.addEventListener('click', () => { const on = br.classList.toggle('showstats'); b.setAttribute('aria-expanded', on);  }); }
 document.querySelector('#toolsP .thead').addEventListener('click', e => { const t = document.getElementById('toolsP'); if (t.classList.contains('min') && !e.target.closest('.collapse')) t.querySelector('.collapse').click(); });
 { const tabs = document.querySelectorAll('[data-tab]'), panes = document.querySelectorAll('[data-pane]');
   const show = t => { tabs.forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t)); panes.forEach(p => p.hidden = p.dataset.pane !== t); try { localStorage.setItem('menuTab', t); } catch (e) {} };
