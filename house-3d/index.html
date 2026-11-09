@@ -1274,6 +1274,15 @@ function wallToilet(p, base, X, Y, rot, plateMat = M.brushed) {
   lb(g, .24, .16, .015, 0, 1.05, .008, plateMat); lb(g, .09, .11, .005, -.055, 1.05, .018, M.alu); lb(g, .09, .11, .005, .055, 1.05, .018, M.alu);
   return g;
 }
+// basin bowl: an open, thin-walled ceramic bowl (rounded rectangle) with a drain, sitting on or in a top
+function basin(p, base, X0, Y0, X1, Y1, z0, z1) {
+  const w = Math.abs(X1 - X0) / 100, d = Math.abs(Y1 - Y0) / 100, h = (z1 - z0) / 100, g = new THREE.Group();
+  g.position.set(wx((X0 + X1) / 2), base + z0 / 100, wz((Y0 + Y1) / 2)); p.add(g);
+  const prof = [[0, 0], [.42, 0], [.48, .08], [.5, .7], [.5, 1], [.46, 1], [.45, .72], [.4, .14], [0, .1]].map(([x, y]) => new THREE.Vector2(x, y * h));
+  const m = shadowy(new THREE.Mesh(new THREE.LatheGeometry(prof, 48), M.ceramic)); m.scale.set(w, 1, d); g.add(m);
+  const dr = new THREE.Mesh(new THREE.CylinderGeometry(.018, .018, .004, 16), M.steel); dr.position.y = h * .1 + .003; g.add(dr);
+  return g;
+}
 function vanity(p, base, r, basinAt) {
   B(p, ...r, 10, 82, M.cabinetDark, base); B(p, r[0] - 1, r[1] - 1, r[2] + 1, r[3] + 1, 82, 86, M.quartz, base);
   CY(p, basinAt[0], basinAt[1], 19, 86, 99, M.ceramic, base, 28, 15);
@@ -1901,7 +1910,7 @@ function desk(p, base, r, chairAt, faceTo) {
   tileRoom([22.5, 321, 188, 490], M.ensWall, { N: [[120, 190, 0, 210]], W: [[376, 436, 140, 210]] });
   panel(86, 488.6, 100, 489, 0, 274, M.mosaic); panel(186.6, 432, 187, 446, 0, 274, M.mosaic);
   toilet(p, b, 62, 466, 62, 380);
-  B(p, 23.5, 330, 68, 395, 45, 80, M.teal, b); B(p, 30, 340, 60, 385, 80, 94, M.ceramic, b); B(p, 33, 343, 57, 382, 90, 94.5, M.water, b);
+  B(p, 23.5, 330, 68, 395, 45, 80, M.teal, b); B(p, 30, 340, 60, 385, 78, 80, M.white, b); basin(p, b, 30, 340, 60, 385, 80, 94);
   CY(p, 26, 362, 1.2, 94, 110, M.steel, b, 8); B(p, 25, 361, 40, 363, 108, 110, M.steel, b);
   B(p, 23, 335, 26, 390, 60, 63, M.steel, b);
   { const g = local(p, 23.6, 362, b, Math.PI / 2); const m = new THREE.Mesh(new THREE.CylinderGeometry(.24, .24, .01, 32, 1, false, 0, Math.PI), M.mirror); m.rotation.x = Math.PI / 2; m.position.set(0, 1.63, .01); g.add(m); lb(g, .48, .52, .01, 0, 1.37, .01, M.mirror); onWall(g, b, 111, 187); }
@@ -1944,7 +1953,7 @@ function desk(p, base, r, chairAt, faceTo) {
     B(p, 93, 486, 95, 488.5, 50, 75, M.black, b);
     // oak vanity with a white top, vessel basin, black wall tap, backlit rounded mirror
     B(p, 23.5, 325, 70, 398, 45, 82, M.oakLight, b); B(p, 23.5, 325, 70, 398, 18, 20, M.oakLight, b); B(p, 23.5, 325, 25, 398, 18, 82, M.oakLight, b);
-    B(p, 23.5, 323, 73, 400, 82, 86, M.qWhite, b); RB(p, 32, 342, 62, 384, 86, 100, M.ceramic, b, .04); B(p, 35, 345, 59, 381, 95, 100.5, M.water, b);
+    B(p, 23.5, 323, 73, 400, 82, 86, M.qWhite, b); basin(p, b, 32, 342, 62, 384, 86, 100);
     B(p, 23.5, 362, 32, 364, 108, 110, M.black, b); CY(p, 25, 355, 1.5, 102, 104, M.black, b, 10);
     B(p, 70, 335, 72, 390, 70, 72, M.black, b); B(p, 70.5, 345, 72, 375, 40, 70, M.sageTowel, b);
     { const rr = new THREE.Shape(), w = .42, h = .7, r = .12;
@@ -1962,7 +1971,7 @@ function desk(p, base, r, chairAt, faceTo) {
   // long wenge vanity on the north wall with a vessel basin, framed mirror, tall cabinet beside it
   B(p, 140, 503, 300, 553, 70, 82, M.wenge, b); B(p, 140, 503, 190, 553, 10, 70, M.wenge, b);
   for (const z of [26, 50]) B(p, 150, 553, 180, 554.5, z, z + 2, M.steel, b);
-  B(p, 220, 512, 280, 548, 82, 96, M.ceramic, b); B(p, 224, 515, 276, 545, 92, 96.5, M.water, b);
+  basin(p, b, 220, 512, 280, 548, 82, 98);
   CY(p, 250, 508, 1.3, 82, 104, M.steel, b, 8); B(p, 249, 508, 251, 522, 102, 104, M.steel, b);
   onWall(B(p, 185, 503.5, 285, 506, 112, 192, M.wenge, b), b, 112, 192); onWall(B(p, 191, 506, 279, 506.6, 118, 186, M.mirror, b), b, 118, 186);
   onWall(B(p, 215, 504, 255, 512, 198, 205, M.steel, b), b, 198, 205);
