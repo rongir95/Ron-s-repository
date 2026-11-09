@@ -1605,11 +1605,6 @@ function desk(p, base, r, chairAt, faceTo) {
     { const v = CY(p, 545, 648.5, 14, 0, 1.5, M.white, b, 28); v.rotation.x = Math.PI / 2; v.position.y = b + 2.35; }
     B(p, 535, 648, 555, 650, 225, 245, M.alu, b);
   }
-  // photos stuck on the outside of the safe-room door (passage side)
-  { const c = document.createElement('canvas'); c.width = 256; c.height = 512; const g = c.getContext('2d'); g.fillStyle = '#f4f2ee'; g.fillRect(0, 0, 256, 512);
-    for (let y = 20; y < 470; y += 34) for (let x = 20 + (y % 2) * 8; x < 230; x += 36) { g.fillStyle = hsl(rnd() * 360, 30, 30 + rnd() * 40); g.fillRect(x, y, 30, 28); }
-    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(.78, 1.9), std({ map: t, roughness: .6 })); m.rotation.y = Math.PI; m.position.set(wx(545), 1.05, wz(629.5)); m.userData.noRemap = true; F[0].furn.add(m); }
 }
 
 /* first floor furniture */
