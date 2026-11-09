@@ -304,6 +304,16 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .card .clink{left:46px!important;top:10px!important}
 .card .x svg{width:15px;height:15px}
 .lbl span{display:none}
+.brand .sub{display:none!important}
+.brand.showstats .sub{display:block!important;margin-top:8px}
+.collapse{transition:background .2s!important}
+@media (min-width:761px){
+  .modes{left:auto!important;right:max(16px,env(safe-area-inset-right,0px));transform:none!important}
+  .zoom{bottom:calc(74px + env(safe-area-inset-bottom,0px))!important}
+  .compass{left:calc(max(16px,env(safe-area-inset-left,0px)) + 2px)!important;bottom:calc(18px + env(safe-area-inset-bottom,0px))!important}
+  body.zshift .compass{left:calc(var(--zl) + 2px)!important}
+  .card{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
 body.tooling .lbl{pointer-events:none}
 .planner input,.planner select{background-color:var(--track)!important;border:0!important;border-radius:10px!important;padding:6px 10px!important}
 .planner select{appearance:none;-webkit-appearance:none;padding-left:28px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%23777' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px 50%;background-size:14px 14px}
@@ -323,8 +333,8 @@ body.zhide .zoom,body.zhide .compass{opacity:0;pointer-events:none}
   <button class="collapse" data-col="brandP" aria-label="כיווץ" aria-expanded="true"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <div class="eyebrow">יקנעם · דגם A-1</div>
   <h1>בית גירשביץ׳</h1>
-  <div class="sub">דירה 29 · בית דו-משפחתי בשתי קומות עם חצר צמודה</div>
   <button class="statbtn" id="statBtn" aria-expanded="false">נתוני הבית ▾</button>
+  <div class="sub">דירה 29 · בית דו-משפחתי בשתי קומות עם חצר צמודה</div>
   <div class="stats">
     <div class="stat"><b id="sG">—</b><span>קומת קרקע, מ״ר</span></div>
     <div class="stat"><b id="sF">—</b><span>קומה א׳, מ״ר</span></div>
@@ -1342,7 +1352,8 @@ J([470, 632], [780, 632], [], 10);                                       // Ron'
 for (const r of ROOMS) {
   const fl = F[r.f], [x0, y0, x1, y1] = r.rect, w = (x1 - x0) / 100, d = (y1 - y0) / 100;
   const g = new THREE.PlaneGeometry(w, d); g.rotateX(-Math.PI / 2);
-  const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * w + x0 / 100, uv.getY(i) * d - y1 / 100);
+  // UVs in the same world mapping as the floor slab (u = X, v = Y in metres, centred), so herringbone runs on unbroken across rooms and passages
+  const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, (x0 + uv.getX(i) * (x1 - x0)) / 100 - CX, (y1 - uv.getY(i) * (y1 - y0)) / 100 - CZ);
   const m = new THREE.Mesh(g, M[r.mat]); m.receiveShadow = true;
   m.position.set(wx((x0 + x1) / 2), fl.base + 0.004 + (ROOMS.indexOf(r) % 4) * 0.002, wz((y0 + y1) / 2)); // staggered so overlapping room floors never share a plane
   m.userData.room = r.id; r.mesh = m; r.baseMat = M[r.mat]; fl.shell.add(m); roomMeshes.push(m);
@@ -1409,8 +1420,12 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
     d.forEach(m => m.userData.noRemap = true); } B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing
   // stone-look strip cladding on the tall landing wall, a wall clock, a floor vase; framed pictures along the flight
   { // brick-strip wallpaper over the whole tall landing wall, both storeys
-    const m = new THREE.Mesh(boxUV(.01, 3.1, 1.88, 4.31, 0), M.stoneStrip); m.position.set(wx(779.4), 1.5, wz(525)); m.scale.y = L1 / 3.1; p.add(m); onWall(m, 0, 0, L1 * 100);
-    const m2 = new THREE.Mesh(boxUV(.01, 2.75, 2.06, 4.22, L1), M.stoneStrip); m2.position.set(wx(779.4), L1 + H2 / 2, wz(512)); m2.scale.y = H2 / 2.75; F[1].furn.add(m2); onWall(m2, L1, 0, H2 * 100); m.userData.noRemap = m2.userData.noRemap = true; }
+    // one continuous pattern: UVs come from the wall position (u = plan Y, v = height), so the two storeys' panels line up seamlessly
+    const strip = (Y0, Y1, z0, h, parent) => { const g = new THREE.PlaneGeometry((Y1 - Y0) / 100, h); g.rotateY(-Math.PI / 2); const uv = g.attributes.uv;
+      for (let i = 0; i < uv.count; i++) uv.setXY(i, (Y0 + uv.getX(i) * (Y1 - Y0)) / 100, z0 + uv.getY(i) * h);
+      const m = new THREE.Mesh(g, M.stoneStrip); m.receiveShadow = true; m.position.set(wx(779.3), z0 + h / 2, wz((Y0 + Y1) / 2)); m.userData.noRemap = true; parent.add(m); return m; };
+    onWall(strip(431, 619, 0, L1, p), 0, 0, L1 * 100);
+    onWall(strip(409, 615, L1, H2, F[1].furn), L1, 0, H2 * 100); }
   onWall(CY(p, 776, 525, 22, 330, 332, std({ color: 0xd9c9a8, roughness: .8 }), 0, 32), 0, 330, 332).rotation.z = Math.PI / 2;
   for (let k = 0; k < 4; k++) { const x = 468 + k * 33, z = Math.round((x + 13 - 452) / 248 * 9 * R) + 112; onWall(B(p, x, 519.5, x + 26, 521, z, z + 20, M.black, 0), 0, z, z + 20); onWall(B(p, x + 3, 519.1, x + 23, 519.5, z + 3, z + 17, M.duvetC, 0), 0, z + 3, z + 17); }
   for (let j = 0; j < 9; j++) { // flight 2: open underneath, the passage to the safe-room door runs below it
@@ -2484,13 +2499,26 @@ function desk(p, base, r, chairAt, faceTo) {
   const TX = -80; // moved west, away from the barbecue
   B(p, 470 + TX, -230, 630 + TX, -140, 72, 74, new THREE.MeshPhysicalMaterial({ color: 0x0c0c0e, roughness: .06, metalness: .1, clearcoat: 1, clearcoatRoughness: .04, envMapIntensity: 1.2 })); // black tempered-glass top for (const [x, y] of [[472, -228], [628, -228], [472, -142], [628, -142]]) B(p, x + TX - 2, y - 2, x + TX + 2, y + 2, 0, 72, M.alu);
   B(p, 470 + TX, -230, 630 + TX, -226, 68, 72, M.alu); B(p, 470 + TX, -144, 630 + TX, -140, 68, 72, M.alu);
-  const resin = std({ color: 0xf2f2ef, roughness: .45 }), resinDS = resin.clone(); resinDS.side = THREE.DoubleSide;
+  // garden chairs: grey aluminium frame with black textilene mesh seat and back
+  const alu = new THREE.MeshStandardMaterial({ color: 0x8c8f93, roughness: .35, metalness: .6 });
+  const meshTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'); x.fillStyle = '#141516'; x.fillRect(0, 0, 64, 64);
+    for (let i = 0; i < 64; i += 8) for (let j = 0; j < 64; j += 8) x.clearRect(i + 2, j + 2, 4, 4);
+    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(10, 10); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; })();
+  const sling = new THREE.MeshStandardMaterial({ color: 0xffffff, map: meshTex, roughness: .8, transparent: true, opacity: .92, alphaTest: .05, side: THREE.DoubleSide });
   const gardenChair = (X, Y, tx, ty) => {
     const g = local(p, X, Y, 0, Math.atan2(wx(tx) - wx(X), wz(ty) - wz(Y)));
-    const seat = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.46, .04, .44, 3, .015), resin)); seat.position.y = .44; g.add(seat);
-    const back = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .46, 24, 1, true, Math.PI - .42, .84), resinDS)); back.position.set(0, .72, -.2 + .6); g.add(back);
-    for (const sx of [-1, 1]) { const arm = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.05, .03, .42, 2, .012), resin)); arm.position.set(sx * .24, .64, 0); g.add(arm);
-      for (const sz of [-1, 1]) { const l = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.018, .022, sz < 0 ? .64 : .64, 8), resin)); l.position.set(sx * .22, .32, sz * .19); l.rotation.x = sz * .06; g.add(l); } }
+    const tube = (len, x, y, z, rx = 0, rz = 0) => { const m = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.013, .013, len, 8), alu)); m.position.set(x, y, z); m.rotation.set(rx, 0, rz); g.add(m); };
+    for (const sx of [-1, 1]) {
+      tube(.44, sx * .23, .22, .2); tube(.44, sx * .23, .22, -.2);            // legs
+      tube(.42, sx * .23, .43, 0, Math.PI / 2);                                  // seat side rail
+      tube(.5, sx * .23, .68, -.24, .18);                                       // back post, leaning back
+      tube(.44, sx * .25, .64, 0, Math.PI / 2);                                  // armrest
+      tube(.2, sx * .25, .54, .19);                                             // armrest front support
+    }
+    for (const z of [-.2, .2]) tube(.46, 0, .43, z, 0, Math.PI / 2);             // seat front/back rails
+    tube(.46, 0, .92, -.28, 0, Math.PI / 2);                                       // back top rail
+    const seat = shadowy(new THREE.Mesh(new THREE.PlaneGeometry(.44, .38), sling)); seat.rotation.x = -Math.PI / 2; seat.position.y = .425; g.add(seat);
+    const back = shadowy(new THREE.Mesh(new THREE.PlaneGeometry(.44, .46), sling)); back.position.set(0, .68, -.245); back.rotation.x = .18; g.add(back);
   };
   for (const [X, Y, tx, ty] of [[510, -110, 510, -185], [590, -110, 590, -185], [510, -260, 510, -185], [650, -185, 550, -185]]) gardenChair(X + TX, Y, tx + TX, ty);
   // retractable awning over the slider, flood lights under it
@@ -3486,6 +3514,7 @@ document.body.appendChild(compass);
   /* ---- room variants: two named options per room, floor and wall colour, switched in place ---- */
   const VAR_FLOORS = { herring: 'פרקט פישבון', lamOak: 'פרקט אלון ישר', terrazzo: 'טרצו', tile: 'אריח אפור 60×60', laminate: 'למינציה קיימת' };
   const VAR_WALLS = { '': 'ללא שינוי', '#f6f6f4': 'לבן', '#e9e2d5': 'שמנת', '#d9d0c3': 'גריז׳', '#c9d3cf': 'מנטה אפרפר', '#cdbfae': 'טאופ' };
+  ROOMS.forEach(r => r._baseAfter = r.afterMat);
   let variants = {}; try { variants = JSON.parse(localStorage.getItem('variants') || '{}'); } catch (e) {}
   const wallPaint = new Map(); // room id -> overlay panels
   function paintRoom(r, col) {
@@ -3500,7 +3529,12 @@ document.body.appendChild(compass);
     if (opt.floor) r.afterMat = opt.floor; if (state.reno) setReno(true, state.split); paintRoom(r, state.reno ? opt.wall : ''); }
   const origSetReno = setReno;
   window.__reapplyVariants = () => Object.keys(variants).forEach(applyVariant);
-  function variantsReady() { if (!db) return; db.collection('variants').onSnapshot(s => { s.docs.forEach(d => variants[d.id] = d.data()); Object.keys(variants).forEach(applyVariant); renderVarUI(); }, () => {}); }
+  function variantsReady() { if (!db) return; db.collection('variants').onSnapshot(s => {
+    // the shared store is the source of truth: drop variants that only this browser remembers, restoring those rooms' planned finish
+    const next = {}; s.docs.forEach(d => next[d.id] = d.data());
+    for (const id of Object.keys(variants)) if (!next[id]) { const r = ROOMS.find(q => q.id === id); if (r) { r.afterMat = r._baseAfter; paintRoom(r, ''); } }
+    variants = next; try { localStorage.setItem('variants', JSON.stringify(variants)); } catch (e) {}
+    Object.keys(variants).forEach(applyVariant); if (state.reno) setReno(true, state.split); renderVarUI(); }, () => {}); }
   async function saveVariant(id) { try { localStorage.setItem('variants', JSON.stringify(variants)); } catch (e) {} if (db) try { await db.collection('variants').doc(id).set(variants[id]); } catch (e) { toast('הגרסה נשמרה רק בדפדפן הזה'); } }
   function renderVarUI() {
     const box = $('varBox'), id = state.sel, r = id && ROOMS.find(q => q.id === id);
