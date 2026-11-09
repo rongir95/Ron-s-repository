@@ -1441,7 +1441,7 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
       for (const z of [32, 72, 112]) if (z + 30 < zt) { d.push(B(p, x0, 436, x1, 470, z, z + 2, shelf, 0));
         let x = x0 + 3; while (x < x1 - 8) { const w = 6 + rnd() * 6, h = Math.min(14 + rnd() * 16, zt - z - 6); d.push(rnd() > .4 ? CY(p, x + w / 2, 452, w / 2, z + 2, z + 2 + h, rnd() > .5 ? jarG : fill(), 0, 14) : B(p, x, 440, x + w, 466, z + 2, z + 2 + h, fill(), 0)); x += w + 2; } }
       let x = x0 + 3; while (x < x1 - 12) { const w = 14 + rnd() * 10; d.push(B(p, x, 440, Math.min(x + w, x1 - 2), 468, 0, 28, std({ color: 0xc8a878, roughness: .9 }), 0)); x += w + 3; } }
-    d.forEach(m => m.userData.noRemap = true); } B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing
+    d.forEach(m => m.userData.noRemap = true); } B(p, 700, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing (starts where the last tread ends, so their tops never overlap)
   // stone-look strip cladding on the tall landing wall, a wall clock, a floor vase; framed pictures along the flight
   { // brick-strip wallpaper over the whole tall landing wall, both storeys
     // one continuous pattern: UVs come from the wall position (u = plan Y, v = height), so the two storeys' panels line up seamlessly
