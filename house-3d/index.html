@@ -255,8 +255,8 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
    ============================================================ */
 const CX = 3.6, CZ = 5.2;
 const wx = X => X / 100 - CX, wz = Y => Y / 100 - CZ;
-const L1 = 3.1, H1 = 2.8, H2 = 2.75, TOP1 = L1 + H2, ATT = 0.2, ROOF0 = TOP1 + ATT;
-const PITCH = 24 * Math.PI / 180, PARTY = 792, GROUND = -0.15;
+const L1 = 3.0, H1 = 2.7, H2 = 2.7, TOP1 = L1 + H2, ATT = 0.2, ROOF0 = TOP1 + ATT;
+const PITCH = 24 * Math.PI / 180, PARTY = 791, GROUND = -0.15;
 
 let seed = 11;
 const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
@@ -855,8 +855,8 @@ function wall(p, a, b, o) {
 function opening(p, a, ux, uy, theta, op, o) {
   const g = new THREE.Group(); g.position.set(wx(a[0] + ux * op.at), o.base, wz(a[1] + uy * op.at)); g.rotation.y = theta; p.add(g); openingGroups.push(g); g.userData.plan = [a[0] + ux * op.at, a[1] + uy * op.at];
   if (op.type === 'hole') return;
-  if (op.type === 'front') g.userData.entry = { room: 'foyer', eye: [335, 785], look: [.25, -1] };
-  if (op.type === 'slide' && o.base === 0) g.userData.entry = { room: 'living', eye: [367, 95], look: [.3, 1] };
+  if (op.type === 'front') g.userData.entry = { room: 'foyer', eye: [300, 770], look: [.25, -1] };
+  if (op.type === 'slide' && o.base === 0) g.userData.entry = { room: 'living', eye: [406, 90], look: [.3, 1] };
   const w = op.w / 100, s = (op.sill || 0) / 100, hd = op.head / 100, t = o.t / 100, os = o.outSide || 1, hgt = hd - s;
   if (op.type === 'door') {
     const d = t + 0.03, cx = a[0] + ux * op.at, cy = a[1] + uy * op.at;
@@ -927,44 +927,46 @@ function buildOutline(p, poly, opsByEdge, o) {
     const nX = -dy / len, nY = dx / len; const mid = [(a[0] + b[0]) / 2 + nX * 40, (a[1] + b[1]) / 2 + nY * 40];
     const outSide = inPoly(mid, poly) ? -1 : 1;
     const party = a[0] === PARTY && b[0] === PARTY;
-    wall(p, a, b, Object.assign({}, o, { outSide, ops: opsByEdge[i] || [], outMat: party ? M.plaster : o.outMat, h: o.h }));
+    wall(p, a, b, Object.assign({}, o, { outSide, ops: opsByEdge[i] || [], outMat: party ? M.plaster : o.outMat, h: o.h, t: (o.tEdge && o.tEdge[i]) || o.t }));
   }
 }
 
 /* ---------------- house data ---------------- */
-const OUT0 = [[63, 35], [PARTY, 35], [PARTY, 960], [282, 960], [282, 830], [136, 705], [4, 705], [4, 301], [63, 301]];
-const OUT1 = [[82, 7], [454, 7], [454, 58], [PARTY, 58], [PARTY, 1030], [82, 1030], [82, 730], [10, 730], [10, 315], [82, 315]];
+// measured from the sales plans: room sizes as written on the plans, 25 cm outer walls downstairs (40 cm on the south), 30 cm upstairs, 22 cm party wall
+const OUT0 = [[255, 12.5], [PARTY, 12.5], [PARTY, 972], [267.5, 972], [267.5, 842], [115, 693.5], [12.5, 693.5], [12.5, 308.5], [67.5, 308.5], [67.5, 38.5], [255, 38.5]];
+const OUT1 = [[60, 15], [482.5, 15], [482.5, 80], [PARTY, 80], [PARTY, 977], [470, 977], [470, 1031], [95, 1031], [95, 735], [15, 735], [15, 321], [60, 321]];
 const W = (at, w, sill = 90, head = 220) => ({ type: 'win', at, w, sill, head });
 const D = (at, w = 80, head = 210, hs = 1) => ({ type: 'door', at, w, sill: 0, head, hs }); // hs: which side the handle is on
 const OPS0 = {
-  0: [{ type: 'slide', at: 367, w: 240, sill: 0, head: 235 }],          // living → patio; the TV wall is to its right on the same wall
-  2: [W(187, 100, 100, 200), W(436, 60, 125, 205)],                     // safe-room window between shutter pockets; guest WC (frosted, beside the mirror)
-  4: [{ type: 'front', at: 82, w: 90, sill: 0, head: 222 }],           // front door at the lower end of the angled wall
-  6: [W(203, 140, 105, 215)],                                           // kitchen window over the sink
-  8: [{ type: 'hole', at: 121, w: 160, sill: 60, head: 220 }],          // dining window: opening cut to the renovated size, filled back for 'before' below                                             // window where the storage door used to be
+  0: [{ type: 'slide', at: 151, w: 240, sill: 0, head: 235 }],          // living → patio; the TV wall is to its right on the same wall
+  2: [W(201, 100, 100, 200), W(446, 60, 125, 205)],                     // safe-room window between shutter pockets; guest WC (frosted, beside the mirror)
+  4: [{ type: 'front', at: 75, w: 90, sill: 0, head: 222 }],           // front door at the lower end of the angled wall
+  6: [W(189, 140, 105, 215)],                                           // kitchen window over the sink
+  8: [{ type: 'hole', at: 135.5, w: 160, sill: 60, head: 220 }],          // dining window: opening cut to the renovated size, filled back for 'before' below                                             // window where the storage door used to be
 };
 const OPS1 = {
-  0: [W(110, 130)],                      // bedroom 1, window near the north-west corner
-  2: [W(184, 150)],                      // bedroom 2
-  4: [W(174, 140), W(504, 135)],         // bedrooms 3 and 4, street side
-  7: [W(139, 100, 120, 210), W(324, 60, 140, 210)], // bathroom and en-suite, onto the laundry screen
+  0: [W(153, 135)],                      // parents' room
+  2: [W(158.5, 140)],                    // Guy's room
+  4: [W(170, 140)],                      // Ron's room
+  6: [W(184, 140)],                      // Mark's room
+  9: [W(144, 100, 120, 210), W(329, 60, 140, 210)], // bathroom and en-suite, onto the laundry screen
 };
 const ROOMS = [
-  { id: 'living', f: 0, name: 'סלון', dims: [510, 397], rect: [272, 47, 780, 425], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט עץ חם, קיר טלוויזיה בטיח בגוון גריז׳ עם מדף אגוז צף ומזנון אגוז תלוי, ספה פינתית בבד בוקלה בהיר עם כריות זית וטרקוטה, שטיח ג׳וטה, שולחן קפה מאגוז ומנורת פאות ברונזה.', note: 'דלת הזזה לחצר עם וילונות וואל, ומימינה על אותו קיר קיר הטלוויזיה עם פאנל חרדל ומזנון לבן צף. ספת עור פינתית בבז׳ לאורך הקיר המשותף, שולחן קפה לבן ומנורה תלויה.' },
-  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [16, 296, 290, 699], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, ארונות אלון עד התקרה בקיר המקרר עם מגדל תנורים ונישה מוארת, ארונות תחתונים לבנים עם משטח לבן, מדפי אלון צפים במקום הקולט, אי לבן עם בר אלון ומנורות כיפה לבנות. בלי הגבס בתקרה.', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, וחלק בורדו שיוצא מקיר הכיריים וסוגר את המטבח מצפון.', spots: true },
-  { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [75, 47, 272, 296], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, בלי הגבס בתקרה, וחלון מוגדל לרוחב 160 ס״מ במקום שבו הייתה דלת המחסן.', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
-  { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 200], rect: [302, 431, 444, 824], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, והנמכת הגבס בתקרה הוסרה (בלי פתח המיזוג), כך שהתקרה גבוהה יותר.', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
-  { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [294, 836, 435, 948], mat: 'slate', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק ירוקים בגובה 1.2 מ׳ וצבע לבן מעליהם, ריצוף טרצו, אסלה תלויה עם מיכל סמוי, נישת עץ מוארת מעל האסלה, כיור תלוי קטן ומראה מעוגלת עם תאורה אחורית.', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
-  { id: 'mamad', f: 0, name: 'ממ״ד · חדר אחסון', dims: [315, 305], rect: [465, 640, 780, 945], mat: 'tile', note: 'מרחב מוגן דירתי מבטון מזוין שמשמש כחדר אחסון, עם מדפים לאורך הקירות. הכניסה מהמעבר שמתחת למדרגות.' },
-  { id: 'bed1', f: 1, name: 'חדר הורים', dims: [395, 285], rect: [94, 19, 448, 309], mat: 'laminate', afterNote: 'אחרי השיפוץ: רצפת הלמינציה נשארת. קיר טאופ מאחורי המיטה עם שתי הדפסים מופשטים, מיטה מרופדת בבז׳ עם מצעים בהירים, מנורות גליל שחורות משני הצדדים, מנורת תקרה עגולה, שטיח ג׳וטה, שידה בטאופ עם מראה עגולה ופאנל רפפות אלון, וילונות פשתן.', eye: [300, 230], look: [-1, -.25], note: 'רצפת למינציה, קיר טפט מאחורי המיטה, שידת מגירות ושעון על הקיר המזרחי, מראה עומדת ומנורת תוף. דלתות למקלחת ולחדר הארונות.' },
-  { id: 'bed2', f: 1, name: 'החדר של גיא', dims: [285, 330], rect: [464, 70, 780, 399], mat: 'lamOak', eye: [610, 350], look: [.2, -1], note: 'רצפת למינציה בגוון אלון, מיטה לאורך הקיר המערבי, שולחן כתיבה בצורת L מתחת לחלון עם מדפים בטורקיז, ארון גבוה בגימור בטון ליד הדלת ומנורה גאומטרית לבנה.' },
-  { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [22, 321, 188, 490], mat: 'ensFloor', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק בטורקיז־ירוק במקלחון עם נישה מוארת וראש גשם שחור, טרצו בשאר הקירות וברצפה, אסלה תלויה ומעליה ארונית אלון עם נישה פתוחה, ארון כיור אלון עם כיור מונח ומראה מעוגלת עם תאורה.', eye: [150, 340], look: [-.4, 1], note: 'אריחים לבנים מבריקים עם פס פסיפס, ארון כיור תלוי בטורקיז, מראה מקושתת ומקלחון זכוכית עם ראש גשם.' },
-  { id: 'closet', f: 1, name: 'חדר ארונות', dims: [145, 170], rect: [200, 321, 359, 490], mat: 'laminate', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
-  { id: 'bath', f: 1, name: 'חדר רחצה אחים', dims: [315, 220], rect: [22, 502, 359, 724], mat: 'bathFloor', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: מקלחון עם מסגרת שחורה במקום האמבטיה, אריחי סטאק בז׳ בגובה 1.2 מ׳, טרצו ברצפה, מכונת כביסה מתחת לארון אלון גבוה, אסלה תלויה מתחת לארונית אלון עם נישה מוארת, ארון כיור אלון ארוך עם כיור מונח, מראה מקושתת שחורה ומנורת קיר.', eye: [330, 612], look: [-1, 0], note: 'אריחי שמנת עם אריחים חומים, ארון כיור ארוך בוונגה עם מראה וארון גבוה, אמבטיה עם מחיצת זכוכית, מכונת כביסה מתחת לארון גבוה.' },
-  { id: 'hall', f: 1, name: 'מסדרון', dims: [90, 400], rect: [371, 321, 456, 724], mat: 'hallTile', note: 'מחבר בין המדרגות לכל חדרי הקומה. בתקרה פתח עלייה לגג.' },
-  { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [468, 626, 780, 1024], mat: 'lamGrey', afterNote: 'אחרי השיפוץ: טפט הדקלים על הקיר המשותף מוסר והקיר צבוע לבן. שאר החדר נשאר כמו היום.', eye: [520, 700], look: [1, .55], note: 'טפט חוף עם דקלים על הקיר המשותף, מיטה מתחת לחלון, ארון כהה עם דלתות הזזה ומדפים פתוחים, שידה ומדף קיר כהים ומנורת כדור קלועה. רצפת למינציה אפורה כהה.' },
-  { id: 'bed4', f: 1, name: 'החדר של מרק', dims: [355, 275], rect: [88, 736, 456, 1024], mat: 'lamDark', eye: [410, 790], look: [-.55, 1], note: 'טפט חוף עם עצי דקל על הקיר המערבי, מיטה לאורך קיר החלון, ארון בגוון עץ אפור לכל אורך הקיר הצפוני ושידה לבנה תלויה. רצפת למינציה כהה.' },
-  { id: 'balcony', f: 1, name: 'מסתור כביסה', dims: [70, 410], rect: [-72, 292, -4, 716], mat: 'balcony', note: 'מרפסת שירות מוסתרת ברפפות, צמודה לחדרי הרחצה.', noLight: true },
+  { id: 'living', f: 0, name: 'סלון', dims: [510, 397], rect: [270, 25, 780, 422], old: [260, 47.5, 779.5, 425], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט עץ חם, קיר טלוויזיה בטיח בגוון גריז׳ עם מדף אגוז צף ומזנון אגוז תלוי, ספה פינתית בבד בוקלה בהיר עם כריות זית וטרקוטה, שטיח ג׳וטה, שולחן קפה מאגוז ומנורת פאות ברונזה.', note: 'דלת הזזה לחצר עם וילונות וואל, ומימינה על אותו קיר קיר הטלוויזיה עם פאנל חרדל ומזנון לבן צף. ספת עור פינתית בבז׳ לאורך הקיר המשותף, שולחן קפה לבן ומנורה תלויה.' },
+  { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [25, 321, 275, 681], old: [16.5, 301, 290, 692.5], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, ארונות אלון עד התקרה בקיר המקרר עם מגדל תנורים ונישה מוארת, ארונות תחתונים לבנים עם משטח לבן, מדפי אלון צפים במקום הקולט, אי לבן עם בר אלון ומנורות כיפה לבנות. בלי הגבס בתקרה.', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, וחלק בורדו שיוצא מקיר הכיריים וסוגר את המטבח מצפון.', spots: true },
+  { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [80, 51, 270, 296], old: [75.5, 47.5, 260, 301], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, בלי הגבס בתקרה, וחלון מוגדל לרוחב 160 ס״מ במקום שבו הייתה דלת המחסן.', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
+  { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 395], rect: [285, 432, 435, 827], old: [302, 431, 435, 824], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, והנמכת הגבס בתקרה הוסרה (בלי פתח המיזוג), כך שהתקרה גבוהה יותר.', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
+  { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [280, 837, 435, 952], old: [294.5, 836, 435, 947.5], mat: 'slate', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק ירוקים בגובה 1.2 מ׳ וצבע לבן מעליהם, ריצוף טרצו, אסלה תלויה עם מיכל סמוי, נישת עץ מוארת מעל האסלה, כיור תלוי קטן ומראה מעוגלת עם תאורה אחורית.', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
+  { id: 'mamad', f: 0, name: 'ממ״ד · חדר אחסון', dims: [315, 305], rect: [465, 647, 780, 952], old: [465, 640, 779.5, 947.5], mat: 'tile', note: 'מרחב מוגן דירתי מבטון מזוין שמשמש כחדר אחסון, עם מדפים לאורך הקירות. הכניסה מהמעבר שמתחת למדרגות.' },
+  { id: 'bed1', f: 1, name: 'חדר הורים', dims: [395, 285], rect: [75, 30, 470, 315], old: [94.5, 19.5, 452, 309], mat: 'laminate', afterNote: 'אחרי השיפוץ: רצפת הלמינציה נשארת. קיר טאופ מאחורי המיטה עם שתי הדפסים מופשטים, מיטה מרופדת בבז׳ עם מצעים בהירים, מנורות גליל שחורות משני הצדדים, מנורת תקרה עגולה, שטיח ג׳וטה, שידה בטאופ עם מראה עגולה ופאנל רפפות אלון, וילונות פשתן.', eye: [300, 230], look: [-1, -.25], note: 'רצפת למינציה, קיר טפט מאחורי המיטה, שידת מגירות ושעון על הקיר המזרחי, מראה עומדת ומנורת תוף. דלתות למקלחת ולחדר הארונות.' },
+  { id: 'bed2', f: 1, name: 'החדר של גיא', dims: [285, 330], rect: [495, 95, 780, 425], old: [464, 70.5, 779.5, 399], mat: 'lamOak', eye: [610, 350], look: [.2, -1], note: 'רצפת למינציה בגוון אלון, מיטה לאורך הקיר המערבי, שולחן כתיבה בצורת L מתחת לחלון עם מדפים בטורקיז, ארון גבוה בגימור בטון ליד הדלת ומנורה גאומטרית לבנה.' },
+  { id: 'ensuite', f: 1, name: 'מקלחת הורים', dims: [180, 170], rect: [30, 327, 210, 497], old: [22.5, 321, 188, 490], mat: 'ensFloor', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק בטורקיז־ירוק במקלחון עם נישה מוארת וראש גשם שחור, טרצו בשאר הקירות וברצפה, אסלה תלויה ומעליה ארונית אלון עם נישה פתוחה, ארון כיור אלון עם כיור מונח ומראה מעוגלת עם תאורה.', eye: [150, 340], look: [-.4, 1], note: 'אריחים לבנים מבריקים עם פס פסיפס, ארון כיור תלוי בטורקיז, מראה מקושתת ומקלחון זכוכית עם ראש גשם.' },
+  { id: 'closet', f: 1, name: 'חדר ארונות', dims: [145, 170], rect: [220, 327, 365, 497], old: [200, 321, 359, 490], mat: 'laminate', note: 'מדפים לבנים פתוחים בשלושה קירות ומוט תלייה, דלת הזזה במסגרת עץ.' },
+  { id: 'bath', f: 1, name: 'חדר רחצה אחים', dims: [315, 220], rect: [30, 509, 345, 729], old: [22.5, 502, 359, 724], mat: 'bathFloor', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: מקלחון עם מסגרת שחורה במקום האמבטיה, אריחי סטאק בז׳ בגובה 1.2 מ׳, טרצו ברצפה, מכונת כביסה מתחת לארון אלון גבוה, אסלה תלויה מתחת לארונית אלון עם נישה מוארת, ארון כיור אלון ארוך עם כיור מונח, מראה מקושתת שחורה ומנורת קיר.', eye: [330, 612], look: [-1, 0], note: 'אריחי שמנת עם אריחים חומים, ארון כיור ארוך בוונגה עם מראה וארון גבוה, אמבטיה עם מחיצת זכוכית, מכונת כביסה מתחת לארון גבוה.' },
+  { id: 'hall', f: 1, name: 'מסדרון', dims: [90, 400], rect: [375, 327, 465, 729], old: [371, 321, 452, 724], mat: 'hallTile', note: 'מחבר בין המדרגות לכל חדרי הקומה. בתקרה פתח עלייה לגג.' },
+  { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [475, 637, 780, 962], old: [468, 626, 779.5, 1017.5], mat: 'lamGrey', afterNote: 'אחרי השיפוץ: טפט הדקלים על הקיר המשותף מוסר והקיר צבוע לבן. שאר החדר נשאר כמו היום.', eye: [520, 700], look: [1, .55], note: 'טפט חוף עם דקלים על הקיר המשותף, מיטה מתחת לחלון, ארון כהה עם דלתות הזזה ומדפים פתוחים, שידה ומדף קיר כהים ומנורת כדור קלועה. רצפת למינציה אפורה כהה.' },
+  { id: 'bed4', f: 1, name: 'החדר של מרק', dims: [355, 275], rect: [110, 741, 465, 1016], old: [94.5, 736, 456, 1017.5], mat: 'lamDark', eye: [410, 790], look: [-.55, 1], note: 'טפט חוף עם עצי דקל על הקיר המערבי, מיטה לאורך קיר החלון, ארון בגוון עץ אפור לכל אורך הקיר הצפוני ושידה לבנה תלויה. רצפת למינציה כהה.' },
+  { id: 'balcony', f: 1, name: 'מסתור כביסה', dims: [70, 410], rect: [-68, 321, 0, 735], old: [-74, 292, -2, 716], mat: 'balcony', note: 'מרפסת שירות מוסתרת ברפפות, צמודה לחדרי הרחצה.', noLight: true },
 ];
 
 /* ---------------- floors ---------------- */
@@ -977,45 +979,50 @@ const roomMeshes = [];
 /* ground slab + walls */
 const slab0 = offsetPoly(OUT0, 12.5);
 const groundSlab = slab(F[0].shell, slab0, 0, 0.45, M.tile, M.concrete); // its top shows in passages not covered by a room floor
-buildOutline(F[0].shell, OUT0, OPS0, { t: 25, base: 0, h: 310, outMat: M.stone, inMat: M.interior });
-const I = (a, b, ops = [], t = 12, extra = {}) => wall(F[0].shell, a, b, Object.assign({ t, base: 0, h: 280, ops, inMat: M.interior }, extra));
+buildOutline(F[0].shell, OUT0, OPS0, { t: 25, tEdge: { 1: 22, 2: 40, 10: 30 }, base: 0, h: L1 * 100, outMat: M.stone, inMat: M.interior });
+const I = (a, b, ops = [], t = 12, extra = {}) => wall(F[0].shell, a, b, Object.assign({ t, base: 0, h: (L1 - .3) * 100, ops, inMat: M.interior }, extra));
 // the former storage room's inner walls were demolished; its space now opens onto the living area
 { // dining window (where the storage door was): 75 cm today, enlarged to 160 cm in the renovation
   const before = new THREE.Group(), after = new THREE.Group(); after.visible = false; F[0].shell.add(before, after);
   renoSets.push({ room: 'dining-window', before, after });
-  const o = { t: 25, base: 0, h: 310, outSide: -1 }, a = [63, 301];
-  const fill = (Y0, Y1, z0, z1) => { onWall(B(before, 50.5, Y0, 63, Y1, z0, z1, M.stone), 0, z0, z1); onWall(B(before, 63, Y0, 75.5, Y1, z0, z1, M.interior), 0, z0, z1); };
-  fill(100, 142.5, 60, 220); fill(217.5, 260, 60, 220); fill(142.5, 217.5, 60, 102); fill(142.5, 217.5, 210, 220);
-  opening(before, a, 0, -1, Math.PI / 2, W(121, 75, 102, 210), o);
-  opening(after, a, 0, -1, Math.PI / 2, W(121, 160, 60, 220), o);
-  B(before, 76, 140, 83, 222, 208, 215, M.shade, 0); B(before, 76.5, 143, 78, 219, 178, 208, M.shade, 0);
-  B(after, 76, 96, 83, 264, 222, 229, M.shade, 0); B(after, 76.5, 99, 78, 261, 200, 222, M.shade, 0);
+  const o = { t: 25, base: 0, h: L1 * 100, outSide: -1 }, a = [67.5, 308.5];
+  const fill = (Y0, Y1, z0, z1) => { onWall(B(before, 55, Y0, 67.5, Y1, z0, z1, M.stone), 0, z0, z1); onWall(B(before, 67.5, Y0, 80, Y1, z0, z1, M.interior), 0, z0, z1); };
+  fill(93, 135.5, 60, 220); fill(210.5, 253, 60, 220); fill(135.5, 210.5, 60, 102); fill(135.5, 210.5, 210, 220);
+  opening(before, a, 0, -1, Math.PI / 2, W(135.5, 75, 102, 210), o);
+  opening(after, a, 0, -1, Math.PI / 2, W(135.5, 160, 60, 220), o);
+  B(before, 80, 133, 87, 213, 208, 215, M.shade, 0); B(before, 80.5, 136, 82, 210, 178, 208, M.shade, 0);
+  B(after, 80, 89, 87, 257, 222, 229, M.shade, 0); B(after, 80.5, 92, 82, 254, 200, 222, M.shade, 0);
   // split AC unit above the enlarged window
-  { const ac = B(after, 75.5, 122, 96, 210, 236, 266, M.white, 0); onWall(ac, 0, 236, 266);
-    onWall(B(after, 96, 126, 96.6, 206, 238, 243, M.alu, 0), 0, 238, 243); }
+  { const ac = B(after, 80, 129, 100, 217, 236, 264, M.white, 0); onWall(ac, 0, 236, 264);
+    onWall(B(after, 100, 133, 100.6, 213, 238, 243, M.alu, 0), 0, 238, 243); }
 }
-I([282, 830], [450, 830], [D(118, 70, 210, -1)]);
-I([450, 625], [450, 960], [], 30);
-I([450, 625], [PARTY, 625], [D(120, 85)], 30, { h: 310 }); // full height: under the stair void it meets the upper wall, no ledge
-I([150, 705], [296, 705]);
-I([296, 590], [296, 705]);
+I([267.5, 832], [450, 832], [D(130, 70, 210, -1)], 10);                 // guest WC
+I([450, 632], [450, 972], [], 30);                                       // safe room, reinforced
+I([450, 632], [PARTY, 632], [D(95, 85)], 30, { h: L1 * 100 });         // full height: under the stair void it meets the upper wall
+I([115, 693.5], [280, 693.5], [], 10);                                   // kitchen / entrance
+I([280, 609], [280, 693.5], [], 10);                                     // corridor along the kitchen
 
 /* first floor slab (with stair void) + walls */
-const SLAB1 = [[-10, 288], [50, 288], [50, -6], [467, -6], [467, 45], [805, 45], [805, 1043], [69, 1043], [69, 742], [-10, 742]];
-slab(F[1].shell, SLAB1, L1, 0.3, M.parquet, M.slabSide, [[[452, 411], [778, 411], [778, 626], [452, 626]]]);
+const SLAB1 = [[0, 296], [45, 296], [45, 0], [802, 0], [802, 992], [475, 992], [475, 1046], [80, 1046], [80, 741], [0, 741]];
+const VOID1 = [[470, 435], [780, 435], [780, 627], [470, 627]];
+slab(F[1].shell, SLAB1, L1, 0.3, M.parquet, M.slabSide, [VOID1]);
 // white plaster ceiling for the ground floor, just under the slab
-slab(F[1].shell, SLAB1, L1 - 0.299, 0.006, M.ceiling, M.ceiling, [[[452, 411], [778, 411], [778, 626], [452, 626]]]);
-buildOutline(F[1].shell, OUT1, OPS1, { t: 25, base: L1, h: H2 * 100, outMat: M.plaster, inMat: M.interior });
+slab(F[1].shell, SLAB1, L1 - 0.299, 0.006, M.ceiling, M.ceiling, [VOID1]);
+buildOutline(F[1].shell, OUT1, OPS1, { t: 30, tEdge: { 1: 25, 3: 22, 5: 10 }, base: L1, h: H2 * 100, outMat: M.plaster, inMat: M.interior });
+// strip of flat roof over the living room, in front of Guy's room
+B(F[1].shell, 495, 0, 802, 65, 0, 1.5, M.cap, L1);
 const J = (a, b, ops = [], t = 12) => wall(F[1].shell, a, b, { t, base: L1, h: H2 * 100, ops, inMat: M.interior });
-J([82, 315], [458, 315], [D(73, 70), Object.assign(D(173, 80), { slide: true }), D(338, 80)]);
-J([458, 58], [458, 405], [D(309, 80)]);
-J([458, 405], [778, 405]);
-J([194, 315], [194, 496]);
-J([365, 315], [365, 730], [D(297, 75)]);
-J([10, 496], [365, 496]);
-J([82, 730], [462, 730], [D(323, 80)]);
-J([462, 620], [462, 1030], [D(53, 85)]);
-J([462, 620], [778, 620]);
+J([60, 321], [470, 321], [D(110, 70), Object.assign(D(271, 70), { slide: true }), D(361, 80)]); // parents' room / en-suite, closet, hall
+J([482.5, 80], [482.5, 430], [D(282, 80)], 25);                          // Guy's room / parents' room and hall
+J([470, 430], [780, 430], [], 10);                                       // Guy's room / stair void
+J([215, 321], [215, 503], [], 10);                                       // en-suite / closet
+J([370, 321], [370, 503], [], 10);                                       // closet / hall
+J([370, 503], [351, 520]);
+J([351, 520], [351, 735], [D(100, 75)]);                                 // bathroom / hall
+J([15, 503], [370, 503]);                                                // en-suite + closet / bathroom
+J([95, 735], [470, 735], [D(318, 80)]);                                  // bathroom, hall / Mark's room
+J([470, 632], [470, 1031], [D(53, 85)], 10);                             // Ron's room / Mark's room and hall
+J([470, 632], [780, 632], [], 10);                                       // Ron's room / stair void
 
 /* room floors, labels, ceiling lights */
 for (const r of ROOMS) {
@@ -1025,7 +1032,7 @@ for (const r of ROOMS) {
   const m = new THREE.Mesh(g, M[r.mat]); m.receiveShadow = true;
   m.position.set(wx((x0 + x1) / 2), fl.base + 0.004, wz((y0 + y1) / 2));
   m.userData.room = r.id; r.mesh = m; r.baseMat = M[r.mat]; fl.shell.add(m); roomMeshes.push(m);
-  if (r.id === 'balcony') B(fl.shell, -75, 288, 2, 720, -15, 0, M.slabSide, fl.base);
+  if (r.id === 'balcony') B(fl.shell, x0 - 6, y0 - 4, x1 + 2, y1 + 4, -15, 0, M.slabSide, fl.base);
   const el = document.createElement('div'); el.className = 'lbl'; el.innerHTML = `<b>${r.name}</b><span>${r.dims[0]}×${r.dims[1]}</span>`;
   el.addEventListener('pointerdown', e => e.stopPropagation());
   el.addEventListener('click', e => { e.stopPropagation(); selectRoom(r.id, true); });
@@ -1033,7 +1040,7 @@ for (const r of ROOMS) {
   lbl.userData.room = r.id; el.addEventListener('dblclick', e => { e.stopPropagation(); focusRoom(r.id); });
   fl.group.add(lbl); fl.labels.push(lbl); r.el = el;
   if (!r.noLight) {
-    const ceil = r.f === 0 ? 2.8 : L1 + H2;
+    const ceil = r.f === 0 ? L1 - .3 : L1 + H2;
     const fx = new THREE.Mesh(new THREE.CylinderGeometry(.17, .17, .035, 24), M.fixture);
     if (r.spots) fx.visible = false, fx.userData.never = true;
     fx.position.set(wx((x0 + x1) / 2), ceil - 0.02, wz((y0 + y1) / 2)); fl.shell.add(fx); fixtures.push(fx);
@@ -1043,8 +1050,9 @@ for (const r of ROOMS) {
 }
 
 /* ---------------- stairs (U-shaped, 18 risers) ---------------- */
+const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
 {
-  const p = F[0].furn, R = 17.22, tr = 248 / 9;
+  const p = F[0].furn, R = L1 * 100 / 18, tr = 248 / 9;
   // as in the photos: solid white stairs with dark wenge treads and grey metal railings
   for (let i = 0; i < 9; i++) { // flight 1
     const xa = 452 + i * tr, top = (i + 1) * R;
@@ -1053,8 +1061,8 @@ for (const r of ROOMS) {
   B(p, 700, 432, 778, 618, 0, 9 * R - 4, M.interior); B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing
   // stone-look strip cladding on the tall landing wall, a wall clock, a floor vase; framed pictures along the flight
   { // brick-strip wallpaper over the whole tall landing wall, both storeys
-    const m = new THREE.Mesh(boxUV(.01, 3.1, 1.88, 4.31, 0), M.stoneStrip); m.position.set(wx(777.4), 1.55, wz(525)); p.add(m); onWall(m, 0, 0, 310);
-    const m2 = new THREE.Mesh(boxUV(.01, 2.75, 2.06, 4.22, L1), M.stoneStrip); m2.position.set(wx(777.4), L1 + 1.375, wz(512)); F[1].furn.add(m2); onWall(m2, L1, 0, 275); }
+    const m = new THREE.Mesh(boxUV(.01, 3.1, 1.88, 4.31, 0), M.stoneStrip); m.position.set(wx(779.4), 1.5, wz(525)); m.scale.y = L1 / 3.1; p.add(m); onWall(m, 0, 0, L1 * 100);
+    const m2 = new THREE.Mesh(boxUV(.01, 2.75, 2.06, 4.22, L1), M.stoneStrip); m2.position.set(wx(779.4), L1 + H2 / 2, wz(512)); m2.scale.y = H2 / 2.75; F[1].furn.add(m2); onWall(m2, L1, 0, H2 * 100); m.userData.noRemap = m2.userData.noRemap = true; }
   onWall(CY(p, 776, 525, 22, 330, 332, std({ color: 0xd9c9a8, roughness: .8 }), 0, 32), 0, 330, 332).rotation.z = Math.PI / 2;
   for (let k = 0; k < 4; k++) { const x = 468 + k * 33, z = Math.round((x + 13 - 452) / 248 * 9 * R) + 112; onWall(B(p, x, 519.5, x + 26, 521, z, z + 20, M.black, 0), 0, z, z + 20); onWall(B(p, x + 3, 519.1, x + 23, 519.5, z + 3, z + 17, M.duvetC, 0), 0, z + 3, z + 17); }
   for (let j = 0; j < 9; j++) { // flight 2: open underneath, the passage to the safe-room door runs below it
@@ -1078,10 +1086,11 @@ for (const r of ROOMS) {
   for (let j = 0; j < 9; j++) { const xb = 700 - (j + 1) * tr, top = 9 * R + (j + 1) * R; onWall(B(p, xb, 521, xb + tr, 527, 0, top - 4, M.interior, 0), 0, 0, top - 4); }
   rail(700, 452, 523, 9 * R, 18 * R, 0);
   const g1 = F[1].furn;
-  for (let y = 413; y <= 525; y += 11) { const m = shadowy(new THREE.Mesh(UNIT, M.railing)); m.scale.set(.016, .92, .016); m.position.set(wx(453), L1 + .46, wz(y)); g1.add(m); }
-  const hr = shadowy(new THREE.Mesh(UNIT, M.railing)); hr.scale.set(.045, .045, 1.14); hr.position.set(wx(453), L1 + .97, wz(468)); g1.add(hr);
+  for (let y = 438; y <= 522; y += 11) { const m = shadowy(new THREE.Mesh(UNIT, M.railing)); m.userData.noRemap = true; m.scale.set(.016, .92, .016); m.position.set(wx(472), L1 + .46, wz(y)); g1.add(m); }
+  const hr = shadowy(new THREE.Mesh(UNIT, M.railing)); hr.userData.noRemap = true; hr.scale.set(.045, .045, .9); hr.position.set(wx(472), L1 + .97, wz(480)); g1.add(hr);
 }
 
+F[0].furn.children.slice(stairMark[0]).forEach(o => o.userData.noRemap = true); F[1].furn.children.slice(stairMark[1]).forEach(o => o.userData.noRemap = true);
 /* ---------------- furniture ---------------- */
 function bed(p, base, [X0, Y0, X1, Y1], head, duvet) {
   B(p, X0, Y0, X1, Y1, 6, 30, M.wood, base);
@@ -1434,15 +1443,15 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let y = 674; y < 776; y += 8.5) for (const z of [102, 197]) { const dpt = 3 + rnd() * 5; onWall(B(p, 433 - dpt, y, 433, y + 7.5, z, z + 7.5, M.black, b), b, z, z + 7.5); }
   for (let z = 110; z < 196; z += 8.5) for (const y of [674, 768]) { const dpt = 3 + rnd() * 5; onWall(B(p, 433 - dpt, y, 433, y + 7.5, z, z + 7.5, M.black, b), b, z, z + 7.5); }
   onWall(B(p, 300, 819, 312, 824, 140, 150, M.black, b), b, 140, 150);
-  { const bulk = new THREE.Group(); bulk.userData.reno = 'before'; bulk.userData.lowerCeiling = true; F[1].shell.add(bulk); renoSets.push({ room: 'kitchen-ceiling', before: bulk });
+  { const bulk = new THREE.Group(); bulk.userData.reno = 'before'; bulk.userData.lowerCeiling = true; bulk.userData.noRemap = true; F[1].shell.add(bulk); renoSets.push({ room: 'kitchen-ceiling', before: bulk });
     const sp = bulk;
-    B(sp, 16, 47, 190, 699, -60, -30.5, M.ceiling, L1);                 // dropped ceiling over the kitchen run and dining
-    B(sp, 190, 610, 290, 699, -60, -30.5, M.ceiling, L1);               // over the fridge
+    B(sp, 25, 51, 190, 681, -60, -30.5, M.ceiling, L1);                 // dropped ceiling over the kitchen run and dining
+    B(sp, 175, 598, 275, 681, -60, -30.5, M.ceiling, L1);               // over the fridge
     B(sp, 190, 110, 191.5, 270, -56, -36, M.trim, L1);
     for (let y = 112; y < 268; y += 3) B(sp, 191.5, y, 192, y + 1.6, -55, -37, M.alu, L1);
-    B(sp, 205, 609, 285, 610.5, -56, -40, M.trim, L1);
-    for (let x = 207; x < 283; x += 3) B(sp, x, 608.5, x + 1.6, 609, -55, -41, M.alu, L1);
-    for (const [x, y] of [[100, 360], [100, 500], [100, 640], [120, 110], [120, 230], [240, 655]]) B(sp, x - 4, y - 4, x + 4, y + 4, -60.5, -60, M.fixture, L1);
+    B(sp, 190, 597, 270, 598.5, -56, -40, M.trim, L1);
+    for (let x = 192; x < 268; x += 3) B(sp, x, 596.5, x + 1.6, 597, -55, -41, M.alu, L1);
+    for (const [x, y] of [[105, 380], [105, 505], [105, 630], [125, 110], [125, 230], [228, 640]]) B(sp, x - 4, y - 4, x + 4, y + 4, -60.5, -60, M.fixture, L1);
   }
   { // entrance ceiling. Before: gypsum dropped ceiling (~2.50 m) with spots and an AC return grille. After: gypsum removed, spots at the slab, no grille
     const sp = new THREE.Group(), spA = new THREE.Group(); sp.userData.lowerCeiling = spA.userData.lowerCeiling = true; spA.visible = false;
@@ -1665,9 +1674,11 @@ function desk(p, base, r, chairAt, faceTo) {
     const uv = m.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) / 3.98, uv.getY(i) / 2.74); uv.needsUpdate = true; }
   bed(p, b, [580, 900, 778, 1018], 'E', M.lilac);
   B(p, 578, 898, 778, 902, 0, 30, M.lime, b); B(p, 578, 898, 582, 1020, 0, 30, M.lime, b);
-  B(p, 470, 760, 530, 1022, 0, 250, M.wenge, b);
-  for (const z of [40, 80, 120, 160, 200]) B(p, 529, 762, 531, 860, z, z + 2, M.black, b);
-  B(p, 530, 860, 531.5, 1020, 2, 248, std({ color: 0xd9d4ca, roughness: .4 }), b); B(p, 530, 939, 532, 941, 2, 248, M.wenge, b);
+  { // wardrobe along the west wall, starting past the door (measured-plan coordinates)
+    const w = [B(p, 475, 730, 535, 960, 0, 250, M.wenge, b)];
+    for (const z of [40, 80, 120, 160, 200]) w.push(B(p, 534, 732, 536, 808, z, z + 2, M.black, b));
+    w.push(B(p, 535, 810, 536.5, 958, 2, 248, std({ color: 0xd9d4ca, roughness: .4 }), b), B(p, 535, 883, 537, 885, 2, 248, M.wenge, b));
+    w.forEach(m => m.userData.noRemap = true); }
   B(p, 656, 627, 776, 668, 0, 52, M.wenge, b); B(p, 715.7, 667.9, 716.3, 668.4, 2, 50, M.black, b);
   onWall(B(p, 662, 627, 772, 660, 145, 190, M.wenge, b), b, 145, 190);
   onWall(B(p, 722, 1022, 758, 1024, 148, 175, std({ color: 0x3f6b8c, roughness: .6 }), b), b, 148, 175);
@@ -1830,11 +1841,82 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, -74, 288, -4, 292, 0, 175, M.slats, b); B(p, -74, 714, -4, 718, 0, 175, M.slats, b);
 }
 
+/* ---------------- fit the furniture to the measured rooms ----------------
+   The furniture was placed in an earlier, less accurate floor plan (r.old). Every piece is moved into the
+   measured room (r.rect): pieces near a wall keep their distance to that wall, the rest move proportionally.
+   Pieces that span a whole wall are stretched to the new length, and everything is fitted under the 2.70 m ceiling. */
+{
+  const OLD_CEIL = [280, 275], NEW_CEIL = [(L1 - .3) * 100, H2 * 100];
+  const axis = (v, o0, o1, n0, n1) => {
+    const A = Math.min(60, (o1 - o0) / 3);
+    if (v <= o0 + A) return n0 + (v - o0);
+    if (v >= o1 - A) return n1 - (o1 - v);
+    return n0 + A + (v - o0 - A) * ((n1 - n0 - 2 * A) / (o1 - o0 - 2 * A));
+  };
+  const box = new THREE.Box3(), c = new THREE.Vector3(), sz = new THREE.Vector3();
+  const roomOf = (f, X, Y) => {
+    const list = ROOMS.filter(r => r.f === f && r.old);
+    const inside = list.find(r => X >= r.old[0] && X <= r.old[2] && Y >= r.old[1] && Y <= r.old[3]);
+    if (inside) return inside;
+    let best = null, bd = 30;
+    for (const r of list) { const dx = Math.max(r.old[0] - X, 0, X - r.old[2]), dy = Math.max(r.old[1] - Y, 0, Y - r.old[3]), d = Math.hypot(dx, dy); if (d < bd) { bd = d; best = r; } }
+    return best;
+  };
+  const move = (o, f) => {
+    if (o.userData.noRemap) return;
+    box.setFromObject(o); if (box.isEmpty()) return;
+    box.getCenter(c); box.getSize(sz);
+    const X = (c.x + CX) * 100, Y = (c.z + CZ) * 100, r = roomOf(f, X, Y);
+    if (!r) return;
+    const [o0, o1, o2, o3] = r.old, [n0, n1, n2, n3] = r.rect;
+    let nx = axis(X, o0, o2, n0, n2), ny = axis(Y, o1, o3, n1, n3);
+    const W = sz.x * 100, D = sz.z * 100;
+    if (o.isMesh) { // stretch pieces that run the full length of a wall
+      if (W >= (o2 - o0) - 25 && W < (o2 - o0) + 60) { const k = (n2 - n0) / (o2 - o0); o.scale.x *= Math.abs(Math.cos(o.rotation.y)) > .5 ? k : 1; o.scale.z *= Math.abs(Math.cos(o.rotation.y)) > .5 ? 1 : k; nx = (n0 + n2) / 2 + (X - (o0 + o2) / 2) * k; }
+      if (D >= (o3 - o1) - 25 && D < (o3 - o1) + 60) { const k = (n3 - n1) / (o3 - o1); o.scale.z *= Math.abs(Math.cos(o.rotation.y)) > .5 ? k : 1; o.scale.x *= Math.abs(Math.cos(o.rotation.y)) > .5 ? 1 : k; ny = (n1 + n3) / 2 + (Y - (o1 + o3) / 2) * k; }
+    }
+    o.position.x += (nx - X) / 100; o.position.z += (ny - Y) / 100;
+    // ceiling height
+    const base = F[f].base, bot = (box.min.y - base) * 100, top = (box.max.y - base) * 100, oc = OLD_CEIL[f], nc = NEW_CEIL[f];
+    if (top > nc + .5) {
+      if (o.isMesh && bot < 60 && top <= oc + 1) { const k = (nc - bot) / (top - bot); const b0 = box.min.y; o.scale.y *= k; o.position.y = b0 + (o.position.y - b0) * k; }
+      else o.position.y -= (oc - nc) / 100;
+    }
+    // keep free-standing pieces inside the (sometimes smaller) measured room
+    if (o.isMesh && !o.userData.wall) {
+      box.setFromObject(o); const bx0 = (box.min.x + CX) * 100, bx1 = (box.max.x + CX) * 100, by0 = (box.min.z + CZ) * 100, by1 = (box.max.z + CZ) * 100;
+      const fit = (lo, hi, a0, a1, isX) => {
+        if (lo >= a0 - 3 && hi <= a1 + 3) return;
+        const len = hi - lo, room = a1 - a0;
+        if (len > room - 2 || len > room * .6 && (lo < a0 - 3 && hi > a1 + 3)) return;  // spans the room: leave
+        const shift = lo < a0 - 3 ? a0 - lo : a1 - hi;
+        if (len <= room) { if (isX) o.position.x += shift / 100; else o.position.z += shift / 100; }
+      };
+      const over = (lo, hi, a0, a1) => Math.max(0, a0 - lo) + Math.max(0, hi - a1);
+      if (by1 - by0 > r.rect[3] - r.rect[1] - 2 || over(by0, by1, r.rect[1], r.rect[3]) > 3) {
+        const len = by1 - by0, room = r.rect[3] - r.rect[1];
+        if (len > room - 4 && len < room + 120 && len < (r.old[3] - r.old[1]) + 5 && len > 120) { // long piece along the room: shorten to fit
+          const k = (room - 4) / len, ax = Math.abs(Math.cos(o.rotation.y)) > .5 ? 'z' : 'x'; o.scale[ax] *= k; o.position.z = (r.rect[1] + r.rect[3]) / 200 - CZ; }
+        else fit(by0, by1, r.rect[1], r.rect[3], false);
+      }
+      fit(bx0, bx1, r.rect[0], r.rect[2], true);
+    }
+    const u = o.userData.wall; if (u && !u.seg) { box.setFromObject(o); u.y0 = box.min.y; u.y1 = box.max.y; u.sy = o.scale.y; }
+  };
+  const walk = (list, f) => list.slice().forEach(o => {
+    if (o.userData.noRemap) return;
+    const container = o.isGroup && !o.userData.entry && o.position.lengthSq() < 1e-8 && o.rotation.y === 0;
+    if (container) walk(o.children, f); else move(o, f);
+  });
+  walk(F[0].furn.children, 0); walk(F[1].furn.children, 1);
+  walk(F[1].shell.children.filter(o => o.userData.lowerCeiling), 0);
+  for (const r of ROOMS) if (r.eye && r.old) r.eye = [axis(r.eye[0], r.old[0], r.old[2], r.rect[0], r.rect[2]), axis(r.eye[1], r.old[1], r.old[3], r.rect[1], r.rect[3])];
+}
 /* ---------------- roof ---------------- */
 {
-  const Y0 = -46, Y1 = 1083, Yr = (Y0 + Y1) / 2, Dh = (Y1 - Y0) / 200, hR = Dh * Math.tan(PITCH), th = 0.17;
-  slab(roofG, [[-10, -6], [PARTY, -6], [PARTY, 1043], [-10, 1043]], ROOF0, ATT, M.cap, M.slabSide);
-  slab(roofG, [[-10, -6], [PARTY, -6], [PARTY, 1043], [-10, 1043]], ROOF0 - ATT + 0.001, 0.006, M.ceiling, M.ceiling); // first floor ceiling
+  const Y0 = -40, Y1 = 1086, Yr = (Y0 + Y1) / 2, Dh = (Y1 - Y0) / 200, hR = Dh * Math.tan(PITCH), th = 0.17;
+  slab(roofG, [[0, 0], [PARTY, 0], [PARTY, 1046], [0, 1046]], ROOF0, ATT, M.cap, M.slabSide);
+  slab(roofG, [[0, 0], [PARTY, 0], [PARTY, 1046], [0, 1046]], ROOF0 - ATT + 0.001, 0.006, M.ceiling, M.ceiling); // first floor ceiling
   const prof = new THREE.Shape([
     new THREE.Vector2(-Dh, -th), new THREE.Vector2(-Dh, 0), new THREE.Vector2(0, hR), new THREE.Vector2(Dh, 0), new THREE.Vector2(Dh, -th),
     new THREE.Vector2(0, hR - th / Math.cos(PITCH))
@@ -1852,10 +1934,10 @@ function desk(p, base, r, chairAt, faceTo) {
   const roof = shadowy(new THREE.Mesh(rg, [M.slabSide, M.roof]));
   roof.position.set(wx(X0), ROOF0, wz(Yr)); roofG.add(roof);
   // gable walls at the west end and at the party wall
-  const gh = (1043 + 6) / 200, gt = new THREE.Shape([new THREE.Vector2(-gh, 0), new THREE.Vector2(0, gh * Math.tan(PITCH) - .02), new THREE.Vector2(gh, 0)]);
-  for (const [x, d, mat] of [[-2.5, .25, M.plaster], [PARTY - 12.5, .125, M.plaster]]) {
+  const gh = 1046 / 200, gt = new THREE.Shape([new THREE.Vector2(-gh, 0), new THREE.Vector2(0, gh * Math.tan(PITCH) - .02), new THREE.Vector2(gh, 0)]);
+  for (const [x, d, mat] of [[2.5, .25, M.plaster], [PARTY - 11, .11, M.plaster]]) {
     const gg = new THREE.ExtrudeGeometry(gt, { depth: d, bevelEnabled: false }); gg.rotateY(Math.PI / 2);
-    const m = shadowy(new THREE.Mesh(gg, mat)); m.position.set(wx(x), ROOF0, wz((1043 - 6) / 2)); roofG.add(m);
+    const m = shadowy(new THREE.Mesh(gg, mat)); m.position.set(wx(x), ROOF0, wz(523)); roofG.add(m);
   }
   // gutters
   for (const Y of [Y0 - 6, Y1 + 6]) { const m = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, len, 12, 1, false, 0, Math.PI), M.alu)); m.rotation.z = Math.PI / 2; m.rotation.y = 0; m.position.set(wx(X0) + len / 2, ROOF0 - .02, wz(Y)); roofG.add(m); }
@@ -1955,7 +2037,7 @@ function desk(p, base, r, chairAt, faceTo) {
     x.fillStyle = '#1d2430'; x.font = 'bold 64px Heebo, Arial'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('29', 128, 68);
     const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace;
     const sign = new THREE.Mesh(new THREE.PlaneGeometry(.44, .22), new THREE.MeshStandardMaterial({ map: tx, emissive: 0xffffff, emissiveMap: tx, emissiveIntensity: .15, roughness: .5 }));
-    sign.position.set(wx(268.5), 1.95, wz(895)); sign.rotation.y = -Math.PI / 2; p.add(sign); window.__sign = sign;
+    sign.position.set(wx(254.5), 1.95, wz(905)); sign.rotation.y = -Math.PI / 2; p.add(sign); window.__sign = sign;
   }
 }
 
@@ -2368,7 +2450,7 @@ renderer.domElement.addEventListener('pointerup', e => {
   if (walking) {
     const h = walkFloorHit(e); if (!h) return;
     if (h.stair) { // stairs: stop on the half landing first, from there go up or back down
-      const LAND = 9 * 17.22 / 100;
+      const LAND = L1 / 2;
       if (!walking.landing) {
         walking.landing = true; walking.pos = [739, 525];
         controls.minDistance = controls.maxDistance = .05;
@@ -2378,7 +2460,7 @@ renderer.domElement.addEventListener('pointerup', e => {
       } else {
         walking.landing = false;
         const up = h.point.y > LAND + .05;
-        const [X, Y, id] = up ? [412, 360, 'hall'] : [373, 560, 'foyer'];
+        const [X, Y, id] = up ? [420, 570, 'hall'] : [380, 480, 'foyer'];
         walkTo(new THREE.Vector3(wx(X), 0, wz(Y)), id, new THREE.Vector3(up ? 0 : -1, 0, up ? 1 : 0));
       }
     } else { walking.landing = false; walkTo(h.point, h.room, h.look); }
