@@ -622,6 +622,7 @@ const M = {
   plaster: std({ map: T.plaster, roughness: .95 }),
   interior: std({ color: 0xf6f6f4, roughness: .95 }),
   slate: std({ map: T.slate, roughness: .6 }),
+  invisible: new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
   screen: std({ color: 0x0b0d10, roughness: .08, metalness: .3, envMapIntensity: 1.2 }),
   switchPlate: std({ color: 0xf7f6f2, roughness: .4 }),
   switchKey: std({ color: 0xe8e6e0, roughness: .35 }),
@@ -759,7 +760,7 @@ const M = {
   pot: std({ color: 0xb6714f, roughness: .8 }),
   water: std({ color: 0xcfe6ee, roughness: .1, envMapIntensity: 1 }),
   solar: std({ color: 0x1d2c4a, roughness: .15, metalness: .4, envMapIntensity: 1.2 }),
-  car: std({ color: 0x35546f, roughness: .25, metalness: .5, envMapIntensity: 1.1 }),
+  car: std({ color: 0x6d7076, roughness: .25, metalness: .6, envMapIntensity: 1.1 }),
   tyre: std({ color: 0x1a1a1a, roughness: .9 }),
   fixture: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffe2b8, emissiveIntensity: .15, roughness: .4 }),
   lampHead: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffd9a0, emissiveIntensity: 0, roughness: .4 }),
@@ -984,6 +985,9 @@ const ROOMS = [
   { id: 'hall', f: 1, name: 'מסדרון', dims: [90, 400], rect: [375, 327, 465, 729], old: [371, 321, 452, 724], mat: 'hallTile', note: 'מחבר בין המדרגות לכל חדרי הקומה. בתקרה פתח עלייה לגג.' },
   { id: 'bed3', f: 1, name: 'החדר של רון', dims: [305, 325], rect: [475, 637, 780, 962], old: [468, 626, 779.5, 1017.5], mat: 'lamGrey', afterNote: 'אחרי השיפוץ: טפט הדקלים על הקיר המשותף מוסר והקיר צבוע לבן. שאר החדר נשאר כמו היום.', eye: [520, 700], look: [1, .55], note: 'טפט חוף עם דקלים על הקיר המשותף, מיטה מתחת לחלון, ארון כהה עם דלתות הזזה ומדפים פתוחים, שידה ומדף קיר כהים ומנורת כדור קלועה. רצפת למינציה אפורה כהה.' },
   { id: 'bed4', f: 1, name: 'החדר של מרק', dims: [355, 275], rect: [110, 741, 465, 1016], old: [94.5, 736, 456, 1017.5], mat: 'lamDark', eye: [410, 790], look: [-.55, 1], note: 'טפט חוף עם עצי דקל על הקיר המערבי, מיטה לאורך קיר החלון, ארון בגוון עץ אפור לכל אורך הקיר הצפוני ושידה לבנה תלויה. רצפת למינציה כהה.' },
+  { id: 'garden', f: 0, name: 'גינה', dims: [1000, 590], rect: [-215, -575, 785, 6], mat: 'invisible', outdoor: true, noLight: true, eye: [406, -90], look: [0, -1], note: 'דק עץ, טאבון לבנים, ערוגות וגדרות עץ כהות.' },
+  { id: 'side', f: 0, name: 'שביל צד', dims: [175, 990], rect: [-175, 6, 0, 1000], mat: 'invisible', outdoor: true, noLight: true, eye: [-90, 500], look: [0, -1], note: 'רצועת דשא סינתטי וחצץ לבן לאורך הבית.' },
+  { id: 'front', f: 0, name: 'חנייה', dims: [960, 440], rect: [-175, 1000, 785, 1440], mat: 'invisible', outdoor: true, noLight: true, eye: [190, 1060], look: [.2, 1], note: 'חנייה לשני רכבים, מחסן ושער הזזה.' },
   { id: 'balcony', f: 1, name: 'מסתור כביסה', dims: [70, 410], rect: [-68, 321, 0, 735], old: [-74, 292, -2, 716], mat: 'balcony', note: 'מרפסת שירות מוסתרת ברפפות, צמודה לחדרי הרחצה.', noLight: true },
 ];
 
@@ -1056,7 +1060,7 @@ for (const r of ROOMS) {
   el.addEventListener('click', e => { e.stopPropagation(); selectRoom(r.id, true); });
   const lbl = new CSS2DObject(el); lbl.position.set(wx((x0 + x1) / 2), fl.base + 1.25, wz((y0 + y1) / 2));
   lbl.userData.room = r.id; el.addEventListener('dblclick', e => { e.stopPropagation(); focusRoom(r.id); });
-  fl.group.add(lbl); fl.labels.push(lbl); r.el = el;
+  if (!r.outdoor) { fl.group.add(lbl); fl.labels.push(lbl); } r.el = el;
   if (!r.noLight) {
     const ceil = r.f === 0 ? L1 - .3 : L1 + H2;
     const fx = new THREE.Mesh(new THREE.CylinderGeometry(.17, .17, .035, 24), M.fixture);
@@ -2037,7 +2041,7 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let X = 400; X < 680; X += 45) blob(X, -520 + rnd() * 30, .3, .3, 0x4a6a3a);
   // dark slatted fences around the garden and the side lawn
   slatFence(-220, -580, 791, -580); slatFence(-220, -580, -220, 1010);
-  B(p, PARTY - 10, -580, PARTY + 10, 12, -15, 180, M.plaster);
+  B(p, PARTY - 10, -580, PARTY + 10, 12, -15, 260, M.stone);
   // wagon wheel and a plant trolley on the wall by the front door
   { const w = new THREE.Mesh(new THREE.TorusGeometry(.38, .04, 8, 28), M.wood); w.position.set(wx(-1), 1.75, wz(860)); w.rotation.y = Math.PI / 2; p.add(w);
     for (let k = 0; k < 6; k++) { const sp = new THREE.Mesh(UNIT, M.wood); sp.scale.set(.02, .74, .025); sp.position.copy(w.position); sp.position.x -= .02; sp.rotation.set(k / 6 * Math.PI, Math.PI / 2, 0, 'YXZ'); p.add(sp); } }
@@ -2048,13 +2052,19 @@ function desk(p, base, r, chairAt, faceTo) {
   for (const X of [-200, 290, 785]) flat(X - 4, 1110, X + 4, 1440, -0.02, M.line);
   // outdoor storage shed at the far right of the parking, against the party line, doors facing the parking
   { const shed = std({ color: 0xe8e1d0, roughness: .6 }), trimS = std({ color: 0x8a8580, roughness: .6 });
-    B(p, 650, 1068, 781, 1228, -2, 0, M.concrete);
-    B(p, 655, 1072, 778, 1224, 0, 205, shed);
-    for (let y = 1078; y < 1222; y += 9) B(p, 654.4, y, 655, y + 1, 2, 203, trimS);
-    B(p, 649, 1066, 784, 1230, 205, 212, trimS); B(p, 646, 1063, 787, 1233, 212, 215, shed);
-    B(p, 654, 1100, 655, 1196, 4, 190, std({ color: 0xc7bda9, roughness: .7 })); B(p, 653.8, 1147.6, 655.2, 1148.4, 4, 190, trimS);
-    for (const y of [1140, 1156]) B(p, 652.5, y - 1, 654, y + 1, 95, 115, M.steel);
-    B(p, 653, 1130, 655, 1166, 130, 170, trimS); B(p, 652.5, 1134, 653, 1162, 134, 166, std({ color: 0x9aa4ab, roughness: .2 })); }
+    B(p, 650, 1268, 781, 1428, -2, 0, M.concrete);
+    B(p, 655, 1272, 778, 1424, 0, 205, shed);
+    for (let y = 1278; y < 1422; y += 9) B(p, 654.4, y, 655, y + 1, 2, 203, trimS);
+    B(p, 649, 1266, 784, 1430, 205, 212, trimS); B(p, 646, 1263, 787, 1433, 212, 215, shed);
+    B(p, 654, 1300, 655, 1396, 4, 190, std({ color: 0xc7bda9, roughness: .7 })); B(p, 653.8, 1347.6, 655.2, 1348.4, 4, 190, trimS);
+    for (const y of [1340, 1356]) B(p, 652.5, y - 1, 654, y + 1, 95, 115, M.steel);
+    B(p, 653, 1330, 655, 1366, 130, 170, trimS); B(p, 652.5, 1334, 653, 1362, 134, 166, std({ color: 0x9aa4ab, roughness: .2 })); }
+  // neighbour's grey slatted fence along the party line beside the parking
+  for (let z = 10; z < 175; z += 22) B(p, 788, 980, 794, 1440, z, z + 16, std({ color: 0x8e9196, roughness: .6, metalness: .3 }));
+  // big green bush beside the entrance path, EV charger and lantern on the facade
+  { const bush = std({ color: 0x3f6a2e, roughness: .9, flatShading: true }); for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.55 + rnd() * .25, 1), bush)); m.position.set(wx(-130 + (rnd() - .5) * 70), .5 + rnd() * .9, wz(1060 + (rnd() - .5) * 80)); p.add(m); } }
+  B(p, 330, 972, 350, 980, 110, 140, std({ color: 0xdfe3e6, roughness: .4 }));
+  B(p, 268, 760, 276, 768, 230, 255, M.black);
   // black slatted sliding gate on the street side, open across the shed
   for (let z = 10; z < 175; z += 16) B(p, 450, 1440, 785, 1446, z, z + 11, M.black); for (const X of [450, 785]) B(p, X - 4, 1438, X + 4, 1448, 0, 180, M.black);
   flat(-2000, 1450, 2000, 1620, -0.02, M.concrete);
@@ -2214,7 +2224,7 @@ function focusRoom(id) {
   scene.updateMatrixWorld(true);
   const rect = r.rect, pad = 24;
   // other floor, garden, neighbour, slabs, other rooms
-  hideForFocus(F[1 - r.f].group); hideForFocus(site); hideForFocus(neighbor);
+  hideForFocus(F[1 - r.f].group); if (!r.outdoor) hideForFocus(site); hideForFocus(neighbor);
   const sf = o => {
     if (o.userData.slab || o.userData.lowerCeiling) hideForFocus(o);
     else if (o.isGroup && !openingGroups.includes(o)) o.children.forEach(sf);   // look inside before/after groups
@@ -2282,7 +2292,7 @@ function enterWalk(id, eyeOv, lookOv) {
   flyTo(eye.clone().sub(look.normalize().multiplyScalar(.05)), eye, 1.4);
   document.getElementById('card').hidden = true; ROOMS.forEach(q => q.mesh.material = q.baseMat);
   document.getElementById('walkName').textContent = r.name; document.getElementById('walkBar').hidden = false;
-  document.getElementById('hint').textContent = 'גרירה להסתובבות · לחיצה על הרצפה למעבר לשם · לחיצה על דלת לכניסה לחדר · לחיצה על המדרגות לקומה השנייה · Esc ליציאה';
+  document.getElementById('hint').textContent = 'גרירה להסתובבות · לחיצה על הרצפה למעבר · לחיצה על דלת לכניסה לחדר או ליציאה לגינה · לחיצה על המדרגות לקומה השנייה · Esc ליציאה';
 }
 const walkRing = new THREE.Mesh(new THREE.RingGeometry(.2, .26, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .85, depthTest: false, side: THREE.DoubleSide }));
 walkRing.rotation.x = -Math.PI / 2; walkRing.renderOrder = 10; walkRing.visible = false; scene.add(walkRing);
@@ -2303,6 +2313,11 @@ function walkFloorHit(e) {
   const hits = ray.intersectObjects([F[0].group, F[1].group], true).filter(h => visibleChain(h.object) && h.object.material !== M.glass && h.object.material !== M.sheer && h.object.material !== M.dotGlass && !h.object.isPoints && h.object !== walkRing && !h.object.userData.rail);
   const h = hits[0]; if (!h) return null;
   if (h.object.userData.stair) return { point: h.point, stair: true };
+  for (let o = h.object; o; o = o.parent) if (o.userData.entry) { // front door / garden slider: step through, in or out
+    const en = o.userData.entry, cur = ROOMS.find(r => r.id === walking.id), out = en.room === 'living' ? ['garden', [406, -70], [0, -1]] : ['front', [190, 1040], [.2, 1]];
+    const [id, pt, lk] = cur && cur.outdoor ? [en.room, en.eye, en.look] : out;
+    return { point: new THREE.Vector3(wx(pt[0]), 0, wz(pt[1])), room: id, door: true, look: new THREE.Vector3(lk[0], 0, lk[1]) };
+  }
   // a door: step through it to the room on the other side
   for (let o = h.object; o; o = o.parent) if (o.userData.doorInfo) {
     const di = o.userData.doorInfo, cur = walking && walking.pos ? walking.pos : [0, 0];
@@ -2423,9 +2438,9 @@ document.querySelectorAll('[data-col]').forEach(btn => {
 });
 { // room picker, grouped by floor
   const sel = document.getElementById('roomSel');
-  [['קומת קרקע', 0], ['קומה א׳', 1]].forEach(([label, f]) => {
+  [['קומת קרקע', 0], ['קומה א׳', 1], ['חוץ', 'out']].forEach(([label, f]) => {
     const og = document.createElement('optgroup'); og.label = label;
-    ROOMS.filter(r => r.f === f).forEach(r => { const o = document.createElement('option'); o.value = r.id; o.textContent = r.name; og.appendChild(o); });
+    ROOMS.filter(r => f === 'out' ? r.outdoor : r.f === f && !r.outdoor).forEach(r => { const o = document.createElement('option'); o.value = r.id; o.textContent = r.name; og.appendChild(o); });
     sel.appendChild(og);
   });
   sel.addEventListener('change', () => sel.value ? focusRoom(sel.value) : exitFocus());
