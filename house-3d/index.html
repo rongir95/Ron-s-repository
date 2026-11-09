@@ -46,8 +46,6 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .brand.min .eyebrow,.brand.min .sub,.brand.min .stats{display:none}
 .brand.min{padding-block:8px}
 .brand.min h1{font-size:18px;margin:0;padding-inline-end:28px}
-.tools.min>*:not(.collapse):not(h2:first-of-type){display:none}
-.tools.min{min-width:0;padding:6px 38px 6px 10px}
 .tools.min h2:first-of-type{margin:4px 0}
 .panel{background:var(--paper);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(15,25,40,.16);transition:background .4s,color .4s}
 
@@ -199,6 +197,10 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .tools.min>*:not(.thead){display:none}
 .tools.min{width:auto;padding:6px}
 .tools.min .tabs{display:none}
+.tools .mlabel{display:none;font:600 13px var(--f-ui);color:var(--ink);padding:0 4px 0 8px}
+.tools.min .mlabel{display:block}
+.tools.min .thead{margin:0;cursor:pointer}
+.tools.min{padding:4px 6px}
 .modes{border-radius:999px;padding:5px}
 .mbtn[aria-selected="true"]{background:var(--pill);color:var(--pill-ink);box-shadow:0 1px 4px rgba(0,0,0,.14)}
 .zoom{border-radius:18px}
@@ -216,7 +218,9 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   .views{display:grid}
   .roomsel{width:100%}
   .tools.min{left:auto;width:auto}
-  .zoom{top:calc(50% - 40px)}
+  .zoom{top:auto;bottom:calc(440px + env(safe-area-inset-bottom,0px))}
+  .compass{top:auto!important;bottom:calc(440px + env(safe-area-inset-bottom,0px))!important;right:auto!important;left:max(12px,env(safe-area-inset-left,0px))!important}
+  body:has(.tools.min) .zoom,body:has(.tools.min) .compass{bottom:calc(140px + env(safe-area-inset-bottom,0px))!important}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -244,6 +248,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
       <button role="tab" data-tab="reno" aria-selected="false">שיפוץ</button>
       <button role="tab" data-tab="set" aria-selected="false">הגדרות</button>
     </div>
+    <span class="mlabel">תפריט</span>
     <button class="collapse" data-col="toolsP" aria-label="כיווץ" aria-expanded="true"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   </div>
   <section class="pane" data-pane="view">
@@ -2825,6 +2830,7 @@ tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
 tog('tRotate', 'rotate', () => controls.autoRotate = state.rotate);
 document.getElementById('cardX').addEventListener('click', () => selectRoom(null));
+document.querySelector('#toolsP .thead').addEventListener('click', e => { const t = document.getElementById('toolsP'); if (t.classList.contains('min') && !e.target.closest('.collapse')) t.querySelector('.collapse').click(); });
 { const tabs = document.querySelectorAll('[data-tab]'), panes = document.querySelectorAll('[data-pane]');
   const show = t => { tabs.forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t)); panes.forEach(p => p.hidden = p.dataset.pane !== t); try { localStorage.setItem('menuTab', t); } catch (e) {} };
   tabs.forEach(b => b.addEventListener('click', () => { document.getElementById('toolsP').classList.remove('min'); show(b.dataset.tab); }));
