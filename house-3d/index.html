@@ -1451,15 +1451,18 @@ function desk(p, base, r, chairAt, faceTo) {
       m.position.set(0, 1.235, k * .12); m.rotation.x = sg * Math.PI / 4; gg.add(m);
     } }
   // ---- dining corner: espresso table and high-back chairs, wallpapered north wall with frames ----
-  B(p, 108, 125, 270, 215, 72, 76, M.espresso, b);
-  for (const [x, y] of [[113, 130], [265, 130], [113, 210], [265, 210]]) B(p, x - 3, y - 3, x + 3, y + 3, 0, 72, M.espresso, b);
+  // dining table and chairs as one piece, measured-plan coordinates
+  const dg = new THREE.Group(); dg.userData.noRemap = true; p.add(dg);
+  { const p = dg; B(p, 100, 132, 262, 222, 72, 76, M.espresso, b);
+    for (const [x, y] of [[106, 138], [256, 138], [106, 216], [256, 216]]) B(p, x - 3, y - 3, x + 3, y + 3, 0, 72, M.espresso, b);
+    B(p, 104, 136, 258, 138, 64, 72, M.espresso, b); B(p, 104, 216, 258, 218, 64, 72, M.espresso, b); }
   const diningChair = (X, Y, toX, toY) => {
-    const g = local(p, X, Y, b, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y)));
+    const g = local(dg, X, Y, b, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y)));
     lb(g, .44, .05, .44, 0, .46, 0, M.espresso); lb(g, .4, .04, .4, 0, .495, .01, std({ color: 0x4a3a30, roughness: 1 }));
     lb(g, .44, .52, .035, 0, .74, -.205, M.espresso);
     for (const [a, c] of [[-.19, -.19], [.19, -.19], [-.19, .19], [.19, .19]]) lb(g, .035, .46, .035, a, .23, c, M.espresso);
   };
-  for (const x of [135, 190, 245]) { diningChair(x, 101, x, 170); diningChair(x, 240, x, 170); }
+  for (const x of [126, 181, 236]) { diningChair(x, 110, x, 177); diningChair(x, 244, x, 177); }
   { const m = new THREE.Mesh(boxUV(1.945, 2.73, .01, .755, .07), M.wallpaper); m.receiveShadow = true;
     m.position.set(wx(172.75), b + .07 + 1.365, wz(48)); p.add(m); onWall(m, b, 7, 280); }
   for (const [x, z, w, h] of [[110, 175, 16, 20], [132, 182, 18, 24], [156, 178, 14, 18], [182, 176, 34, 26], [110, 138, 16, 18], [134, 136, 18, 16], [158, 140, 18, 22], [184, 138, 16, 20], [128, 210, 20, 14]]) {
