@@ -1041,8 +1041,8 @@ function opening(p, a, ux, uy, theta, op, o) {
     if (op.slide) { // brown wood sliding door on a track, half open, on the room side
       const sd = -os * (t / 2 + 0.025);
       lb(g, w + .9, .05, .05, .4, hd + .03, sd, M.wood);
-      lb(g, w, hd - .02, .035, w * .55, (hd - .02) / 2, sd, M.wood);
-      lb(g, .02, .3, .02, w * .55 - w / 2 + .06, 1.0, sd - os * .025, M.black);
+      lb(g, w, hd - .02, .035, w * 1.02, (hd - .02) / 2, sd, M.wood);   // slid fully open
+      lb(g, .02, .3, .02, w * 1.02 - w / 2 + .06, 1.0, sd - os * .025, M.black);
       return;
     }
     lb(g, lw, lh, 0.04, 0, lh / 2, 0, M.trim);
@@ -1093,7 +1093,8 @@ function opening(p, a, ux, uy, theta, op, o) {
     lb(g, w, 0.16, t * .55, 0, hd + 0.08, -os * t * 0.15, M.trim).castShadow = false;
     { const sd = Math.min(hgt * .3, .45); const sh = new THREE.Mesh(new THREE.PlaneGeometry(w - 2 * fw, sd), M.shutter); sh.position.set(0, hd - fw - sd / 2, os * (t / 2 - .015)); if (os < 0) sh.rotation.y = Math.PI; g.add(sh); }
   }
-  if (op.type !== 'front' && op.type !== 'utility') { const hy = op.type === 'slide' ? 1.05 : s + hgt * .5; lb(g, .022, .14, .025, (op.type === 'slide' ? .05 : w / 2 - fw - .03), hy, fz - os * .055, M.black); }
+  if (op.type === 'slide') { for (const sx of [-1, 1]) { lb(g, .022, .3, .03, sx * (w / 2 - fw - .07), 1.05, fz - os * .06, M.black); lb(g, .022, .3, .03, sx * (w / 2 - fw - .07), 1.05, fz + os * .06, M.black); } } // pull handles on the outer stile of each panel
+  else if (op.type !== 'front' && op.type !== 'utility') { lb(g, .022, .14, .025, w / 2 - fw - .03, s + hgt * .5, fz - os * .055, M.black); }
   if (s > 0) { lb(g, w + 0.08, 0.04, 0.09, 0, s - 0.02, os * (t / 2 + 0.03), M.sillStone); lb(g, w, 0.025, 0.07, 0, s - 0.012, -os * (t / 2 - 0.02), M.sillStone); }
 }
 function buildOutline(p, poly, opsByEdge, o) {
@@ -1266,7 +1267,7 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
   B(p, 700, 432, 778, 532, 0, 9 * R - 4, M.interior); B(p, 700, 612, 778, 618, 0, 9 * R - 4, M.interior);
   B(p, 760, 532, 778, 612, 0, 9 * R - 4, M.interior); B(p, 700, 532, 760, 612, 9 * R - 16, 9 * R - 4, M.interior);
   { // coat rack on the angled wall beside the front door, coats and bags hanging on it (entrance photos)
-    const g = local(F[0].furn, 172, 754, 0, 2.395); g.userData.noRemap = true;
+    const g = local(F[0].furn, 200, 695, 0, 0); g.userData.noRemap = true;
     lb(g, .9, .1, .025, 0, 1.72, .013, M.oak);
     for (let k = 0; k < 5; k++) { const x = -.36 + k * .18; lb(g, .02, .02, .09, x, 1.7, .07, M.black);
       if (k !== 2) { const c = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.32, .78, .12, 3, .04), std({ color: [0x2b2f36, 0x5a4636, 0x1f2a3a, 0x6b6f72, 0x3a2f2a][k], roughness: 1 }))); c.position.set(x, 1.27, .1); c.rotation.z = (rnd() - .5) * .1; g.add(c); } }
@@ -1325,10 +1326,6 @@ function bed(p, base, [X0, Y0, X1, Y1], head, duvet) {
     RB(p, ...foot, 56.5, 59, M.knit, base, .012); }
   // duvet draping over both long sides and the foot
   const [a0, b0, a1, b1] = D;
-  if (horiz) { RB(p, a0, b0 - 1.5, a1, b0 + .5, 24, 56, duvet, base, .008); RB(p, a0, b1 - .5, a1, b1 + 1.5, 24, 56, duvet, base, .008);
-    head === 'W' ? RB(p, a1 - .5, b0 - 1, a1 + 1.5, b1 + 1, 24, 56, duvet, base, .008) : RB(p, a0 - 1.5, b0 - 1, a0 + .5, b1 + 1, 24, 56, duvet, base, .008); }
-  else { RB(p, a0 - 1.5, b0, a0 + .5, b1, 24, 56, duvet, base, .008); RB(p, a1 - .5, b0, a1 + 1.5, b1, 24, 56, duvet, base, .008);
-    head === 'N' ? RB(p, a0 - 1, b1 - .5, a1 + 1, b1 + 1.5, 24, 56, duvet, base, .008) : RB(p, a0 - 1, b0 - 1.5, a1 + 1, b0 + .5, 24, 56, duvet, base, .008); }
   RB(p, ...sub(58, 80, -3.5), 55, 59.5, M.linen, base, .02);
   // bed legs
   for (const [x, y] of [[X0 + 4, Y0 + 4], [X1 - 4, Y0 + 4], [X0 + 4, Y1 - 4], [X1 - 4, Y1 - 4]]) B(p, x - 2, y - 2, x + 2, y + 2, 0, 6, M.black, base);
@@ -1379,6 +1376,26 @@ function basin(p, base, X0, Y0, X1, Y1, z0, z1) {
   const m = shadowy(new THREE.Mesh(new THREE.LatheGeometry(prof, 48), M.ceramic)); m.scale.set(w, 1, d); g.add(m);
   const dr = new THREE.Mesh(new THREE.CylinderGeometry(.018, .018, .004, 16), M.steel); dr.position.y = h * .1 + .003; g.add(dr);
   return g;
+}
+// French-door fridge with a bottom freezer drawer, black stainless steel (plan box 199..289 × 627..699)
+function fridgeFD(p, b) {
+  const body = std({ color: 0x3b3e44, roughness: .35, metalness: .5, envMapIntensity: 1 }), door = std({ color: 0x4a4e55, roughness: .25, metalness: .55, envMapIntensity: 1.3 });
+  const g = new THREE.Group(); g.position.set(wx(244), b, wz(627)); g.rotation.y = Math.PI; p.add(g); // local +z points into the kitchen (towards smaller Y)
+  const cab = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.9, 1.84, .66, 3, .02), body)); cab.position.set(0, .92, -.36); g.add(cab);
+  const dr = (w, h, x, y) => { const m = shadowy(new THREE.Mesh(new RoundedBoxGeometry(w, h, .05, 3, .015), door)); m.position.set(x, y, .0); g.add(m); return m; };
+  dr(.443, 1.06, -.226, 1.33); dr(.443, 1.06, .226, 1.33);           // two upper doors
+  dr(.894, .66, 0, .46);                                               // freezer drawer
+  lb(g, .9, .06, .6, 0, .04, -.33, std({ color: 0x111214, roughness: .6 }));   // kick plate
+  const steel = std({ color: 0xc9ccd0, roughness: .2, metalness: .95, envMapIntensity: 1.2 });
+  for (const sx of [-1, 1]) { // tall bar handles near the centre gap, on stand-offs
+    lb(g, .022, .72, .022, sx * .03, 1.33, .07, steel); for (const dy of [-.33, .33]) lb(g, .015, .015, .045, sx * .03, 1.33 + dy, .045, steel); }
+  lb(g, .55, .022, .022, 0, .72, .07, steel); for (const dx of [-.25, .25]) lb(g, .015, .015, .045, dx, .72, .045, steel);
+  // water and ice dispenser recess with a small display on the left door
+  lb(g, .2, .32, .012, -.24, 1.25, .028, std({ color: 0x0c0d0f, roughness: .4 }));
+  lb(g, .12, .035, .006, -.24, 1.43, .036, std({ color: 0x1b2a3a, roughness: .2, emissive: 0x3a7ad0, emissiveIntensity: .35 }));
+  lb(g, .08, .1, .03, -.24, 1.2, .04, std({ color: 0x3a3c40, roughness: .5 }));
+  // brand badge
+  lb(g, .08, .012, .004, .23, 1.82, .028, steel);
 }
 function vanity(p, base, r, basinAt) {
   B(p, ...r, 10, 82, M.cabinetDark, base); B(p, r[0] - 1, r[1] - 1, r[2] + 1, r[3] + 1, 82, 86, M.quartz, base);
@@ -1469,8 +1486,6 @@ function desk(p, base, r, chairAt, faceTo) {
   { // white gloss coffee table with a lift-up top and two drawers, recessed plinth (as in the photos)
     const gloss = std({ color: 0xf7f7f5, roughness: .08, envMapIntensity: 1.1 });
     RB(p, 565, 185, 665, 285, 36, 42, gloss, b, .01); RB(p, 567, 187, 663, 283, 8, 36, gloss, b, .01); B(p, 575, 195, 655, 275, 0, 8, M.black, b);
-    for (const x of [566.4, 663.6]) { B(p, x - .3, 187, x + .3, 283, 22, 22.6, M.black, b); B(p, x - .6, 220, x + .6, 250, 28, 29, M.steel, b); }
-    B(p, 615, 187, 615.4, 283, 9, 36, M.black, b);
     for (let k = 0; k < 3; k++) B(p, 585 + k * 6, 210 + k * 3, 615 + k * 6, 232 + k * 3, 42 + k * .8, 42.8 + k * .8, std({ color: [0xe8e2d4, 0x3a5a7a, 0x8a3a2a][k], roughness: .8 }), b);
     B(p, 630, 240, 645, 246, 42, 43.5, M.black, b); }
   // champagne pendant over the coffee table
@@ -1610,12 +1625,9 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 140, 638.5, 194, 640, 152, 186, M.black, b); B(p, 140, 638.5, 194, 640, 88, 146, M.black, b);
   handleX(146, 188, 638.5, 140); handleX(146, 188, 640, 60); handleX(146, 188, 640, 30);
   // black stainless French-door fridge with a cream cabinet above it
-  B(p, 199, 627, 289, 699, 0, 186, M.fridge, b);
-  B(p, 243.6, 626.4, 244.4, 627, 2, 186, M.black, b); B(p, 199, 626.4, 289, 627, 82, 83, M.black, b);
-  for (const x of [237, 249]) { B(p, x, 621, x + 2, 627, 95, 172, M.steel, b); B(p, x, 621, x + 2, 627, 15, 74, M.steel, b); }
+  fridgeFD(p, b);
   B(p, 199, 640, 289, 699, 190, 249, M.kCream, b); handleX(225, 263, 640, 194);
   // breakfast bar in walnut veneer with a waterfall end, running north–south between kitchen and living
-  BU(205, 334, 245, 510, 0, 95, M.veneer, p);
   BU(200, 334, 276, 518, 95, 100, M.veneer, p);
   BU(200, 510, 276, 518, 0, 95, M.veneer, p);
   // bordeaux gloss island with a grey top, at the north end of the bar, reaching towards the living room
@@ -1625,7 +1637,7 @@ function desk(p, base, r, chairAt, faceTo) {
    B(p, 129.7, 387, 130.3, 387.6, 10, 86, M.black, b), B(p, 189.7, 387, 190.3, 387.6, 10, 86, M.black, b), B(p, 69, 387, 220, 387.6, 47.7, 48.3, M.black, b),
    ...[[160, 80], [160, 40], [210, 80], [210, 40]].map(([x, z]) => B(p, x - 15, 387.6, x + 15, 389, z - .8, z + .8, M.steel, b)),
    B(p, 211, 385, 221, 391, 92, 95, M.steel, b)].forEach(m => m.userData.noRemap = true);
-  for (const y of [390, 460]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
+  for (const y of [430, 485]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
   // two white square-frame pendants over the bar
   B(p, 225, 370, 249, 470, 276, 280, M.white, b);
   for (const [y, z] of [[395, 175], [445, 188]]) {
@@ -1659,15 +1671,13 @@ function desk(p, base, r, chairAt, faceTo) {
     B(p, 140, 638.5, 194, 640, 152, 186, M.black, b); B(p, 141, 638, 193, 638.5, 156, 182, M.steel, b);
     B(p, 140, 638.5, 194, 640, 88, 146, M.black, b); B(p, 141, 638, 193, 638.5, 92, 102, M.steel, b);
     for (let x = 150; x < 190; x += 30) B(p, x, 639.5, x + .4, 640.2, 0, 86, M.espresso, b);
-    B(p, 199, 627, 289, 699, 0, 186, M.fridge, b);
-    B(p, 243.6, 626.4, 244.4, 627, 2, 186, M.black, b); B(p, 199, 626.4, 289, 627, 82, 83, M.black, b);
-    for (const x of [237, 249]) { B(p, x, 621, x + 2, 627, 95, 172, M.steel, b); B(p, x, 621, x + 2, 627, 15, 74, M.steel, b); }
+    fridgeFD(p, b);
     B(p, 199, 640, 289, 699, 188, C, M.oakLight, b); B(p, 289, 625, 296, 699, 0, C, M.oakLight, b);
     for (const x of [244]) B(p, x - .3, 639.4, x + .3, 640, 190, C - 2, M.espresso, b);
     // white peninsula with a white quartz top, light-oak breakfast bar resting on it
     [B(p, 69, 325, 273, 387, 8, 88, M.kWhite, b), B(p, 71, 327, 271, 385, 0, 8, M.kWhite, b), B(p, 69, 321, 281, 391, 88, 92, M.qWhite, b)].forEach(m => m.userData.noRemap = true);
-    BU(205, 334, 245, 510, 0, 95, M.oakLight, p); BU(200, 334, 276, 518, 95, 100, M.oakLight, p); BU(200, 510, 276, 518, 0, 95, M.oakLight, p);
-    for (const y of [390, 460]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
+    BU(200, 334, 276, 518, 95, 100, M.oakLight, p); BU(200, 510, 276, 518, 0, 95, M.oakLight, p);
+    for (const y of [430, 485]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
     // white dome pendants over the bar
     for (const y of [395, 465]) {
       CY(p, 238, y, .3, 210, 279, M.black, b, 6); CY(p, 238, y, 4, 277, 279, M.white, b, 14);
@@ -1706,6 +1716,8 @@ function desk(p, base, r, chairAt, faceTo) {
   for (const x of [126, 181, 236]) { diningChair(x, 110, x, 177); diningChair(x, 244, x, 177); }
   { const m = new THREE.Mesh(boxUV(1.945, 2.73, .01, .755, .07), M.wallpaper); m.receiveShadow = true;
     m.position.set(wx(172.75), b + .07 + 1.365, wz(48)); p.add(m); onWall(m, b, 7, 280); }
+  { const m = new THREE.Mesh(boxUV(.01, 2.7, .3, 0, .07), M.wallpaper); m.position.set(wx(270.6), b + 1.42, wz(40)); m.userData.noRemap = true; p.add(m); onWall(m, b, 7, 277);
+    const m2 = new THREE.Mesh(boxUV(.34, 2.7, .01, 2.4, .07), M.wallpaper); m2.position.set(wx(256), b + 1.42, wz(58.6)); m2.userData.noRemap = true; p.add(m2); onWall(m2, b, 7, 277); }
   for (const [x, z, w, h] of [[110, 175, 16, 20], [132, 182, 18, 24], [156, 178, 14, 18], [182, 176, 34, 26], [110, 138, 16, 18], [134, 136, 18, 16], [158, 140, 18, 22], [184, 138, 16, 20], [128, 210, 20, 14]]) {
     onWall(B(p, x, 48.5, x + w, 50.5, z, z + h, M.black, b), b, z, z + h);
     onWall(B(p, x + 2.5, 50.5, x + w - 2.5, 51, z + 2.5, z + h - 2.5, M.linen, b), b, z, z + h);
@@ -2080,8 +2092,8 @@ function desk(p, base, r, chairAt, faceTo) {
   { const w = B(p.parent || p, 186, 652, 192, 724, 0, 270, M.interior, b); onWall(w, b, 0, 270); }
   B(p, 192, 652, 358, 724, 0, 54, M.bathBrown, b); RB(p, 190, 654, 357, 723, 50, 58, M.ceramic, b, .02); B(p, 198, 662, 349, 715, 46, 58.3, M.water, b);
   { const gl = B(p, 268, 652, 269, 723, 58, 200, M.glass, b); gl.castShadow = false; } B(p, 255, 652, 358, 654, 190, 192, M.steel, b);
-  B(p, 125, 664, 185, 723, 0, 85, M.white, b); CY(p, 155, 663, 17, 30, 31, M.black, b, 24).rotation.x = Math.PI / 2;
-  B(p, 125, 668, 185, 723, 90, 272, M.wenge, b); B(p, 154.6, 667.5, 155.4, 668, 92, 270, M.black, b);
+  B(p, 125, 652, 185, 712, 0, 85, M.white, b); CY(p, 155, 651, 17, 30, 31, M.black, b, 24).rotation.x = Math.PI / 2;
+  B(p, 125, 652, 185, 723, 90, 272, M.wenge, b); B(p, 154.6, 651.5, 155.4, 652, 92, 270, M.black, b);
   B(p, 70, 690, 110, 722, 0, 95, M.oak, b);
   { const sh = new THREE.Mesh(new THREE.CylinderGeometry(.09, .12, .16, 16), std({ color: 0xb87a3a, roughness: .4, emissive: 0x3a1a00 })); sh.position.set(wx(110), b + 2.1, wz(590)); p.add(sh); CY(p, 110, 590, .3, 218, 274, M.black, b, 6); }
   { // accessories (before): bottles on the tub rim, bath mat, towels on hooks by the door
@@ -2111,8 +2123,8 @@ function desk(p, base, r, chairAt, faceTo) {
     CY(p, 270, 690, 12, 222, 224, M.black, b, 28); B(p, 269, 690, 271, 723, 236, 238, M.black, b); CY(p, 270, 690, .8, 224, 237, M.black, b, 6);
     B(p, 330, 721, 333, 723, 80, 160, M.black, b);
     // washer under a tall oak cabinet, slatted oak laundry cabinet beside it
-    B(p, 125, 664, 185, 723, 0, 85, M.white, b); CY(p, 155, 663, 17, 30, 31, M.black, b, 24).rotation.x = Math.PI / 2;
-    B(p, 125, 668, 185, 723, 90, 270, M.oakLight, b); B(p, 154.6, 667.5, 155.4, 668, 92, 268, M.espresso, b);
+    B(p, 125, 652, 185, 712, 0, 85, M.white, b); CY(p, 155, 651, 17, 30, 31, M.black, b, 24).rotation.x = Math.PI / 2;
+    B(p, 125, 652, 185, 723, 90, 270, M.oakLight, b); B(p, 154.6, 651.5, 155.4, 652, 92, 268, M.espresso, b);
     B(p, 80, 690, 120, 722, 0, 85, M.oakLight, b); for (let x = 82; x < 120; x += 4) B(p, x, 689.5, x + 2, 690, 6, 80, M.wood, b);
     // wall-hung toilet on the west wall, oak cabinet above with a lit niche
     wallToilet(p, b, 72, 503, 0, M.white);
@@ -2286,6 +2298,7 @@ function desk(p, base, r, chairAt, faceTo) {
   flat(-215, -330, -175, 1010, -0.035, M.gravel);
   for (let Y = -250; Y < 950; Y += 160) { CY(p, -185, Y, 2, -15, 35, M.black, 0, 8); CY(p, -185, Y, 4, 30, 40, M.lampHead, 0, 10); }
   // brick barbecue with a chimney in the north-east corner of the deck
+  { const n0 = p.children.length;
   { const BR = (x0, y0, x1, y1, z0, z1) => { const w = (x1 - x0) / 100, d = (y1 - y0) / 100, h = (z1 - z0) / 100; const m = shadowy(new THREE.Mesh(boxUV(w, h, d, x0 / 100, z0 / 100), M.brick)); m.position.set(wx((x0 + x1) / 2), (z0 + z1) / 200, wz((y0 + y1) / 2)); p.add(m); return m; };
     BR(675, -328, 785, -248, -15, 75);                                         // base
     B(p, 670, -332, 789, -244, 75, 82, M.sillStone);                         // stone ledge
@@ -2299,6 +2312,8 @@ function desk(p, base, r, chairAt, faceTo) {
       for (const [dx, dy] of [[-15, -12], [15, -12], [-15, 12], [15, 12]]) B(p, 735 + dx - 2, -291 + dy - 2, 735 + dx + 2, -291 + dy + 2, 290, 300, M.brick); }
     // side counter of the barbecue, wood top on bricks
     BR(620, -320, 675, -262, -15, 75); B(p, 615, -324, 676, -258, 75, 81, M.wood); }
+    const pv = new THREE.Vector3(wx(735), 0, wz(-290)), Y = new THREE.Vector3(0, 1, 0), a = -Math.PI / 2, shift = new THREE.Vector3(.08, 0, .5);
+    for (const o of p.children.slice(n0)) { o.position.sub(pv).applyAxisAngle(Y, a).add(pv).add(shift); o.rotation.y += a; } }
   // glass-top table with white garden chairs
   B(p, 470, -230, 630, -140, 72, 74, M.glass); for (const [x, y] of [[472, -228], [628, -228], [472, -142], [628, -142]]) B(p, x - 2, y - 2, x + 2, y + 2, 0, 72, M.alu);
   B(p, 470, -230, 630, -226, 68, 72, M.alu); B(p, 470, -144, 630, -140, 68, 72, M.alu);
@@ -2358,14 +2373,21 @@ function desk(p, base, r, chairAt, faceTo) {
   { const bush = std({ color: 0x3f6a2e, roughness: .9, flatShading: true }); for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.55 + rnd() * .25, 1), bush)); m.position.set(wx(-130 + (rnd() - .5) * 70), .5 + rnd() * .9, wz(1060 + (rnd() - .5) * 80)); p.add(m); } }
   B(p, 330, 972, 350, 980, 110, 140, std({ color: 0xdfe3e6, roughness: .4 }));
   // black slatted sliding gate on the street side, open across the shed
-  for (let z = 10; z < 175; z += 16) B(p, 450, 1440, 785, 1446, z, z + 11, M.black); for (const X of [450, 785]) B(p, X - 4, 1438, X + 4, 1448, 0, 180, M.black);
+  // street side: fixed slatted fence, a pedestrian gate, then the wide electric sliding gate for the cars (black horizontal slats)
+  const slats = (X0, X1, z1 = 175) => { for (let z = 10; z < z1; z += 16) B(p, X0, 1440, X1, 1446, z, z + 11, M.black); };
+  for (const X of [-200, 0, 100, 785]) B(p, X - 5, 1437, X + 5, 1449, 0, 185, M.black);
+  slats(-195, -5);                                                             // fixed fence
+  slats(4, 96, 170); B(p, 4, 1440, 96, 1446, 168, 172, M.black); B(p, 4, 1440, 8, 1446, 10, 170, M.black); B(p, 92, 1440, 96, 1446, 10, 170, M.black);   // pedestrian gate
+  B(p, 80, 1446, 84, 1450, 95, 110, M.steel); B(p, 80, 1436, 84, 1440, 95, 110, M.steel);
+  slats(105, 780); B(p, 105, 1446, 780, 1450, 0, 6, M.alu);                     // electric gate on its track
+  B(p, 770, 1449, 790, 1460, 0, 40, std({ color: 0x3a3c40, roughness: .5 }));  // gate motor
   flat(-2000, 1450, 2000, 1620, -0.02, M.concrete);
   B(p, -2000, 1612, 2000, 1628, -15, 1, M.sillStone);
   flat(-2000, 1628, 2000, 2400, GROUND + .005, M.asphalt);
   for (let X = -2000; X < 2000; X += 600) flat(X, 2005, X + 300, 2017, GROUND + .01, M.line);
   // car in the parking bay (one of the two spaces)
-  for (const [cx, col] of [[40, M.car], [540, null]]) if (col) {
-    const g = local(p, cx, 1255, GROUND + .02);
+  for (const [cx, col] of [[95, M.car], [470, std({ color: 0xe9e9e6, roughness: .22, metalness: .35, envMapIntensity: 1.1 })]]) {
+    const g = local(p, cx, 1215, GROUND + .02); g.scale.setScalar(.88);
     // side profile of a family hatchback, extruded across the width
     const sh = new THREE.Shape(), P = [[-2.17, .32], [-2.2, .62], [-2.05, .86], [-1.25, .92], [-.75, 1.42], [.55, 1.45], [1.25, .98], [2.05, .88], [2.18, .62], [2.15, .32]];
     sh.moveTo(P[0][0], P[0][1]); for (const [x, y] of P.slice(1)) sh.lineTo(x, y);
@@ -2373,7 +2395,7 @@ function desk(p, base, r, chairAt, faceTo) {
     sh.lineTo(P[0][0], P[0][1]);
     const bg = new THREE.ExtrudeGeometry(sh, { depth: 1.76, bevelEnabled: true, bevelThickness: .06, bevelSize: .05, bevelSegments: 4, curveSegments: 16 });
     bg.translate(0, 0, -.88); bg.rotateY(-Math.PI / 2);
-    const body = shadowy(new THREE.Mesh(bg, M.car)); g.add(body);
+    const body = shadowy(new THREE.Mesh(bg, col)); g.add(body);
     const glassM = std({ color: 0x141c26, roughness: .05, metalness: .4, envMapIntensity: 1.6, side: THREE.DoubleSide });
     const gs = new THREE.Shape([[-1.15, .96], [-.72, 1.37], [.5, 1.4], [1.12, 1.0]].map(([x, y]) => new THREE.Vector2(x, y)));
     for (const side of [-1, 1]) { const m = new THREE.Mesh(new THREE.ShapeGeometry(gs), glassM); m.rotation.y = -Math.PI / 2; m.position.x = side * .95; g.add(m); }
@@ -2383,7 +2405,7 @@ function desk(p, base, r, chairAt, faceTo) {
     for (const [x, z] of [[-.82, 1.35], [.82, 1.35], [-.82, -1.35], [.82, -1.35]]) {
       const w = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.33, .33, .22, 28), M.tyre)); w.rotation.z = Math.PI / 2; w.position.set(x, .33, z); g.add(w);
       const r2 = new THREE.Mesh(new THREE.CylinderGeometry(.21, .21, .23, 20), rim); r2.rotation.z = Math.PI / 2; r2.position.set(x, .33, z); g.add(r2); }
-    for (const x of [-.98, .98]) { const mr = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.12, .1, .18, 2, .03), M.car)); mr.position.set(x, 1.0, .75); g.add(mr); }
+    for (const x of [-.98, .98]) { const mr = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.12, .1, .18, 2, .03), col)); mr.position.set(x, 1.0, .75); g.add(mr); }
     for (const x of [-.62, .62]) { const l = new THREE.Mesh(new RoundedBoxGeometry(.32, .1, .04, 2, .02), M.lampHead); l.position.set(x, .72, 2.22); g.add(l);
       const t = new THREE.Mesh(new RoundedBoxGeometry(.3, .09, .04, 2, .02), std({ color: 0x8a1010, roughness: .3, emissive: 0x300000 })); t.position.set(x, .8, -2.22); g.add(t); }
     const grille = new THREE.Mesh(new RoundedBoxGeometry(.7, .14, .03, 2, .02), M.black); grille.position.set(0, .55, 2.24); g.add(grille);
