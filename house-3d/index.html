@@ -1295,7 +1295,7 @@ function desk(p, base, r, chairAt, faceTo) {
   const handleX = (X0, X1, Y, z) => B(p, X0, Y - 2, X1, Y, z - .8, z + .8, M.steel, b);   // bar handle on a face looking north
   // bar stools: cream bouclé seat and back, black metal frame
   const barStool = (X, Y, toX, toY, pp = p) => {
-    const g = local(pp, X, Y, b, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y)));
+    const g = local(pp, X, Y, b, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y))); g.userData.owner = 'kitchen';
     const seat = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.44, .08, .42, 3, .03), M.boucle)); seat.position.set(0, .7, 0); g.add(seat);
     const back = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.42, .26, .06, 3, .025), M.boucle)); back.position.set(0, .93, -.2); g.add(back);
     for (const [a, c] of [[-.19, -.18], [.19, -.18], [-.19, .18], [.19, .18]]) lb(g, .022, .7, .022, a, .35, c, M.black);
@@ -2095,7 +2095,7 @@ function focusRoom(id) {
   };
   F[r.f].shell.children.forEach(sf);
   ROOMS.forEach(q => { if (q.id !== id) hideForFocus(q.mesh); });
-  const ff = o => { if (o.userData.reno) { o.children.forEach(ff); return; } if (o.userData.rail || (!o.userData.wall && !inRect(planXY(o), rect, 6))) hideForFocus(o); };
+  const ff = o => { if (o.userData.reno) { o.children.forEach(ff); return; } if (o.userData.rail || (o.userData.owner && o.userData.owner !== id) || (!o.userData.wall && !o.userData.owner && !inRect(planXY(o), rect, 6))) hideForFocus(o); };
   F[r.f].furn.children.forEach(ff);
   F[r.f].lights.forEach(l => { if (!inRect(planXY(l), rect, 6)) hideForFocus(l); });
   fixtures.forEach(f => { f.userData.focusHide = true; }); // no ceiling in this view, so no ceiling fixtures
