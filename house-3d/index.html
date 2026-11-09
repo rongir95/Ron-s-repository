@@ -203,7 +203,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .seg{background:var(--track);border-radius:12px;padding:3px;margin:0}
 .seg button{border-radius:9px;transition:background .25s,box-shadow .25s}
 .seg button[aria-pressed="true"]{background:var(--pill);color:var(--pill-ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.roomsel{background-color:var(--track);border-radius:12px;margin:0;width:100%}
+.roomsel{background-color:var(--track);border-radius:12px;margin:0;width:100%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%23777' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important;background-size:14px 14px!important;background-position:10px 50%!important;background-repeat:no-repeat!important;padding-left:30px}
 .sw{width:38px;height:23px;border-radius:12px;background:rgba(120,120,128,.28)}
 .sw::after{top:2px;right:2px;width:19px;height:19px;box-shadow:0 2px 4px rgba(0,0,0,.25)}
 .tbtn[aria-pressed="true"] .sw{background:#34c759}
@@ -1269,7 +1269,7 @@ for (const r of ROOMS) {
   const n = B(p, 385, 345, 455, 410, cz - 4, cz, M.white, b); n.userData.noRemap = true;
   B(p, 393, 353, 447, 402, cz - 4.4, cz - 4, M.fixture, b).userData.noRemap = true;
   B(p, 385, 600, 455, 670, cz - .6, cz, M.trim, b).userData.noRemap = true;
-  onWall(B(p, 470.5, 336, 472, 376, 150, 200, M.white, b), b, 150, 200); }
+  { const ep = B(p, 410, 322, 450, 323.5, 150, 200, M.white, b); ep.userData.noRemap = true; onWall(ep, b, 150, 200); } }
 /* ---------------- stairs (U-shaped, 18 risers) ---------------- */
 const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
 {
@@ -1277,11 +1277,11 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
   // as in the photos: solid white stairs with dark wenge treads and grey metal railings
   for (let i = 0; i < 9; i++) { // flight 1
     const xa = 452 + i * tr, top = (i + 1) * R;
-    B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.treadWood).userData.stair = true;
+    if (xa + tr > 590) { B(p, xa, 430, xa + tr, 434, 0, top - 4, M.interior); B(p, xa, 434, xa + tr, 521, top - 14, top - 4, M.interior); } else B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.treadWood).userData.stair = true;
   }
   // landing block, with an open storage recess cut into it from the passage side
-  B(p, 700, 432, 778, 528, 0, 9 * R - 4, M.interior); B(p, 700, 616, 778, 618, 0, 9 * R - 4, M.interior);
-  B(p, 776, 528, 778, 616, 0, 9 * R - 4, M.interior); B(p, 700, 528, 776, 616, 9 * R - 16, 9 * R - 4, M.interior);
+  B(p, 700, 430, 778, 434, 0, 9 * R - 4, M.interior); B(p, 700, 616, 778, 618, 0, 9 * R - 4, M.interior);
+  B(p, 776, 434, 778, 616, 0, 9 * R - 4, M.interior); B(p, 700, 434, 776, 616, 9 * R - 16, 9 * R - 4, M.interior);
   { // coat rack on the angled wall beside the front door, coats and bags hanging on it (entrance photos)
     const g = local(F[0].furn, 200, 695, 0, 0); g.userData.noRemap = true;
     lb(g, .9, .1, .025, 0, 1.72, .013, M.oak);
@@ -1304,6 +1304,10 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
         else if (kind === 2) { const w = 7 + rnd() * 5, h = 14 + rnd() * 10; d.push(B(p, row - 10, y, row + 8, y + w, base, base + h, fill(), 0)); y += w + 1.5; }
         else { const r = 4, h = 10; for (let k = 0; k < 2 && base + (k + 1) * h < z + 36; k++) d.push(CY(p, row, y + r, r, base + k * h, base + (k + 1) * h - .3, std({ color: 0xc8ccd0, roughness: .3, metalness: .7 }), 0, 16)); y += 2 * r + 2; }
       } }
+    for (const [x0, x1, zt] of [[704, 775, 9 * R - 18], [650, 700, 8 * R - 18], [600, 650, 6 * R - 18]]) {
+      for (const z of [32, 72, 112]) if (z + 30 < zt) { d.push(B(p, x0, 436, x1, 470, z, z + 2, shelf, 0));
+        let x = x0 + 3; while (x < x1 - 8) { const w = 6 + rnd() * 6, h = Math.min(14 + rnd() * 16, zt - z - 6); d.push(rnd() > .4 ? CY(p, x + w / 2, 452, w / 2, z + 2, z + 2 + h, rnd() > .5 ? jarG : fill(), 0, 14) : B(p, x, 440, x + w, 466, z + 2, z + 2 + h, fill(), 0)); x += w + 2; } }
+      let x = x0 + 3; while (x < x1 - 12) { const w = 14 + rnd() * 10; d.push(B(p, x, 440, Math.min(x + w, x1 - 2), 468, 0, 28, std({ color: 0xc8a878, roughness: .9 }), 0)); x += w + 3; } }
     d.forEach(m => m.userData.noRemap = true); } B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing
   // stone-look strip cladding on the tall landing wall, a wall clock, a floor vase; framed pictures along the flight
   { // brick-strip wallpaper over the whole tall landing wall, both storeys
@@ -1608,6 +1612,7 @@ function desk(p, base, r, chairAt, faceTo) {
   { const p = kitBefore;
   // sink wall (west): cream gloss base units, light grey quartz top, white glass splashback
   for (const [y0, y1, z1] of [[320, 472, 88], [538, 699, 88], [472, 538, 71]]) B(p, 16, y0, 76, y1, 10, z1, M.kCream, b); B(p, 68, 472, 76, 538, 71, 88, M.kCream, b);
+  [B(p, 25, 325, 84, 352, 10, 88, M.kCream, b), B(p, 25, 325, 88, 352, 88, 92, M.kTop, b)].forEach(m => m.userData.noRemap = true);
   for (const [x0, y0, x1, y1] of [[16, 318, 79, 472], [16, 538, 79, 699], [16, 472, 26, 538], [68, 472, 79, 538]]) B(p, x0, y0, x1, y1, 88, 92, M.kTop, b); // worktop with the sink cut-out
   // on the counter: kettle, fruit bowl, cutting board, coffee machine, dish soap by the sink
   CY(p, 40, 610, 8, 92, 113, M.steel, b, 18, 9); CY(p, 40, 610, 3, 113, 116, M.black, b, 10);
@@ -1661,10 +1666,10 @@ function desk(p, base, r, chairAt, faceTo) {
   // bordeaux gloss island with a grey top, at the north end of the bar, reaching towards the living room
   // bordeaux peninsula: runs from the cooktop counter on the west wall eastwards, closing the north end of the kitchen
   // bordeaux peninsula, measured-plan coordinates (body and top together)
-  [B(p, 69, 345, 273, 407, 8, 88, M.kRed, b), B(p, 71, 347, 271, 405, 0, 8, M.white, b), B(p, 69, 341, 281, 411, 88, 92, M.kTop, b),
-   B(p, 129.7, 407, 130.3, 407.6, 10, 86, M.black, b), B(p, 189.7, 407, 190.3, 407.6, 10, 86, M.black, b), B(p, 69, 407, 220, 407.6, 47.7, 48.3, M.black, b),
-   ...[[160, 80], [160, 40], [210, 80], [210, 40]].map(([x, z]) => B(p, x - 15, 407.6, x + 15, 409, z - .8, z + .8, M.steel, b)),
-   B(p, 211, 405, 221, 411, 92, 95, M.steel, b)].forEach(m => m.userData.noRemap = true);
+  [B(p, 69, 290, 273, 352, 8, 88, M.kRed, b), B(p, 71, 292, 271, 350, 0, 8, M.white, b), B(p, 69, 286, 281, 356, 88, 92, M.kTop, b),
+   B(p, 129.7, 352, 130.3, 352.6, 10, 86, M.black, b), B(p, 189.7, 352, 190.3, 352.6, 10, 86, M.black, b), B(p, 69, 352, 220, 352.6, 47.7, 48.3, M.black, b),
+   ...[[160, 80], [160, 40], [210, 80], [210, 40]].map(([x, z]) => B(p, x - 15, 352.6, x + 15, 354, z - .8, z + .8, M.steel, b)),
+   B(p, 211, 350, 221, 356, 92, 95, M.steel, b)].forEach(m => m.userData.noRemap = true);
   for (const y of [430, 485]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
   // two white square-frame pendants over the bar
   B(p, 225, 370, 249, 470, 276, 280, M.white, b);
@@ -1679,6 +1684,7 @@ function desk(p, base, r, chairAt, faceTo) {
   { const p = kitAfter, C = 279;
     const hx = (X0, X1, Y, z) => B(p, X0, Y - 1.5, X1, Y, z - .5, z + .5, M.black, b);
     // west wall: white handleless base run, white quartz top, sink under the window, induction hob, no wall units
+    [B(p, 25, 325, 84, 352, 10, 88, M.kWhite, b), B(p, 25, 325, 88, 352, 88, 92, M.qWhite, b)].forEach(m => m.userData.noRemap = true);
     B(p, 16, 320, 76, 699, 10, 88, M.kWhite, b); B(p, 16, 318, 79, 699, 88, 92, M.qWhite, b); B(p, 18, 320, 74, 699, 0, 10, M.skirt, b);
     for (let y = 380; y < 690; y += 60) B(p, 76, y - .3, 76.6, y + .3, 10, 86, M.trim, b);
     for (let y = 320; y < 690; y += 60) B(p, 76, y + 2, 77, y + 58, 84, 85, M.black, b);
@@ -1703,7 +1709,7 @@ function desk(p, base, r, chairAt, faceTo) {
     B(p, 199, 640, 289, 699, 188, C, M.oakLight, b); B(p, 289, 625, 296, 699, 0, C, M.oakLight, b);
     for (const x of [244]) B(p, x - .3, 639.4, x + .3, 640, 190, C - 2, M.espresso, b);
     // white peninsula with a white quartz top, light-oak breakfast bar resting on it
-    [B(p, 69, 345, 273, 407, 8, 88, M.kWhite, b), B(p, 71, 347, 271, 405, 0, 8, M.kWhite, b), B(p, 69, 341, 281, 411, 88, 92, M.qWhite, b)].forEach(m => m.userData.noRemap = true);
+    [B(p, 69, 290, 273, 352, 8, 88, M.kWhite, b), B(p, 71, 292, 271, 350, 0, 8, M.kWhite, b), B(p, 69, 286, 281, 356, 88, 92, M.qWhite, b)].forEach(m => m.userData.noRemap = true);
     BU(200, 334, 276, 518, 95, 100, M.oakLight, p); BU(200, 510, 276, 518, 0, 95, M.oakLight, p);
     for (const y of [430, 485]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
     // white dome pendants over the bar
@@ -2373,7 +2379,7 @@ function desk(p, base, r, chairAt, faceTo) {
       for (const [dx, dy] of [[-15, -12], [15, -12], [-15, 12], [15, 12]]) B(p, 735 + dx - 2, -291 + dy - 2, 735 + dx + 2, -291 + dy + 2, 290, 300, M.brick); }
     // side counter of the barbecue, wood top on bricks
     BR(620, -320, 675, -262, -15, 75); B(p, 615, -324, 676, -258, 75, 81, M.wood); }
-    const pv = new THREE.Vector3(wx(735), 0, wz(-290)), Y = new THREE.Vector3(0, 1, 0), a = -Math.PI / 2, shift = new THREE.Vector3(.08, 0, .5);
+    const pv = new THREE.Vector3(wx(735), 0, wz(-290)), Y = new THREE.Vector3(0, 1, 0), a = -Math.PI / 2, shift = new THREE.Vector3(.08, 0, 1.4);
     for (const o of p.children.slice(n0)) { o.position.sub(pv).applyAxisAngle(Y, a).add(pv).add(shift); o.rotation.y += a; } }
   // glass-top table with white garden chairs
   B(p, 470, -230, 630, -140, 72, 74, M.glass); for (const [x, y] of [[472, -228], [628, -228], [472, -142], [628, -142]]) B(p, x - 2, y - 2, x + 2, y + 2, 0, 72, M.alu);
@@ -3215,7 +3221,7 @@ gtao.blendIntensity = .9;
 composer.addPass(gtao); composer.addPass(new OutputPass());
 state.hq = innerWidth > 760; window.__composer = composer;
 { const el = document.getElementById('tHQ'); el.setAttribute('aria-pressed', state.hq); el.addEventListener('click', () => { state.hq = !state.hq; el.setAttribute('aria-pressed', state.hq); }); }
-const clock = new THREE.Clock();
+const clock = new THREE.Clock(); const lastCam = new THREE.Vector3(), lastTgt = new THREE.Vector3(); let stillFrames = 0;
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), .05), k = 1 - Math.pow(.002, dt);
   F[1].group.position.y += (targets.f1 - F[1].group.position.y) * k;
@@ -3238,7 +3244,12 @@ renderer.setAnimationLoop(() => {
     renoVisual(false); renderer.setScissor(0, 0, x, H); renderer.render(scene, camera);
     renoVisual(true); renderer.setScissor(x, 0, W - x, H); renderer.render(scene, camera);
     renderer.setScissorTest(false);
-  } else if (state.hq) composer.render(dt); else renderer.render(scene, camera);
+  } else {
+    const moving = camTween || camera.position.distanceToSquared(lastCam) > 1e-7 || controls.target.distanceToSquared(lastTgt) > 1e-7;
+    lastCam.copy(camera.position); lastTgt.copy(controls.target);
+    stillFrames = moving ? 0 : stillFrames + 1;
+    if (state.hq && stillFrames > 4) composer.render(dt); else renderer.render(scene, camera);
+  }
   labelRenderer.render(scene, camera);
 });
 window.__ready = true;
