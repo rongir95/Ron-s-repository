@@ -1761,7 +1761,13 @@ function desk(p, base, r, chairAt, faceTo) {
   // olive drapes on a rod either side of the window, striped drum pendant
   onWall(B(p, 110, 24, 275, 26, 228, 231, M.black, b), b, 228, 231);
   for (const x0 of [112, 245]) for (let x = x0; x < x0 + 28; x += 6) { const m = new THREE.Mesh(UNIT, M.olive); m.scale.set(.065, 2.28, .006); m.position.set(wx(x + 3), b + 1.14, wz(28)); p.add(m); onWall(m, b, 0, 228); }
-  { const sh = new THREE.Mesh(new THREE.CylinderGeometry(.26, .3, .3, 32, 1, true), M.drum); sh.position.set(wx(205), b + 2.2, wz(166)); p.add(sh); CY(p, 205, 166, .3, 235, 274, M.black, b, 6); }
+  { // pleated drum shade on three wires, like the photo
+    const pg = new THREE.CylinderGeometry(.24, .32, .26, 64, 1, true), pos = pg.attributes.position;
+    for (let i = 0; i < pos.count; i++) { const x = pos.getX(i), z = pos.getZ(i), a = Math.atan2(z, x), k = 1 + Math.sin(a * 32) * .025; pos.setX(i, x * k); pos.setZ(i, z * k); }
+    pg.computeVertexNormals();
+    const sh = new THREE.Mesh(pg, new THREE.MeshStandardMaterial({ color: 0xb7a98a, roughness: .8, side: THREE.DoubleSide, emissive: 0x3a2a10, emissiveIntensity: .15 })); sh.position.set(wx(205), b + 2.05, wz(166)); p.add(sh);
+    for (let k = 0; k < 3; k++) { const a = k / 3 * 6.283; const w = new THREE.Mesh(new THREE.CylinderGeometry(.002, .002, .58, 4), M.steel); w.position.set(wx(205) + Math.cos(a) * .12, b + 2.45, wz(166) + Math.sin(a) * .12); p.add(w); }
+    CY(p, 205, 166, 7, 268, 274, M.steel, b, 20, 9); }
   }
   // ---- parents' bedroom after the renovation: taupe feature wall with two abstract prints, upholstered bed, black cylinder pendants, round flush light ----
   const bedAfter = new THREE.Group(); bedAfter.userData.reno = 'after'; bedAfter.visible = false; p.add(bedAfter); renoSets[renoSets.length - 1].after = bedAfter;
@@ -1843,7 +1849,13 @@ function desk(p, base, r, chairAt, faceTo) {
   onWall(B(p, 722, 1022, 758, 1024, 148, 175, std({ color: 0x3f6b8c, roughness: .6 }), b), b, 148, 175);
   onWall(B(p, 560, 1018, 712, 1021, 236, 239, M.black, b), b, 236, 239);
   for (let x = 563; x < 710; x += 6) { const m = new THREE.Mesh(UNIT, M.sheer); m.scale.set(.065, 1.85, .006); m.position.set(wx(x + 3), b + 1.43, wz(1015 - ((x / 6) % 2) * 2)); m.rotation.y = ((x / 6) % 2 ? .5 : -.5); m.renderOrder = 3; p.add(m); onWall(m, b, 50, 236); }
-  { const sph = new THREE.Mesh(new THREE.SphereGeometry(.27, 24, 16), M.wicker); sph.position.set(wx(640), b + 2.05, wz(830)); p.add(sph); CY(p, 640, 830, .3, 232, 274, M.steel, b, 6); }
+  { // string ball pendant: a tangle of white thread over a faint inner glow
+    const g = new THREE.Group(); g.position.set(wx(640), b + 2.0, wz(830)); p.add(g);
+    const thread = new THREE.LineBasicMaterial({ color: 0xf4efe4, transparent: true, opacity: .9 }), pts = [];
+    for (let i = 0; i < 1400; i++) { const u = rnd() * 2 - 1, a = rnd() * 6.283, q = Math.sqrt(1 - u * u); pts.push(new THREE.Vector3(Math.cos(a) * q * .3, u * .3, Math.sin(a) * q * .3)); }
+    g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), thread));
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(.28, 24, 16), new THREE.MeshStandardMaterial({ color: 0xf6f1e6, roughness: 1, transparent: true, opacity: .35, depthWrite: false })));
+    CY(p, 640, 830, .3, 230, 274, M.steel, b, 6); CY(p, 640, 830, 5, 268, 274, M.steel, b, 16, 2); }
   // ---- Mark's room, from the photos: palm-beach mural on the west wall, bed along the window wall, grey-wood wardrobe on the north wall ----
   { const m = new THREE.Mesh(boxUV(.01, 2.74, 2.86, 0, 0), M.muralMark); m.position.set(wx(88.6), b + 1.37, wz(880)); p.add(m); onWall(m, b, 0, 274);
     const uv = m.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) / 2.86, uv.getY(i) / 2.74); uv.needsUpdate = true; }
