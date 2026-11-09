@@ -78,7 +78,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .roomsel:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .roomsel option,.roomsel optgroup{color:#1d2430;background:#fff}
 .cbtn{all:unset;box-sizing:border-box;display:block;width:100%;text-align:center;margin-top:12px;padding:9px 12px;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:13px;cursor:pointer}
-.cbtn.alt{background:transparent;color:var(--accent);border:1.5px solid var(--accent);margin-top:8px}
+.cbtn.alt{background:transparent!important;color:var(--accent);border:1.5px solid var(--accent);margin-top:8px;box-shadow:none}
 .cbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .focusbar{all:unset;position:fixed;top:calc(66px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:9px 16px;border-radius:999px;cursor:pointer;font-weight:500;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);box-shadow:0 10px 30px rgba(15,25,40,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);white-space:nowrap}
 .focusbar b{font-weight:600}
@@ -105,6 +105,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .zoom{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(76px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;padding:4px;gap:2px;border-radius:12px}
 .zoom button{all:unset;cursor:pointer;width:40px;height:40px;display:grid;place-items:center;border-radius:9px;color:var(--ink);font:500 22px/1 var(--f-ui)}
 .zoom button:hover{background:var(--line)}
+.zoom button[aria-pressed="true"]{background:var(--accent-grad);color:#fff}
 .zoom button:disabled{opacity:.35;cursor:default;background:none!important;color:var(--ink)!important}
 .zoom button:active{background:var(--accent);color:var(--accent-ink)}
 .zoom button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
@@ -118,7 +119,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .photobar .pbar{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .photobar .pbar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
 .photobar .mbtn{padding:6px 12px;font-size:13px;background:var(--line)}
-.compass{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(236px + env(safe-area-inset-bottom,0px));width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--ink);padding:0}
+.compass{position:fixed;left:max(16px,env(safe-area-inset-left,0px));left:calc(max(16px,env(safe-area-inset-left,0px)) + 62px)!important;bottom:calc(76px + env(safe-area-inset-bottom,0px));width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--ink);padding:0}
 @media (max-width:760px){.compass{left:auto;right:max(12px,env(safe-area-inset-right,0px));bottom:auto;top:calc(50% + 70px)}}
 .planner{position:fixed;right:max(16px,env(safe-area-inset-right,0px));top:calc(190px + env(safe-area-inset-top,0px));bottom:calc(90px + env(safe-area-inset-bottom,0px));width:360px;padding:14px 16px;overflow:auto;font-size:13px;z-index:4}
 .planner .phead{display:flex;justify-content:space-between;align-items:center}
@@ -140,9 +141,28 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .statbtn{all:unset;cursor:pointer;margin-top:6px;font-size:12px;font-weight:600;color:var(--accent)}
 .brand.showstats .stats{display:flex}
 .brand.min .statbtn{display:none}
-.cbtn{background:var(--accent-grad)!important;box-shadow:0 4px 14px rgba(91,95,245,.3)}
+.cbtn:not(.alt){background:var(--accent-grad)!important;box-shadow:0 4px 14px rgba(91,95,245,.3)}
 .lbl.on{background:var(--accent-grad)!important}
 .tbtn[aria-pressed="true"] .sw{background:linear-gradient(135deg,#34c759,#2fd18f)}
+.mlabel3d{background:#ff3b6b;color:#fff;font:600 12px var(--f-ui);padding:4px 9px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.25);text-align:center;direction:rtl}
+.mlabel3d small{font-weight:500;opacity:.85}
+.pin3d{display:flex;align-items:center;gap:6px;cursor:pointer;pointer-events:auto;transform:translateY(-12px)}
+.pin3d .dot{width:16px;height:16px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--accent-grad);box-shadow:0 2px 6px rgba(0,0,0,.35);border:2px solid #fff;flex:none}
+.pin3d .txt{background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--glass-edge);border-radius:10px;padding:3px 8px;font:500 12px var(--f-ui);color:var(--ink);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:rtl}
+.pin3d.done .dot{background:#34c759}.pin3d.done .txt{opacity:.6;text-decoration:line-through}
+.pinpop{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(360px,calc(100% - 32px));padding:14px;z-index:20}
+.pinpop textarea{width:100%;box-sizing:border-box;font:14px var(--f-ui);border-radius:10px;border:1px solid var(--line);padding:8px;background:var(--paper-solid);color:var(--ink);resize:vertical;direction:rtl}
+.pinrow{display:flex;gap:6px;align-items:center;margin-top:8px}.pinrow small{flex:1;color:var(--muted)}
+.pinrow button,.tourbar button{all:unset;cursor:pointer;padding:6px 12px;border-radius:999px;background:var(--track);font:600 13px var(--f-ui);color:var(--ink)}
+.pinrow button.primary{background:var(--accent-grad);color:#fff}
+.tourbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;align-items:center;padding:6px 8px 6px 14px;border-radius:999px;font-size:13px;max-width:calc(100% - 32px);z-index:6}
+.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(70px + env(safe-area-inset-top,0px));padding:8px 16px;border-radius:999px;font:600 13px var(--f-ui);z-index:21}
+.varbox{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}
+.varbox .vhead{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600}
+.varbox .vseg{grid-template-columns:1fr 1fr;width:150px}.varbox .vseg button{padding:4px;font-size:12px}
+.varbox label{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.varbox select{font:13px var(--f-ui);border-radius:8px;border:1px solid var(--line);padding:3px 6px;background:var(--paper-solid);color:var(--ink)}
+.linkout{width:100%;margin-top:6px;font:12px monospace;direction:ltr}
 .hint{position:fixed;left:50%;transform:translateX(-50%);top:calc(116px + env(safe-area-inset-top,0px));max-width:min(560px,calc(100% - 640px));font-size:12px;color:var(--muted);padding:6px 14px;border-radius:999px;text-align:center;transition:opacity .6s;pointer-events:none}
 .hint.fade{opacity:0}
 
@@ -295,7 +315,13 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
     <button class="tbtn" id="tNeighbor" aria-pressed="true">יחידה שכנה A-2 <span class="sw"></span></button>
     <button class="tbtn" id="tRotate" aria-pressed="false">סיבוב אוטומטי <span class="sw"></span></button>
     <button class="tbtn" id="tHQ" aria-pressed="true">איכות גבוהה <span class="sw"></span></button>
+    <h2>שכבות</h2>
+    <button class="tbtn" id="tPins" aria-pressed="true">הערות <span id="pinCount"></span> <span class="sw"></span></button>
+    <button class="tbtn" id="tElec" aria-pressed="false">חשמל <span class="sw"></span></button>
+    <button class="tbtn" id="tPlumb" aria-pressed="false">אינסטלציה <span class="sw"></span></button>
     <h2>כלים</h2>
+    <button class="tbtn wide" id="tTour">סיור מודרך <span class="chev">›</span></button>
+    <a class="tbtn wide" id="tDash" href="https://shiputz-chi.vercel.app/" target="_blank" rel="noopener">דשבורד השיפוץ <span class="chev">↗</span></a>
     <button class="tbtn wide" id="tPlanner">מתכנן ריצוף <span class="chev">›</span></button>
   </section>
 </aside>
@@ -334,12 +360,22 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <p id="cNote"></p>
   <button class="cbtn" id="cFocus">הצגת החדר הזה בלבד</button>
   <button class="cbtn alt" id="cWalk">עמידה בתוך החדר</button>
+  <div class="varbox" id="varBox" hidden>
+    <div class="vhead">גרסאות לשיפוץ <div class="seg vseg"><button data-var="a" aria-pressed="true">גרסה א׳</button><button data-var="b" aria-pressed="false">גרסה ב׳</button></div></div>
+    <label>רצפה <select id="varFloor"></select></label>
+    <label>צבע קירות <select id="varWall"></select></label>
+  </div>
+  <button class="cbtn alt" id="cLink">העתקת קישור לחדר</button>
+  <input id="linkOut" class="linkout" readonly hidden aria-label="קישור לחדר">
 </div>
 
 <button class="focusbar" id="walkBar" hidden><span class="back">יציאה</span><span>עומדים בתוך <b id="walkName"></b></span></button>
 <button class="focusbar" id="focusBar" hidden><span class="back">חזרה לכל הבית</span><span>מבט על <b id="focusName"></b></span></button>
 
 <div class="zoom panel" role="group" aria-label="זום">
+  <button data-tool="measure" aria-pressed="false" aria-label="מדידה" title="מדידה"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 16.5 16.5 3 21 7.5 7.5 21z M7 13l2 2 M10 10l2 2 M13 7l2 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
+  <button data-tool="pin" aria-pressed="false" aria-label="הוספת הערה" title="הוספת הערה"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10" r="2.3" fill="currentColor"/></svg></button>
+  <hr>
   <button id="tPhoto" aria-label="צילום ריאליסטי" title="צילום ריאליסטי"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.6l1.2-1.7c.3-.4.7-.6 1.2-.6h3c.5 0 .9.2 1.2.6L15.9 6h1.6A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
   <hr>
   <button id="zIn" aria-label="התקרבות" title="התקרבות (+)">+</button>
@@ -350,6 +386,10 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 <div class="splitbar" id="splitBar" hidden><span class="tag l">לפני</span><span class="knob" aria-label="גרירה להשוואה">⟷</span><span class="tag r">אחרי</span></div>
 
 <div class="photobar panel" id="photoBar" hidden><span id="photoTxt">מכין את הסצנה…</span><div class="pbar"><i id="photoProg"></i></div><button class="mbtn" id="photoClose">סגירה</button></div>
+
+<div class="pinpop panel" id="pinPop" hidden><textarea id="pinText" rows="3" placeholder="למשל: להזיז את השקע 20 ס״מ שמאלה"></textarea><div class="pinrow"><small id="pinMeta"></small><button id="pinDone" hidden>סמן כטופל</button><button id="pinDel" hidden>מחיקה</button><button id="pinCancel">ביטול</button><button id="pinSave" class="primary">שמירה</button></div></div>
+<div class="tourbar panel" id="tourBar" hidden><span id="tourTxt"></span><button id="tourNext">הבא ›</button><button id="tourStop">סיום</button></div>
+<div class="toast panel" id="toast" hidden></div>
 
 <div class="hint panel" id="hint">גרירה לסיבוב · גלילה לזום · לחיצה כפולה על חדר להצגתו בלבד</div>
 
@@ -3210,6 +3250,182 @@ document.body.appendChild(compass);
 }
 { const h = document.getElementById('hint'); let t; const show = () => { h.classList.remove('fade'); clearTimeout(t); t = setTimeout(() => h.classList.add('fade'), 6000); };
   new MutationObserver(show).observe(h, { childList: true, characterData: true, subtree: true }); show(); }
+/* ================= renovation tools: measure, pins, room variants, tour + links, MEP layers ================= */
+{
+  const $ = id => document.getElementById(id);
+  const toast = (msg) => { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600); };
+  const toPlan = v => [(v.x + CX) * 100, (v.z + CZ) * 100];
+  const surfHit = e => { ptr.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(ptr, camera);
+    return ray.intersectObjects(scene.children, true).find(h => visibleChain(h.object) && h.object.isMesh && h.object !== walkRing && !h.object.userData.toolMark && h.object.material !== M.glass && h.object !== sky); };
+  const mark = (o) => { o.userData.toolMark = true; o.traverse && o.traverse(c => c.userData.toolMark = true); return o; };
+  const toolLayer = new THREE.Group(); scene.add(toolLayer);
+
+  /* ---- tool modes ---- */
+  let tool = null;
+  const setTool = t => { tool = tool === t ? null : t; document.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-pressed', b.dataset.tool === tool));
+    renderer.domElement.style.cursor = tool ? 'crosshair' : '';
+    if (tool === 'measure') toast('מדידה: לחיצה על שתי נקודות · לחיצה על קיר מראה את שטחו'); if (tool === 'pin') toast('הערה: לחיצה על מקום במודל כדי להצמיד הערה');
+    if (!tool) clearMeasure(); };
+  document.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
+  addEventListener('keydown', e => { if (e.key === 'Escape' && tool) { setTool(tool); e.stopImmediatePropagation(); } }, true);
+
+  /* ---- measure ---- */
+  let mPts = [];
+  const dotM = new THREE.MeshBasicMaterial({ color: 0xff3b6b, depthTest: false }), lineM = new THREE.LineBasicMaterial({ color: 0xff3b6b, depthTest: false });
+  const label = (html, pos) => { const el = document.createElement('div'); el.className = 'mlabel3d'; el.innerHTML = html; const o = new CSS2DObject(el); o.position.copy(pos); toolLayer.add(o); return o; };
+  function clearMeasure() { mPts = []; toolLayer.children.slice().forEach(o => { if (o.userData.measure) { toolLayer.remove(o); if (o.element) o.element.remove(); } }); }
+  function measureClick(h) {
+    if (mPts.length === 2) clearMeasure();
+    const p = h.point.clone(); mPts.push(p);
+    const d = mark(new THREE.Mesh(new THREE.SphereGeometry(.025, 12, 8), dotM)); d.position.copy(p); d.renderOrder = 20; d.userData.measure = true; toolLayer.add(d);
+    if (mPts.length === 1) {
+      const u = h.object.userData.wall, seg = u && h.object.userData.seg;
+      if (seg) { const len = Math.hypot(seg[2] - seg[0], seg[3] - seg[1]) / 100, ht = u.y1 - u.y0;
+        const o = label(`קיר: ${len.toFixed(2)} × ${ht.toFixed(2)} מ׳ = <b>${(len * ht).toFixed(1)} מ״ר</b><br><small>לחיצה נוספת למדידת מרחק</small>`, p.clone().add(new THREE.Vector3(0, .15, 0))); o.userData.measure = true; }
+      return; }
+    const [a, b] = mPts, g = new THREE.BufferGeometry().setFromPoints([a, b]), ln = mark(new THREE.Line(g, lineM)); ln.renderOrder = 20; ln.userData.measure = true; toolLayer.add(ln);
+    const dist = a.distanceTo(b) * 100, dh = Math.abs(a.y - b.y) * 100, dflat = Math.hypot(a.x - b.x, a.z - b.z) * 100;
+    const o = label(`<b>${Math.round(dist)} ס״מ</b>${dh > 5 && dflat > 5 ? `<br><small>אופקי ${Math.round(dflat)} · אנכי ${Math.round(dh)}</small>` : ''}`, a.clone().lerp(b, .5)); o.userData.measure = true;
+  }
+
+  /* ---- pins (shared through the artifact database; this browser only when it is unavailable) ---- */
+  let db = null, pins = new Map(), pinsCol = null, myId = null;
+  const pinLayer = new THREE.Group(); scene.add(pinLayer);
+  function drawPins() {
+    pinLayer.children.slice().forEach(o => { pinLayer.remove(o); if (o.element) o.element.remove(); });
+    for (const [id, p] of pins) {
+      const el = document.createElement('div'); el.className = 'pin3d' + (p.done ? ' done' : ''); el.innerHTML = `<span class="dot"></span><span class="txt"></span>`; el.querySelector('.txt').textContent = p.text;
+      el.addEventListener('pointerdown', e => e.stopPropagation()); el.addEventListener('click', e => { e.stopPropagation(); openPin(id); });
+      const o = new CSS2DObject(el); o.position.set(p.x, p.y, p.z); o.userData.pin = p; pinLayer.add(o);
+    }
+    applyPinVisibility(); $('pinCount').textContent = pins.size ? `(${pins.size})` : '';
+  }
+  function applyPinVisibility() { pinLayer.children.forEach(o => { const p = o.userData.pin; const f = p.y > L1 - .05 ? 1 : 0;
+    o.visible = state.showPins && (state.mode === 'full' || state.mode === 'exploded' || (state.mode === 'ground' ? f === 0 : f === 1)); }); }
+  state.showPins = true;
+  const savePinsLocal = () => { if (db) return; try { localStorage.setItem('pins', JSON.stringify([...pins])); } catch (e) {} };
+  async function addPin(pt) {
+    const pop = $('pinPop'); pop.hidden = false; $('pinText').value = ''; $('pinText').focus(); $('pinDel').hidden = true; $('pinDone').hidden = true;
+    pop.dataset.id = ''; pop.dataset.pt = JSON.stringify([pt.x, pt.y + .05, pt.z]);
+  }
+  function openPin(id) { const p = pins.get(id), pop = $('pinPop'); pop.hidden = false; pop.dataset.id = id; $('pinText').value = p.text; $('pinDel').hidden = false; $('pinDone').hidden = false;
+    $('pinDone').textContent = p.done ? 'סמן כפתוח' : 'סמן כטופל'; $('pinMeta').textContent = p.ts ? new Date(p.ts).toLocaleDateString('he-IL') : ''; }
+  $('pinCancel').addEventListener('click', () => $('pinPop').hidden = true);
+  $('pinSave').addEventListener('click', async () => {
+    const pop = $('pinPop'), text = $('pinText').value.trim(); if (!text) { pop.hidden = true; return; }
+    const id = pop.dataset.id; pop.hidden = true;
+    if (id) { const p = { ...pins.get(id), text }; pins.set(id, p); drawPins(); if (db) try { await pinsCol.doc(id).update({ text }); } catch (e) { toast('לא ניתן לשמור. אין הרשאת עריכה'); } else savePinsLocal(); return; }
+    const [x, y, z] = JSON.parse(pop.dataset.pt), p = { x, y, z, text, done: false, ts: Date.now(), by: myId || '' };
+    if (db) { try { await pinsCol.add(p); } catch (e) { toast('לא ניתן לשמור. אין הרשאת עריכה'); } }
+    else { pins.set('l' + Date.now(), p); drawPins(); savePinsLocal(); }
+    toast('ההערה נשמרה');
+  });
+  $('pinDel').addEventListener('click', async () => { const id = $('pinPop').dataset.id; $('pinPop').hidden = true; pins.delete(id); drawPins(); if (db) try { await pinsCol.doc(id).delete(); } catch (e) {} else savePinsLocal(); });
+  $('pinDone').addEventListener('click', async () => { const id = $('pinPop').dataset.id, p = pins.get(id); $('pinPop').hidden = true; p.done = !p.done; drawPins(); if (db) try { await pinsCol.doc(id).update({ done: p.done }); } catch (e) {} else savePinsLocal(); });
+  $('tPins').addEventListener('click', () => { state.showPins = !state.showPins; $('tPins').setAttribute('aria-pressed', state.showPins); applyPinVisibility(); });
+  (async () => {
+    try { const raw = JSON.parse(localStorage.getItem('pins') || '[]'); pins = new Map(raw); drawPins(); } catch (e) {}
+    const cl = window.claude; if (!cl || !cl.use) return;
+    db = await cl.use('db'); if (!db) return;
+    try { const u = await cl.use('user'); myId = u ? await u.id() : null; } catch (e) {}
+    pinsCol = db.collection('pins'); let first = true; const tmo = setTimeout(() => { if (first) toast('ההערות המשותפות לא נטענו'); }, 10000);
+    pinsCol.onSnapshot(snap => { first = false; clearTimeout(tmo); pins = new Map(snap.docs.map(d => [d.id, d.data()])); drawPins(); }, () => { clearTimeout(tmo); });
+    variantsReady();
+  })();
+
+  /* ---- intercept clicks while a tool is on ---- */
+  let dn = null;
+  renderer.domElement.addEventListener('pointerdown', e => { dn = [e.clientX, e.clientY]; }, true);
+  renderer.domElement.addEventListener('pointerup', e => {
+    if (!tool || !dn || Math.hypot(e.clientX - dn[0], e.clientY - dn[1]) > 6) return;
+    e.stopImmediatePropagation(); const h = surfHit(e); if (!h) return;
+    if (tool === 'measure') measureClick(h); else { addPin(h.point); tool = null; document.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-pressed', false)); renderer.domElement.style.cursor = ''; }
+  }, true);
+
+  /* ---- room variants: two named options per room, floor and wall colour, switched in place ---- */
+  const VAR_FLOORS = { herring: 'פרקט פישבון', lamOak: 'פרקט אלון ישר', terrazzo: 'טרצו', tile: 'אריח אפור 60×60', laminate: 'למינציה קיימת' };
+  const VAR_WALLS = { '': 'ללא שינוי', '#f6f6f4': 'לבן', '#e9e2d5': 'שמנת', '#d9d0c3': 'גריז׳', '#c9d3cf': 'מנטה אפרפר', '#cdbfae': 'טאופ' };
+  let variants = {}; try { variants = JSON.parse(localStorage.getItem('variants') || '{}'); } catch (e) {}
+  const wallPaint = new Map(); // room id -> overlay panels
+  function paintRoom(r, col) {
+    (wallPaint.get(r.id) || []).forEach(m => { m.parent.remove(m); }); wallPaint.delete(r.id); if (!col) return;
+    const mat = std({ color: col, roughness: .95 }), [x0, y0, x1, y1] = r.rect, base = F[r.f].base, h = r.f ? H2 : L1 - .3, list = [];
+    for (const [ax, ay, bx, by, nx, ny] of [[x0, y0, x1, y0, 0, 1], [x0, y1, x1, y1, 0, -1], [x0, y0, x0, y1, 1, 0], [x1, y0, x1, y1, -1, 0]]) {
+      const len = Math.hypot(bx - ax, by - ay) / 100, m = new THREE.Mesh(new THREE.PlaneGeometry(len, h - .08), mat);
+      m.position.set(wx((ax + bx) / 2 + nx * .6), base + .08 + (h - .08) / 2, wz((ay + by) / 2 + ny * .6)); m.lookAt(m.position.x + nx, m.position.y, m.position.z + ny); F[r.f].shell.add(m); list.push(m); }
+    wallPaint.set(r.id, list);
+  }
+  function applyVariant(id) { const r = ROOMS.find(q => q.id === id), v = variants[id]; if (!r || !v) return; const opt = v[v.active || 'a']; if (!opt) return;
+    if (opt.floor) r.afterMat = opt.floor; if (state.reno) setReno(true, state.split); paintRoom(r, state.reno ? opt.wall : ''); }
+  const origSetReno = setReno;
+  window.__reapplyVariants = () => Object.keys(variants).forEach(applyVariant);
+  function variantsReady() { if (!db) return; db.collection('variants').onSnapshot(s => { s.docs.forEach(d => variants[d.id] = d.data()); Object.keys(variants).forEach(applyVariant); renderVarUI(); }, () => {}); }
+  async function saveVariant(id) { try { localStorage.setItem('variants', JSON.stringify(variants)); } catch (e) {} if (db) try { await db.collection('variants').doc(id).set(variants[id]); } catch (e) { toast('הגרסה נשמרה רק בדפדפן הזה'); } }
+  function renderVarUI() {
+    const box = $('varBox'), id = state.sel, r = id && ROOMS.find(q => q.id === id);
+    if (!r || r.outdoor) { box.hidden = true; return; } box.hidden = false;
+    const v = variants[id] || (variants[id] = { active: 'a', a: { floor: r.afterMat || r.mat, wall: '' }, b: { floor: r.afterMat || r.mat, wall: '' } });
+    box.querySelectorAll('[data-var]').forEach(b => b.setAttribute('aria-pressed', b.dataset.var === v.active));
+    const o = v[v.active]; $('varFloor').value = o.floor in VAR_FLOORS ? o.floor : 'herring'; $('varWall').value = o.wall || '';
+  }
+  for (const [k, n] of Object.entries(VAR_FLOORS)) $('varFloor').add(new Option(n, k)); for (const [k, n] of Object.entries(VAR_WALLS)) $('varWall').add(new Option(n, k));
+  $('varBox').querySelectorAll('[data-var]').forEach(b => b.addEventListener('click', () => { const v = variants[state.sel]; v.active = b.dataset.var; if (!state.reno) setReno(true); applyVariant(state.sel); renderVarUI(); saveVariant(state.sel); }));
+  $('varFloor').addEventListener('change', () => { const v = variants[state.sel]; v[v.active].floor = $('varFloor').value; if (!state.reno) setReno(true); applyVariant(state.sel); saveVariant(state.sel); });
+  $('varWall').addEventListener('change', () => { const v = variants[state.sel]; v[v.active].wall = $('varWall').value; if (!state.reno) setReno(true); applyVariant(state.sel); saveVariant(state.sel); });
+  new MutationObserver(renderVarUI).observe($('card'), { attributes: true, attributeFilter: ['hidden'] });
+  document.querySelectorAll('[data-reno]').forEach(b => b.addEventListener('click', () => setTimeout(() => Object.keys(variants).forEach(applyVariant), 0)));
+
+  /* ---- links to a room + guided tour ---- */
+  const BASE = 'https://claude.ai/artifact/GaV1fQwQ9szhgczVGzKTfs';
+  $('cLink').addEventListener('click', async () => {
+    const link = `${BASE}#room-${state.sel}-${state.reno ? 'after' : 'before'}`;
+    try { await navigator.clipboard.writeText(link); toast('הקישור הועתק'); } catch (e) { $('linkOut').hidden = false; $('linkOut').value = link; $('linkOut').select(); }
+  });
+  function fromHash() { const m = /^#room-([a-z0-9]+)(?:-(before|after))?$/.exec(location.hash); if (!m || !ROOMS.find(r => r.id === m[1])) return; setReno(m[2] === 'after'); focusRoom(m[1]); }
+  addEventListener('hashchange', fromHash); setTimeout(fromHash, 300);
+  const TOUR = [['living', 'הסלון: פרקט פישבון, קיר טלוויזיה בטיח גריז׳ וספת בוקלה'], ['kitchen', 'המטבח: ארונות אלון עד התקרה, מדפים צפים ואי לבן'], ['storage', 'פינת האוכל: חלון מוגדל ומזגן'],
+    ['foyer', 'המבואה: בלי הנמכת הגבס, פרקט פישבון'], ['wc', 'שירותי אורחים: אריחי סטאק ירוקים ואסלה תלויה'], ['mamad', 'הממ״ד: ארונות אחסון'], ['bed1', 'חדר ההורים: קיר טאופ ומיטה מרופדת'],
+    ['ensuite', 'מקלחת ההורים: טורקיז וטרצו'], ['bath', 'חדר רחצה אחים: מקלחון במקום האמבטיה']];
+  let tourI = -1, tourT = null;
+  const tourStep = () => { tourI++; if (tourI >= TOUR.length) return stopTour(); const [id, txt] = TOUR[tourI]; setReno(true); focusRoom(id);
+    $('tourTxt').textContent = `${tourI + 1}/${TOUR.length} · ${txt}`; clearTimeout(tourT); tourT = setTimeout(tourStep, 7000); };
+  function stopTour() { clearTimeout(tourT); tourI = -1; $('tourBar').hidden = true; }
+  $('tTour').addEventListener('click', () => { $('tourBar').hidden = false; tourI = -1; tourStep(); });
+  $('tourNext').addEventListener('click', tourStep); $('tourStop').addEventListener('click', stopTour);
+
+  /* ---- MEP layers: electrical (sockets, switches, light points, feeds) and plumbing (supply and drain) ---- */
+  const elec = [new THREE.Group(), new THREE.Group()], plumb = [new THREE.Group(), new THREE.Group()];
+  elec.forEach((g, f) => { g.visible = false; F[f].group.add(g); }); plumb.forEach((g, f) => { g.visible = false; F[f].group.add(g); });
+  const eM = new THREE.MeshBasicMaterial({ color: 0xffb300, depthTest: false, transparent: true, opacity: .95 }), eL = new THREE.LineBasicMaterial({ color: 0xffb300, depthTest: false, transparent: true, opacity: .75 });
+  const hot = new THREE.LineBasicMaterial({ color: 0xff4d4d, depthTest: false }), cold = new THREE.LineBasicMaterial({ color: 0x3aa0ff, depthTest: false }), drain = new THREE.LineBasicMaterial({ color: 0x9a7a5a, depthTest: false });
+  const V = (X, Y, y) => new THREE.Vector3(wx(X), y, wz(Y));
+  const box = (g, X, Y, y, mat, s) => { const m = new THREE.Mesh(new THREE.BoxGeometry(s, s, s), mat); m.position.copy(V(X, Y, y)); m.renderOrder = 30; g.add(m); };
+  const run = (g, pts, mat) => { const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat); l.renderOrder = 30; g.add(l); };
+  const PANEL = [[300, 650], [430, 330]];          // distribution boards: entrance (ground), hall (upper)
+  const ceilY = f => (f ? H2 : L1 - .3) - .05;
+  const feed = (f, X, Y, y) => { const [px, py] = PANEL[f], c = ceilY(f); run(elec[f], [V(X, Y, y), V(X, Y, c), V(X, py, c), V(px, py, c)], eL); };
+  PANEL.forEach(([X, Y], f) => box(elec[f], X, Y, 1.7, eM, .16));
+  const SOCK = { living: [[540, 30, 30], [700, 30, 30], [775, 300, 30], [600, 418, 30]], kitchen: [[30, 360, 110], [30, 540, 110], [30, 640, 110], [150, 330, 110], [244, 680, 30]], storage: [[90, 60, 30], [260, 60, 30]],
+    foyer: [[290, 640, 30]], mamad: [[470, 700, 30], [775, 800, 30]], bed1: [[80, 40, 40], [80, 300, 40], [465, 180, 30]], bed2: [[500, 100, 40], [775, 120, 90], [600, 420, 30]],
+    bed3: [[775, 900, 40], [480, 700, 30]], bed4: [[115, 980, 40], [400, 1010, 30]], ensuite: [[35, 360, 110]], bath: [[35, 640, 110], [140, 515, 110]] };
+  for (const [rid, list] of Object.entries(SOCK)) { const r = ROOMS.find(q => q.id === rid); if (!r) continue;
+    for (const [X, Y, z] of list) { box(elec[r.f], X, Y, z / 100, eM, .07); feed(r.f, X, Y, z / 100); } }
+  for (const r of ROOMS) { if (r.outdoor || r.noLight) continue; const [x0, y0, x1, y1] = r.rect, X = (x0 + x1) / 2, Y = (y0 + y1) / 2;
+    box(elec[r.f], X, Y, ceilY(r.f) + .03, eM, .1); feed(r.f, X, Y, ceilY(r.f)); }
+  // plumbing: cold (blue) and hot (red) supply in the floor to each wet point, drains (brown) to the riser by the laundry recess
+  const RISER = [20, 505];
+  run(plumb[0], [V(...RISER, -.1), V(...RISER, L1)], drain); run(plumb[1], [V(...RISER, 0), V(...RISER, H2)], drain);
+  const WET = [[30, 505, 0, true], [80, 435, 0, true], [298, 880, 0, false], [420, 935, 0, true], [62, 485, 1, true], [50, 360, 1, true], [150, 470, 1, true], [72, 515, 1, false], [250, 520, 1, true], [270, 690, 1, true], [155, 690, 1, false]];
+  const wetM = new THREE.MeshBasicMaterial({ color: 0x3aa0ff, depthTest: false });
+  for (const [X, Y, f, hotToo] of WET) { const g = plumb[f]; box(g, X, Y, .45, wetM, .07);
+    run(g, [V(X, Y, .45), V(X, Y, .03), V(RISER[0], Y, .03), V(...RISER, .03)], cold);
+    if (hotToo) run(g, [V(X + 4, Y, .45), V(X + 4, Y, .06), V(RISER[0] + 4, Y, .06), V(RISER[0] + 4, RISER[1], .06)], hot);
+    run(g, [V(X, Y, .0), V(X, RISER[1], -.02), V(...RISER, -.03)], drain); }
+  const tgl = (id, gs) => $(id).addEventListener('click', () => { const on = !gs[0].visible; gs.forEach(g => g.visible = on); $(id).setAttribute('aria-pressed', on); if (on && state.mode === 'full') { setMode('ground'); if (state.walls === 'full') setWalls('low'); } });
+  tgl('tElec', elec); tgl('tPlumb', plumb);
+  window.__applyPins = applyPinVisibility;
+}
+
 const zOutBtn = document.getElementById('zOut');
 // high quality: ambient occlusion (soft contact shadows in corners and under furniture)
 const composer = new EffectComposer(renderer);
