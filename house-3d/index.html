@@ -1278,7 +1278,17 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
   { // open storage recess under the landing: white shelves with boxes, baskets and folded things
     const d = [], shelf = std({ color: 0xf2f0ea, roughness: .5 }), stuff = () => std({ color: new THREE.Color().setHSL(rnd(), .2 + rnd() * .3, .35 + rnd() * .4), roughness: .8 });
     for (const z of [32, 72, 112]) d.push(B(p, 701, 533, 760, 611, z, z + 2, shelf, 0));
-    for (const z of [0, 34, 74, 114]) { let y = 536; while (y < 600) { const w = 14 + rnd() * 16, h = Math.min(22 + rnd() * 10, 9 * R - 18 - z - 2); if (h > 6) d.push(B(p, 712 + rnd() * 8, y, 756, Math.min(y + w, 608), z + (z ? 0 : 1), z + (z ? 0 : 1) + h, rnd() > .4 ? std({ color: 0xc8a878, roughness: .9 }) : stuff(), 0)); y += w + 3; } }
+    // pantry: jars, bottles, small packets and tins on each shelf
+    const jarG = std({ color: 0xe8f0f0, roughness: .08, transparent: true, opacity: .55, envMapIntensity: 1.2 }), lid = std({ color: 0x2a2a2a, roughness: .4, metalness: .4 });
+    const fill = () => std({ color: [0xe0b050, 0x8a5a2a, 0xf2ead8, 0xc0402a, 0x6a8a3a, 0x3a2a1a][(rnd() * 6) | 0], roughness: .9 });
+    for (const z of [34, 74, 114, 0]) { let y = 538;
+      while (y < 604) { const kind = (rnd() * 4) | 0, base = z + 1;
+        if (kind === 0) { const r = 4 + rnd() * 1.5, h = 12 + rnd() * 8; d.push(CY(p, 735, y + r, r, base, base + h, jarG, 0, 16), CY(p, 735, y + r, r - .6, base + .5, base + h * (.4 + rnd() * .5), fill(), 0, 14), CY(p, 735, y + r, r + .2, base + h, base + h + 2, lid, 0, 16)); y += 2 * r + 2; }
+        else if (kind === 1) { const r = 3 + rnd(), h = 22 + rnd() * 10, c = std({ color: [0x2f5a2a, 0x8a2a1a, 0xd8c890, 0x1a3a5a][(rnd() * 4) | 0], roughness: .15, transparent: true, opacity: .85 });
+          d.push(CY(p, 728 + rnd() * 10, y + r, r, base, base + h * .7, c, 0, 14), CY(p, 728, y + r, 1.3, base + h * .7, base + h, c, 0, 10)); y += 2 * r + 2; }
+        else if (kind === 2) { const w = 7 + rnd() * 5, h = 14 + rnd() * 10; d.push(B(p, 722 + rnd() * 12, y, 735 + rnd() * 10, y + w, base, base + h, fill(), 0)); y += w + 1.5; }
+        else { const r = 4, h = 10; for (let k = 0; k < 2 && base + (k + 1) * h < z + 36; k++) d.push(CY(p, 740, y + r, r, base + k * h, base + (k + 1) * h - .3, std({ color: 0xc8ccd0, roughness: .3, metalness: .7 }), 0, 16)); y += 2 * r + 2; }
+      } }
     d.forEach(m => m.userData.noRemap = true); } B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing
   // stone-look strip cladding on the tall landing wall, a wall clock, a floor vase; framed pictures along the flight
   { // brick-strip wallpaper over the whole tall landing wall, both storeys
@@ -2413,7 +2423,10 @@ function desk(p, base, r, chairAt, faceTo) {
   for (const X of [-200, -100, 785]) B(p, X - 5, 1437, X + 5, 1449, 0, 185, M.black);
   slats(-196, -104, 170); B(p, -196, 1440, -104, 1446, 168, 172, M.black); B(p, -196, 1440, -192, 1446, 10, 170, M.black); B(p, -108, 1440, -104, 1446, 10, 170, M.black);   // pedestrian gate, far left
   B(p, -124, 1446, -120, 1450, 95, 110, M.steel); B(p, -124, 1436, -120, 1440, 95, 110, M.steel);
-  slats(-95, 780); B(p, -95, 1446, 780, 1450, 0, 6, M.alu);                     // electric gate on its track
+  slats(-95, 780); B(p, -95, 1446, 780, 1450, 0, 6, M.alu);
+  { // stone-clad concrete wall closing the gap between the street fence and the garden fence (west side of the parking)
+    const w = (1446 - 1005) / 100, h = 1.6; const m = shadowy(new THREE.Mesh(boxUV(.25, h, w, 0, 0), M.stone)); m.position.set(wx(-213), -0.15 + h / 2, wz((1005 + 1446) / 2)); p.add(m);
+    B(p, -228, 1003, -198, 1449, 145, 152, M.concrete); B(p, -228, 1003, -198, 1449, -15, -2, M.concrete); }                     // electric gate on its track
   B(p, 770, 1449, 790, 1460, 0, 40, std({ color: 0x3a3c40, roughness: .5 }));  // gate motor
   flat(-2000, 1450, 2000, 1620, -0.02, M.concrete);
   B(p, -2000, 1612, 2000, 1628, -15, 1, M.sillStone);
