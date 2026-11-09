@@ -1256,10 +1256,15 @@ function chair(p, base, X, Y, toX, toY, mat = M.oak, seatMat = M.fabric2) {
   for (const [a, b] of [[-.19, -.19], [.19, -.19], [-.19, .19], [.19, .19]]) { const l = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.013, .018, .45, 8), mat)); l.position.set(a, .225, b); g.add(l); }
 }
 function toilet(p, base, X, Y, toX, toY) {
+  // floor-standing close-coupled toilet: lathe-turned bowl and pedestal, rounded cistern, seat ring and lid
   const g = local(p, X, Y, base, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y)));
-  lb(g, .38, .38, .17, 0, .62, -.24, M.ceramic);
-  const bowl = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.19, .15, .4, 24), M.ceramic)); bowl.scale.z = 1.35; bowl.position.set(0, .2, .02); g.add(bowl);
-  const lid = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.2, .2, .03, 24), M.white)); lid.scale.z = 1.35; lid.position.set(0, .415, .02); g.add(lid);
+  const prof = [[0, 0], [.11, 0], [.12, .02], [.1, .12], [.13, .26], [.19, .36], [.2, .4], [.0, .4]].map(([x, y]) => new THREE.Vector2(x, y));
+  const bowl = shadowy(new THREE.Mesh(new THREE.LatheGeometry(prof, 32), M.ceramic)); bowl.scale.z = 1.3; bowl.position.set(0, 0, .05); g.add(bowl);
+  const water = new THREE.Mesh(new THREE.CircleGeometry(.12, 24), M.water); water.rotation.x = -Math.PI / 2; water.scale.y = 1.3; water.position.set(0, .3, .05); g.add(water);
+  const seat = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.16, .025, 10, 32), M.white)); seat.rotation.x = Math.PI / 2; seat.scale.y = 1.3; seat.position.set(0, .415, .05); g.add(seat);
+  const lid = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.19, .19, .02, 32), M.white)); lid.scale.z = 1.3; lid.rotation.x = -1.35; lid.position.set(0, .62, -.17); g.add(lid);
+  const tank = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.38, .36, .17, 4, .04), M.ceramic)); tank.position.set(0, .6, -.24); g.add(tank);
+  const btn = new THREE.Mesh(new THREE.CylinderGeometry(.025, .025, .01, 16), M.steel); btn.position.set(0, .785, -.24); g.add(btn);
 }
 // wall-hung rimless toilet with a concealed cistern and flush plate; rot turns the bowl away from the wall
 function wallToilet(p, base, X, Y, rot, plateMat = M.brushed) {
@@ -1886,7 +1891,7 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 25, 342, 38, 382, 108, 109, M.glass, b);
   B(p, 112, 402, 188, 490, 0, 4, M.white, b);
   for (const [x0, y0, x1, y1] of [[112, 401.5, 188, 402.5], [111.5, 402, 112.5, 490]]) { const gl = B(p, x0, y0, x1, y1, 4, 200, M.dotGlass, b); gl.castShadow = false; gl.renderOrder = 3; }
-  B(p, 140, 450, 170, 480, 230, 232, M.steel, b); B(p, 185, 464, 188, 466, 205, 232, M.steel, b);
+  [B(p, 162, 457, 192, 487, 230, 232, M.steel, b), B(p, 192, 471, 209, 473, 230, 232, M.steel, b), B(p, 207, 470, 210, 474, 205, 232, M.steel, b)].forEach(m => m.userData.noRemap = true); // rain head on its arm, inside the shower
   }
   { // accessories (before): towel bar with towels, bath mat, bottles in the shower
     const p = ensBefore;
