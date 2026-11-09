@@ -1328,7 +1328,7 @@ function desk(p, base, r, chairAt, faceTo) {
     // soft back cushions leaning on the frame
     for (let k = 0; k < 2; k++) { const c = RB(p, 735, 222 + k * 88, 754, 306 + k * 88, 44, 84, M.leather, b, .07); c.rotation.z = -.12; }
     for (let k = 0; k < 3; k++) { const c = RB(p, 560 + k * 62, 378, 620 + k * 62, 398, 44, 84, M.leather, b, .07); c.rotation.x = .12; }
-  RB(p, 735, 222, 754, 248, 48, 72, M.duvetB, b, .08); RB(p, 735, 370, 754, 396, 48, 72, M.duvetD, b, .08);
+  RB(p, 716, 226, 734, 252, 48, 72, M.duvetB, b, .08); RB(p, 716, 352, 734, 378, 48, 72, M.duvetD, b, .08);
   { const seam = std({ color: 0x9c8c74, roughness: .8 });
     for (const [x0, y0, x1, y1] of [[694, 276, 753, 277], [536, 337, 537, 397], [587, 337, 588, 397], [639, 337, 640, 397]]) B(p, x0, y0, x1, y1, 50, 50.6, seam, b);
     for (const [x, y] of [[694, 199], [774, 199], [534, 416], [774, 416], [534, 338], [686, 338]]) B(p, x - 2, y - 2, x + 2, y + 2, 0, 8, M.black, b); }
@@ -1373,8 +1373,8 @@ function desk(p, base, r, chairAt, faceTo) {
     RB(p, 530, 334, 552, 400, 40, 60, M.boucle, b, .05);
     for (let k = 0; k < 2; k++) RB(p, 694, 200 + k * 64, 750, 260 + k * 64, 42, 52, M.boucle, b, .05);
     for (let k = 0; k < 3; k++) RB(p, 556 + k * 45, 338, 598 + k * 45, 394, 42, 52, M.boucle, b, .05);
-    RB(p, 730, 210, 752, 245, 50, 80, M.sageTowel, b, .05); RB(p, 730, 250, 752, 284, 50, 80, M.rust, b, .05);
-    RB(p, 732, 290, 752, 322, 50, 76, M.linen, b, .05); RB(p, 600, 376, 632, 396, 50, 78, M.sageTowel, b, .05);
+    RB(p, 714, 214, 734, 248, 50, 80, M.sageTowel, b, .07); RB(p, 714, 254, 734, 288, 50, 80, M.rust, b, .07);
+    RB(p, 716, 294, 734, 326, 50, 76, M.linen, b, .07); RB(p, 600, 358, 632, 376, 50, 78, M.sageTowel, b, .07);
     RB(p, 700, 340, 740, 400, 44, 50, std({ color: 0xece4d4, roughness: 1 }), b, .04);
     // soft back cushions leaning on the frame
     for (let k = 0; k < 2; k++) { const c = RB(p, 735, 222 + k * 88, 754, 306 + k * 88, 44, 84, M.boucle, b, .07); c.rotation.z = -.12; }
@@ -2816,6 +2816,33 @@ document.body.appendChild(compass);
   document.getElementById('tPlanner').addEventListener('click', () => { panel.hidden = !panel.hidden; if (!panel.hidden) { document.getElementById('card').hidden = true; if (!state.reno) setReno(true); render(); } });
   document.getElementById('plClose').addEventListener('click', () => panel.hidden = true);
   apply();
+}
+/* ---------- foliage: faceted green blobs become clusters of real leaves ---------- */
+{
+  const blobs = [];
+  scene.traverse(o => { if (!o.isMesh || o.geometry.type !== 'IcosahedronGeometry' || !o.material.color) return;
+    const hsl = o.material.color.getHSL({}); if (hsl.h > .17 && hsl.h < .45 && hsl.s > .15) blobs.push(o); });
+  const leafG = new THREE.SphereGeometry(1, 6, 4); leafG.scale(.5, .08, 1); leafG.translate(0, 0, .6);
+  const mats = new Map(), dummy = new THREE.Object3D();
+  for (const o of blobs) {
+    const r = o.geometry.parameters.radius, sc = (o.scale.x + o.scale.y + o.scale.z) / 3, R = r * sc;
+    const key = o.material.color.getHexString(); if (!mats.has(key)) { const c = o.material.color.clone(); mats.set(key, new THREE.MeshStandardMaterial({ color: c, roughness: .7, side: THREE.DoubleSide, vertexColors: false })); }
+    const n = Math.max(10, Math.min(140, Math.round(R * R * 260))), leafS = Math.max(.025, Math.min(.12, R * .28));
+    const im = new THREE.InstancedMesh(leafG, mats.get(key), n); im.castShadow = true; im.receiveShadow = true;
+    const col = new THREE.Color();
+    for (let i = 0; i < n; i++) {
+      const u = rnd() * 2 - 1, a = rnd() * Math.PI * 2, rr = Math.cbrt(.35 + rnd() * .65), q = Math.sqrt(1 - u * u);
+      dummy.position.set(Math.cos(a) * q * rr * o.scale.x * r, u * rr * o.scale.y * r, Math.sin(a) * q * rr * o.scale.z * r);
+      dummy.rotation.set(rnd() * Math.PI, rnd() * Math.PI * 2, rnd() * Math.PI); dummy.scale.setScalar(leafS * (.7 + rnd() * .6)); dummy.updateMatrix();
+      im.setMatrixAt(i, dummy.matrix); col.setHSL(0, 0, .8 + rnd() * .4); im.setColorAt(i, col);
+    }
+    im.position.copy(o.position); im.rotation.copy(o.rotation); im.userData = o.userData;
+    o.parent.add(im); o.parent.remove(o);
+    const wi = wallPieces.indexOf(o); if (wi >= 0) { wallPieces[wi] = im; }
+    // a darker inner core so the cluster does not look see-through
+    const core = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshStandardMaterial({ color: o.material.color.clone().multiplyScalar(.55), roughness: 1 }));
+    core.scale.set(o.scale.x * r * .55, o.scale.y * r * .55, o.scale.z * r * .55); core.position.copy(o.position); core.castShadow = true; im.parent.add(core);
+  }
 }
 const zOutBtn = document.getElementById('zOut');
 // high quality: ambient occlusion (soft contact shadows in corners and under furniture)
