@@ -114,6 +114,12 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .splitbar .knob{pointer-events:auto;position:absolute;top:50%;left:-20px;width:40px;height:40px;margin-top:-20px;border-radius:50%;background:#fff;color:#1d2430;display:grid;place-items:center;font-size:18px;cursor:ew-resize;box-shadow:0 4px 14px rgba(0,0,0,.3);touch-action:none}
 .splitbar .tag{position:absolute;top:calc(50% + 30px);padding:3px 9px;border-radius:999px;background:rgba(17,22,32,.75);color:#fff;font-size:12px;white-space:nowrap}
 .splitbar .tag.l{right:10px}.splitbar .tag.r{left:10px}
+.photobar{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:8px 10px 8px 16px;border-radius:999px;font-size:13px;z-index:6;white-space:nowrap}
+.photobar .pbar{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.photobar .pbar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.photobar .mbtn{padding:6px 12px;font-size:13px;background:var(--line)}
+.compass{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(178px + env(safe-area-inset-bottom,0px));width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--ink);padding:0}
+@media (max-width:760px){.compass{left:auto;right:max(12px,env(safe-area-inset-right,0px));bottom:auto;top:calc(50% + 70px)}}
 .hint{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--muted);padding:6px 12px;border-radius:999px}
 
 .lbl{display:flex;gap:7px;align-items:baseline;pointer-events:auto;cursor:pointer;background:var(--paper);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:4px 10px;font:500 12px/1.3 var(--f-ui);white-space:nowrap;box-shadow:0 4px 12px rgba(10,20,30,.15);direction:rtl;transition:background .3s}
@@ -173,6 +179,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <button class="tbtn" id="tNeighbor" aria-pressed="true">יחידה שכנה A-2 <span class="sw"></span></button>
   <button class="tbtn" id="tRotate" aria-pressed="false">סיבוב אוטומטי <span class="sw"></span></button>
   <button class="tbtn" id="tHQ" aria-pressed="true">איכות גבוהה <span class="sw"></span></button>
+  <button class="tbtn" id="tPhoto" style="background:var(--accent);color:var(--accent-ink);justify-content:center">צילום ריאליסטי</button>
   <h2>שיפוץ</h2>
   <div class="seg" role="group" aria-label="לפני או אחרי שיפוץ">
     <button data-reno="before" aria-pressed="true">לפני</button>
@@ -231,12 +238,17 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 
 <div class="splitbar" id="splitBar" hidden><span class="tag l">לפני</span><span class="knob" aria-label="גרירה להשוואה">⟷</span><span class="tag r">אחרי</span></div>
 
+<div class="photobar panel" id="photoBar" hidden><span id="photoTxt">מכין את הסצנה…</span><div class="pbar"><i id="photoProg"></i></div><button class="mbtn" id="photoClose">סגירה</button></div>
+
 <div class="hint panel" id="hint">גרירה לסיבוב · גלילה לזום · לחיצה כפולה על חדר להצגתו בלבד</div>
 
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+  "three/examples/jsm/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+  "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.8/build/index.module.js",
+  "three-gpu-pathtracer": "https://cdn.jsdelivr.net/npm/three-gpu-pathtracer@0.0.23/build/index.module.js"
 } }
 </script>
 <script type="module">
@@ -2061,7 +2073,7 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, PARTY - 10, -580, PARTY + 10, 12, -15, 260, M.stone);
   // wagon wheel and a plant trolley on the wall by the front door
   { // wagon wheel on the stone wall left of the front door (south face of the kitchen block), facing the parking
-    const g = new THREE.Group(); g.position.set(wx(58), 1.75, wz(720)); p.add(g);
+    const g = new THREE.Group(); g.position.set(wx(58), 1.75, wz(720)); p.add(g); onWall(g, 0, 133, 217);
     const rim = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.38, .035, 8, 32), M.wood)); g.add(rim);
     const hub = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, .1, 16), M.wood)); hub.rotation.x = Math.PI / 2; g.add(hub);
     for (let k = 0; k < 6; k++) { const sp = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.025, .74, .025), M.wood)); sp.rotation.z = k / 6 * Math.PI; g.add(sp); } }
@@ -2312,7 +2324,7 @@ function enterWalk(id, eyeOv, lookOv) {
   flyTo(eye.clone().sub(look.normalize().multiplyScalar(.05)), eye, 1.4);
   document.getElementById('card').hidden = true; ROOMS.forEach(q => q.mesh.material = q.baseMat);
   document.getElementById('walkName').textContent = r.name; document.getElementById('walkBar').hidden = false;
-  document.getElementById('hint').textContent = 'גרירה להסתובבות · לחיצה על הרצפה למעבר · לחיצה על דלת לכניסה לחדר או ליציאה לגינה · לחיצה על המדרגות לקומה השנייה · Esc ליציאה';
+  document.getElementById('hint').textContent = 'גרירה או מקשי החצים להסתובבות · W A S D להליכה · לחיצה על הרצפה למעבר · לחיצה על דלת לכניסה לחדר או ליציאה לגינה · לחיצה על המדרגות לקומה השנייה · Esc ליציאה';
 }
 const walkRing = new THREE.Mesh(new THREE.RingGeometry(.2, .26, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .85, depthTest: false, side: THREE.DoubleSide }));
 walkRing.rotation.x = -Math.PI / 2; walkRing.renderOrder = 10; walkRing.visible = false; scene.add(walkRing);
@@ -2502,7 +2514,7 @@ window.addEventListener('keydown', e => {
   if (e.key === 'Escape') { if (walking) exitWalk(); else if (focus) exitFocus(); else selectRoom(null); }
   if (e.key === '+' || e.key === '=') zoomBy(.8);
   if (e.key === '-' || e.key === '_') zoomBy(1.25);
-  if (e.key === 'w' || e.key === 'W') setWalls({ full: 'low', low: 'none', none: 'full' }[state.walls]);
+  if (!walking && (e.key === 'w' || e.key === 'W')) setWalls({ full: 'low', low: 'none', none: 'full' }[state.walls]);
 });
 
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let down = null;
@@ -2596,6 +2608,91 @@ document.getElementById('loading').classList.add('done');
     }
   }
 }
+/* ---------- realistic picture: progressive path tracing of the current view ---------- */
+let photo = null; // { pt, target, saved }
+const PHOTO_SAMPLES = 400;
+function makeSkyEquirect(night) {
+  const w = 256, h = 128, data = new Float32Array(w * h * 4);
+  const top = night ? [0.02, 0.03, 0.08] : [0.35, 0.55, 0.9], hor = night ? [0.08, 0.1, 0.18] : [0.9, 0.93, 0.95], gnd = night ? [0.03, 0.03, 0.03] : [0.35, 0.33, 0.28];
+  for (let y = 0; y < h; y++) { const v = 1 - y / (h - 1), el = (v - .5) * 2; let c;
+    if (el > 0) { const t = Math.pow(el, .6); c = hor.map((a, i) => a + (top[i] - a) * t); } else { const t = Math.min(1, -el * 4); c = hor.map((a, i) => a + (gnd[i] - a) * t); }
+    for (let x = 0; x < w; x++) { const k = (y * w + x) * 4; const m = night ? 1 : 1.4; data[k] = c[0] * m; data[k + 1] = c[1] * m; data[k + 2] = c[2] * m; data[k + 3] = 1; } }
+  const t = new THREE.DataTexture(data, w, h, THREE.RGBAFormat, THREE.FloatType); t.mapping = THREE.EquirectangularReflectionMapping; t.needsUpdate = true; return t;
+}
+async function startPhoto() {
+  if (photo) return;
+  const bar = document.getElementById('photoBar'), txt = document.getElementById('photoTxt'), prog = document.getElementById('photoProg');
+  bar.hidden = false; txt.textContent = 'מכין את הסצנה…'; prog.style.width = '0%';
+  camTween = null; controls.autoRotate = false;
+  const saved = { exp: renderer.toneMappingExposure, lights: F.flatMap(f => f.lights).map(l => l.intensity), env: scene.environment, bg: scene.background, sky: sky.visible, stars: stars.visible, labels: labelRenderer.domElement.style.display, ring: walkRing.visible };
+  photo = { saved, ready: false };
+  try {
+    const { WebGLPathTracer } = await import('three-gpu-pathtracer');
+    if (!('backgroundRotation' in THREE.Scene.prototype)) { THREE.Scene.prototype.backgroundRotation = new THREE.Euler(); THREE.Scene.prototype.environmentRotation = new THREE.Euler(); } // three r160 lacks these
+    if (!photo) return;
+    sky.visible = false; stars.visible = false; walkRing.visible = false; labelRenderer.domElement.style.display = 'none';
+    const env = makeSkyEquirect(state.night); scene.environment = env; scene.background = env;
+    // interiors: switch the ceiling lights on softly so rooms are lit like in a real photo
+    F.forEach(f => f.lights.forEach(l => { l.intensity = state.night ? 14 : 8; l.color.set(0xfff1e0); })); renderer.toneMappingExposure = 1.45;
+    const pt = new WebGLPathTracer(renderer);
+    pt.bounces = 5; pt.filterGlossyFactor = .5; pt.minSamples = 1; pt.renderDelay = 0; pt.fadeDuration = 300; pt.tiles.set(2, 2);
+    await new Promise(r => setTimeout(r, 30));
+    pt.setScene(scene, camera);
+    photo.pt = pt; photo.env = env; photo.ready = true;
+    let cam0 = null, tgt0 = null, settle = 30;
+    photo.check = () => { if (settle > 0) { settle--; cam0 = camera.position.clone(); tgt0 = controls.target.clone(); return false; }
+      return camera.position.distanceToSquared(cam0) > 1e-5 || controls.target.distanceToSquared(tgt0) > 1e-5; };
+  } catch (e) { console.error(e); txt.textContent = 'הצילום לא נתמך בדפדפן הזה'; setTimeout(stopPhoto, 2500); }
+}
+function stopPhoto() {
+  if (!photo) return;
+  const { saved, pt, env } = photo; photo = null;
+  if (pt) pt.dispose(); if (env) env.dispose();
+  renderer.toneMappingExposure = saved.exp; F.flatMap(f => f.lights).forEach((l, i) => { l.intensity = saved.lights[i]; l.color.set(0xffc98a); });
+  scene.environment = saved.env; scene.background = saved.bg; sky.visible = saved.sky; stars.visible = saved.stars; labelRenderer.domElement.style.display = saved.labels;
+  document.getElementById('photoBar').hidden = true;
+}
+document.getElementById('tPhoto').addEventListener('click', startPhoto);
+document.getElementById('photoClose').addEventListener('click', stopPhoto);
+function photoFrame() {
+  if (!photo.ready) return true;
+  if (photo.check()) { stopPhoto(); return false; }   // moving the camera ends the picture
+  if (photo.pt.samples < PHOTO_SAMPLES) photo.pt.renderSample();
+  const n = Math.floor(photo.pt.samples), pct = Math.min(100, n / PHOTO_SAMPLES * 100);
+  document.getElementById('photoProg').style.width = pct + '%';
+  document.getElementById('photoTxt').textContent = pct < 100 ? `מחשב תאורה אמיתית… ${Math.round(pct)}%` : 'הצילום מוכן · הזזת המצלמה תסגור אותו';
+  return true;
+}
+/* ---------- keyboard walking (W A S D / arrows) while standing inside ---------- */
+const keys = new Set();
+addEventListener('keydown', e => { if (e.target.closest && e.target.closest('input,select,textarea')) return; const k = e.key.toLowerCase(); if (walking && ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) { keys.add(k); e.preventDefault(); } });
+addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
+addEventListener('blur', () => keys.clear());
+function keyWalk(dt) {
+  if (!walking || !keys.size || camTween) return;
+  const fwd = controls.target.clone().sub(camera.position); fwd.y = 0; if (fwd.lengthSq() < 1e-8) return; fwd.normalize();
+  const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
+  const mv = new THREE.Vector3();
+  if (keys.has('w') || keys.has('arrowup')) mv.add(fwd); if (keys.has('s') || keys.has('arrowdown')) mv.sub(fwd);
+  if (keys.has('d')) mv.add(right); if (keys.has('a')) mv.sub(right);
+  if (keys.has('arrowleft') || keys.has('arrowright')) { // arrows left/right turn
+    const a = (keys.has('arrowleft') ? 1 : -1) * dt * 1.6, off = camera.position.clone().sub(controls.target);
+    off.applyAxisAngle(new THREE.Vector3(0, 1, 0), a); camera.position.copy(controls.target).add(off); }
+  if (mv.lengthSq() === 0) return;
+  mv.normalize().multiplyScalar(dt * 1.4);
+  const nx = (controls.target.x + mv.x + CX) * 100, ny = (controls.target.z + mv.z + CZ) * 100;
+  const cur = ROOMS.find(r => r.id === walking.id), f = cur ? cur.f : 0;
+  const inR = (r, pad) => nx >= r.rect[0] + pad && nx <= r.rect[2] - pad && ny >= r.rect[1] + pad && ny <= r.rect[3] - pad;
+  const room = (cur && inR(cur, 20)) ? cur : ROOMS.find(r => r.f === f && !r.noWalk && r.id !== 'balcony' && inR(r, 20));
+  if (!room) return; // a wall is in the way
+  // only step into a neighbouring room through a door (or between open-plan / outdoor areas)
+  if (room !== cur && !(cur && (cur.outdoor || room.outdoor ? cur.outdoor && room.outdoor : ['living', 'kitchen', 'storage', 'foyer'].includes(cur.id) && ['living', 'kitchen', 'storage', 'foyer'].includes(room.id)))) return;
+  camera.position.add(mv); controls.target.add(mv);
+  walking.pos = [nx, ny]; if (room.id !== walking.id) { walking.id = room.id; document.getElementById('walkName').textContent = room.name; }
+}
+// compass: shows where north is (the garden side faces north-west in the plans; north = -Z here)
+const compass = document.createElement('div'); compass.className = 'compass panel'; compass.innerHTML = '<svg viewBox="0 0 40 40" width="34" height="34"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-opacity=".25"/><path d="M20 5 L25 20 L20 17 L15 20Z" fill="#c0392b"/><path d="M20 35 L25 20 L20 23 L15 20Z" fill="currentColor" fill-opacity=".5"/><text x="20" y="4.5" font-size="6" text-anchor="middle" fill="currentColor">N</text></svg>';
+document.body.appendChild(compass);
 const zOutBtn = document.getElementById('zOut');
 // high quality: ambient occlusion (soft contact shadows in corners and under furniture)
 const composer = new EffectComposer(renderer);
@@ -2617,7 +2714,8 @@ renderer.setAnimationLoop(() => {
     camera.position.lerpVectors(camTween.p0, camTween.p1, e); controls.target.lerpVectors(camTween.t0, camTween.t1, e);
     if (t >= 1) camTween = null;
   }
-  controls.update();
+  if (photo) { controls.update(); if (photoFrame()) return; } else { keyWalk(dt); controls.update(); }
+  { const d = camera.getWorldDirection(new THREE.Vector3()); compass.firstChild.style.transform = `rotate(${Math.atan2(d.x, -d.z) * -180 / Math.PI}deg)`; }
   { // grey out "−" when no further zoom-out is possible
     const out = walking ? camera.fov >= 114.9 && controls.maxDistance >= walkRoomMaxBack() - .01
                         : camera.position.distanceTo(controls.target) >= controls.maxDistance - .05;
