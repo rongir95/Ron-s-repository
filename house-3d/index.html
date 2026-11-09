@@ -858,9 +858,18 @@ function boxUV(w, h, d, uOff = 0, vOff = 0) {
   return g;
 }
 const shadowy = m => { m.castShadow = true; m.receiveShadow = true; return m; };
+// every box gets slightly softened edges (real furniture and joinery never has razor-sharp corners)
+const softCache = new Map();
+function softBox(w, h, d) {
+  const mn = Math.min(w, h, d); if (mn < .02) return null;
+  const r = Math.min(.008, mn / 4), key = [w, h, d].map(v => v.toFixed(3)).join('|');
+  if (!softCache.has(key)) softCache.set(key, new RoundedBoxGeometry(w, h, d, 2, r));
+  return softCache.get(key);
+}
 function B(p, X0, Y0, X1, Y1, z0, z1, mat, base = 0) {
-  const m = shadowy(new THREE.Mesh(UNIT, mat));
-  m.scale.set(Math.abs(X1 - X0) / 100, Math.abs(z1 - z0) / 100, Math.abs(Y1 - Y0) / 100);
+  const w = Math.abs(X1 - X0) / 100, h = Math.abs(z1 - z0) / 100, d = Math.abs(Y1 - Y0) / 100, g = (mat && mat.map) ? null : softBox(w, h, d);
+  const m = shadowy(new THREE.Mesh(g || UNIT, mat));
+  if (g) m.scale.set(1, 1, 1); else m.scale.set(w, h, d);
   m.position.set(wx((X0 + X1) / 2), base + (z0 + z1) / 200, wz((Y0 + Y1) / 2));
   p.add(m); return m;
 }
