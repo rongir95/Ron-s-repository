@@ -80,7 +80,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .cbtn{all:unset;box-sizing:border-box;display:block;width:100%;text-align:center;margin-top:12px;padding:9px 12px;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:13px;cursor:pointer}
 .cbtn.alt{background:transparent;color:var(--accent);border:1.5px solid var(--accent);margin-top:8px}
 .cbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.focusbar{all:unset;position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:9px 16px;border-radius:999px;cursor:pointer;font-weight:500;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);box-shadow:0 10px 30px rgba(15,25,40,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);white-space:nowrap}
+.focusbar{all:unset;position:fixed;top:calc(66px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:9px 16px;border-radius:999px;cursor:pointer;font-weight:500;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);box-shadow:0 10px 30px rgba(15,25,40,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);white-space:nowrap}
 .focusbar b{font-weight:600}
 .focusbar .back{background:var(--accent-grad);font-weight:600;box-shadow:0 2px 8px rgba(91,95,245,.35);color:var(--accent-ink);border-radius:999px;padding:3px 10px;font-size:12px}
 .focusbar:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -114,7 +114,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .splitbar .knob{pointer-events:auto;position:absolute;top:50%;left:-20px;width:40px;height:40px;margin-top:-20px;border-radius:50%;background:#fff;color:#1d2430;display:grid;place-items:center;font-size:18px;cursor:ew-resize;box-shadow:0 4px 14px rgba(0,0,0,.3);touch-action:none}
 .splitbar .tag{position:absolute;top:calc(50% + 30px);padding:3px 9px;border-radius:999px;background:rgba(17,22,32,.75);color:#fff;font-size:12px;white-space:nowrap}
 .splitbar .tag.l{right:10px}.splitbar .tag.r{left:10px}
-.photobar{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:8px 10px 8px 16px;border-radius:999px;font-size:13px;z-index:6;white-space:nowrap}
+.photobar{position:fixed;top:calc(66px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:8px 10px 8px 16px;border-radius:999px;font-size:13px;z-index:6;white-space:nowrap}
 .photobar .pbar{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .photobar .pbar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
 .photobar .mbtn{padding:6px 12px;font-size:13px;background:var(--line)}
@@ -134,7 +134,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .pltab td{padding:4px 2px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 .plnote{color:var(--muted);font-size:11px;line-height:1.5;margin:10px 0 0}
 @media (max-width:760px){.planner{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));width:auto;top:calc(120px + env(safe-area-inset-top,0px));bottom:calc(130px + env(safe-area-inset-bottom,0px))}}
-.renobar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));width:270px;padding:4px!important;z-index:3}
+.renobar{position:fixed;left:50%;transform:translateX(-50%);top:calc(16px + env(safe-area-inset-top,0px));width:270px;padding:4px!important;z-index:3}
 .renobar button{padding:7px 6px;font-weight:600}
 @media (max-width:760px){.renobar{bottom:auto;top:calc(150px + env(safe-area-inset-top,0px));width:calc(100% - 24px);max-width:320px}}
 .statbtn{all:unset;cursor:pointer;margin-top:6px;font-size:12px;font-weight:600;color:var(--accent)}
@@ -143,7 +143,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .cbtn{background:var(--accent-grad)!important;box-shadow:0 4px 14px rgba(91,95,245,.3)}
 .lbl.on{background:var(--accent-grad)!important}
 .tbtn[aria-pressed="true"] .sw{background:linear-gradient(135deg,#34c759,#2fd18f)}
-.hint{position:fixed;left:50%;transform:translateX(-50%);top:calc(68px + env(safe-area-inset-top,0px));max-width:min(560px,calc(100% - 640px));font-size:12px;color:var(--muted);padding:6px 14px;border-radius:999px;text-align:center;transition:opacity .6s;pointer-events:none}
+.hint{position:fixed;left:50%;transform:translateX(-50%);top:calc(116px + env(safe-area-inset-top,0px));max-width:min(560px,calc(100% - 640px));font-size:12px;color:var(--muted);padding:6px 14px;border-radius:999px;text-align:center;transition:opacity .6s;pointer-events:none}
 .hint.fade{opacity:0}
 
 .lbl{display:flex;gap:7px;align-items:baseline;pointer-events:auto;cursor:pointer;background:var(--paper);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:4px 10px;font:500 12px/1.3 var(--f-ui);white-space:nowrap;box-shadow:0 4px 12px rgba(10,20,30,.15);direction:rtl;transition:background .3s}
@@ -180,9 +180,11 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 :root{--glass:linear-gradient(140deg,rgba(255,255,255,.62),rgba(255,255,255,.30));--glass-edge:rgba(255,255,255,.65);--glass-hi:rgba(255,255,255,.9);--glass-shadow:0 10px 40px rgba(20,30,50,.18),0 2px 8px rgba(20,30,50,.08);--track:rgba(118,118,128,.16);--pill:#ffffff;--pill-ink:#1d2430}
 :root[data-night="1"]{--glass:linear-gradient(140deg,rgba(44,52,68,.62),rgba(20,26,38,.42));--glass-edge:rgba(255,255,255,.16);--glass-hi:rgba(255,255,255,.22);--glass-shadow:0 10px 40px rgba(0,0,0,.45);--track:rgba(255,255,255,.1);--pill:rgba(255,255,255,.18);--pill-ink:#fff}
 .panel{background:var(--glass)!important;backdrop-filter:blur(26px) saturate(1.9);-webkit-backdrop-filter:blur(26px) saturate(1.9);border:1px solid var(--glass-edge)!important;box-shadow:inset 0 1px 0 var(--glass-hi),inset 0 -1px 0 rgba(255,255,255,.12),var(--glass-shadow)!important;border-radius:22px}
-.tools{width:236px;min-width:0;padding:8px;gap:2px}
+.tools{width:184px;min-width:0;padding:7px;gap:2px}
+.tools .tbtn{font-size:12.5px;padding:7px 8px}
+.views .tbtn{padding:7px 4px}
 .thead{display:flex;align-items:center;gap:6px;margin-bottom:4px}
-.tabs{flex:1;display:grid;grid-template-columns:repeat(3,1fr);padding:3px;border-radius:12px;background:var(--track)}
+.tabs{flex:1;display:grid;grid-template-columns:repeat(2,1fr);padding:3px;border-radius:12px;background:var(--track)}
 .tabs button{all:unset;cursor:pointer;text-align:center;padding:6px 4px;border-radius:9px;font:600 13px var(--f-ui);color:var(--muted);transition:background .25s,color .25s,box-shadow .25s}
 .tabs button[aria-selected="true"]{background:var(--pill);color:var(--pill-ink);box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.04)}
 .tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
@@ -258,7 +260,6 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <div class="thead">
     <div class="tabs" role="tablist" aria-label="תפריט">
       <button role="tab" data-tab="view" aria-selected="true">מבט</button>
-      <button role="tab" data-tab="reno" aria-selected="false">שיפוץ</button>
       <button role="tab" data-tab="set" aria-selected="false">הגדרות</button>
     </div>
     <span class="mlabel">תפריט</span>
@@ -288,16 +289,14 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
       <button data-walls="none" aria-pressed="false">ללא</button>
     </div>
   </section>
-  <section class="pane" data-pane="reno" hidden>
-    <h2>תכנון</h2>
-    <button class="tbtn wide" id="tPlanner">מתכנן ריצוף <span class="chev">›</span></button>
-  </section>
   <section class="pane" data-pane="set" hidden>
     <button class="tbtn" id="tNight" aria-pressed="false">תאורת לילה <span class="sw"></span></button>
     <button class="tbtn" id="tLabels" aria-pressed="true">שמות חדרים <span class="sw"></span></button>
     <button class="tbtn" id="tNeighbor" aria-pressed="true">יחידה שכנה A-2 <span class="sw"></span></button>
     <button class="tbtn" id="tRotate" aria-pressed="false">סיבוב אוטומטי <span class="sw"></span></button>
     <button class="tbtn" id="tHQ" aria-pressed="true">איכות גבוהה <span class="sw"></span></button>
+    <h2>כלים</h2>
+    <button class="tbtn wide" id="tPlanner">מתכנן ריצוף <span class="chev">›</span></button>
   </section>
 </aside>
 
@@ -405,7 +404,7 @@ stage.appendChild(labelRenderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 1200);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.enableDamping = true; controls.dampingFactor = 0.16;
 controls.maxPolarAngle = Math.PI * 0.495; controls.minDistance = 3; controls.maxDistance = 70;
 controls.autoRotateSpeed = 0.6;
 
@@ -1059,7 +1058,7 @@ function opening(p, a, ux, uy, theta, op, o) {
     const lw = w - 0.1, lh = hd - 0.05;
     if (op.slide) { // brown wood sliding door on a track, half open, on the room side
       const sd = os * (t / 2 + 0.025); // track and leaf on the closet side, leaf slid fully open inside the closet
-      lb(g, w, hd - .02, .035, w + .3, (hd - .02) / 2, sd + os * .02, M.wood);   // slid fully open inside the closet, out of sight from the bedroom
+      lb(g, w, hd - .02, .035, -(w + .05), (hd - .02) / 2, sd + os * .02, M.wood);   // slid fully open inside the closet, out of sight from the bedroom
       return;
     }
     lb(g, lw, lh, 0.04, 0, lh / 2, 0, M.trim);
@@ -1281,8 +1280,8 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
     B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.treadWood).userData.stair = true;
   }
   // landing block, with an open storage recess cut into it from the passage side
-  B(p, 700, 432, 778, 532, 0, 9 * R - 4, M.interior); B(p, 700, 612, 778, 618, 0, 9 * R - 4, M.interior);
-  B(p, 760, 532, 778, 612, 0, 9 * R - 4, M.interior); B(p, 700, 532, 760, 612, 9 * R - 16, 9 * R - 4, M.interior);
+  B(p, 700, 432, 778, 528, 0, 9 * R - 4, M.interior); B(p, 700, 616, 778, 618, 0, 9 * R - 4, M.interior);
+  B(p, 776, 528, 778, 616, 0, 9 * R - 4, M.interior); B(p, 700, 528, 776, 616, 9 * R - 16, 9 * R - 4, M.interior);
   { // coat rack on the angled wall beside the front door, coats and bags hanging on it (entrance photos)
     const g = local(F[0].furn, 200, 695, 0, 0); g.userData.noRemap = true;
     lb(g, .9, .1, .025, 0, 1.72, .013, M.oak);
@@ -1293,17 +1292,17 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
     lb(g, .8, .45, .3, 0, .225, .16, M.white); lb(g, .78, .005, .29, 0, .23, .31, M.black); }
   { // open storage recess under the landing: white shelves with boxes, baskets and folded things
     const d = [], shelf = std({ color: 0xf2f0ea, roughness: .5 }), stuff = () => std({ color: new THREE.Color().setHSL(rnd(), .2 + rnd() * .3, .35 + rnd() * .4), roughness: .8 });
-    for (const z of [32, 72, 112]) d.push(B(p, 701, 533, 760, 611, z, z + 2, shelf, 0));
+    for (const z of [32, 72, 112]) d.push(B(p, 701, 529, 775, 615, z, z + 2, shelf, 0));
     // pantry: jars, bottles, small packets and tins on each shelf
     const jarG = std({ color: 0xe8f0f0, roughness: .08, transparent: true, opacity: .55, envMapIntensity: 1.2 }), lid = std({ color: 0x2a2a2a, roughness: .4, metalness: .4 });
     const fill = () => std({ color: [0xe0b050, 0x8a5a2a, 0xf2ead8, 0xc0402a, 0x6a8a3a, 0x3a2a1a][(rnd() * 6) | 0], roughness: .9 });
-    for (const z of [34, 74, 114, 0]) { let y = 538;
-      while (y < 604) { const kind = (rnd() * 4) | 0, base = z + 1;
-        if (kind === 0) { const r = 4 + rnd() * 1.5, h = 12 + rnd() * 8; d.push(CY(p, 735, y + r, r, base, base + h, jarG, 0, 16), CY(p, 735, y + r, r - .6, base + .5, base + h * (.4 + rnd() * .5), fill(), 0, 14), CY(p, 735, y + r, r + .2, base + h, base + h + 2, lid, 0, 16)); y += 2 * r + 2; }
+    for (const z of [34, 74, 114, 0]) for (const row of [735, 760]) { let y = 532;
+      while (y < 608) { const kind = (rnd() * 4) | 0, base = z + 1;
+        if (kind === 0) { const r = 4 + rnd() * 1.5, h = 12 + rnd() * 8; d.push(CY(p, row, y + r, r, base, base + h, jarG, 0, 16), CY(p, row, y + r, r - .6, base + .5, base + h * (.4 + rnd() * .5), fill(), 0, 14), CY(p, row, y + r, r + .2, base + h, base + h + 2, lid, 0, 16)); y += 2 * r + 2; }
         else if (kind === 1) { const r = 3 + rnd(), h = 22 + rnd() * 10, c = std({ color: [0x2f5a2a, 0x8a2a1a, 0xd8c890, 0x1a3a5a][(rnd() * 4) | 0], roughness: .15, transparent: true, opacity: .85 });
-          d.push(CY(p, 728 + rnd() * 10, y + r, r, base, base + h * .7, c, 0, 14), CY(p, 728, y + r, 1.3, base + h * .7, base + h, c, 0, 10)); y += 2 * r + 2; }
-        else if (kind === 2) { const w = 7 + rnd() * 5, h = 14 + rnd() * 10; d.push(B(p, 722 + rnd() * 12, y, 735 + rnd() * 10, y + w, base, base + h, fill(), 0)); y += w + 1.5; }
-        else { const r = 4, h = 10; for (let k = 0; k < 2 && base + (k + 1) * h < z + 36; k++) d.push(CY(p, 740, y + r, r, base + k * h, base + (k + 1) * h - .3, std({ color: 0xc8ccd0, roughness: .3, metalness: .7 }), 0, 16)); y += 2 * r + 2; }
+          d.push(CY(p, row - 5 + rnd() * 10, y + r, r, base, base + h * .7, c, 0, 14), CY(p, row, y + r, 1.3, base + h * .7, base + h, c, 0, 10)); y += 2 * r + 2; }
+        else if (kind === 2) { const w = 7 + rnd() * 5, h = 14 + rnd() * 10; d.push(B(p, row - 10, y, row + 8, y + w, base, base + h, fill(), 0)); y += w + 1.5; }
+        else { const r = 4, h = 10; for (let k = 0; k < 2 && base + (k + 1) * h < z + 36; k++) d.push(CY(p, row, y + r, r, base + k * h, base + (k + 1) * h - .3, std({ color: 0xc8ccd0, roughness: .3, metalness: .7 }), 0, 16)); y += 2 * r + 2; }
       } }
     d.forEach(m => m.userData.noRemap = true); } B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing
   // stone-look strip cladding on the tall landing wall, a wall clock, a floor vase; framed pictures along the flight
@@ -2418,7 +2417,7 @@ function desk(p, base, r, chairAt, faceTo) {
   // front: covered entry, path, parking, street
   flat(-175, 980, 300, 1060, -0.03, M.sillStone);   // light stone slabs at the entrance
   // two-car parking pad across the front, no roof, running right to the party line
-  flat(-200, 1060, 785, 1450, -0.028, M.pavers2);
+  flat(-200, 972, 785, 1450, -0.028, M.pavers2);   // the whole front is interlocking pavers
   for (let y = 1065; y < 1440; y += 52) flat(-190, y, -110, y + 46, -0.022, M.pathSlab);
   for (let y = 702; y < 1000; y += 50) for (let x = -2; x < 268; x += 50) flat(x, y, Math.min(x + 48, 268), Math.min(y + 48, 1000), -0.022, M.pathSlab);   // paved entrance by the front door
   for (let y = 1000; y < 1065; y += 52) flat(-190, y, -110, y + 46, -0.022, M.pathSlab);   // stepping-slab path from the gate to the door
@@ -2851,7 +2850,7 @@ document.querySelector('#toolsP .thead').addEventListener('click', e => { const 
 { const tabs = document.querySelectorAll('[data-tab]'), panes = document.querySelectorAll('[data-pane]');
   const show = t => { tabs.forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t)); panes.forEach(p => p.hidden = p.dataset.pane !== t); try { localStorage.setItem('menuTab', t); } catch (e) {} };
   tabs.forEach(b => b.addEventListener('click', () => { document.getElementById('toolsP').classList.remove('min'); show(b.dataset.tab); }));
-  let t0 = 'view'; try { t0 = localStorage.getItem('menuTab') || 'view'; } catch (e) {} show(t0); }
+  let t0 = 'view'; try { t0 = localStorage.getItem('menuTab') || 'view'; } catch (e) {} show(['view', 'set'].includes(t0) ? t0 : 'view'); }
 /* before / after renovation: swaps the room groups and floors in place, camera stays where it is */
 function renoVisual(on) {
   if (!skirts.classified) { // which room does each skirting board face?
@@ -3196,7 +3195,7 @@ document.body.appendChild(compass);
 {
   const blade = new THREE.ConeGeometry(.012, .14, 3); blade.translate(0, .07, 0);
   const n = 10000, im = new THREE.InstancedMesh(blade, new THREE.MeshStandardMaterial({ color: 0x6f9a48, roughness: .9 }), n), d = new THREE.Object3D(), col = new THREE.Color();
-  let k = 0; const areas = [[-175, -330, 0, 1000, 4000], [-215, -470, 791, -332, 3500], [-215, -330, 178, 10, 2500]];
+  let k = 0; const areas = [[-175, -330, 0, 965, 4000], [-215, -470, 791, -332, 3500], [-215, -330, 178, 10, 2500]];
   for (const [x0, y0, x1, y1, cnt] of areas) for (let i = 0; i < cnt && k < n; i++, k++) {
     d.position.set(wx(x0 + rnd() * (x1 - x0)), -.035, wz(y0 + rnd() * (y1 - y0)));
     d.rotation.set((rnd() - .5) * .5, rnd() * 6.28, (rnd() - .5) * .5); d.scale.setScalar(.6 + rnd() * .9); d.updateMatrix(); im.setMatrixAt(k, d.matrix);
@@ -3210,8 +3209,8 @@ const zOutBtn = document.getElementById('zOut');
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 const gtao = new GTAOPass(scene, camera, innerWidth, innerHeight);
-gtao.updateGtaoMaterial({ radius: .35, distanceExponent: 1.5, thickness: 1, scale: 1.2, samples: 12, distanceFallOff: 1 });
-gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 12 });
+gtao.updateGtaoMaterial({ radius: .35, distanceExponent: 1.5, thickness: 1, scale: 1.2, samples: 16, distanceFallOff: 1 });
+gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 10, rings: 3, samples: 16 });
 gtao.blendIntensity = .9;
 composer.addPass(gtao); composer.addPass(new OutputPass());
 state.hq = innerWidth > 760; window.__composer = composer;
