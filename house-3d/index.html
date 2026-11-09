@@ -166,6 +166,58 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   .hint{display:none}
   .zoom{left:auto;right:max(12px,env(safe-area-inset-right,0px));bottom:auto;top:50%;transform:translateY(-50%)}
 }
+/* ---------- liquid glass ---------- */
+:root{--glass:linear-gradient(140deg,rgba(255,255,255,.62),rgba(255,255,255,.30));--glass-edge:rgba(255,255,255,.65);--glass-hi:rgba(255,255,255,.9);--glass-shadow:0 10px 40px rgba(20,30,50,.18),0 2px 8px rgba(20,30,50,.08);--track:rgba(118,118,128,.16);--pill:#ffffff;--pill-ink:#1d2430}
+:root[data-night="1"]{--glass:linear-gradient(140deg,rgba(44,52,68,.62),rgba(20,26,38,.42));--glass-edge:rgba(255,255,255,.16);--glass-hi:rgba(255,255,255,.22);--glass-shadow:0 10px 40px rgba(0,0,0,.45);--track:rgba(255,255,255,.1);--pill:rgba(255,255,255,.18);--pill-ink:#fff}
+.panel{background:var(--glass)!important;backdrop-filter:blur(26px) saturate(1.9);-webkit-backdrop-filter:blur(26px) saturate(1.9);border:1px solid var(--glass-edge)!important;box-shadow:inset 0 1px 0 var(--glass-hi),inset 0 -1px 0 rgba(255,255,255,.12),var(--glass-shadow)!important;border-radius:22px}
+.tools{width:236px;min-width:0;padding:8px;gap:2px}
+.thead{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.tabs{flex:1;display:grid;grid-template-columns:repeat(3,1fr);padding:3px;border-radius:12px;background:var(--track)}
+.tabs button{all:unset;cursor:pointer;text-align:center;padding:6px 4px;border-radius:9px;font:600 13px var(--f-ui);color:var(--muted);transition:background .25s,color .25s,box-shadow .25s}
+.tabs button[aria-selected="true"]{background:var(--pill);color:var(--pill-ink);box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.04)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.tools .collapse{position:static;flex:none}
+.tools h2:first-of-type{padding-right:0}
+.pane{display:flex;flex-direction:column;gap:4px;padding:2px}
+.pane h2{margin:8px 6px 2px;font-size:11px;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.tbtn{border-radius:12px;padding:8px 10px}
+.tbtn:hover{background:rgba(255,255,255,.35)}
+:root[data-night="1"] .tbtn:hover{background:rgba(255,255,255,.08)}
+.tbtn.wide{background:var(--track);justify-content:space-between}
+.tbtn .chev{color:var(--muted);font-size:18px;line-height:1}
+.views{gap:4px;padding:0}
+.views .tbtn{background:var(--track);justify-content:center;padding:8px}
+.views .tbtn:hover{filter:none;background:rgba(255,255,255,.5)}
+.seg{background:var(--track);border-radius:12px;padding:3px;margin:0}
+.seg button{border-radius:9px;transition:background .25s,box-shadow .25s}
+.seg button[aria-pressed="true"]{background:var(--pill);color:var(--pill-ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.roomsel{background-color:var(--track);border-radius:12px;margin:0;width:100%}
+.sw{width:38px;height:23px;border-radius:12px;background:rgba(120,120,128,.28)}
+.sw::after{top:2px;right:2px;width:19px;height:19px;box-shadow:0 2px 4px rgba(0,0,0,.25)}
+.tbtn[aria-pressed="true"] .sw{background:#34c759}
+.tbtn[aria-pressed="true"] .sw::after{transform:translateX(-15px)}
+.tools.min>*:not(.thead){display:none}
+.tools.min{width:auto;padding:6px}
+.tools.min .tabs{display:none}
+.modes{border-radius:999px;padding:5px}
+.mbtn[aria-selected="true"]{background:var(--pill);color:var(--pill-ink);box-shadow:0 1px 4px rgba(0,0,0,.14)}
+.zoom{border-radius:18px}
+.zoom button{border-radius:12px}
+.zoom #tPhoto{color:var(--accent)}
+.compass{border-radius:50%}
+.lbl{background:var(--glass)!important;backdrop-filter:blur(16px) saturate(1.8);-webkit-backdrop-filter:blur(16px) saturate(1.8);border:1px solid var(--glass-edge);box-shadow:inset 0 1px 0 var(--glass-hi),0 4px 14px rgba(10,20,30,.15)}
+.lbl.on{background:var(--accent)!important}
+.focusbar{background:var(--glass)!important;backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border:1px solid var(--glass-edge)!important;box-shadow:inset 0 1px 0 var(--glass-hi),var(--glass-shadow)!important}
+@media (max-width:760px){
+  .tools{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));width:auto;top:auto;bottom:calc(76px + env(safe-area-inset-bottom,0px));flex-direction:column;overflow:visible;max-height:46vh}
+  .pane{overflow:auto;max-height:36vh}
+  .tools h2{display:block}
+  .tools .tbtn{flex:initial}
+  .views{display:grid}
+  .roomsel{width:100%}
+  .tools.min{left:auto;width:auto}
+  .zoom{top:calc(50% - 40px)}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -186,40 +238,55 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 </header>
 
 <aside class="tools panel" id="toolsP" aria-label="אפשרויות תצוגה">
-  <button class="collapse" data-col="toolsP" aria-label="כיווץ" aria-expanded="true"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-  <h2>תצוגה</h2>
-  <button class="tbtn" id="tNight" aria-pressed="false">תאורת לילה <span class="sw"></span></button>
-  <button class="tbtn" id="tLabels" aria-pressed="true">שמות חדרים <span class="sw"></span></button>
-  <button class="tbtn" id="tNeighbor" aria-pressed="true">יחידה שכנה A-2 <span class="sw"></span></button>
-  <button class="tbtn" id="tRotate" aria-pressed="false">סיבוב אוטומטי <span class="sw"></span></button>
-  <button class="tbtn" id="tHQ" aria-pressed="true">איכות גבוהה <span class="sw"></span></button>
-  <button class="tbtn" id="tPlanner" style="justify-content:center">מתכנן ריצוף</button>
-  <button class="tbtn" id="tPhoto" style="background:var(--accent);color:var(--accent-ink);justify-content:center">צילום ריאליסטי</button>
-  <h2>שיפוץ</h2>
-  <div class="seg" role="group" aria-label="לפני או אחרי שיפוץ">
-    <button data-reno="before" aria-pressed="true">לפני</button>
-    <button data-reno="after" aria-pressed="false">אחרי</button>
-    <button data-reno="split" aria-pressed="false">השוואה</button>
+  <div class="thead">
+    <div class="tabs" role="tablist" aria-label="תפריט">
+      <button role="tab" data-tab="view" aria-selected="true">מבט</button>
+      <button role="tab" data-tab="reno" aria-selected="false">שיפוץ</button>
+      <button role="tab" data-tab="set" aria-selected="false">הגדרות</button>
+    </div>
+    <button class="collapse" data-col="toolsP" aria-label="כיווץ" aria-expanded="true"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   </div>
-  <h2>קירות</h2>
-  <div class="seg" role="group" aria-label="גובה קירות">
-    <button data-walls="full" aria-pressed="true">מלאים</button>
-    <button data-walls="low" aria-pressed="false">נמוכים</button>
-    <button data-walls="none" aria-pressed="false">ללא</button>
-  </div>
-  <h2>מבט על חדר</h2>
-  <select class="roomsel" id="roomSel" aria-label="בחירת חדר להתמקדות">
-    <option value="">בחרו חדר…</option>
-  </select>
-  <h2>מבט</h2>
-  <div class="views">
-    <button class="tbtn" data-view="street">חזית</button>
-    <button class="tbtn" data-view="garden">גינה</button>
-    <button class="tbtn" data-view="top">מבט על</button>
-    <button class="tbtn" data-view="iso">איזומטרי</button>
-    <button class="tbtn" data-walkout="garden">הליכה בגינה</button>
-    <button class="tbtn" data-walkout="front">הליכה בחנייה</button>
-  </div>
+  <section class="pane" data-pane="view">
+    <h2>חדר</h2>
+    <select class="roomsel" id="roomSel" aria-label="בחירת חדר להתמקדות">
+      <option value="">בחרו חדר…</option>
+    </select>
+    <h2>זווית</h2>
+    <div class="views">
+      <button class="tbtn" data-view="street">חזית</button>
+      <button class="tbtn" data-view="garden">גינה</button>
+      <button class="tbtn" data-view="top">מבט על</button>
+      <button class="tbtn" data-view="iso">איזומטרי</button>
+    </div>
+    <h2>הליכה בחוץ</h2>
+    <div class="views">
+      <button class="tbtn" data-walkout="garden">בגינה</button>
+      <button class="tbtn" data-walkout="front">בחנייה</button>
+    </div>
+    <h2>קירות</h2>
+    <div class="seg" role="group" aria-label="גובה קירות">
+      <button data-walls="full" aria-pressed="true">מלאים</button>
+      <button data-walls="low" aria-pressed="false">נמוכים</button>
+      <button data-walls="none" aria-pressed="false">ללא</button>
+    </div>
+  </section>
+  <section class="pane" data-pane="reno" hidden>
+    <h2>מצב הבית</h2>
+    <div class="seg" role="group" aria-label="לפני או אחרי שיפוץ">
+      <button data-reno="before" aria-pressed="true">לפני</button>
+      <button data-reno="after" aria-pressed="false">אחרי</button>
+      <button data-reno="split" aria-pressed="false">השוואה</button>
+    </div>
+    <h2>תכנון</h2>
+    <button class="tbtn wide" id="tPlanner">מתכנן ריצוף <span class="chev">›</span></button>
+  </section>
+  <section class="pane" data-pane="set" hidden>
+    <button class="tbtn" id="tNight" aria-pressed="false">תאורת לילה <span class="sw"></span></button>
+    <button class="tbtn" id="tLabels" aria-pressed="true">שמות חדרים <span class="sw"></span></button>
+    <button class="tbtn" id="tNeighbor" aria-pressed="true">יחידה שכנה A-2 <span class="sw"></span></button>
+    <button class="tbtn" id="tRotate" aria-pressed="false">סיבוב אוטומטי <span class="sw"></span></button>
+    <button class="tbtn" id="tHQ" aria-pressed="true">איכות גבוהה <span class="sw"></span></button>
+  </section>
 </aside>
 
 <nav class="modes panel" role="tablist" aria-label="קומות">
@@ -256,6 +323,8 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 <button class="focusbar" id="focusBar" hidden><span class="back">חזרה לכל הבית</span><span>מבט על <b id="focusName"></b></span></button>
 
 <div class="zoom panel" role="group" aria-label="זום">
+  <button id="tPhoto" aria-label="צילום ריאליסטי" title="צילום ריאליסטי"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.6l1.2-1.7c.3-.4.7-.6 1.2-.6h3c.5 0 .9.2 1.2.6L15.9 6h1.6A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+  <hr>
   <button id="zIn" aria-label="התקרבות" title="התקרבות (+)">+</button>
   <hr>
   <button id="zOut" aria-label="התרחקות" title="התרחקות (−)">−</button>
@@ -1193,7 +1262,9 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
     const xa = 452 + i * tr, top = (i + 1) * R;
     B(p, xa, 432, xa + tr, 523, 0, top - 4, M.interior); B(p, xa - 2, 430, xa + tr, 523, top - 4, top, M.treadWood).userData.stair = true;
   }
-  B(p, 700, 432, 778, 618, 0, 9 * R - 4, M.interior);
+  // landing block, with an open storage recess cut into it from the passage side
+  B(p, 700, 432, 778, 532, 0, 9 * R - 4, M.interior); B(p, 700, 612, 778, 618, 0, 9 * R - 4, M.interior);
+  B(p, 760, 532, 778, 612, 0, 9 * R - 4, M.interior); B(p, 700, 532, 760, 612, 9 * R - 16, 9 * R - 4, M.interior);
   { // coat rack on the angled wall beside the front door, coats and bags hanging on it (entrance photos)
     const g = local(F[0].furn, 172, 754, 0, 2.395); g.userData.noRemap = true;
     lb(g, .9, .1, .025, 0, 1.72, .013, M.oak);
@@ -1202,10 +1273,11 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
     const bag = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.28, .3, .1, 3, .03), std({ color: 0xd8b9a0, roughness: .8 }))); bag.position.set(0, 1.45, .09); g.add(bag);
     // small shoe cabinet under it
     lb(g, .8, .45, .3, 0, .225, .16, M.white); lb(g, .78, .005, .29, 0, .23, .31, M.black); }
-  { // small storage cut under the landing, opening onto the passage: flush white door with a black handle
-    const d = [B(p, 698.6, 534, 700, 610, 3, 9 * R - 14, M.trim, 0)];
-    for (const [y0, y1, z0, z1] of [[533, 534, 2, 9 * R - 13], [610, 611, 2, 9 * R - 13], [533, 611, 9 * R - 14, 9 * R - 13]]) d.push(B(p, 698.8, y0, 700, y1, z0, z1, M.black, 0));
-    d.push(B(p, 697.6, 540, 698.6, 552, 92, 94, M.black, 0)); d.forEach(m => m.userData.noRemap = true); } B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing
+  { // open storage recess under the landing: white shelves with boxes, baskets and folded things
+    const d = [], shelf = std({ color: 0xf2f0ea, roughness: .5 }), stuff = () => std({ color: new THREE.Color().setHSL(rnd(), .2 + rnd() * .3, .35 + rnd() * .4), roughness: .8 });
+    for (const z of [32, 72, 112]) d.push(B(p, 701, 533, 760, 611, z, z + 2, shelf, 0));
+    for (const z of [0, 34, 74, 114]) { let y = 536; while (y < 600) { const w = 14 + rnd() * 16, h = Math.min(22 + rnd() * 10, 9 * R - 18 - z - 2); if (h > 6) d.push(B(p, 712 + rnd() * 8, y, 756, Math.min(y + w, 608), z + (z ? 0 : 1), z + (z ? 0 : 1) + h, rnd() > .4 ? std({ color: 0xc8a878, roughness: .9 }) : stuff(), 0)); y += w + 3; } }
+    d.forEach(m => m.userData.noRemap = true); } B(p, 698, 430, 778, 620, 9 * R - 4, 9 * R, M.treadWood).userData.stair = true; // landing
   // stone-look strip cladding on the tall landing wall, a wall clock, a floor vase; framed pictures along the flight
   { // brick-strip wallpaper over the whole tall landing wall, both storeys
     const m = new THREE.Mesh(boxUV(.01, 3.1, 1.88, 4.31, 0), M.stoneStrip); m.position.set(wx(779.4), 1.5, wz(525)); m.scale.y = L1 / 3.1; p.add(m); onWall(m, 0, 0, L1 * 100);
@@ -2645,6 +2717,10 @@ tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
 tog('tRotate', 'rotate', () => controls.autoRotate = state.rotate);
 document.getElementById('cardX').addEventListener('click', () => selectRoom(null));
+{ const tabs = document.querySelectorAll('[data-tab]'), panes = document.querySelectorAll('[data-pane]');
+  const show = t => { tabs.forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t)); panes.forEach(p => p.hidden = p.dataset.pane !== t); try { localStorage.setItem('menuTab', t); } catch (e) {} };
+  tabs.forEach(b => b.addEventListener('click', () => { document.getElementById('toolsP').classList.remove('min'); show(b.dataset.tab); }));
+  let t0 = 'view'; try { t0 = localStorage.getItem('menuTab') || 'view'; } catch (e) {} show(t0); }
 /* before / after renovation: swaps the room groups and floors in place, camera stays where it is */
 function renoVisual(on) {
   if (!skirts.classified) { // which room does each skirting board face?
