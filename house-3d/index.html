@@ -195,6 +195,8 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
     <button class="tbtn" data-view="garden">גינה</button>
     <button class="tbtn" data-view="top">מבט על</button>
     <button class="tbtn" data-view="iso">איזומטרי</button>
+    <button class="tbtn" data-walkout="garden">הליכה בגינה</button>
+    <button class="tbtn" data-walkout="front">הליכה בחנייה</button>
   </div>
 </aside>
 
@@ -2404,6 +2406,7 @@ function selectRoom(id, fly) {
 
 document.querySelectorAll('.mbtn').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
 document.querySelectorAll('[data-walls]').forEach(b => b.addEventListener('click', () => setWalls(b.dataset.walls)));
+document.querySelectorAll('[data-walkout]').forEach(b => b.addEventListener('click', () => { if (walking) exitWalk(false); if (focus) exitFocus(false); enterWalk(b.dataset.walkout); }));
 document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { if (walking) exitWalk(false); const [p, t] = VIEWS[b.dataset.view](); if (b.dataset.view === 'top' && state.mode === 'full') setMode('ground'); flyTo(p, t, 1.4); }));
 const tog = (id, key, fn) => { const el = document.getElementById(id); el.addEventListener('click', () => { state[key] = !state[key]; el.setAttribute('aria-pressed', state[key]); fn(); }); };
 tog('tNight', 'night', applyNight);
