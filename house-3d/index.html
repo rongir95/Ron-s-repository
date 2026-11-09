@@ -11,7 +11,8 @@
   --ink:#1d2430;
   --muted:#5d6775;
   --line:rgba(29,36,48,.14);
-  --accent:#2f5d8a;
+  --accent:#5b5ff5;
+  --accent-grad:linear-gradient(135deg,#4f8dff,#8b5cf6);
   --accent-ink:#ffffff;
   --stage:#c9d9e6;
   --f-display:"Frank Ruhl Libre","David Libre",Georgia,serif;
@@ -24,7 +25,8 @@
   --ink:#eef1f6;
   --muted:#a2acba;
   --line:rgba(255,255,255,.14);
-  --accent:#f0c27e;
+  --accent:#ffb454;
+  --accent-grad:linear-gradient(135deg,#ffb454,#ff7a59);
   --accent-ink:#1a1f29;
   --stage:#0b1220;
   color-scheme: dark;
@@ -54,7 +56,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .brand h1{font-family:var(--f-display);font-weight:700;font-size:28px;line-height:1.1;margin:4px 0 2px;text-wrap:balance}
 .brand h1 .tag{font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--accent-ink);background:var(--accent);border-radius:6px;padding:2px 7px;vertical-align:middle;margin-inline-start:6px;direction:ltr;display:inline-block}
 .brand .sub{color:var(--muted);font-size:13px}
-.stats{display:flex;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.stats{display:none;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .stat b{display:block;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
 .stat span{font-size:11px;color:var(--muted)}
 
@@ -80,7 +82,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .cbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .focusbar{all:unset;position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:9px 16px;border-radius:999px;cursor:pointer;font-weight:500;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);box-shadow:0 10px 30px rgba(15,25,40,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);white-space:nowrap}
 .focusbar b{font-weight:600}
-.focusbar .back{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:3px 10px;font-size:12px}
+.focusbar .back{background:var(--accent-grad);font-weight:600;box-shadow:0 2px 8px rgba(91,95,245,.35);color:var(--accent-ink);border-radius:999px;padding:3px 10px;font-size:12px}
 .focusbar:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .views{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 2px 2px}
 .views .tbtn{justify-content:center;background:var(--line);padding:6px 8px}
@@ -135,7 +137,14 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .renobar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));width:270px;padding:4px!important;z-index:3}
 .renobar button{padding:7px 6px;font-weight:600}
 @media (max-width:760px){.renobar{bottom:auto;top:calc(150px + env(safe-area-inset-top,0px));width:calc(100% - 24px);max-width:320px}}
-.hint{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--muted);padding:6px 12px;border-radius:999px}
+.statbtn{all:unset;cursor:pointer;margin-top:6px;font-size:12px;font-weight:600;color:var(--accent)}
+.brand.showstats .stats{display:flex}
+.brand.min .statbtn{display:none}
+.cbtn{background:var(--accent-grad)!important;box-shadow:0 4px 14px rgba(91,95,245,.3)}
+.lbl.on{background:var(--accent-grad)!important}
+.tbtn[aria-pressed="true"] .sw{background:linear-gradient(135deg,#34c759,#2fd18f)}
+.hint{position:fixed;left:50%;transform:translateX(-50%);top:calc(68px + env(safe-area-inset-top,0px));max-width:min(560px,calc(100% - 640px));font-size:12px;color:var(--muted);padding:6px 14px;border-radius:999px;text-align:center;transition:opacity .6s;pointer-events:none}
+.hint.fade{opacity:0}
 
 .lbl{display:flex;gap:7px;align-items:baseline;pointer-events:auto;cursor:pointer;background:var(--paper);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:4px 10px;font:500 12px/1.3 var(--f-ui);white-space:nowrap;box-shadow:0 4px 12px rgba(10,20,30,.15);direction:rtl;transition:background .3s}
 .lbl b{font-weight:500}
@@ -236,6 +245,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <div class="eyebrow">יקנעם · דגם A-1</div>
   <h1>בית גירשביץ׳</h1>
   <div class="sub">דירה 29 · בית דו-משפחתי בשתי קומות עם חצר צמודה</div>
+  <button class="statbtn" id="statBtn" aria-expanded="false">נתוני הבית ▾</button>
   <div class="stats">
     <div class="stat"><b id="sG">—</b><span>קומת קרקע, מ״ר</span></div>
     <div class="stat"><b id="sF">—</b><span>קומה א׳, מ״ר</span></div>
@@ -1049,9 +1059,7 @@ function opening(p, a, ux, uy, theta, op, o) {
     const lw = w - 0.1, lh = hd - 0.05;
     if (op.slide) { // brown wood sliding door on a track, half open, on the room side
       const sd = os * (t / 2 + 0.025); // track and leaf on the closet side, leaf slid fully open inside the closet
-      lb(g, w + .9, .05, .05, .4, hd + .03, sd, M.wood);
-      lb(g, w, hd - .02, .035, w * 1.02, (hd - .02) / 2, sd, M.wood);   // slid fully open
-      lb(g, .02, .3, .02, w * 1.02 - w / 2 + .06, 1.0, sd - os * .025, M.black);
+      lb(g, w, hd - .02, .035, w + .3, (hd - .02) / 2, sd + os * .02, M.wood);   // slid fully open inside the closet, out of sight from the bedroom
       return;
     }
     lb(g, lw, lh, 0.04, 0, lh / 2, 0, M.trim);
@@ -1679,10 +1687,10 @@ function desk(p, base, r, chairAt, faceTo) {
     B(p, 22, 340, 70, 400, 92, 93, M.black, b);
     for (const [y0, y1, z1] of [[320, 435, 150], [575, 699, 150], [435, 575, 104]]) B(p, 16.5, y0, 17.5, y1, 92, z1, M.backsplash, b);
     // floating oak shelves where the hood used to be, with jars, bowls and a plant
-    for (const z of [160, 200]) B(p, 16, 325, 42, 430, z, z + 4, M.oakLight, b);
-    for (let y = 335; y < 400; y += 9) CY(p, 28, y, 3, 164, 175, std({ color: new THREE.Color().setHSL(.05 + rnd() * .1, .6, .35 + rnd() * .2), roughness: .4 }), b, 10);
-    CY(p, 29, 412, 7, 164, 170, M.white, b, 18); CY(p, 28, 345, 7, 204, 214, M.white, b, 18);
-    for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.05, 0), M.leaf)); m.position.set(wx(28 + (rnd() - .5) * 10), b + 2.18 + rnd() * .1, wz(395 + (rnd() - .5) * 16)); p.add(m); }
+    for (const z of [160, 200]) B(p, 16, 325, 42, 412, z, z + 4, M.oakLight, b);
+    for (let y = 335; y < 390; y += 9) CY(p, 28, y, 3, 164, 175, std({ color: new THREE.Color().setHSL(.05 + rnd() * .1, .6, .35 + rnd() * .2), roughness: .4 }), b, 10);
+    CY(p, 29, 400, 7, 164, 170, M.white, b, 18); CY(p, 28, 345, 7, 204, 214, M.white, b, 18);
+    for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.05, 0), M.leaf)); m.position.set(wx(28 + (rnd() - .5) * 10), b + 2.18 + rnd() * .1, wz(385 + (rnd() - .5) * 12)); p.add(m); }
     // south wall: oak tall units to the ceiling, oven tower with built-in microwave and oven, lit open niche, fridge set into the oak wall
     B(p, 76, 640, 136, 699, 10, 88, M.kWhite, b); B(p, 76, 637, 136, 699, 88, 92, M.qWhite, b);
     B(p, 76, 664, 136, 699, 135, C, M.oakLight, b); B(p, 78, 663.5, 134, 664, 135, 140, M.oakLight, b);
@@ -1709,11 +1717,11 @@ function desk(p, base, r, chairAt, faceTo) {
   // roller blinds over the kitchen and dining windows, decorative security grille outside the sink window
   B(p, 17, 430, 24, 580, 215, 222, M.shade, b); B(p, 17.5, 433, 19, 577, 186, 215, M.shade, b);
   for (const z of [192, 200, 208]) B(p, 19, 433, 19.4, 577, z, z + 1.2, M.alu, b);
-  { const gx = -11.5;
-    for (let y = 437; y <= 573; y += 12) B(p, gx - .7, y - .7, gx + .7, y + .7, 105, 215, M.alu, b);
-    for (const z of [105, 142, 214]) B(p, gx - .7, 433, gx + .7, 577, z - .7, z + .7, M.alu, b);
-    const gg = local(p, gx, 505, b);
-    for (let k = -6; k <= 6; k++) for (const sg of [1, -1]) {
+  { const gx = -6, gp = new THREE.Group(); gp.userData.noRemap = true; p.add(gp);
+    for (let y = 446; y <= 578; y += 12) B(gp, gx - .7, y - .7, gx + .7, y + .7, 105, 215, M.alu, b);
+    for (const z of [105, 142, 214]) B(gp, gx - .7, 442, gx + .7, 582, z - .7, z + .7, M.alu, b);
+    const gg = local(gp, gx, 512, b);
+    for (let k = -5; k <= 5; k++) for (const sg of [1, -1]) {
       const m = shadowy(new THREE.Mesh(UNIT, M.alu)); m.scale.set(.012, .26, .012);
       m.position.set(0, 1.235, k * .12); m.rotation.x = sg * Math.PI / 4; gg.add(m);
     } }
@@ -2838,6 +2846,7 @@ tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
 tog('tRotate', 'rotate', () => controls.autoRotate = state.rotate);
 document.getElementById('cardX').addEventListener('click', () => selectRoom(null));
+{ const b = document.getElementById('statBtn'), br = document.getElementById('brandP'); b.addEventListener('click', () => { const on = br.classList.toggle('showstats'); b.setAttribute('aria-expanded', on); b.textContent = on ? 'נתוני הבית ▴' : 'נתוני הבית ▾'; }); }
 document.querySelector('#toolsP .thead').addEventListener('click', e => { const t = document.getElementById('toolsP'); if (t.classList.contains('min') && !e.target.closest('.collapse')) t.querySelector('.collapse').click(); });
 { const tabs = document.querySelectorAll('[data-tab]'), panes = document.querySelectorAll('[data-pane]');
   const show = t => { tabs.forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t)); panes.forEach(p => p.hidden = p.dataset.pane !== t); try { localStorage.setItem('menuTab', t); } catch (e) {} };
@@ -3194,6 +3203,8 @@ document.body.appendChild(compass);
     col.setHSL(.24 + rnd() * .05, .45, .28 + rnd() * .14); im.setColorAt(k, col); }
   im.count = k; site.add(im);
 }
+{ const h = document.getElementById('hint'); let t; const show = () => { h.classList.remove('fade'); clearTimeout(t); t = setTimeout(() => h.classList.add('fade'), 6000); };
+  new MutationObserver(show).observe(h, { childList: true, characterData: true, subtree: true }); show(); }
 const zOutBtn = document.getElementById('zOut');
 // high quality: ambient occlusion (soft contact shadows in corners and under furniture)
 const composer = new EffectComposer(renderer);
