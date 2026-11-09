@@ -2043,8 +2043,11 @@ function desk(p, base, r, chairAt, faceTo) {
   slatFence(-220, -580, 791, -580); slatFence(-220, -580, -220, 1010);
   B(p, PARTY - 10, -580, PARTY + 10, 12, -15, 260, M.stone);
   // wagon wheel and a plant trolley on the wall by the front door
-  { const w = new THREE.Mesh(new THREE.TorusGeometry(.38, .04, 8, 28), M.wood); w.position.set(wx(-1), 1.75, wz(860)); w.rotation.y = Math.PI / 2; p.add(w);
-    for (let k = 0; k < 6; k++) { const sp = new THREE.Mesh(UNIT, M.wood); sp.scale.set(.02, .74, .025); sp.position.copy(w.position); sp.position.x -= .02; sp.rotation.set(k / 6 * Math.PI, Math.PI / 2, 0, 'YXZ'); p.add(sp); } }
+  { // wagon wheel on the stone wall left of the front door (south face of the kitchen block), facing the parking
+    const g = new THREE.Group(); g.position.set(wx(58), 1.75, wz(720)); p.add(g);
+    const rim = shadowy(new THREE.Mesh(new THREE.TorusGeometry(.38, .035, 8, 32), M.wood)); g.add(rim);
+    const hub = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, .1, 16), M.wood)); hub.rotation.x = Math.PI / 2; g.add(hub);
+    for (let k = 0; k < 6; k++) { const sp = shadowy(new THREE.Mesh(new THREE.BoxGeometry(.025, .74, .025), M.wood)); sp.rotation.z = k / 6 * Math.PI; g.add(sp); } }
   // front: covered entry, path, parking, street
   flat(-175, 980, 300, 1060, -0.03, M.sillStone);   // light stone slabs at the entrance
   // two-car parking pad across the front, no roof, running right to the party line
