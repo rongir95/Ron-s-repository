@@ -305,6 +305,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .card .x svg{width:15px;height:15px}
 .lbl span{display:none}
 body.tooling .lbl{pointer-events:none}
+#tPhoto,#tPhoto+hr{display:none} /* path-traced photo hidden: it does not render the model's custom materials correctly */
 body.zshift .zoom{left:var(--zl)!important}
 body.zshift .compass{left:calc(var(--zl) + 62px)!important}
 body.zhide .zoom,body.zhide .compass{opacity:0;pointer-events:none}
