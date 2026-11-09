@@ -2478,7 +2478,7 @@ function desk(p, base, r, chairAt, faceTo) {
     for (const o of p.children.slice(n0)) { o.position.sub(pv).applyAxisAngle(Y, a).add(pv).add(shift); o.rotation.y += a; } }
   // glass-top table with white garden chairs
   const TX = -80; // moved west, away from the barbecue
-  B(p, 470 + TX, -230, 630 + TX, -140, 72, 74, M.glass); for (const [x, y] of [[472, -228], [628, -228], [472, -142], [628, -142]]) B(p, x + TX - 2, y - 2, x + TX + 2, y + 2, 0, 72, M.alu);
+  B(p, 470 + TX, -230, 630 + TX, -140, 72, 74, new THREE.MeshPhysicalMaterial({ color: 0x0c0c0e, roughness: .06, metalness: .1, clearcoat: 1, clearcoatRoughness: .04, envMapIntensity: 1.2 })); // black tempered-glass top for (const [x, y] of [[472, -228], [628, -228], [472, -142], [628, -142]]) B(p, x + TX - 2, y - 2, x + TX + 2, y + 2, 0, 72, M.alu);
   B(p, 470 + TX, -230, 630 + TX, -226, 68, 72, M.alu); B(p, 470 + TX, -144, 630 + TX, -140, 68, 72, M.alu);
   const resin = std({ color: 0xf2f2ef, roughness: .45 }), resinDS = resin.clone(); resinDS.side = THREE.DoubleSide;
   const gardenChair = (X, Y, tx, ty) => {
