@@ -1360,7 +1360,13 @@ function desk(p, base, r, chairAt, faceTo) {
     for (const [x0, y0, x1, y1] of [[694, 276, 753, 277], [536, 337, 537, 397], [587, 337, 588, 397], [639, 337, 640, 397]]) B(p, x0, y0, x1, y1, 50, 50.6, seam, b);
     for (const [x, y] of [[694, 199], [774, 199], [534, 416], [774, 416], [534, 338], [686, 338]]) B(p, x - 2, y - 2, x + 2, y + 2, 0, 8, M.black, b); }
   // white gloss square coffee table, two tiers
-  RB(p, 565, 185, 665, 285, 22, 34, M.white, b, .015); B(p, 575, 195, 655, 275, 0, 22, M.white, b);
+  { // white gloss coffee table with a lift-up top and two drawers, recessed plinth (as in the photos)
+    const gloss = std({ color: 0xf7f7f5, roughness: .08, envMapIntensity: 1.1 });
+    RB(p, 565, 185, 665, 285, 36, 42, gloss, b, .01); RB(p, 567, 187, 663, 283, 8, 36, gloss, b, .01); B(p, 575, 195, 655, 275, 0, 8, M.black, b);
+    for (const x of [566.4, 663.6]) { B(p, x - .3, 187, x + .3, 283, 22, 22.6, M.black, b); B(p, x - .6, 220, x + .6, 250, 28, 29, M.steel, b); }
+    B(p, 615, 187, 615.4, 283, 9, 36, M.black, b);
+    for (let k = 0; k < 3; k++) B(p, 585 + k * 6, 210 + k * 3, 615 + k * 6, 232 + k * 3, 42 + k * .8, 42.8 + k * .8, std({ color: [0xe8e2d4, 0x3a5a7a, 0x8a3a2a][k], roughness: .8 }), b);
+    B(p, 630, 240, 645, 246, 42, 43.5, M.black, b); }
   // champagne pendant over the coffee table
   B(p, 570, 228, 660, 242, 276, 280, M.champagne, b);
   for (const [x, y, z] of [[580, 232, 214], [598, 238, 200], [615, 232, 222], [632, 238, 206], [650, 232, 216]]) {
