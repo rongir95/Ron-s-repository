@@ -813,6 +813,36 @@ const M = {
   line: std({ color: 0xf4f4f0, roughness: .8 }),
 };
 
+/* ---------------- surface detail: relief (normal maps) from the colour textures, wood grain and fabric weave ---------------- */
+function reliefFrom(tex, invert = false) {
+  const img = tex.image, w = img.width, h = img.height;
+  const src = img.getContext ? img : (() => { const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0); return c; })();
+  const d = src.getContext('2d').getImageData(0, 0, w, h).data, L = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) L[i] = (d[i * 4] * .3 + d[i * 4 + 1] * .59 + d[i * 4 + 2] * .11) / 255 * (invert ? -1 : 1);
+  const out = document.createElement('canvas'); out.width = w; out.height = h; const og = out.getContext('2d'), od = og.createImageData(w, h);
+  const at = (x, y) => L[((y + h) % h) * w + ((x + w) % w)];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const dx = (at(x + 1, y - 1) + 2 * at(x + 1, y) + at(x + 1, y + 1)) - (at(x - 1, y - 1) + 2 * at(x - 1, y) + at(x - 1, y + 1));
+    const dy = (at(x - 1, y + 1) + 2 * at(x, y + 1) + at(x + 1, y + 1)) - (at(x - 1, y - 1) + 2 * at(x, y - 1) + at(x + 1, y - 1));
+    let nx = -dx * 2, ny = dy * 2, nz = 1; const l = Math.hypot(nx, ny, nz); const k = (y * w + x) * 4;
+    od.data[k] = (nx / l * .5 + .5) * 255; od.data[k + 1] = (ny / l * .5 + .5) * 255; od.data[k + 2] = (nz / l * .5 + .5) * 255; od.data[k + 3] = 255; }
+  og.putImageData(od, 0, 0);
+  const t = new THREE.CanvasTexture(out); t.wrapS = tex.wrapS; t.wrapT = tex.wrapT; t.repeat.copy(tex.repeat); t.offset.copy(tex.offset); t.rotation = tex.rotation; t.center.copy(tex.center);
+  t.anisotropy = tex.anisotropy; return t;
+}
+const relief = (mat, k = 1, invert = false) => { if (!mat || !mat.map || !mat.map.image || !mat.map.image.width) return; /* photo textures still loading are skipped */ mat.normalMap = reliefFrom(mat.map, invert); mat.normalScale.set(k, k); mat.needsUpdate = true; };
+// wood grain for furniture (box UVs are in metres, so one tile ≈ 1 m)
+const grainTex = (base, dark, light) => canvasTex(512, (g, s) => {
+  g.fillStyle = base; g.fillRect(0, 0, s, s);
+  for (let i = 0; i < 700; i++) { const y = rnd() * s; g.strokeStyle = rnd() > .5 ? dark : light; g.globalAlpha = .08 + rnd() * .22; g.lineWidth = .5 + rnd() * 1.8;
+    g.beginPath(); g.moveTo(0, y); for (let x = 0; x <= s; x += 24) g.lineTo(x, y + Math.sin(x / (60 + i % 40) + i) * 2.2); g.stroke(); }
+  g.globalAlpha = 1;
+}, 1);
+const weaveTex = (base, tone) => canvasTex(256, (g, s) => {
+  g.fillStyle = base; g.fillRect(0, 0, s, s);
+  for (let y = 0; y < s; y += 2) for (let x = 0; x < s; x += 2) { g.fillStyle = ((x + y) / 2) % 2 ? tone : 'rgba(0,0,0,.05)'; g.globalAlpha = .25 + rnd() * .25; g.fillRect(x, y, 2, 2); }
+  g.globalAlpha = 1; speckle(g, s, 2500, .06);
+}, .12);
 /* ---------------- geometry helpers ---------------- */
 const UNIT = new THREE.BoxGeometry(1, 1, 1);
 const wallPieces = [], openingGroups = [], fixtures = [];
@@ -1032,6 +1062,20 @@ const ROOMS = [
   { id: 'balcony', f: 1, name: 'מסתור כביסה', dims: [70, 410], rect: [-68, 321, 0, 735], old: [-74, 292, -2, 716], mat: 'balcony', note: 'מרפסת שירות מוסתרת ברפפות, צמודה לחדרי הרחצה.', noLight: true },
 ];
 
+// apply the surface detail
+for (const [k, st] of [['tile', .6], ['herring', .9], ['lamOak', .8], ['lamDark', .8], ['lamGrey', .8], ['laminate', .8], ['closetFloor', .7], ['parquet', .8], ['terrazzo', .35], ['slate', .6],
+                       ['ensFloor', .6], ['bathFloor', .6], ['hallTile', .6], ['pavers2', 1], ['pavers', 1], ['deck', 1], ['stone', 1.4], ['brick', 1.2], ['stoneStrip', 1.6], ['wcWhite', .5], ['wcRed', .5],
+                       ['greenStack', .6], ['tealStack', .6], ['beigeStack', .6], ['ensWall', .5], ['bathWall', .5], ['bathBrown', .5], ['veneer', .7], ['wallpaper', .5], ['grass', .8], ['turf', .8], ['mulch', 1], ['gravel', 1], ['roof', 1.2]]) relief(M[k], st);
+for (const [k, base, dark, light] of [['walnut', '#5b3a24', '#2a170c', '#7a5236'], ['oak', '#b98d5c', '#7a5530', '#d7b07e'], ['espresso', '#3a261c', '#1a0f08', '#57402f'], ['wenge', '#3d2a20', '#1c120b', '#5a4232'],
+                                      ['walnutA', '#8a5a36', '#5a3418', '#a8774c'], ['oakLight', '#c49a6c', '#946a3e', '#ddb98c'], ['grayWood', '#a69a8c', '#7d7166', '#c2b8ab'], ['wood', '#8a6240', '#5a3c22', '#a77d56'], ['fenceDark', '#3b2c22', '#1e140d', '#57443a']]) {
+  M[k].map = grainTex(base, dark, light); M[k].color.set(0xffffff); relief(M[k], .35);
+}
+for (const [k, base, tone] of [['leather', '#c4b49c', 'rgba(255,255,255,.18)'], ['boucle', '#e6dccb', 'rgba(255,255,255,.35)'], ['fabric', '#8a97a3', 'rgba(255,255,255,.2)'], ['fabric2', '#c6a77e', 'rgba(255,255,255,.2)'],
+                               ['linen', '#f4f1ea', 'rgba(0,0,0,.06)'], ['linenBed', '#d9ccb8', 'rgba(255,255,255,.2)'], ['knit', '#8c8073', 'rgba(255,255,255,.2)'], ['jute', null, null]]) {
+  if (base) { M[k].map = weaveTex(base, tone); M[k].color.set(0xffffff); }
+  relief(M[k], k === 'boucle' || k === 'knit' || k === 'jute' ? 1.2 : .5);
+}
+M.leather.roughness = .45;
 /* ---------------- floors ---------------- */
 function mkFloor(base) { const group = new THREE.Group(); const f = { base, group, shell: new THREE.Group(), furn: new THREE.Group(), labels: [], lights: [] }; group.add(f.shell, f.furn); scene.add(group); return f; }
 const F = [mkFloor(0), mkFloor(L1)];
@@ -1281,6 +1325,9 @@ function desk(p, base, r, chairAt, faceTo) {
   for (let k = 0; k < 2; k++) RB(p, 695, 220 + k * 59, 752, 275 + k * 59, 42, 50, M.leather, b, .04);
   for (let k = 0; k < 3; k++) RB(p, 535 + k * 52, 338, 583 + k * 52, 396, 42, 50, M.leather, b, .04);
   for (let k = 0; k < 3; k++) RB(p, 760, 222 + k * 60, 774, 272 + k * 60, 78, 98, M.leather, b, .04);
+    // soft back cushions leaning on the frame
+    for (let k = 0; k < 2; k++) { const c = RB(p, 735, 222 + k * 88, 754, 306 + k * 88, 44, 84, M.leather, b, .07); c.rotation.z = -.12; }
+    for (let k = 0; k < 3; k++) { const c = RB(p, 560 + k * 62, 378, 620 + k * 62, 398, 44, 84, M.leather, b, .07); c.rotation.x = .12; }
   RB(p, 735, 222, 754, 248, 48, 72, M.duvetB, b, .08); RB(p, 735, 370, 754, 396, 48, 72, M.duvetD, b, .08);
   { const seam = std({ color: 0x9c8c74, roughness: .8 });
     for (const [x0, y0, x1, y1] of [[694, 276, 753, 277], [536, 337, 537, 397], [587, 337, 588, 397], [639, 337, 640, 397]]) B(p, x0, y0, x1, y1, 50, 50.6, seam, b);
@@ -1329,6 +1376,9 @@ function desk(p, base, r, chairAt, faceTo) {
     RB(p, 730, 210, 752, 245, 50, 80, M.sageTowel, b, .05); RB(p, 730, 250, 752, 284, 50, 80, M.rust, b, .05);
     RB(p, 732, 290, 752, 322, 50, 76, M.linen, b, .05); RB(p, 600, 376, 632, 396, 50, 78, M.sageTowel, b, .05);
     RB(p, 700, 340, 740, 400, 44, 50, std({ color: 0xece4d4, roughness: 1 }), b, .04);
+    // soft back cushions leaning on the frame
+    for (let k = 0; k < 2; k++) { const c = RB(p, 735, 222 + k * 88, 754, 306 + k * 88, 44, 84, M.boucle, b, .07); c.rotation.z = -.12; }
+    for (let k = 0; k < 3; k++) { const c = RB(p, 560 + k * 62, 378, 620 + k * 62, 398, 44, 84, M.boucle, b, .07); c.rotation.x = .12; }
     for (const [x, y] of [[694, 199], [774, 199], [534, 416], [774, 416], [534, 338], [686, 338]]) B(p, x - 2, y - 2, x + 2, y + 2, 0, 8, M.walnutA, b);
     { const seam = std({ color: 0xcfc4b1, roughness: 1 }); for (const [x0, y0, x1, y1] of [[694, 263, 750, 264], [600, 337, 601, 396], [645, 337, 646, 396]]) B(p, x0, y0, x1, y1, 52, 52.5, seam, b); }
     // jute rug, walnut plinth coffee table with a tray, vase and books
