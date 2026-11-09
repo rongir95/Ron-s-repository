@@ -308,6 +308,10 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .card .x svg{width:15px;height:15px}
 .lbl span{display:none}
 .brand .sub{display:none!important}
+.brand .statbtn{display:none!important}
+.brand:not(.min) .stats{display:flex}
+.brand:not(.min) .sub{display:block!important;margin-top:6px}
+.brand.min{cursor:pointer}
 .brand.min{display:flex;align-items:center;gap:12px;padding:8px 10px 8px 18px!important}
 .brand.min h1{margin:0!important;padding:0!important;line-height:1}
 .brand.min .collapse{position:static;order:2;flex:none}
@@ -322,8 +326,8 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   .zoom hr{border-top:0;border-left:1px solid var(--line);margin:6px 0;height:24px}
   .zoom button[data-tip]::after{left:50%;top:auto;bottom:calc(100% + 12px);transform:translate(-50%,4px)}
   @media (hover:hover){.zoom button[data-tip]:hover::after{transform:translate(-50%,0)}}
-  .compass{left:calc(max(16px,env(safe-area-inset-left,0px)) + 196px)!important;bottom:calc(20px + env(safe-area-inset-bottom,0px))!important}
-  body.zshift .compass{left:calc(var(--zl) + 196px)!important}
+  .compass{left:calc(max(16px,env(safe-area-inset-left,0px)) + 250px)!important;bottom:calc(20px + env(safe-area-inset-bottom,0px))!important}
+  body.zshift .compass{left:calc(var(--zl) + 250px)!important}
   .card{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 }
 body.tooling .lbl{pointer-events:none}
@@ -459,6 +463,8 @@ body.zhide .zoom,body.zhide .compass{opacity:0;pointer-events:none}
   <button data-tool="pin" aria-pressed="false" aria-label="הוספת הערה" title="הוספת הערה"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10" r="2.3" fill="currentColor"/></svg></button>
   <hr>
   <button id="tPhoto" aria-label="צילום ריאליסטי" title="צילום ריאליסטי"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.6l1.2-1.7c.3-.4.7-.6 1.2-.6h3c.5 0 .9.2 1.2.6L15.9 6h1.6A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></button>
+  <hr>
+  <button id="tReset" aria-label="איפוס הדמו" title="איפוס הדמו"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4.5H9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <hr>
   <button id="zIn" aria-label="התקרבות" title="התקרבות (+)">+</button>
   <hr>
@@ -1195,7 +1201,6 @@ function opening(p, a, ux, uy, theta, op, o) {
     const lw = w - 0.1, lh = hd - 0.05;
     if (op.slide) { // brown wood sliding door on a track, half open, on the room side
       const sd = os * (t / 2 + 0.025); // track and leaf on the closet side, leaf slid fully open inside the closet
-      lb(g, w, hd - .02, .035, -(w + .05), (hd - .02) / 2, sd + os * .02, M.wood);   // slid fully open inside the closet, out of sight from the bedroom
       return;
     }
     // the leaf hangs on a hinge group (hinge on the side away from the handle) so it can swing open
@@ -2746,6 +2751,7 @@ function setMode(m, keepFocus) {
 }
 /* walls: full height, cut at 1 m (dollhouse), or only a thin footprint on the floor */
 function applyWalls() {
+  M.cap.color.set((state.mode === 'full' || state.walls === 'full') ? 0xf2f0eb : 0x2d3139);
   const eff = state.mode === 'full' ? 'full' : state.walls;
   const cut = eff === 'full' ? null : eff === 'low' ? 1.0 : 0.06;
   for (const m of wallPieces) {
@@ -3034,6 +3040,8 @@ function setCardNote(t) {
 }
 document.getElementById('cMore').addEventListener('click', () => { const n = document.getElementById('cNote'), m = document.getElementById('cMore'), open = n.classList.toggle('clamp'); m.textContent = open ? 'קראו עוד' : 'פחות'; m.setAttribute('aria-expanded', !open); });
 function cFocusText(t) { const b = document.getElementById('cFocus'), i = b.querySelector('.ic'); b.textContent = t; if (i) b.prepend(i); }
+// reset: forget this browser's view settings and start the demo fresh (shared notes and variants stay)
+document.getElementById('tReset').addEventListener('click', () => { try { localStorage.clear(); } catch (e) {} try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} location.reload(); });
 // hover tooltips on the tool stack (replace the slow native title)
 document.querySelectorAll('.zoom button').forEach(b => { const t = b.getAttribute('title') || b.getAttribute('aria-label'); if (t) { b.dataset.tip = t; b.removeAttribute('title'); } });
 // small line icons for the menus
@@ -3118,8 +3126,10 @@ let splitX = .5;
 document.querySelectorAll('[data-col]').forEach(btn => {
   const panel = document.getElementById(btn.dataset.col), key = 'col_' + btn.dataset.col;
   const set = min => { panel.classList.toggle('min', min); btn.setAttribute('aria-expanded', !min); btn.setAttribute('aria-label', min ? 'הרחבה' : 'כיווץ'); try { localStorage.setItem(key, min ? '1' : ''); } catch (e) {} };
-  try { if (localStorage.getItem(key)) set(true); } catch (e) {}
-  btn.addEventListener('click', () => set(!panel.classList.contains('min')));
+  let v = null; try { v = localStorage.getItem(key); } catch (e) {}
+  if (v === null ? btn.dataset.col === 'brandP' : v) set(true); // the title card starts collapsed
+  btn.addEventListener('click', e => { e.stopPropagation(); set(!panel.classList.contains('min')); });
+  if (btn.dataset.col === 'brandP') panel.addEventListener('click', () => { if (panel.classList.contains('min')) set(false); });
 });
 { // room picker, grouped by floor
   const sel = document.getElementById('roomSel');
