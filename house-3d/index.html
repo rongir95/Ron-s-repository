@@ -1085,6 +1085,11 @@ for (const [k, base, tone] of [['leather', '#c4b49c', 'rgba(255,255,255,.18)'], 
   relief(M[k], k === 'boucle' || k === 'knit' || k === 'jute' ? 1.2 : .5);
 }
 M.leather.roughness = .45;
+// painted interior walls and ceilings: a faint roller texture so large white surfaces are not perfectly flat
+{ const paint = canvasTex(256, (g, s) => { g.fillStyle = '#f6f6f4'; g.fillRect(0, 0, s, s);
+    for (let i = 0; i < 900; i++) { g.fillStyle = `rgba(${rnd() > .5 ? '255,255,255' : '120,115,105'},${rnd() * .018})`; g.beginPath(); g.arc(rnd() * s, rnd() * s, 2 + rnd() * 9, 0, 6.3); g.fill(); }
+    speckle(g, s, 3500, .025); }, .8);
+  for (const k of ['interior', 'ceiling']) { M[k].map = paint; M[k].color.set(0xffffff); relief(M[k], .12); } }
 /* ---------------- floors ---------------- */
 function mkFloor(base) { const group = new THREE.Group(); const f = { base, group, shell: new THREE.Group(), furn: new THREE.Group(), labels: [], lights: [] }; group.add(f.shell, f.furn); scene.add(group); return f; }
 const F = [mkFloor(0), mkFloor(L1)];
