@@ -116,7 +116,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .photobar .pbar{width:120px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .photobar .pbar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
 .photobar .mbtn{padding:6px 12px;font-size:13px;background:var(--line)}
-.compass{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(178px + env(safe-area-inset-bottom,0px));width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--ink);padding:0}
+.compass{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(236px + env(safe-area-inset-bottom,0px));width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--ink);padding:0}
 @media (max-width:760px){.compass{left:auto;right:max(12px,env(safe-area-inset-right,0px));bottom:auto;top:calc(50% + 70px)}}
 .planner{position:fixed;right:max(16px,env(safe-area-inset-right,0px));top:calc(190px + env(safe-area-inset-top,0px));bottom:calc(90px + env(safe-area-inset-bottom,0px));width:360px;padding:14px 16px;overflow:auto;font-size:13px;z-index:4}
 .planner .phead{display:flex;justify-content:space-between;align-items:center}
@@ -132,6 +132,9 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .pltab td{padding:4px 2px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 .plnote{color:var(--muted);font-size:11px;line-height:1.5;margin:10px 0 0}
 @media (max-width:760px){.planner{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));width:auto;top:calc(120px + env(safe-area-inset-top,0px));bottom:calc(130px + env(safe-area-inset-bottom,0px))}}
+.renobar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));width:270px;padding:4px!important;z-index:3}
+.renobar button{padding:7px 6px;font-weight:600}
+@media (max-width:760px){.renobar{bottom:auto;top:calc(150px + env(safe-area-inset-top,0px));width:calc(100% - 24px);max-width:320px}}
 .hint{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--muted);padding:6px 12px;border-radius:999px}
 
 .lbl{display:flex;gap:7px;align-items:baseline;pointer-events:auto;cursor:pointer;background:var(--paper);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:4px 10px;font:500 12px/1.3 var(--f-ui);white-space:nowrap;box-shadow:0 4px 12px rgba(10,20,30,.15);direction:rtl;transition:background .3s}
@@ -276,12 +279,6 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
     </div>
   </section>
   <section class="pane" data-pane="reno" hidden>
-    <h2>מצב הבית</h2>
-    <div class="seg" role="group" aria-label="לפני או אחרי שיפוץ">
-      <button data-reno="before" aria-pressed="true">לפני</button>
-      <button data-reno="after" aria-pressed="false">אחרי</button>
-      <button data-reno="split" aria-pressed="false">השוואה</button>
-    </div>
     <h2>תכנון</h2>
     <button class="tbtn wide" id="tPlanner">מתכנן ריצוף <span class="chev">›</span></button>
   </section>
@@ -293,6 +290,12 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
     <button class="tbtn" id="tHQ" aria-pressed="true">איכות גבוהה <span class="sw"></span></button>
   </section>
 </aside>
+
+<div class="seg renobar panel" id="renoBar" role="group" aria-label="לפני או אחרי שיפוץ">
+      <button data-reno="before" aria-pressed="true">לפני</button>
+      <button data-reno="after" aria-pressed="false">אחרי</button>
+      <button data-reno="split" aria-pressed="false">השוואה</button>
+    </div>
 
 <nav class="modes panel" role="tablist" aria-label="קומות">
   <button class="mbtn" role="tab" data-mode="full" aria-selected="true">בית מלא</button>
@@ -2408,7 +2411,9 @@ function desk(p, base, r, chairAt, faceTo) {
   flat(-175, 980, 300, 1060, -0.03, M.sillStone);   // light stone slabs at the entrance
   // two-car parking pad across the front, no roof, running right to the party line
   flat(-200, 1060, 785, 1450, -0.028, M.pavers2);
-  for (let y = 1065; y < 1440; y += 52) flat(-190, y, -110, y + 46, -0.022, M.pathSlab);   // stepping-slab path from the gate to the door
+  for (let y = 1065; y < 1440; y += 52) flat(-190, y, -110, y + 46, -0.022, M.pathSlab);
+  for (let y = 702; y < 1000; y += 50) for (let x = -2; x < 268; x += 50) flat(x, y, Math.min(x + 48, 268), Math.min(y + 48, 1000), -0.022, M.pathSlab);   // paved entrance by the front door
+  for (let y = 1000; y < 1065; y += 52) flat(-190, y, -110, y + 46, -0.022, M.pathSlab);   // stepping-slab path from the gate to the door
   for (const X of [-200, 290, 785]) flat(X - 4, 1110, X + 4, 1440, -0.02, M.line);
   // outdoor storage shed at the far right of the parking, against the party line, doors facing the parking
   { const shed = std({ color: 0xe8e1d0, roughness: .6 }), trimS = std({ color: 0x8a8580, roughness: .6 });
@@ -2432,8 +2437,11 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, -124, 1446, -120, 1450, 95, 110, M.steel); B(p, -124, 1436, -120, 1440, 95, 110, M.steel);
   slats(-95, 780); B(p, -95, 1446, 780, 1450, 0, 6, M.alu);
   { // stone-clad concrete wall closing the gap between the street fence and the garden fence (west side of the parking)
-    const w = (1446 - 1005) / 100, h = 1.6; const m = shadowy(new THREE.Mesh(boxUV(.25, h, w, 0, 0), M.stone)); m.position.set(wx(-213), -0.15 + h / 2, wz((1005 + 1446) / 2)); p.add(m);
-    B(p, -228, 1003, -198, 1449, 145, 152, M.concrete); B(p, -228, 1003, -198, 1449, -15, -2, M.concrete); }                     // electric gate on its track
+    const w = (1446 - 1005) / 100, h = .8; const m = shadowy(new THREE.Mesh(boxUV(.25, h, w, 0, 0), M.stone)); m.position.set(wx(-213), -0.15 + h / 2, wz((1005 + 1446) / 2)); p.add(m);
+    B(p, -228, 1003, -198, 1449, 65, 72, M.concrete);
+    // dark wooden slats on top, continuing the garden fence, lower than it
+    for (let Y = 1003; Y <= 1449; Y += 90) B(p, -217, Y - 4, -209, Y + 4, 72, 150, M.fenceDark);
+    for (let z = 76; z < 146; z += 20) B(p, -214.5, 1003, -211.5, 1449, z, z + 15, M.fenceDark); B(p, -228, 1003, -198, 1449, -15, -2, M.concrete); }                     // electric gate on its track
   B(p, 770, 1449, 790, 1460, 0, 40, std({ color: 0x3a3c40, roughness: .5 }));  // gate motor
   flat(-2000, 1450, 2000, 1620, -0.02, M.concrete);
   B(p, -2000, 1612, 2000, 1628, -15, 1, M.sillStone);
