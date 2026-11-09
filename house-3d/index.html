@@ -1177,7 +1177,7 @@ function wall(p, a, b, o) {
     if (o.base === 0 && z0 === 0 && !o.noSkirt) {
       // inside faces only: both sides of an interior wall, the room side of an exterior one
       const dep = outSide ? t / 2 + 0.8 : t + 1.6, off = outSide ? -outSide * dep / 2 : 0;
-      const k = shadowy(new THREE.Mesh(UNIT, M.skirt)); k.userData.skirt = true; skirts.push(k); const sh = 0.07 + (skirts.length % 3) * 0.0015; k.scale.set((e - s) / 100, sh, dep / 100); // heights differ by 1.5 mm so boards meeting at a corner never share a top face
+      const k = shadowy(new THREE.Mesh(UNIT, M.skirt)); k.userData.skirt = true; skirts.push(k); const sh = 0.07 + (skirts.length % 3) * 0.0015; k.scale.set((e - s) / 100 - .006, sh, dep / 100); // heights differ by 1.5 mm so boards meeting at a corner never share a top face
       const ox = -uy * off, oy = ux * off;
       k.position.set(wx(a[0] + ux * c + ox), sh / 2, wz(a[1] + uy * c + oy)); k.rotation.y = theta; p.add(k);
       k.userData.wall = { base: 0, y0: 0, y1: sh, sy: sh }; wallPieces.push(k);
@@ -1215,7 +1215,7 @@ function opening(p, a, ux, uy, theta, op, o) {
       lb(lg, 0.045, 0.045, 0.01, hx, 1.0, sd * 0.024, M.black);
       lb(lg, 0.04, 0.04, 0.01, hx, 1.13, sd * 0.024, M.black);
     }
-    const sw = op.swing || 1; lg.userData.openRot = -sw * hs * Math.PI * .48; doorLeaves.push(lg);
+    lg.userData.hs = hs; lg.userData.sides = doorInfo.sides; lg.userData.f = doorInfo.f; doorLeaves.push(lg);
     return;
   }
   const fz = os * (t / 2 - 0.07), fw = 0.055, fd = 0.07;
@@ -1487,10 +1487,11 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
     post(700, 430, 9 * R - 4, 9 * R + 98); post(452, 430, 0, 102); post(700, 523, 9 * R - 4, 9 * R + 98); }
   // wall between the two flights, from the floor up to the underside of the upper flight
   for (let j = 0; j < 9; j++) { const xb = 700 - (j + 1) * tr, top = 9 * R + (j + 1) * R; onWall(B(p, xb, 521, xb + tr, 527, 0, top - 4, M.interior, 0), 0, 0, top - 4); }
-  rail(700, 452, 523, 9 * R, 18 * R, 0);
+  rail(700, 472, 523, 9 * R, 18 * R, 0); // stops at the top newel, where the upstairs gallery rail turns 90°
+  { const m = shadowy(new THREE.Mesh(UNIT, M.railing)); m.scale.set(.06, 1.0, .06); m.position.set(wx(472), L1 + .5, wz(523)); m.userData.rail = true; m.userData.noRemap = true; p.add(m); }
   const g1 = F[1].furn;
   for (let y = 438; y <= 522; y += 11) { const m = shadowy(new THREE.Mesh(UNIT, M.railing)); m.userData.noRemap = true; m.scale.set(.016, .92, .016); m.position.set(wx(472), L1 + .46, wz(y)); g1.add(m); }
-  const hr = shadowy(new THREE.Mesh(UNIT, M.railing)); hr.userData.noRemap = true; hr.scale.set(.045, .045, .9); hr.position.set(wx(472), L1 + .97, wz(480)); g1.add(hr);
+  const hr = shadowy(new THREE.Mesh(UNIT, M.railing)); hr.userData.noRemap = true; hr.scale.set(.045, .04, .88); hr.position.set(wx(472), L1 + .92, wz(479)); // meets the stair handrail at the newel g1.add(hr);
 }
 
 F[0].furn.children.slice(stairMark[0]).forEach(o => o.userData.noRemap = true); F[1].furn.children.slice(stairMark[1]).forEach(o => o.userData.noRemap = true);
@@ -1748,8 +1749,9 @@ function desk(p, base, r, chairAt, faceTo) {
     const m = shadowy(new THREE.Mesh(boxUV(w, h, d, (X0 + Y0) / 100, z0 / 100), mat));
     m.position.set(wx((X0 + X1) / 2), b + (z0 + z1) / 200, wz((Y0 + Y1) / 2)); pp.add(m); return m;
   };
-  const handleY = (X, Y0, Y1, z) => B(p, X, Y0, X + 2, Y1, z - .8, z + .8, M.steel, b);   // bar handle on a face looking east
-  const handleX = (X0, X1, Y, z) => B(p, X0, Y - 2, X1, Y, z - .8, z + .8, M.steel, b);   // bar handle on a face looking north
+  let handleTo = null; // the before/after group being built, so handles swap with their cabinets
+  const handleY = (X, Y0, Y1, z) => B(handleTo || p, X, Y0, X + 2, Y1, z - .8, z + .8, M.steel, b);   // bar handle on a face looking east
+  const handleX = (X0, X1, Y, z) => B(handleTo || p, X0, Y - 2, X1, Y, z - .8, z + .8, M.steel, b);   // bar handle on a face looking north
   // bar stools: cream bouclé seat and back, black metal frame
   const barStool = (X, Y, toX, toY, pp = p) => {
     const g = local(pp, X, Y, b, Math.atan2(wx(toX) - wx(X), wz(toY) - wz(Y))); g.userData.owner = 'kitchen'; g.userData.stool = true;
@@ -1760,7 +1762,7 @@ function desk(p, base, r, chairAt, faceTo) {
     lb(g, .4, .02, .02, 0, .28, .18, M.black); lb(g, .4, .02, .02, 0, .28, -.18, M.black);
   };
   const kitBefore = new THREE.Group(); kitBefore.userData.reno = 'before'; p.add(kitBefore); renoSets.push({ room: 'kitchen', before: kitBefore });
-  { const p = kitBefore;
+  { const p = kitBefore; handleTo = kitBefore;
   // sink wall (west): cream gloss base units, light grey quartz top, white glass splashback
   for (const [y0, y1, z1] of [[320, 472, 88], [538, 699, 88], [472, 538, 71]]) B(p, 16, y0, 76, y1, 10, z1, M.kCream, b); B(p, 68, 472, 76, 538, 71, 88, M.kCream, b);
   [B(p, 25, 325, 84, 352, 10, 88, M.kCream, b), B(p, 25, 325, 88, 352, 88, 92, M.kTop, b)].forEach(m => m.userData.noRemap = true);
@@ -1849,8 +1851,8 @@ function desk(p, base, r, chairAt, faceTo) {
     CY(p, 29, 400, 7, 164, 170, M.white, b, 18); CY(p, 28, 345, 7, 204, 214, M.white, b, 18);
     for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.05, 0), M.leaf)); m.position.set(wx(28 + (rnd() - .5) * 10), b + 2.18 + rnd() * .1, wz(385 + (rnd() - .5) * 12)); p.add(m); }
     // south wall: oak tall units to the ceiling, oven tower with built-in microwave and oven, lit open niche, fridge set into the oak wall
-    B(p, 76, 640, 136, 699, 10, 88, M.kWhite, b); B(p, 76, 637, 136, 699, 88, 92, M.qWhite, b);
-    B(p, 76, 664, 136, 699, 135, C, M.oakLight, b); B(p, 78, 663.5, 134, 664, 135, 140, M.oakLight, b);
+    B(p, 76, 640, 135.5, 699, 10, 88, M.kWhite, b); B(p, 76, 637, 135.5, 699, 88, 92, M.qWhite, b);
+    B(p, 16, 664, 136, 699, 135, C, M.oakLight, b); B(p, 78, 663.5, 134, 664, 135, 140, M.oakLight, b); // oak wall units reach the west wall
     B(p, 78, 664, 134, 668, 100, 135, M.oakLight, b); B(p, 78, 664.5, 134, 665, 133, 134, M.led, b);
     for (const [x, z] of [[90, 115], [112, 115]]) CY(p, x, 680, 4, 102, 110, M.white, b, 14);
     B(p, 136, 640, 198, 699, 0, C, M.oakLight, b);
@@ -2560,7 +2562,7 @@ function desk(p, base, r, chairAt, faceTo) {
   };
   for (const [X, Y, tx, ty] of [[510, -110, 510, -185], [590, -110, 590, -185], [510, -260, 510, -185], [650, -185, 550, -185]]) gardenChair(X + TX, Y, tx + TX, ty);
   // retractable awning over the slider, flood lights under it
-  { const g = local(p, 406, 12.5, 2.62); lb(g, 3.2, .2, .2, 0, 0, -.1, std({ color: 0xe8e2d4, roughness: .5 }));
+  { const g = local(p, 406, 12.5, 2.62); lb(g, 3.2, .2, .2, 0, 0, -.115, std({ color: 0xe8e2d4, roughness: .5 })); // stands 1.5 cm off the stone so the faces never meet
     for (const x of [-1.2, 1.2]) lb(g, .1, .15, .3, x, -.15, -.2, std({ color: 0xd8d2c4, roughness: .5 })); }
   for (const x of [330, 470]) { const l = B(p, x - 8, -14, x + 8, -6, 230, 240, M.black); }
   // trees and plants: orange-flowering tree in the north-west corner, lemon trees, cycas, small palms, grasses
@@ -3027,6 +3029,11 @@ const tog = (id, key, fn) => { const el = document.getElementById(id); el.addEve
 tog('tNight', 'night', applyNight);
 tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
+// each door swings into the room, away from the hall / passage (sides[0] is the leaf's +z side)
+{ const passage = ['hall', 'foyer', 'living', 'kitchen', 'storage'];
+  const roomAt = (q, f) => ROOMS.find(r => r.f === f && !r.outdoor && q[0] >= r.rect[0] - 5 && q[0] <= r.rect[2] + 5 && q[1] >= r.rect[1] - 5 && q[1] <= r.rect[3] + 5);
+  for (const l of doorLeaves) { const [a, b] = l.userData.sides.map(q => roomAt(q, l.userData.f)), pa = !a || passage.includes(a.id), pb = !b || passage.includes(b.id);
+    const S = pa && !pb ? -1 : 1; l.userData.openRot = -S * l.userData.hs * Math.PI * .48; } }
 state.doorsOpen = true; const applyDoors = () => doorLeaves.forEach(l => l.rotation.y = state.doorsOpen ? l.userData.openRot : 0); applyDoors();
 tog('tDoors', 'doorsOpen', applyDoors);
 state.cars = true; tog('tCars', 'cars', () => (globalThis.__cars || []).forEach(c => c.visible = state.cars));
