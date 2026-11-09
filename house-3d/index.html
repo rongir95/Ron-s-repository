@@ -120,6 +120,20 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
 .photobar .mbtn{padding:6px 12px;font-size:13px;background:var(--line)}
 .compass{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(178px + env(safe-area-inset-bottom,0px));width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--ink);padding:0}
 @media (max-width:760px){.compass{left:auto;right:max(12px,env(safe-area-inset-right,0px));bottom:auto;top:calc(50% + 70px)}}
+.planner{position:fixed;right:max(16px,env(safe-area-inset-right,0px));top:calc(190px + env(safe-area-inset-top,0px));bottom:calc(90px + env(safe-area-inset-bottom,0px));width:360px;padding:14px 16px;overflow:auto;font-size:13px;z-index:4}
+.planner .phead{display:flex;justify-content:space-between;align-items:center}
+.planner h3{margin:0;font:700 18px var(--f-display)} .planner h4{margin:14px 0 6px;font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.06em}
+.planner .x{all:unset;cursor:pointer;font-size:20px;color:var(--muted);padding:2px 6px}
+.plsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.plsum div{background:var(--line);border-radius:10px;padding:8px}
+.plsum b{display:block;font-size:17px;font-variant-numeric:tabular-nums;direction:ltr;text-align:right} .plsum span{font-size:11px;color:var(--muted)}
+.plrow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.planner input,.planner select{font:inherit;color:var(--ink);background:var(--paper-solid);border:1px solid var(--line);border-radius:6px;padding:3px 6px;width:64px}
+.planner select{width:auto;max-width:130px}
+.pltab{width:100%;border-collapse:collapse} .pltab th{font-weight:500;color:var(--muted);font-size:11px;text-align:right;padding:4px 2px;border-bottom:1px solid var(--line)}
+.pltab td{padding:4px 2px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.plnote{color:var(--muted);font-size:11px;line-height:1.5;margin:10px 0 0}
+@media (max-width:760px){.planner{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));width:auto;top:calc(120px + env(safe-area-inset-top,0px));bottom:calc(130px + env(safe-area-inset-bottom,0px))}}
 .hint{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--muted);padding:6px 12px;border-radius:999px}
 
 .lbl{display:flex;gap:7px;align-items:baseline;pointer-events:auto;cursor:pointer;background:var(--paper);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:4px 10px;font:500 12px/1.3 var(--f-ui);white-space:nowrap;box-shadow:0 4px 12px rgba(10,20,30,.15);direction:rtl;transition:background .3s}
@@ -179,6 +193,7 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <button class="tbtn" id="tNeighbor" aria-pressed="true">יחידה שכנה A-2 <span class="sw"></span></button>
   <button class="tbtn" id="tRotate" aria-pressed="false">סיבוב אוטומטי <span class="sw"></span></button>
   <button class="tbtn" id="tHQ" aria-pressed="true">איכות גבוהה <span class="sw"></span></button>
+  <button class="tbtn" id="tPlanner" style="justify-content:center">מתכנן ריצוף</button>
   <button class="tbtn" id="tPhoto" style="background:var(--accent);color:var(--accent-ink);justify-content:center">צילום ריאליסטי</button>
   <h2>שיפוץ</h2>
   <div class="seg" role="group" aria-label="לפני או אחרי שיפוץ">
@@ -213,6 +228,16 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   <button class="mbtn" role="tab" data-mode="first" aria-selected="false">קומה א׳</button>
   <button class="mbtn" role="tab" data-mode="exploded" aria-selected="false">פיצול קומות</button>
 </nav>
+
+<aside class="planner panel" id="planner" hidden aria-label="מתכנן ריצוף">
+  <div class="phead"><h3>מתכנן ריצוף · אחרי השיפוץ</h3><button class="x" id="plClose" aria-label="סגירה">×</button></div>
+  <div class="plsum"><div><b id="plCost">—</b><span>עלות ריצוף משוערת</span></div><div><b id="plArea">—</b><span>מ״ר לכיסוי</span></div><div><b id="plBuy">—</b><span>מ״ר לקנייה כולל פחת</span></div></div>
+  <div class="plrow"><label for="plWaste">פחת וחיתוכים</label><input id="plWaste" type="number" min="0" max="30" step="1" value="8"><span>%</span></div>
+  <table class="pltab"><thead><tr><th>חדר</th><th>מ״ר</th><th>חומר</th></tr></thead><tbody id="plRooms"></tbody></table>
+  <h4>מחירים ואריזות</h4>
+  <table class="pltab"><thead><tr><th>חומר</th><th>₪ למ״ר</th><th>מ״ר בקרטון</th><th>קרטונים</th></tr></thead><tbody id="plMats"></tbody></table>
+  <p class="plnote">השטחים לפי מידות הפנים בתוכנית. החומר שבוחרים כאן מוצג במודל במצב "אחרי". המחירים הם דוגמה, ואפשר לשנות אותם.</p>
+</aside>
 
 <div class="card panel" id="card" hidden>
   <button class="x" id="cardX" aria-label="סגירה">×</button>
@@ -2445,11 +2470,11 @@ document.getElementById('cardX').addEventListener('click', () => selectRoom(null
 function renoVisual(on) {
   groundSlab.material[0] = on ? M.herring : M.tile; // parquet everywhere on the ground floor after, incl. the passage to the safe room and the entry corner
   renoSets.forEach(r => { r.before.visible = !on; if (r.after) r.after.visible = on; });
-  ROOMS.forEach(r => { if (!r.afterMat) return; if (r.mesh.material !== r.hl || state.split) r.mesh.material = M[on ? r.afterMat : r.mat]; });
+  ROOMS.forEach(r => { if (r.mesh.material !== r.hl || state.split) r.mesh.material = M[on && r.afterMat ? r.afterMat : r.mat]; });
 }
 function setReno(on, split = false) {
   state.reno = on; state.split = split;
-  ROOMS.forEach(r => { if (r.afterMat) { r.baseMat = M[on ? r.afterMat : r.mat]; delete r.hl; r.mesh.material = r.baseMat; } });
+  ROOMS.forEach(r => { const m = M[on && r.afterMat ? r.afterMat : r.mat]; if (r.baseMat !== m) { r.baseMat = m; delete r.hl; r.mesh.material = m; } });
   renoVisual(on);
   document.querySelectorAll('[data-reno]').forEach(b => b.setAttribute('aria-pressed', split ? b.dataset.reno === 'split' : b.dataset.reno === (on ? 'after' : 'before')));
   document.getElementById('splitBar').hidden = !split;
@@ -2693,6 +2718,55 @@ function keyWalk(dt) {
 // compass: shows where north is (the garden side faces north-west in the plans; north = -Z here)
 const compass = document.createElement('div'); compass.className = 'compass panel'; compass.innerHTML = '<svg viewBox="0 0 40 40" width="34" height="34"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-opacity=".25"/><path d="M20 5 L25 20 L20 17 L15 20Z" fill="#c0392b"/><path d="M20 35 L25 20 L20 23 L15 20Z" fill="currentColor" fill-opacity=".5"/><text x="20" y="4.5" font-size="6" text-anchor="middle" fill="currentColor">N</text></svg>';
 document.body.appendChild(compass);
+/* ---------- flooring planner: areas from the plan, material per room, quantities and cost ---------- */
+{
+  const MATS = {
+    herring: { name: 'פרקט פישבון', price: 260, box: 1.6 },
+    terrazzo: { name: 'טרצו', price: 320, box: 1.44 },
+    tile: { name: 'אריח 60×60 אפור (קיים)', price: 0, box: 1.44 },
+    lamOak: { name: 'פרקט אלון', price: 190, box: 2.2 },
+    keep: { name: 'ללא שינוי', price: 0, box: 1 },
+  };
+  const ROOMS_PL = ['living', 'kitchen', 'storage', 'foyer', 'wc', 'mamad', 'ensuite', 'bath'];
+  let st = { waste: 8, prices: {}, boxes: {}, pick: {} };
+  try { Object.assign(st, JSON.parse(localStorage.getItem('floorPlanner') || '{}')); } catch (e) {}
+  const save = () => { try { localStorage.setItem('floorPlanner', JSON.stringify(st)); } catch (e) {} };
+  const area = r => r.dims[0] * r.dims[1] / 1e4;
+  const pickOf = r => st.pick[r.id] || r.afterMat || 'keep';
+  const fmt = n => n.toLocaleString('he-IL', { maximumFractionDigits: 1 });
+  const rows = document.getElementById('plRooms'), mats = document.getElementById('plMats');
+  function apply() {
+    for (const id of ROOMS_PL) { const r = ROOMS.find(q => q.id === id); if (!r) continue; const k = pickOf(r);
+      r.afterMat = k === 'keep' ? null : k; if (!r._origAfter) r._origAfter = true; }
+    if (state.reno) setReno(true, state.split);
+  }
+  function render() {
+    const waste = st.waste / 100; let total = 0, cover = 0, buy = 0; const per = {};
+    rows.innerHTML = '';
+    for (const id of ROOMS_PL) { const r = ROOMS.find(q => q.id === id); if (!r) continue; const a = area(r), k = pickOf(r);
+      const tr = document.createElement('tr'); tr.innerHTML = `<td>${r.name}</td><td>${fmt(a)}</td>`;
+      const td = document.createElement('td'), sel = document.createElement('select'); sel.id = 'pl_' + id;
+      for (const [mk, m] of Object.entries(MATS)) { const o = document.createElement('option'); o.value = mk; o.textContent = m.name; if (mk === k) o.selected = true; sel.appendChild(o); }
+      sel.addEventListener('change', () => { st.pick[id] = sel.value; save(); apply(); render(); });
+      td.appendChild(sel); tr.appendChild(td); rows.appendChild(tr);
+      if (k !== 'keep' && k !== 'tile') { cover += a; per[k] = (per[k] || 0) + a; } }
+    mats.innerHTML = '';
+    for (const [k, a] of Object.entries(per)) { const m = MATS[k], price = st.prices[k] ?? m.price, box = st.boxes[k] ?? m.box;
+      const need = a * (1 + waste), n = Math.ceil(need / box); buy += n * box; total += n * box * price;
+      const tr = document.createElement('tr'); tr.innerHTML = `<td>${m.name}</td><td><input type="number" min="0" step="5" value="${price}" id="pp_${k}"></td><td><input type="number" min="0.1" step="0.1" value="${box}" id="pb_${k}"></td><td>${n}</td>`;
+      mats.appendChild(tr);
+      tr.querySelector('#pp_' + k).addEventListener('change', e => { st.prices[k] = +e.target.value; save(); render(); });
+      tr.querySelector('#pb_' + k).addEventListener('change', e => { st.boxes[k] = Math.max(.1, +e.target.value); save(); render(); }); }
+    document.getElementById('plCost').textContent = '₪' + Math.round(total).toLocaleString('he-IL');
+    document.getElementById('plArea').textContent = fmt(cover);
+    document.getElementById('plBuy').textContent = fmt(buy);
+  }
+  const w = document.getElementById('plWaste'); w.value = st.waste; w.addEventListener('change', () => { st.waste = Math.max(0, Math.min(30, +w.value || 0)); save(); render(); });
+  const panel = document.getElementById('planner');
+  document.getElementById('tPlanner').addEventListener('click', () => { panel.hidden = !panel.hidden; if (!panel.hidden) { document.getElementById('card').hidden = true; if (!state.reno) setReno(true); render(); } });
+  document.getElementById('plClose').addEventListener('click', () => panel.hidden = true);
+  apply();
+}
 const zOutBtn = document.getElementById('zOut');
 // high quality: ambient occlusion (soft contact shadows in corners and under furniture)
 const composer = new EffectComposer(renderer);
