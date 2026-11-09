@@ -1332,6 +1332,13 @@ function desk(p, base, r, chairAt, faceTo) {
   B(p, 741.5, 135, 742, 176, 82, 136, M.glass, b);
   for (let z = 10; z < 78; z += 11) B(p, 741.3, 135, 742, 176, z, z + 1.2, M.black, b);
   for (let y = 137; y < 177; y += 10) B(p, 741.3, y, 742, y + 1.2, 8, 78, M.black, b);
+  { // wine bottles lying in the cubbies, necks facing the room
+    const glassG = std({ color: 0x1f3a24, roughness: .15, envMapIntensity: 1.2 }), glassR = std({ color: 0x3a1418, roughness: .15, envMapIntensity: 1.2 }), cap = std({ color: 0xb08a3a, roughness: .4, metalness: .6 });
+    for (let z = 15; z < 78; z += 11) for (let y = 142; y < 177; y += 10) { if (rnd() < .2) continue;
+      const g = new THREE.Group(); g.position.set(wx(767), b + z / 100, wz(y)); g.rotation.z = Math.PI / 2; p.add(g);
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(.036, .036, .2, 14), rnd() > .5 ? glassG : glassR); body.position.y = .02; g.add(body);
+      const neck = new THREE.Mesh(new THREE.CylinderGeometry(.014, .03, .1, 12), body.material); neck.position.y = .17; g.add(neck);
+      const c = new THREE.Mesh(new THREE.CylinderGeometry(.015, .015, .03, 10), cap); c.position.y = .235; g.add(c); } }
   B(p, 752, 143, 770, 163, 140, 162, M.black, b); B(p, 751.5, 146, 752, 160, 143, 159, M.duvetC, b);
   // beige leather L-sectional: long side against the party wall, return along the south facing the garden
   RB(p, 690, 195, 778, 420, 8, 42, M.leather, b, .04); RB(p, 756, 195, 778, 420, 40, 84, M.leather, b, .05);
@@ -2144,7 +2151,15 @@ function desk(p, base, r, chairAt, faceTo) {
   // glass-top table with white garden chairs
   B(p, 470, -230, 630, -140, 72, 74, M.glass); for (const [x, y] of [[472, -228], [628, -228], [472, -142], [628, -142]]) B(p, x - 2, y - 2, x + 2, y + 2, 0, 72, M.alu);
   B(p, 470, -230, 630, -226, 68, 72, M.alu); B(p, 470, -144, 630, -140, 68, 72, M.alu);
-  for (const [X, Y, tx, ty] of [[510, -110, 510, -185], [590, -110, 590, -185], [510, -260, 510, -185], [650, -185, 550, -185]]) chair(p, 0, X, Y, tx, ty, M.white, M.white);
+  const resin = std({ color: 0xf2f2ef, roughness: .45 }), resinDS = resin.clone(); resinDS.side = THREE.DoubleSide;
+  const gardenChair = (X, Y, tx, ty) => {
+    const g = local(p, X, Y, 0, Math.atan2(wx(tx) - wx(X), wz(ty) - wz(Y)));
+    const seat = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.46, .04, .44, 3, .015), resin)); seat.position.y = .44; g.add(seat);
+    const back = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .46, 24, 1, true, Math.PI - .42, .84), resinDS)); back.position.set(0, .72, -.2 + .6); g.add(back);
+    for (const sx of [-1, 1]) { const arm = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.05, .03, .42, 2, .012), resin)); arm.position.set(sx * .24, .64, 0); g.add(arm);
+      for (const sz of [-1, 1]) { const l = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.018, .022, sz < 0 ? .64 : .64, 8), resin)); l.position.set(sx * .22, .32, sz * .19); l.rotation.x = sz * .06; g.add(l); } }
+  };
+  for (const [X, Y, tx, ty] of [[510, -110, 510, -185], [590, -110, 590, -185], [510, -260, 510, -185], [650, -185, 550, -185]]) gardenChair(X, Y, tx, ty);
   // retractable awning over the slider, flood lights under it
   { const g = local(p, 406, 12.5, 2.62); lb(g, 3.2, .2, .2, 0, 0, -.1, std({ color: 0xe8e2d4, roughness: .5 }));
     for (const x of [-1.2, 1.2]) lb(g, .1, .15, .3, x, -.15, -.2, std({ color: 0xd8d2c4, roughness: .5 })); }
