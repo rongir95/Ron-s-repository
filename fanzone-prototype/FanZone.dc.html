@@ -362,7 +362,12 @@
             <sc-for list="{{ chatMessages }}" as="m" key="m.id" hint-placeholder-count="4">
               <div style="flex-shrink:0;display:flex;align-items:flex-start;gap:6px;padding:8px 0;animation:fzMsgIn .45s cubic-bezier(.22,1,.36,1);">
                 <div onClick="{{ m.onOpen }}" style="width:24px;height:24px;border-radius:50%;flex-shrink:0;cursor:pointer;box-sizing:border-box;border:1.5px solid transparent;padding:1.5px;background:linear-gradient(#0C161C,#0C161C) padding-box,{{ m.ring }} border-box;">
-                  <img src="{{ m.avatar }}" alt="" style="display:block;width:18px;height:18px;border-radius:50%;object-fit:cover;{{ m.imgScale }}">
+                  <sc-if value="{{ m.hasImg }}" hint-placeholder-val="{{ true }}">
+                    <img src="{{ m.avatar }}" alt="" style="display:block;width:18px;height:18px;border-radius:50%;object-fit:cover;{{ m.imgScale }}">
+                  </sc-if>
+                  <sc-if value="{{ m.noImg }}" hint-placeholder-val="{{ false }}">
+                    <span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#080E12;color:#F9FAFA;font-family:'DAZN Oscine',sans-serif;font-size:11px;font-weight:700;line-height:1;">{{ m.initial }}</span>
+                  </sc-if>
                 </div>
                 <div style="flex:1;min-width:0;">
                   <div onClick="{{ m.onOpen }}" style="font-size:14px;font-weight:700;color:#F9FAFA;line-height:24px;height:24px;cursor:pointer;display:inline-block;">{{ m.name }}</div>
@@ -2311,9 +2316,9 @@ const CHAT_POOL = [
   { name: "Sana",   text: "ref is a joke",                                                                                                 avatar: "uploads/5-77ed6223.png" },
   { name: "Kenji",  text: "that Musiala turn \ud83e\udd2f",                                                                                  avatar: "uploads/2-ac602cb6.png" },
   { name: "Rina",   text: "Bayern need to stop giving the ball away in their own half, BVB are pressing every mistake",       avatar: "assets/img/av190.png" },
-  { name: "Daiki",  text: "CORNER",                                                                                                        avatar: "uploads/10-20cdbf55.png" },
+  { name: "Daiki",  text: "CORNER",                                                                                                        avatar: "" },
   { name: "Yui",    text: "Olise vs Schlotterbeck is the matchup to watch second half",                                               avatar: "uploads/3-0a35ccd5.png" },
-  { name: "Sho",    text: "why is he shooting from there \ud83d\ude2d",                                                                    avatar: "uploads/1-fd1da97a.png" },
+  { name: "Sho",    text: "why is he shooting from there \ud83d\ude2d",                                                                    avatar: "" },
   { name: "Miku",   text: "level at the break, this is exactly the Klassiker we were promised \ud83d\udc4f",                             avatar: "uploads/9-244c1b8c.png" },
   { name: "Ryo",    text: "foul all day",                                                                                                  avatar: "uploads/4-d33fc601.png" },
   { name: "Akari",  text: "Bayern\u2019s high line is so risky against Adeyemi\u2019s pace, one ball over the top and it\u2019s a 1v1 every time", avatar: "uploads/15-0b0a6991.png" },
@@ -2715,7 +2720,7 @@ class Component extends DCLogic {
     const text = (this.state.fzDraft || "").trim();
     if (!text) return;
     const s = this.state;
-    const av = s.avatar && AV_MAP[s.avatar] && AV_MAP[s.avatar].src ? AV_MAP[s.avatar].src : "assets/comments/avin.png";
+    const av = s.avatar && AV_MAP[s.avatar] && AV_MAP[s.avatar].src ? AV_MAP[s.avatar].src : "";
     const msg = { id: "me" + Date.now(), name: s.nickname || "Charlie", avatar: av, text, mine: true };
     this.setState(st => ({ feed: st.feed.concat(msg).slice(-40), fzDraft: "", atBottom: true, showFtue: false }));
   };
@@ -4144,8 +4149,9 @@ class Component extends DCLogic {
         const p = this.synthProfile(m.name, m.avatar);
         const t = teamById(p.favoriteId);
         // my messages: the same ring as my avatar next to the Message field (my favorite team, or the default gradient)
-        if (m.mine) { const myFav = s.favoriteId ? teamById(s.favoriteId) : null; return { ...m, ring: myFav ? myFav.card : "linear-gradient(210deg,#8923A0 0%,#F1A322 38%,#FFFA00 100%)", imgScale: "", onOpen: this.openCard }; }
-        return { ...m, ring: t ? t.card : "#F2C400", imgScale: "transform:scale(1.05);", onOpen: () => this.openUserCard(m) };
+        const fzAv = { hasImg: !!m.avatar, noImg: !m.avatar, initial: String(m.name || "?").charAt(0).toUpperCase(), imgScale: /(^|\/)uploads\//.test(m.avatar || "") ? "transform:scale(1.207);" : "" };
+        if (m.mine) { const myFav = s.favoriteId ? teamById(s.favoriteId) : null; return { ...m, ...fzAv, ring: myFav ? myFav.card : "linear-gradient(210deg,#8923A0 0%,#F1A322 38%,#FFFA00 100%)", onOpen: this.openCard }; }
+        return { ...m, ...fzAv, ring: t ? t.card : "#F2C400", onOpen: () => this.openUserCard(m) };
       }),
       feedRef: this.feedRef,
       barRef: this.barRef,

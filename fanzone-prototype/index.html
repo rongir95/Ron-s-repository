@@ -138,9 +138,7 @@
       <button type="button" class="live-btn" id="pollBtn" aria-pressed="false" disabled>
         <svg width="18" height="18" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><rect x="25" y="16.7" width="39.3" height="16.7" rx="4"></rect><rect x="25" y="41.7" width="50" height="16.7" rx="4"></rect><rect x="25" y="66.7" width="21.4" height="16.7" rx="4"></rect></svg>
         <span id="pollBtnText">Start poll</span>
-      </button>
-      <p class="hint" id="pollHint">Open FanZone to start a poll. It slides down under the FanZone header.</p>
-    </div>
+      </button>    </div>
 
     <div class="tabs" role="tablist" aria-label="Prototype panel">
       <button type="button" role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="true">Settings</button>
@@ -312,9 +310,6 @@
     [pollBtn, pollMini].forEach(function (b) { b.disabled = !inFanZone; b.setAttribute("aria-pressed", String(pollOn)); });
     document.getElementById("pollBtnText").textContent = label;
     pollMini.textContent = label;
-    document.getElementById("pollHint").textContent = inFanZone
-      ? (pollOn ? "The poll is live in FanZone. It closes by itself when the timer runs out." : "Slides a poll down under the FanZone header.")
-      : "Open FanZone to start a poll. It slides down under the FanZone header.";
   }
   function togglePoll() {
     if (!inFanZone) return;
