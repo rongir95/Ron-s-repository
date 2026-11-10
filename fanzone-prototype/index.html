@@ -1,0 +1,214 @@
+<title>FanZone Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* Layout: device stage on the left, a quiet control rail on the right; on phones the device fills the screen under a slim bar and the rail becomes a sheet. */
+  :root {
+    color-scheme: dark;
+    --ground: #06080a;
+    --stage: #0b0f12;
+    --rail: #11171b;
+    --raise: #1b2328;
+    --line: rgba(233, 238, 240, 0.10);
+    --text: #eef1f2;
+    --muted: #a3acb1;
+    --accent: #f7ff1a;          /* DAZN yellow, used only for the selected state */
+    --on-accent: #0b0f12;
+    --bezel: #1c1c20;
+    --font: "DAZN Oscine", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @font-face { font-family: "DAZN Oscine"; src: url("uploads/DAZN_Oscine_Rg.ttf") format("truetype"); font-weight: 400 500; font-display: swap; }
+  @font-face { font-family: "DAZN Oscine"; src: url("uploads/DAZN_Oscine_Bd.ttf") format("truetype"); font-weight: 600 800; font-display: swap; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.45; overflow: hidden; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .shell { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 340px; }
+  .stage { position: relative; min-width: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(110% 90% at 50% 0%, #161b20 0%, var(--stage) 55%, var(--ground) 100%); padding-block: 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; }
+  .device { position: relative; flex: none; border-radius: calc(46px * var(--s, 1)); box-shadow: 0 0 0 calc(11px * var(--s, 1)) var(--bezel), 0 0 0 calc(13px * var(--s, 1)) #2c2c31, 0 40px 90px rgba(0, 0, 0, 0.55); overflow: hidden; background: #000; }
+  .device iframe { position: absolute; left: 0; top: 0; width: 375px; height: 812px; border: 0; transform-origin: 0 0; transform: scale(var(--s, 1)); background: #000; display: block; }
+
+  .rail { background: var(--rail); border-left: 1px solid var(--line); overflow-y: auto; padding-block: 28px 32px; padding-left: 24px; padding-right: max(24px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 26px; }
+  .brand { display: flex; flex-direction: column; gap: 4px; }
+  .brand h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.01em; text-wrap: balance; }
+  .brand p { margin: 0; color: var(--muted); }
+
+  .group { display: flex; flex-direction: column; gap: 10px; }
+  .label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; padding: 4px; background: var(--raise); border-radius: 12px; }
+  .seg button { border: 0; background: transparent; padding: 9px 6px; border-radius: 9px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--muted); line-height: 1.2; }
+  .seg button small { display: block; font-weight: 400; font-size: 11px; margin-top: 2px; opacity: 0.85; }
+  .seg button:hover { color: var(--text); }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+  .hint { margin: 0; font-size: 12px; color: var(--muted); }
+
+  .restart { border: 1px solid var(--line); background: transparent; border-radius: 12px; padding: 11px 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .restart:hover { background: var(--raise); }
+
+  .try { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .try li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; }
+  .try .n { width: 22px; height: 22px; border-radius: 50%; background: var(--raise); color: var(--muted); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+  .try b { font-weight: 700; }
+  .try span { color: var(--muted); }
+  .try li > div { min-width: 0; }
+
+  .topbar, .sheet-head { display: none; }
+
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: calc(8px + env(safe-area-inset-top, 0px)); padding-bottom: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); background: var(--rail); border-bottom: 1px solid var(--line); }
+    .topbar strong { font-size: 17px; font-weight: 800; }
+    .topbar button { border: 1px solid var(--line); background: var(--raise); border-radius: 999px; padding: 6px 14px; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .stage { padding: 0; background: #000; }
+    .device { border-radius: 0; box-shadow: none; }
+    .rail { position: fixed; inset: 0; z-index: 20; border-left: 0; padding-top: calc(16px + env(safe-area-inset-top, 0px)); padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+    .rail[data-open="false"] { display: none; }
+    .sheet-head { display: flex; justify-content: flex-end; margin-bottom: -14px; }
+    .sheet-head button { border: 0; background: var(--raise); border-radius: 999px; padding: 8px 16px; font-weight: 700; cursor: pointer; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="shell">
+  <header class="topbar">
+    <strong>FanZone</strong>
+    <button type="button" id="openSettings" aria-controls="rail" aria-expanded="false">Settings &amp; tips</button>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="device" id="device">
+      <iframe id="app" title="FanZone app prototype" allow="autoplay; fullscreen"></iframe>
+    </div>
+  </main>
+
+  <aside class="rail" id="rail" data-open="false" aria-label="Prototype settings">
+    <div class="sheet-head"><button type="button" id="closeSettings">Back to the prototype</button></div>
+
+    <div class="brand">
+      <h1>FanZone</h1>
+      <p>Interactive prototype: Home, the match page with Comments &amp; Replies, the Fan Card and FanZone live chat.</p>
+    </div>
+
+    <div class="group">
+      <span class="label" id="l-start">Start screen</span>
+      <div class="seg" role="group" aria-labelledby="l-start" data-key="start">
+        <button type="button" data-val="home">Home</button>
+        <button type="button" data-val="fanzone">FanZone</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <span class="label" id="l-profile">Fan profile</span>
+      <div class="seg" role="group" aria-labelledby="l-profile" data-key="profile">
+        <button type="button" data-val="empty">New fan<small>empty card</small></button>
+        <button type="button" data-val="full">Existing fan<small>filled card</small></button>
+      </div>
+    </div>
+
+    <div class="group">
+      <span class="label" id="l-card">My Card design</span>
+      <div class="seg" role="group" aria-labelledby="l-card" data-key="card">
+        <button type="button" data-val="A">A<small>Current</small></button>
+        <button type="button" data-val="B">B<small>Spotlight</small></button>
+        <button type="button" data-val="C">C<small>Compact</small></button>
+      </div>
+    </div>
+
+    <div class="group">
+      <span class="label" id="l-fol">"Following" on My Card</span>
+      <div class="seg" role="group" aria-labelledby="l-fol" data-key="following">
+        <button type="button" data-val="1">Show</button>
+        <button type="button" data-val="0">Hide</button>
+      </div>
+      <p class="hint">Hide shows the no-following version of My Card.</p>
+    </div>
+
+    <button type="button" class="restart" id="restart">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.61-3.89M13.5 2.5v3h-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Restart prototype
+    </button>
+
+    <div class="group">
+      <span class="label">Things to try</span>
+      <ol class="try">
+        <li><span class="n">1</span><div><b>Make your Fan Card.</b> <span>On Home, tap your avatar (top right) to pick an avatar, a favorite team and a status.</span></div></li>
+        <li><span class="n">2</span><div><b>Join the comments.</b> <span>Tap Watch now, then Comments. View replies, reply, post a comment, and long-press the heart for more reactions.</span></div></li>
+        <li><span class="n">3</span><div><b>Meet other fans.</b> <span>In Comments, tap Futcrunch, Mariana, Sandra45 or MisterFotball12 to open their Fan Card. Tap your own avatar to open yours.</span></div></li>
+        <li><span class="n">4</span><div><b>Manage your comments.</b> <span>Long-press your comment to delete it, or someone else's to report it.</span></div></li>
+        <li><span class="n">5</span><div><b>Lose the connection.</b> <span>Tap the status bar on the match page to turn on No Internet, then try to post.</span></div></li>
+        <li><span class="n">6</span><div><b>FanZone live chat.</b> <span>Set Start screen to FanZone to open the live chat over the match.</span></div></li>
+      </ol>
+    </div>
+  </aside>
+</div>
+
+<script>
+(function () {
+  var DEFAULTS = { start: "home", profile: "empty", card: "A", following: "1" };
+  var KEY = "fanzone-prototype-settings";
+  var settings = Object.assign({}, DEFAULTS);
+  try { Object.assign(settings, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
+
+  var frame = document.getElementById("app");
+  var device = document.getElementById("device");
+  var stage = document.getElementById("stage");
+  var rail = document.getElementById("rail");
+  var openBtn = document.getElementById("openSettings");
+  var loads = 0;
+
+  function query() {
+    var q = "embed=1&reset=1&start=" + settings.start + "&profile=" + settings.profile + "&card=" + settings.card + "&following=" + settings.following;
+    return q;
+  }
+  function load() {
+    loads += 1;
+    var q = query();
+    // settings travel in both the query and the hash, whichever the host keeps
+    frame.src = "FanZone.dc.html?n=" + loads + "&" + q + "#" + q;
+  }
+  function paint() {
+    document.querySelectorAll(".seg").forEach(function (g) {
+      var k = g.getAttribute("data-key");
+      g.querySelectorAll("button").forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b.getAttribute("data-val") === String(settings[k])));
+      });
+    });
+  }
+  function fit() {
+    var cs = getComputedStyle(stage);
+    var w = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    var h = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var framed = window.matchMedia("(min-width: 861px)").matches;
+    var room = framed ? 30 : 0;                       // leave space for the bezel
+    var s = Math.min((w - room) / 375, (h - room) / 812);
+    if (framed) s = Math.min(s, 1.15);
+    s = Math.max(0.3, s);
+    device.style.setProperty("--s", s.toFixed(4));
+    device.style.width = (375 * s) + "px";
+    device.style.height = (812 * s) + "px";
+  }
+  function setOpen(open) {
+    rail.setAttribute("data-open", String(open));
+    openBtn.setAttribute("aria-expanded", String(open));
+  }
+
+  document.querySelectorAll(".seg").forEach(function (g) {
+    g.addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      settings[g.getAttribute("data-key")] = b.getAttribute("data-val");
+      try { localStorage.setItem(KEY, JSON.stringify(settings)); } catch (err) {}
+      paint();
+      load();
+    });
+  });
+  document.getElementById("restart").addEventListener("click", function () { load(); setOpen(false); });
+  openBtn.addEventListener("click", function () { setOpen(true); });
+  document.getElementById("closeSettings").addEventListener("click", function () { setOpen(false); });
+  window.addEventListener("resize", fit);
+
+  paint();
+  fit();
+  load();
+})();
+</script>
