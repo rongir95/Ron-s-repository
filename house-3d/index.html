@@ -1079,6 +1079,7 @@ const weaveTex = (base, tone) => canvasTex(256, (g, s) => {
 const UNIT = new THREE.BoxGeometry(1, 1, 1);
 const wallPieces = [], openingGroups = [], fixtures = [];
 let wallsReno = false; // 'after' shown: before-only wall finishes (dining wallpaper) are hidden
+const siteGround = []; // flat outdoor surfaces (lawn, paving, deck): the only site pieces the walk cursor tests
 const doorLeaves = []; // interior door leaves (hinge groups), open by default
 const skirts = []; // ground-floor skirting boards, white where the renovation lays parquet
 const renoSets = []; // { room, before, after } groups swapped by the before/after switch
@@ -1187,7 +1188,7 @@ function wall(p, a, b, o) {
   for (const op of ops) opening(p, a, ux, uy, theta, op, o);
 }
 function opening(p, a, ux, uy, theta, op, o) {
-  const g = new THREE.Group(); g.position.set(wx(a[0] + ux * op.at), o.base, wz(a[1] + uy * op.at)); g.rotation.y = theta; p.add(g); openingGroups.push(g); g.userData.plan = [a[0] + ux * op.at, a[1] + uy * op.at]; g.userData.opType = op.type; g.userData.opF = o.base > 1 ? 1 : 0;
+  const g = new THREE.Group(); g.position.set(wx(a[0] + ux * op.at), o.base, wz(a[1] + uy * op.at)); g.rotation.y = theta; p.add(g); openingGroups.push(g); g.userData.plan = [a[0] + ux * op.at, a[1] + uy * op.at]; g.userData.opType = op.type; g.userData.opF = o.base > 1 ? 1 : 0; { const os0 = o.outSide || 1, P = g.userData.plan; g.userData.inPt = [P[0] + os0 * uy * 60, P[1] - os0 * ux * 60]; }
   if (op.type === 'hole') return;
   if (op.type === 'front') g.userData.entry = { room: 'foyer', eye: [300, 770], look: [.25, -1] };
   if (op.type === 'slide' && o.base === 0) g.userData.entry = { room: 'living', eye: [406, 90], look: [.3, 1] };
@@ -1366,22 +1367,22 @@ I([280, 609], [280, 690], [], 10);                                     // corrid
 /* first floor slab (with stair void) + walls */
 const SLAB1 = [[0, 296], [45, 296], [45, 0], [802, 0], [802, 992], [475, 992], [475, 1046], [80, 1046], [80, 741], [0, 741]];
 const VOID1 = [[470, 435], [780, 435], [780, 627], [470, 627]];
-slab(F[1].shell, SLAB1, L1, 0.3, M.hallTile, M.slabSide, [VOID1]);
+slab(F[1].shell, offsetPoly(SLAB1, -.5), L1, 0.3, M.hallTile, M.slabSide, [VOID1]); // edge 5 mm inside the wall faces, so it never shares their plane
 // white plaster ceiling for the ground floor, just under the slab
 slab(F[1].shell, SLAB1, L1 - 0.299, 0.006, M.ceiling, M.ceiling, [VOID1]);
 buildOutline(F[1].shell, OUT1, OPS1, { t: 30, tEdge: { 1: 25, 3: 22, 5: 10, 10: 27 }, outEdge: { 1: M.stone, 2: M.stone }, base: L1, h: H2 * 100, outMat: M.plaster, inMat: M.interior });
 // strip of flat roof over the living room, in front of Guy's room
 B(F[1].shell, 495, 0, 802, 65, 0, 1.5, M.cap, L1);
 const J = (a, b, ops = [], t = 12) => wall(F[1].shell, a, b, { t, base: L1, h: H2 * 100, ops, inMat: M.interior });
-J([60, 321], [470, 321], [D(110, 70), Object.assign(D(271, 70), { slide: true }), D(361, 80)]); // parents' room / en-suite, closet, hall
-J([482.5, 80], [482.5, 430], [D(282, 80)], 25);                          // Guy's room / parents' room and hall
+J([60, 321], [470, 321], [D(110, 70), Object.assign(D(271, 70), { slide: true }), D(361, 80, 210, -1)]); // parents' room / en-suite, closet, hall
+J([482.5, 80], [482.5, 430], [D(282, 80, 210, -1)], 25);                          // Guy's room / parents' room and hall
 J([470, 430], [780, 430], [], 10);                                       // Guy's room / stair void
 J([215, 321], [215, 503], [], 10);                                       // en-suite / closet
 J([370, 321], [370, 503], [], 10);                                       // closet / hall
 J([370, 503], [351, 520]);
-J([351, 520], [351, 735], [D(100, 75)]);                                 // bathroom / hall
+J([351, 520], [351, 735], [D(100, 75, 210, -1)]);                                 // bathroom / hall
 J([15, 503], [370, 503]);                                                // en-suite + closet / bathroom
-J([95, 735], [470, 735], [D(318, 80)]);                                  // bathroom, hall / Mark's room
+J([95, 735], [470, 735], [D(318, 80, 210, -1)]);                                  // bathroom, hall / Mark's room
 J([470, 632], [470, 1031], [D(53, 85)], 10);                             // Ron's room / Mark's room and hall
 J([470, 632], [780, 632], [], 10);                                       // Ron's room / stair void
 
@@ -1467,7 +1468,7 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
   onWall(CY(p, 776, 525, 22, 330, 332, std({ color: 0xd9c9a8, roughness: .8 }), 0, 32), 0, 330, 332).rotation.z = Math.PI / 2;
   for (let k = 0; k < 4; k++) { const x = 468 + k * 33, z = Math.round((x + 13 - 452) / 248 * 9 * R) + 112; onWall(B(p, x, 519.5, x + 26, 521, z, z + 20, M.black, 0), 0, z, z + 20); onWall(B(p, x + 3, 519.1, x + 23, 519.5, z + 3, z + 17, M.duvetC, 0), 0, z + 3, z + 17); }
   for (let j = 0; j < 9; j++) { // flight 2: open underneath, the passage to the safe-room door runs below it
-    const xb = 700 - (j + 1) * tr, top = 9 * R + (j + 1) * R;
+    const xb = 700 - (j + 1) * tr, top = 9 * R + (j + 1) * R - (j === 8 ? 1.2 : 0); // the top tread tucks 12 mm under the upstairs floor
     B(p, xb, 525, xb + tr, 618, top - R, top - 4, M.interior); B(p, xb - 2, 523, xb + tr, 620, top - 4, top, M.treadWood).userData.stair = true;
   }
   // glass balustrades + handrails along the sloped flights
@@ -1479,7 +1480,7 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
     }
     const len = Math.hypot((X1 - X0) / 100, (z1 - z0) / 100);
     const h = shadowy(new THREE.Mesh(UNIT, M.railing)); h.scale.set(len, .04, .05);
-    h.position.set(wx((X0 + X1) / 2), base + (z0 + z1) / 200 + .92, wz(Y)); h.rotation.z = Math.atan2((z1 - z0), (X1 - X0)); h.userData.rail = true; p.add(h);
+    h.position.set(wx((X0 + X1) / 2), base + (z0 + z1) / 200 + .92, wz(Y)); h.rotation.z = Math.atan((z1 - z0) / (X1 - X0)); // slope of the line itself, so a flight drawn right-to-left tilts the right way h.userData.rail = true; p.add(h);
   };
   rail(452, 700, 430, 5, 9 * R, 0); // handrails run into the newel posts
   rail(700, 778, 430, 9 * R, 9 * R, 0);
@@ -1771,7 +1772,14 @@ function desk(p, base, r, chairAt, faceTo) {
   CY(p, 40, 610, 8, 92, 113, M.steel, b, 18, 9); CY(p, 40, 610, 3, 113, 116, M.black, b, 10);
   CY(p, 50, 440, 13, 92, 98, M.white, b, 24, 8); for (const [dx, dy, c] of [[-4, -2, 0xd8a03a], [3, 3, 0xb83a2a], [2, -5, 0x9ab04a], [-2, 5, 0xd8a03a]]) { const f = new THREE.Mesh(new THREE.SphereGeometry(.04, 12, 8), std({ color: c, roughness: .5 })); f.position.set(wx(50 + dx), b + 1.0, wz(440 + dy)); p.add(f); }
   B(p, 18, 545, 21, 585, 92, 128, M.oak, b);
-  B(p, 22, 655, 52, 680, 92, 128, M.black, b); B(p, 30, 662, 44, 672, 98, 104, M.steel, b);
+  { // bean-to-cup coffee machine, front facing the room: black body, steel drip tray with a cup, twin spout, glossy control panel
+    B(p, 20, 655, 48, 680, 92, 127, M.black, b); B(p, 21, 656, 46, 679, 127, 129, std({ color: 0x2a2c30, roughness: .4 }), b);
+    B(p, 44, 659, 48.5, 676, 98, 115, std({ color: 0x0b0b0c, roughness: .3 }), b);
+    B(p, 47.5, 659.5, 54, 675.5, 92, 95, M.steel, b); B(p, 48, 660.5, 53.5, 674.5, 95, 95.4, M.black, b);
+    B(p, 45, 664, 51, 671, 109, 113, M.steel, b); for (const y of [666, 669]) CY(p, 49.5, y, .5, 106, 109, M.steel, b, 8);
+    CY(p, 50, 667.5, 2.6, 95.4, 102, M.white, b, 16);
+    B(p, 48.2, 657, 48.8, 678, 117, 125, std({ color: 0x111215, roughness: .08, envMapIntensity: 1.4 }), b);
+    for (const y of [660, 664, 668, 672, 676]) B(p, 48.8, y - .7, 49, y + .7, 120.5, 121.5, M.led, b); }
   CY(p, 30, 535, 2.5, 92, 112, std({ color: 0x8fb34a, roughness: .2, transparent: true, opacity: .85 }), b, 10);
   B(p, 18, 320, 74, 699, 0, 10, M.skirt, b);
   // door fronts: two doors left of the dishwasher, three to its right, then the corner
@@ -1851,7 +1859,7 @@ function desk(p, base, r, chairAt, faceTo) {
     CY(p, 29, 400, 7, 164, 170, M.white, b, 18); CY(p, 28, 345, 7, 204, 214, M.white, b, 18);
     for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.05, 0), M.leaf)); m.position.set(wx(28 + (rnd() - .5) * 10), b + 2.18 + rnd() * .1, wz(385 + (rnd() - .5) * 12)); p.add(m); }
     // south wall: oak tall units to the ceiling, oven tower with built-in microwave and oven, lit open niche, fridge set into the oak wall
-    B(p, 76, 640, 135.5, 699, 10, 88, M.kWhite, b); B(p, 76, 637, 135.5, 699, 88, 92, M.qWhite, b);
+    B(p, 76, 640.4, 137, 699, 10, 88, M.kWhite, b); B(p, 76, 637, 137, 699, 88, 92, M.qWhite, b); // tucks 1 cm into the oak tower, front set 4 mm back: no crack and no shared face
     B(p, 16, 664, 136, 699, 135, C, M.oakLight, b); B(p, 78, 663.5, 134, 664, 135, 140, M.oakLight, b); // oak wall units reach the west wall
     B(p, 78, 664, 134, 668, 100, 135, M.oakLight, b); B(p, 78, 664.5, 134, 665, 133, 134, M.led, b);
     for (const [x, z] of [[90, 115], [112, 115]]) CY(p, x, 680, 4, 102, 110, M.white, b, 14);
@@ -1866,11 +1874,12 @@ function desk(p, base, r, chairAt, faceTo) {
     [B(p, 69, 290, 273, 352, 8, 88, M.kWhite, b), B(p, 71, 292, 271, 350, 0, 8, M.kWhite, b), B(p, 69, 286, 281, 356, 88, 92, M.qWhite, b)].forEach(m => m.userData.noRemap = true);
     BU(200, 300, 276, 488, 95, 100, M.oakLight, p); BU(200, 480, 276, 488, 0, 95, M.oakLight, p);
     for (const y of [400, 455]) { barStool(296, y, 230, y, p); barStool(180, y, 250, y, p); }
-    // white dome pendants over the bar
-    for (const y of [395, 465]) {
-      CY(p, 238, y, .3, 210, 279, M.black, b, 6); CY(p, 238, y, 4, 277, 279, M.white, b, 14);
-      const d = new THREE.Mesh(new THREE.SphereGeometry(.2, 28, 10, 0, Math.PI * 2, 0, Math.PI / 2.6), std({ color: 0xf4f1ea, roughness: .5, side: THREE.DoubleSide })); d.position.set(wx(238), b + 2.0, wz(y)); p.add(d);
-      const bl = new THREE.Mesh(new THREE.SphereGeometry(.045, 12, 8), M.led); bl.position.set(wx(238), b + 1.92, wz(y)); p.add(bl);
+    // the same white square-frame pendants as before the renovation
+    B(p, 225, 370, 249, 470, 276, 280, M.white, b);
+    for (const [y, z] of [[395, 175], [445, 188]]) {
+      CY(p, 237, y, .3, z + 24, 276, M.black, b, 6);
+      for (const [y0, y1, z0, z1] of [[y - 12, y + 12, z, z + 2.5], [y - 12, y + 12, z + 21.5, z + 24], [y - 12, y - 9.5, z, z + 24], [y + 9.5, y + 12, z, z + 24]]) B(p, 233, y0, 241, y1, z0, z1, M.white, b);
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(.035, 12, 8), M.fixture); bulb.position.set(wx(237), z / 100 + .12, wz(y)); p.add(bulb);
     }
   }
   // roller blinds over the kitchen and dining windows, decorative security grille outside the sink window
@@ -2500,11 +2509,11 @@ function desk(p, base, r, chairAt, faceTo) {
   const p = site;
   const gp = new THREE.PlaneGeometry(240, 240); gp.rotateX(-Math.PI / 2);
   const uv = gp.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 240, uv.getY(i) * 240);
-  const ground = new THREE.Mesh(gp, M.grass); ground.receiveShadow = true; ground.position.y = GROUND; p.add(ground);
+  const ground = new THREE.Mesh(gp, M.grass); ground.receiveShadow = true; ground.position.y = GROUND; p.add(ground); siteGround.push(ground);
   const flat = (X0, Y0, X1, Y1, y, mat) => {
     const w = (X1 - X0) / 100, d = (Y1 - Y0) / 100, g = new THREE.PlaneGeometry(w, d); g.rotateX(-Math.PI / 2);
     const u = g.attributes.uv; for (let i = 0; i < u.count; i++) u.setXY(i, u.getX(i) * w + X0 / 100, u.getY(i) * d - Y1 / 100);
-    const m = new THREE.Mesh(g, mat); m.receiveShadow = true; m.position.set(wx((X0 + X1) / 2), y, wz((Y0 + Y1) / 2)); p.add(m); return m;
+    const m = new THREE.Mesh(g, mat); m.receiveShadow = true; m.position.set(wx((X0 + X1) / 2), y, wz((Y0 + Y1) / 2)); p.add(m); siteGround.push(m); return m;
   };
   // ---- garden, from the photos ----
   const slatFence = (X0, Y0, X1, Y1, h = 165) => { const along = Math.abs(X1 - X0) > Math.abs(Y1 - Y0), L = along ? X1 - X0 : Y1 - Y0;
@@ -2591,7 +2600,8 @@ function desk(p, base, r, chairAt, faceTo) {
   // front: covered entry, path, parking, street
   flat(-175, 980, 300, 1060, -0.03, M.sillStone);   // light stone slabs at the entrance
   // two-car parking pad across the front, no roof, running right to the party line
-  flat(-200, 972, 785, 1450, -0.028, M.pavers2);   // the whole front is interlocking pavers
+  flat(-100, 972, 785, 1450, -0.028, M.pavers2);   // interlocking pavers for the parking
+  flat(-200, 972, -100, 1450, -0.026, M.gravel);   // white gravel under the stepping-slab path to the door
   for (let y = 1065; y < 1440; y += 52) flat(-190, y, -110, y + 46, -0.022, M.pathSlab);
   for (let y = 702; y < 1000; y += 50) for (let x = -2; x < 268; x += 50) flat(x, y, Math.min(x + 48, 268), Math.min(y + 48, 1000), -0.022, M.pathSlab);   // paved entrance by the front door
   for (let y = 1000; y < 1065; y += 52) flat(-190, y, -110, y + 46, -0.022, M.pathSlab);   // stepping-slab path from the gate to the door
@@ -2924,7 +2934,8 @@ function walkRoomMaxBack() {
 // floor point under the pointer, only when nothing (wall, furniture) is in front of it
 function walkFloorHit(e) {
   ptr.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(ptr, camera);
-  const hits = ray.intersectObjects([F[0].group, F[1].group, site], true).filter(h => visibleChain(h.object) && h.object.material !== M.glass && h.object.material !== M.sheer && h.object.material !== M.dotGlass && !h.object.isPoints && h.object !== walkRing && !h.object.userData.rail);
+  const outside = (ROOMS.find(r => r.id === walking.id) || {}).outdoor;
+  const hits = ray.intersectObjects([F[0].group, F[1].group], true).concat(outside ? ray.intersectObjects(siteGround, false) : []).sort((a, b) => a.distance - b.distance).filter(h => visibleChain(h.object) && h.object.material !== M.glass && h.object.material !== M.sheer && h.object.material !== M.dotGlass && !h.object.isPoints && h.object !== walkRing && !h.object.userData.rail);
   let h = hits[0]; if (!h) return null;
   { const cur = ROOMS.find(r => r.id === walking.id); if (cur && cur.outdoor && !h.object.userData.stair && !h.object.userData.room) { // outside, look past chairs and plants to the ground behind the click
       let en = null; for (let o = h.object; o; o = o.parent) if (o.userData.entry || o.userData.doorInfo) en = o;
@@ -2951,7 +2962,8 @@ function walkFloorHit(e) {
   { // outside: grass, paving, deck or path — walk there within the garden, side path or parking
     const cur = ROOMS.find(r => r.id === walking.id);
     if (cur && cur.outdoor && h.point.y < .5) { const X = (h.point.x + CX) * 100, Y = (h.point.z + CZ) * 100;
-      const r = ROOMS.find(q => q.outdoor && X >= q.rect[0] && X <= q.rect[2] && Y >= q.rect[1] && Y <= q.rect[3]);
+      const gap = q => Math.hypot(Math.max(q.rect[0] - X, 0, X - q.rect[2]), Math.max(q.rect[1] - Y, 0, Y - q.rect[3]));
+      const r = ROOMS.filter(q => q.outdoor && gap(q) < 80).sort((a, b) => gap(a) - gap(b))[0]; // nearest outdoor area (paving runs a little past the area outlines)
       if (r) return { point: new THREE.Vector3(h.point.x, 0, h.point.z), room: r.id }; } }
   // furniture standing on the floor: walk to its foot if it is close to the floor
   return null;
@@ -2967,7 +2979,9 @@ function walkTo(point, roomId, lookDir) {
   flyTo(eye.clone().sub(look.multiplyScalar(.05)), eye, .9);
   document.getElementById('walkName').textContent = r.name; document.getElementById('roomSel').value = roomId;
 }
-renderer.domElement.addEventListener('pointermove', e => {
+let moveEv = null; // hover work runs at most once per frame
+renderer.domElement.addEventListener('pointermove', e => { if (!moveEv) requestAnimationFrame(() => { const ev = moveEv; moveEv = null; hoverMove(ev); }); moveEv = e; });
+function hoverMove(e) {
   if (!walking && !e.buttons) {
     ptr.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(ptr, camera);
     const hit = ray.intersectObjects([F[0].group], true).find(h => visibleChain(h.object)); let en = false;
@@ -2979,7 +2993,7 @@ renderer.domElement.addEventListener('pointermove', e => {
   walkRing.visible = !!h; renderer.domElement.style.cursor = h ? 'pointer' : '';
   if (h) walkRing.position.set(h.point.x, h.point.y + .01, h.point.z);
   walkRing.material.color.set(h && (h.stair || h.door) ? 0xf0c27e : 0xffffff);
-});
+}
 function exitWalk(goBack = true) {
   walkRing.visible = false; renderer.domElement.style.cursor = '';
   if (!walking) return;
@@ -3205,7 +3219,7 @@ renderer.domElement.addEventListener('pointerup', e => {
   if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
   if (!walking && !focus) { // from outside: click the garden, the side path or the parking to stand there
     ptr.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1); ray.setFromCamera(ptr, camera);
-    const hit = ray.intersectObjects([F[0].group, site], true).find(h => visibleChain(h.object) && !h.object.isPoints);
+    const hit = ray.intersectObjects([F[0].group], true).find(h => visibleChain(h.object) && !h.object.isPoints);
     const r = hit && hit.object.userData.room && ROOMS.find(q => q.id === hit.object.userData.room);
     if (r && r.outdoor) { const X = (hit.point.x + CX) * 100, Y = (hit.point.z + CZ) * 100, d = hit.point.clone().sub(camera.position); enterWalk(r.id, [X, Y], [d.x, d.z]); return; }
   }
@@ -3215,7 +3229,7 @@ renderer.domElement.addEventListener('pointerup', e => {
     for (let o = hit && hit.object; o; o = o.parent) if (o.userData.entry) { const en = o.userData.entry; enterWalk(en.room, en.eye, en.look); return; }
     // a window: step into the room behind it
     for (let o = hit && hit.object; o; o = o.parent) if (o.userData.opType === 'win' || o.userData.opType === 'hole') {
-      const [X, Y] = o.userData.plan, f = o.userData.opF, near = r => X >= r.rect[0] - 50 && X <= r.rect[2] + 50 && Y >= r.rect[1] - 50 && Y <= r.rect[3] + 50;
+      const [X, Y] = o.userData.inPt, f = o.userData.opF, near = r => X >= r.rect[0] - 15 && X <= r.rect[2] + 15 && Y >= r.rect[1] - 15 && Y <= r.rect[3] + 15; // 60 cm inside the window
       const dc = r => ((r.rect[0] + r.rect[2]) / 2 - X) ** 2 + ((r.rect[1] + r.rect[3]) / 2 - Y) ** 2;
       const room = ROOMS.filter(r => r.f === f && !r.outdoor && near(r)).sort((a, b) => dc(a) - dc(b))[0];
       if (room) { if (state.mode === 'ground' && f === 1) setMode('full'); enterWalk(room.id); return; }
