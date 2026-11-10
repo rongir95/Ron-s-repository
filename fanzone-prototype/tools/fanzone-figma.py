@@ -24,6 +24,15 @@ def rep(old, new, count=1):
 # ---------------------------------------------------------------- drawer background
 rep('pointer-events:auto;background:#080E12;border-radius:24px 24px 0 0;display:flex;flex-direction:column;',
     'pointer-events:auto;background:#0C161C;border-radius:24px 24px 0 0;display:flex;flex-direction:column;padding-bottom:21px;box-sizing:border-box;')
+# favorite-saved toasts (my card + another fan's card): the dark strip under the toast stopped 21px above the bottom,
+# so the card showed through below it. It now runs to the bottom; the pill stays where it was (padding 16 + 21).
+_old = 'bottom:21px;height:103px;box-sizing:border-box;'
+if src.count(_old) != 2:
+    raise SystemExit('toast strips: expected 2, found %d' % src.count(_old))
+for _z in ('8', '24'):
+    rep('bottom:21px;height:103px;box-sizing:border-box;z-index:' + _z + ';display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:12px 12px 16px;background:linear-gradient(180deg,rgba(8,14,18,0) 0%,#080E12 37.5%);',
+        'bottom:0;height:124px;box-sizing:border-box;z-index:' + _z + ';display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:12px 12px 37px;background:linear-gradient(180deg,rgba(8,14,18,0) 0%,#080E12 31%);')
+
 # the stream must autoplay: browsers allow that only when the video is muted, and muted="" through React leaves it
 # unmuted, so autoplay was blocked and only the still showed. Mute it as a property and start it when it mounts.
 rep('<video src="assets/video/fixture-bayern-bvb.mp4" ref="{{ fixVidRef }}" onTimeUpdate="{{ onFixTime }}" autoplay="" muted="" loop="" playsinline="" preload="auto"',
