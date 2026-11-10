@@ -39,6 +39,16 @@ DATA = {
     "stickerDefault": [S+'s%02d.png' % i for i in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 13, 14, 16, 8, 17)],
     "stickerResult":  [S+'s%02d.png' % i for i in (10, 13, 14, 15, 3, 12, 16, 17, 18, 10, 11, 12, 15, 13, 14, 16, 8, 17)],
 }
+# more to scroll through: the Figma frames only show the first screen, so each list continues with the same
+# assets in another order
+MORE_GIF = [[[G+'g09.jpg', 166], [G+'g02.jpg', 124], [G+'g05.jpg', 166], [G+'g08.jpg', 125], [G+'g04.jpg', 166], [G+'g01.jpg', 124]],
+            [[G+'g06.jpg', 166], [G+'g09.jpg', 124], [G+'g03.jpg', 166], [G+'g07.jpg', 125], [G+'g01.jpg', 166], [G+'g05.jpg', 124]]]
+for k in ('gifDefault', 'gifResult'):
+    for c in (0, 1):
+        DATA[k][c] = DATA[k][c] + MORE_GIF[c]
+MORE_ST = [S+'s%02d.png' % i for i in (18, 9, 4, 11, 2, 16, 7, 13, 1, 15, 6, 10, 3, 17, 12, 5, 14, 8)]
+DATA['stickerDefault'] += MORE_ST
+DATA['stickerResult'] += MORE_ST[::-1]
 
 # ---------------------------------------------------------------- CSS
 rep("  @keyframes fzPushIn {",
@@ -95,7 +105,7 @@ SHEET = r'''      <!-- ===================== GIF & STICKER DRAWER (Figma "Giphy 
             </label>
           </div>
           <!-- grid -->
-          <div class="gz-scroll" style="flex:1;min-height:0;overflow-y:auto;margin-top:8px;padding:0 16px 24px;">
+          <div class="gz-scroll" ref="{{ gzScrollRef }}" style="flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;cursor:grab;margin-top:8px;padding:0 16px 24px;">
             <sc-if value="{{ gzLoading }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;gap:8px;">
                 <div style="width:168px;display:flex;flex-direction:column;gap:8px;"><span class="gz-sk" style="display:block;height:124px;"></span><span class="gz-sk" style="display:block;height:166px;"></span><span class="gz-sk" style="display:block;height:124px;"></span></div>
@@ -131,6 +141,36 @@ rep('// FanZone chat: which team each fan supports',
     '// GIFs & stickers (Figma "Giphy - Stickers - Dev")\nconst GZ = ' + json.dumps(DATA) + ';\n// FanZone chat: which team each fan supports')
 rep('  openFanZoneOver = (e) => {',
 '''  openGiphy = (e) => { if (e && e.stopPropagation) e.stopPropagation(); clearTimeout(this._gzT); this.setState({ gzOpen: true, gzTab: this.state.gzTab || "gif", gzExpanded: false, gzQuery: "", gzLoading: false, showFtue: false }); };
+  // a mouse drag scrolls the grid like a finger would (touch scrolls natively); a drag never sends an item
+  gzScrollRef = (el) => {
+    if (!el || el._gzDrag) return;
+    el._gzDrag = true;
+    let down = false, moved = false, y0 = 0, top0 = 0, lastY = 0, lastT = 0, v = 0, raf = 0;
+    el.addEventListener("pointerdown", (e) => {
+      if (e.pointerType !== "mouse" || e.button !== 0) return;
+      cancelAnimationFrame(raf);
+      down = true; moved = false; y0 = lastY = e.clientY; top0 = el.scrollTop; lastT = performance.now(); v = 0;
+    });
+    el.addEventListener("pointermove", (e) => {
+      if (!down) return;
+      const dy = e.clientY - y0;
+      if (!moved && Math.abs(dy) > 4) { moved = true; el.style.cursor = "grabbing"; try { el.setPointerCapture(e.pointerId); } catch (err) {} }
+      if (!moved) return;
+      el.scrollTop = top0 - dy;
+      const t = performance.now(); if (t > lastT) { v = (e.clientY - lastY) / (t - lastT); lastY = e.clientY; lastT = t; }
+    });
+    const end = () => {
+      if (!down) return;
+      down = false; el.style.cursor = "grab";
+      if (!moved) return;
+      let vel = -v * 16;
+      const glide = () => { if (Math.abs(vel) < 0.5) return; el.scrollTop += vel; vel *= 0.94; raf = requestAnimationFrame(glide); };
+      if (performance.now() - lastT < 80) glide();
+    };
+    el.addEventListener("pointerup", end);
+    el.addEventListener("pointercancel", end);
+    el.addEventListener("click", (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  };
   closeGiphy = () => { clearTimeout(this._gzT); this.setState({ gzOpen: false, gzExpanded: false, gzQuery: "", gzLoading: false }); };
   gzSetTab = (tab) => { clearTimeout(this._gzT); const q = this.state.gzQuery || ""; this.setState({ gzTab: tab, gzLoading: !!q.trim() }); if (q.trim()) this._gzT = setTimeout(() => this.setState({ gzLoading: false }), 700); };
   gzOnFocus = () => { if (!this.state.gzExpanded) this.setState({ gzExpanded: true }); };
@@ -161,7 +201,7 @@ rep('  openFanZoneOver = (e) => {',
     return {
       gzOpen: !!s.gzOpen && s.screen === "fanzone",
       gzTop: s.gzExpanded ? (s.fzOver ? 62 : 54) : base,
-      openGiphy: this.openGiphy, closeGiphy: this.closeGiphy,
+      openGiphy: this.openGiphy, closeGiphy: this.closeGiphy, gzScrollRef: this.gzScrollRef,
       gzGifSel: tab === "gif" ? "true" : "false", gzStickerSel: tab === "sticker" ? "true" : "false",
       gzGifTabBg: tab === "gif" ? "#3D4549" : "transparent", gzStickerTabBg: tab === "sticker" ? "#3D4549" : "transparent",
       gzPickGif: () => this.gzSetTab("gif"), gzPickSticker: () => this.gzSetTab("sticker"),

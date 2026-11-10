@@ -291,7 +291,7 @@
             </label>
           </div>
           <!-- grid -->
-          <div class="gz-scroll" style="flex:1;min-height:0;overflow-y:auto;margin-top:8px;padding:0 16px 24px;">
+          <div class="gz-scroll" ref="{{ gzScrollRef }}" style="flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;cursor:grab;margin-top:8px;padding:0 16px 24px;">
             <sc-if value="{{ gzLoading }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;gap:8px;">
                 <div style="width:168px;display:flex;flex-direction:column;gap:8px;"><span class="gz-sk" style="display:block;height:124px;"></span><span class="gz-sk" style="display:block;height:166px;"></span><span class="gz-sk" style="display:block;height:124px;"></span></div>
@@ -2394,7 +2394,7 @@ const CHAT_POOL = [
 ];
 
 // GIFs & stickers (Figma "Giphy - Stickers - Dev")
-const GZ = {"gifDefault": [[["assets/gif/g01.jpg", 166], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g06.jpg", 166]], [["assets/gif/g02.jpg", 165], ["assets/gif/g04.jpg", 124], ["assets/gif/g08.jpg", 163], ["assets/gif/g05.jpg", 121]]], "gifResult": [[["assets/gif/g05.jpg", 124], ["assets/gif/g06.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g03.jpg", 166]], [["assets/gif/g02.jpg", 165], ["assets/gif/g08.jpg", 163], ["assets/gif/g09.jpg", 166], ["assets/gif/g04.jpg", 121], ["assets/gif/g01.jpg", 166]]], "stickerDefault": ["assets/stickers/s01.png", "assets/stickers/s02.png", "assets/stickers/s03.png", "assets/stickers/s04.png", "assets/stickers/s05.png", "assets/stickers/s06.png", "assets/stickers/s07.png", "assets/stickers/s08.png", "assets/stickers/s09.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png"], "stickerResult": ["assets/stickers/s10.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s15.png", "assets/stickers/s03.png", "assets/stickers/s12.png", "assets/stickers/s16.png", "assets/stickers/s17.png", "assets/stickers/s18.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png"]};
+const GZ = {"gifDefault": [[["assets/gif/g01.jpg", 166], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 166], ["assets/gif/g02.jpg", 124], ["assets/gif/g05.jpg", 166], ["assets/gif/g08.jpg", 125], ["assets/gif/g04.jpg", 166], ["assets/gif/g01.jpg", 124]], [["assets/gif/g02.jpg", 165], ["assets/gif/g04.jpg", 124], ["assets/gif/g08.jpg", 163], ["assets/gif/g05.jpg", 121], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 124], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g01.jpg", 166], ["assets/gif/g05.jpg", 124]]], "gifResult": [[["assets/gif/g05.jpg", 124], ["assets/gif/g06.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g03.jpg", 166], ["assets/gif/g09.jpg", 166], ["assets/gif/g02.jpg", 124], ["assets/gif/g05.jpg", 166], ["assets/gif/g08.jpg", 125], ["assets/gif/g04.jpg", 166], ["assets/gif/g01.jpg", 124]], [["assets/gif/g02.jpg", 165], ["assets/gif/g08.jpg", 163], ["assets/gif/g09.jpg", 166], ["assets/gif/g04.jpg", 121], ["assets/gif/g01.jpg", 166], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 124], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g01.jpg", 166], ["assets/gif/g05.jpg", 124]]], "stickerDefault": ["assets/stickers/s01.png", "assets/stickers/s02.png", "assets/stickers/s03.png", "assets/stickers/s04.png", "assets/stickers/s05.png", "assets/stickers/s06.png", "assets/stickers/s07.png", "assets/stickers/s08.png", "assets/stickers/s09.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png", "assets/stickers/s18.png", "assets/stickers/s09.png", "assets/stickers/s04.png", "assets/stickers/s11.png", "assets/stickers/s02.png", "assets/stickers/s16.png", "assets/stickers/s07.png", "assets/stickers/s13.png", "assets/stickers/s01.png", "assets/stickers/s15.png", "assets/stickers/s06.png", "assets/stickers/s10.png", "assets/stickers/s03.png", "assets/stickers/s17.png", "assets/stickers/s12.png", "assets/stickers/s05.png", "assets/stickers/s14.png", "assets/stickers/s08.png"], "stickerResult": ["assets/stickers/s10.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s15.png", "assets/stickers/s03.png", "assets/stickers/s12.png", "assets/stickers/s16.png", "assets/stickers/s17.png", "assets/stickers/s18.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png", "assets/stickers/s08.png", "assets/stickers/s14.png", "assets/stickers/s05.png", "assets/stickers/s12.png", "assets/stickers/s17.png", "assets/stickers/s03.png", "assets/stickers/s10.png", "assets/stickers/s06.png", "assets/stickers/s15.png", "assets/stickers/s01.png", "assets/stickers/s13.png", "assets/stickers/s07.png", "assets/stickers/s16.png", "assets/stickers/s02.png", "assets/stickers/s11.png", "assets/stickers/s04.png", "assets/stickers/s09.png", "assets/stickers/s18.png"]};
 // FanZone chat: which team each fan supports (drives their avatar ring and Fan Card favorite)
 const FZ_FAN_TEAM = {"Ayaka": "bayern", "Hina": "bayern", "Sora": "bayern", "Mei": "bayern", "Aoi": "bayern", "Riku": "bayern", "Nao": "bayern", "Kenji": "bayern", "Rina": "bayern", "Daiki": "bayern", "Sho": "bayern", "Ai": "bvb", "Misaki": "bvb", "Kaito": "bvb", "Ren": "bvb", "Yuki": "bvb", "Haruto": "bvb", "Emi": "bvb", "Taiga": "bvb", "Sana": "bvb", "Yui": "bvb", "Miku": "bvb", "Ryo": "bvb", "Akari": "bvb"};
 // ---------- teams ----------
@@ -2798,6 +2798,36 @@ class Component extends DCLogic {
     this.setState(st => ({ feed: st.feed.concat(msg).slice(-40), fzDraft: "", atBottom: true, showFtue: false }));
   };
   openGiphy = (e) => { if (e && e.stopPropagation) e.stopPropagation(); clearTimeout(this._gzT); this.setState({ gzOpen: true, gzTab: this.state.gzTab || "gif", gzExpanded: false, gzQuery: "", gzLoading: false, showFtue: false }); };
+  // a mouse drag scrolls the grid like a finger would (touch scrolls natively); a drag never sends an item
+  gzScrollRef = (el) => {
+    if (!el || el._gzDrag) return;
+    el._gzDrag = true;
+    let down = false, moved = false, y0 = 0, top0 = 0, lastY = 0, lastT = 0, v = 0, raf = 0;
+    el.addEventListener("pointerdown", (e) => {
+      if (e.pointerType !== "mouse" || e.button !== 0) return;
+      cancelAnimationFrame(raf);
+      down = true; moved = false; y0 = lastY = e.clientY; top0 = el.scrollTop; lastT = performance.now(); v = 0;
+    });
+    el.addEventListener("pointermove", (e) => {
+      if (!down) return;
+      const dy = e.clientY - y0;
+      if (!moved && Math.abs(dy) > 4) { moved = true; el.style.cursor = "grabbing"; try { el.setPointerCapture(e.pointerId); } catch (err) {} }
+      if (!moved) return;
+      el.scrollTop = top0 - dy;
+      const t = performance.now(); if (t > lastT) { v = (e.clientY - lastY) / (t - lastT); lastY = e.clientY; lastT = t; }
+    });
+    const end = () => {
+      if (!down) return;
+      down = false; el.style.cursor = "grab";
+      if (!moved) return;
+      let vel = -v * 16;
+      const glide = () => { if (Math.abs(vel) < 0.5) return; el.scrollTop += vel; vel *= 0.94; raf = requestAnimationFrame(glide); };
+      if (performance.now() - lastT < 80) glide();
+    };
+    el.addEventListener("pointerup", end);
+    el.addEventListener("pointercancel", end);
+    el.addEventListener("click", (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  };
   closeGiphy = () => { clearTimeout(this._gzT); this.setState({ gzOpen: false, gzExpanded: false, gzQuery: "", gzLoading: false }); };
   gzSetTab = (tab) => { clearTimeout(this._gzT); const q = this.state.gzQuery || ""; this.setState({ gzTab: tab, gzLoading: !!q.trim() }); if (q.trim()) this._gzT = setTimeout(() => this.setState({ gzLoading: false }), 700); };
   gzOnFocus = () => { if (!this.state.gzExpanded) this.setState({ gzExpanded: true }); };
@@ -2828,7 +2858,7 @@ class Component extends DCLogic {
     return {
       gzOpen: !!s.gzOpen && s.screen === "fanzone",
       gzTop: s.gzExpanded ? (s.fzOver ? 62 : 54) : base,
-      openGiphy: this.openGiphy, closeGiphy: this.closeGiphy,
+      openGiphy: this.openGiphy, closeGiphy: this.closeGiphy, gzScrollRef: this.gzScrollRef,
       gzGifSel: tab === "gif" ? "true" : "false", gzStickerSel: tab === "sticker" ? "true" : "false",
       gzGifTabBg: tab === "gif" ? "#3D4549" : "transparent", gzStickerTabBg: tab === "sticker" ? "#3D4549" : "transparent",
       gzPickGif: () => this.gzSetTab("gif"), gzPickSticker: () => this.gzSetTab("sticker"),
