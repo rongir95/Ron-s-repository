@@ -10,7 +10,7 @@
 
 The GIFs are still frames (the Figma's animated files are up to 10 MB and could not be brought in from Figma);
 GIFs and stickers were rendered from the Figma at 2x into assets/gif/ and assets/stickers/.
-Sheet: #1B2326, 24px top corners (all drawers), handle 44x4 #CED0D2, close 24px #3D4549 circle.
+Sheet: #1B2326, 24px top corners (all drawers), handle 44x4 #CED0D2, close button the same as the other drawers (32px, white 20%).
 Segmented control 153x40, border #3D4549, radius 9, states 72x32 radius 6 (selected #3D4549).
 Search field 343x48, border #6D7377, radius 8, placeholder #6D7377 16px.
 
@@ -75,7 +75,7 @@ SHEET = r'''      <!-- ===================== GIF & STICKER DRAWER (Figma "Giphy 
           <!-- sheet header: handle + close -->
           <div style="position:relative;flex-shrink:0;height:48px;">
             <span aria-hidden="true" style="position:absolute;left:50%;top:12px;transform:translateX(-50%);width:44px;height:4px;border-radius:9999px;background:#CED0D2;"></span>
-            <button onClick="{{ closeGiphy }}" aria-label="Close" style="position:absolute;right:12px;top:12px;width:24px;height:24px;border:0;padding:0;border-radius:50%;background:#3D4549;display:flex;align-items:center;justify-content:center;cursor:pointer;"><img src="assets/icons/fz-close.svg" alt="" width="16" height="16" style="display:block;"></button>
+            <button onClick="{{ closeGiphy }}" aria-label="Close" title="Close" style="position:absolute;right:16px;top:16px;width:32px;height:32px;border:0;padding:0;border-radius:9999px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="display:block;"><path d="M5 5L15 15M15 5L5 15" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round"></path></svg></button>
           </div>
           <!-- GIF / Sticker -->
           <div style="flex-shrink:0;height:56px;box-sizing:border-box;padding:8px 16px;display:flex;justify-content:center;">
