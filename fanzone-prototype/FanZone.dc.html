@@ -393,7 +393,7 @@
             </div>
           </sc-if>
           <!-- scrollable track: avatar + input + reactions (2 pages) -->
-          <div class="fz-scroll" ref="{{ barRef }}" style="flex:1;min-width:0;display:flex;align-items:center;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;height:72px;cursor:grab;padding-right:12px;">
+          <div class="fz-scroll" ref="{{ barRef }}" style="flex:1;min-width:0;display:flex;align-items:center;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;height:72px;cursor:grab;padding-right:12px;">
             <!-- entry point: your avatar (B + avatar in gradient ring) -->
             <button onClick="{{ openCard }}" title="Open your Fan Card" style="position:relative;scroll-snap-align:start;border:0;padding:5px;{{ selfCardCursor }}flex-shrink:0;width:40px;height:40px;box-sizing:border-box;border-radius:50%;background:transparent;">
               <span aria-hidden="true" style="position:absolute;inset:0;border-radius:50%;background:{{ ringBg }};-webkit-mask:radial-gradient(circle closest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));mask:radial-gradient(circle closest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));"></span>
@@ -418,9 +418,9 @@
               <img src="assets/icons/face-sticker.svg" alt="" width="24" height="24" style="display:block;flex-shrink:0;{{ fzStickerStyle }}">
             </div>
             <!-- reactions -->
-            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;height:48px;">
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;height:48px;scroll-snap-align:end;">
               <sc-for list="{{ reactions }}" as="r" hint-placeholder-count="5">
-                <img src="{{ r }}" alt="" style="scroll-snap-align:end;flex-shrink:0;width:40px;height:40px;margin:-2px;object-fit:contain;cursor:pointer;">
+                <img src="{{ r }}" alt="" style="flex-shrink:0;width:40px;height:40px;margin:-2px;object-fit:contain;cursor:pointer;">
               </sc-for>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-left:6px;">
                 <path d="M4 9C4.6 6.7 6.7 5 9.2 5H15M15 5L12.5 2.5M15 5L12.5 7.5" stroke="#F9FAFA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -3083,8 +3083,12 @@ class Component extends DCLogic {
     el._dragBound = true;
     let down = false, startX = 0, startLeft = 0, moved = false;
     let captured = false;
+    let fieldTap = null;
+    el.addEventListener("dragstart", (e) => e.preventDefault()); // the reaction images must not start a native image drag
     el.addEventListener("pointerdown", (e) => {
       down = true; moved = false; captured = false; startX = e.clientX; startLeft = el.scrollLeft;
+      fieldTap = (e.pointerType === "mouse" && e.target && e.target.tagName === "INPUT") ? e.target : null;
+      if (fieldTap && document.activeElement !== fieldTap) e.preventDefault();
     });
     el.addEventListener("pointermove", (e) => {
       if (!down) return;
@@ -3099,12 +3103,12 @@ class Component extends DCLogic {
     const end = () => {
       if (!down) return;
       down = false; el.style.cursor = "grab";
-      if (!moved) return;
+      if (!moved) { if (fieldTap) { try { fieldTap.focus(); } catch (err) {} } return; }
       // snap to nearest page
-      const page = el.clientWidth - 82;
-      const target = el.scrollLeft > page / 2 ? el.scrollWidth : 0;
-      el.style.scrollSnapType = "x proximity";
+      const dragged = el.scrollLeft - startLeft;
+      const target = dragged > 40 ? el.scrollWidth : (dragged < -40 ? 0 : startLeft);
       el.scrollTo({ left: target, behavior: "smooth" });
+      clearTimeout(el._snapT); el._snapT = setTimeout(() => { el.style.scrollSnapType = "x mandatory"; }, 450);
     };
     el.addEventListener("pointerup", end);
     el.addEventListener("pointercancel", end);

@@ -43,9 +43,10 @@ Tapping your own avatar opens My Card.
 - `tools/fanzone-panel.py`: collapse / expand for the FanZone panel, FanZone messages and the tooltip switches.
 - `tools/chat-bayern-bvb.py`: rewrites the FanZone chat for Bayern vs Dortmund.
 - `tools/fanzone-figma.py`: aligns the FanZone drawer with the Figma screen (node 496:103459): message rows, my avatar ring, and the sponsored (Coca-Cola) header, which the shell's "FanZone header: Sponsored" switch turns on; the regular header is the default.
-- `tools/chat-avatars.py`: one avatar style for every fan in the chat, per FanZone DS `.UserIndicator`: 24px ring, 18px picture or the nickname's initial (run last).
+- `tools/chat-avatars.py`: one avatar style for every fan in the chat, per FanZone DS `.UserIndicator`: 24px ring, 18px picture or the nickname's initial.
+- `tools/fanzone-bar.py`: the message bar's two states (field / all reactions) with a swipe between them (run last).
 
-To rebuild `FanZone.dc.html`, run the seven scripts in the order above on the two source pages.
+To rebuild `FanZone.dc.html`, run the eight scripts in the order above on the two source pages.
 
 ## Run locally
 
