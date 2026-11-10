@@ -1480,7 +1480,7 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
     }
     const len = Math.hypot((X1 - X0) / 100, (z1 - z0) / 100);
     const h = shadowy(new THREE.Mesh(UNIT, M.railing)); h.scale.set(len, .04, .05);
-    h.position.set(wx((X0 + X1) / 2), base + (z0 + z1) / 200 + .92, wz(Y)); h.rotation.z = Math.atan((z1 - z0) / (X1 - X0)); // slope of the line itself, so a flight drawn right-to-left tilts the right way h.userData.rail = true; p.add(h);
+    h.position.set(wx((X0 + X1) / 2), base + (z0 + z1) / 200 + .92, wz(Y)); h.rotation.z = Math.atan((z1 - z0) / (X1 - X0)); h.userData.rail = true; p.add(h);
   };
   rail(452, 700, 430, 5, 9 * R, 0); // handrails run into the newel posts
   rail(700, 778, 430, 9 * R, 9 * R, 0);
@@ -1492,7 +1492,7 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
   { const m = shadowy(new THREE.Mesh(UNIT, M.railing)); m.scale.set(.06, 1.0, .06); m.position.set(wx(472), L1 + .5, wz(523)); m.userData.rail = true; m.userData.noRemap = true; p.add(m); }
   const g1 = F[1].furn;
   for (let y = 438; y <= 522; y += 11) { const m = shadowy(new THREE.Mesh(UNIT, M.railing)); m.userData.noRemap = true; m.scale.set(.016, .92, .016); m.position.set(wx(472), L1 + .46, wz(y)); g1.add(m); }
-  const hr = shadowy(new THREE.Mesh(UNIT, M.railing)); hr.userData.noRemap = true; hr.scale.set(.045, .04, .88); hr.position.set(wx(472), L1 + .92, wz(479)); // meets the stair handrail at the newel g1.add(hr);
+  const hr = shadowy(new THREE.Mesh(UNIT, M.railing)); hr.userData.noRemap = true; hr.scale.set(.045, .04, .88); hr.position.set(wx(472), L1 + .92, wz(479)); g1.add(hr);
 }
 
 F[0].furn.children.slice(stairMark[0]).forEach(o => o.userData.noRemap = true); F[1].furn.children.slice(stairMark[1]).forEach(o => o.userData.noRemap = true);
