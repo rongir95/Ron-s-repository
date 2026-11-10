@@ -3959,7 +3959,7 @@ class Component extends DCLogic {
       pollCls: s.pollClosing ? "is-out" : "",
       pollH: h,
       pollClipH: h + 24, // room for the card's shadow
-      fzPanelTop: s.fzOver ? 274 : 273,
+      fzPanelTop: s.fzOver ? 282 : 273, // 8px below the stream (match video ends at 274, FanZone's own at 265)
       pollTimerPct: Math.max(0, Math.min(100, s.pollTime ?? 100)),
       pollToggleCollapse: () => this.setState({ pollCollapsed: !collapsed }),
       pollCollapseLabel: collapsed ? "Expand poll" : "Collapse poll",

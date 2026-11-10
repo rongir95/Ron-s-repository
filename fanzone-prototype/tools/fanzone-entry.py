@@ -100,7 +100,7 @@ rep('      isFixture: s.screen === "fixture",',
     '      openFanZoneOver: this.openFanZoneOver,')
 # poll + panel positions follow the video bottom (match video ends at 274, FanZone's own at 265)
 rep('      fzPanelTop: 273,',
-    '      fzPanelTop: s.fzOver ? 274 : 273,')
+    '      fzPanelTop: s.fzOver ? 282 : 273, // 8px below the stream (match video ends at 274, FanZone\'s own at 265)')
 rep('  componentWillUnmount() { ', '  componentWillUnmount() { clearTimeout(this._fzAutoT); clearTimeout(this._fzLoadT); ')
 
 open(PATH, 'w', encoding='utf-8').write(src)
