@@ -24,6 +24,23 @@ def rep(old, new, count=1):
 # ---------------------------------------------------------------- drawer background
 rep('pointer-events:auto;background:#080E12;border-radius:24px 24px 0 0;display:flex;flex-direction:column;',
     'pointer-events:auto;background:#0C161C;border-radius:24px 24px 0 0;display:flex;flex-direction:column;padding-bottom:21px;box-sizing:border-box;')
+# the stream must autoplay: browsers allow that only when the video is muted, and muted="" through React leaves it
+# unmuted, so autoplay was blocked and only the still showed. Mute it as a property and start it when it mounts.
+rep('<video src="assets/video/fixture-bayern-bvb.mp4" ref="{{ fixVidRef }}" onTimeUpdate="{{ onFixTime }}" autoplay="" muted="" loop="" playsinline="" preload="auto"',
+    '<video src="assets/video/fixture-bayern-bvb.mp4" ref="{{ fixVidRef }}" onTimeUpdate="{{ onFixTime }}" autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" preload="auto"')
+rep('  fixVidRef = (el) => { this._fixVid = el; };',
+    '  fixVidRef = (el) => {\n'
+    '    this._fixVid = el;\n'
+    '    if (!el) return;\n'
+    '    el.muted = true; el.defaultMuted = true; el.playsInline = true; el.setAttribute("muted", ""); el.setAttribute("playsinline", "");\n'
+    '    const go = () => { if (this.state.fixPlaying !== false) { const p = el.play(); if (p && p.catch) p.catch(() => {}); } };\n'
+    '    if (el.readyState >= 2) go(); else el.addEventListener("loadeddata", go, { once: true });\n'
+    '    go();\n'
+    '  };')
+
+# the loading layer (FanZone just opened) must stop above the message bar, now 21px higher, and match the drawer color
+rep('<div style="position:absolute;left:0;right:0;top:48px;bottom:72px;z-index:2;background:#080E12;display:flex;align-items:center;justify-content:center;" aria-label="Loading FanZone">',
+    '<div style="position:absolute;left:0;right:0;top:48px;bottom:93px;z-index:2;background:#0C161C;display:flex;align-items:center;justify-content:center;" aria-label="Loading FanZone">')
 # 21px home-indicator strip under the message bar, as in the Figma frame
 rep('<div class="{{ fzPanelCls }}" style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;',
     '<div class="fz-fzpanel {{ fzPanelCls }}" style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;')

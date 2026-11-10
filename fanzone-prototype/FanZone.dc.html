@@ -351,7 +351,7 @@
       </sc-if>
         <!-- loading (FanZone just opened) -->
         <sc-if value="{{ fzLoading }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute;left:0;right:0;top:48px;bottom:72px;z-index:2;background:#080E12;display:flex;align-items:center;justify-content:center;" aria-label="Loading FanZone">
+          <div style="position:absolute;left:0;right:0;top:48px;bottom:93px;z-index:2;background:#0C161C;display:flex;align-items:center;justify-content:center;" aria-label="Loading FanZone">
             <span style="width:30px;height:30px;border-radius:50%;border:2.5px solid rgba(249,250,250,.18);border-top-color:#F9FAFA;animation:fzSpin .8s linear infinite;"></span>
           </div>
         </sc-if>
@@ -692,7 +692,7 @@
         <!-- home indicator -->
         <div style="position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;border-radius:100px;background:#F9FAFA;z-index:2;pointer-events:none;"></div>
         <!-- player (496:98838): plays the match clip; until the MP4 exists the Figma still underneath stays visible -->
-        <video src="assets/video/fixture-bayern-bvb.mp4" ref="{{ fixVidRef }}" onTimeUpdate="{{ onFixTime }}" autoplay="" muted="" loop="" playsinline="" preload="auto" style="position:absolute;left:0;top:62px;width:375px;height:212px;object-fit:cover;display:block;background:#000;"></video>
+        <video src="assets/video/fixture-bayern-bvb.mp4" ref="{{ fixVidRef }}" onTimeUpdate="{{ onFixTime }}" autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" preload="auto" style="position:absolute;left:0;top:62px;width:375px;height:212px;object-fit:cover;display:block;background:#000;"></video>
         <!-- player controls state (Figma 512:109199): shown on hover / tap, auto-hides after 3s while playing -->
         <div onMouseEnter="{{ showFixCtrls }}" onMouseMove="{{ showFixCtrls }}" onMouseLeave="{{ hideFixCtrlsSoon }}" onClick="{{ toggleFixCtrls }}" style="position:absolute;left:0;top:62px;width:375px;height:212px;z-index:3;cursor:pointer;">
           <div style="position:absolute;inset:0;transition:opacity .2s ease;opacity:{{ fixCtrlOpacity }};pointer-events:{{ fixCtrlPE }};">
@@ -2806,7 +2806,14 @@ class Component extends DCLogic {
     this._opBackT = setTimeout(() => this.setState({ commentsView: "list", opClosing: false, opSub: null, opSubClosing: false }), 300);
   };
   // ---- fixture player controls ----
-  fixVidRef = (el) => { this._fixVid = el; };
+  fixVidRef = (el) => {
+    this._fixVid = el;
+    if (!el) return;
+    el.muted = true; el.defaultMuted = true; el.playsInline = true; el.setAttribute("muted", ""); el.setAttribute("playsinline", "");
+    const go = () => { if (this.state.fixPlaying !== false) { const p = el.play(); if (p && p.catch) p.catch(() => {}); } };
+    if (el.readyState >= 2) go(); else el.addEventListener("loadeddata", go, { once: true });
+    go();
+  };
   onFixTime = (e) => { const v = e.currentTarget; if (v.duration) { const pct = Math.round((v.currentTime / v.duration) * 1000) / 10; if (pct !== this.state.fixProgress) this.setState({ fixProgress: pct }); } };
   armFixHide = () => { clearTimeout(this._fixHideT); this._fixHideT = setTimeout(() => { if (this.state.fixPlaying) this.setState({ fixCtrls: false }); }, 3000); };
   showFixCtrls = () => { if (!this.state.fixCtrls) this.setState({ fixCtrls: true }); this.armFixHide(); };
