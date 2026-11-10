@@ -175,6 +175,14 @@
   .fz-collapse-btn:focus-visible { outline: 2px solid #F9FAFA; outline-offset: 2px; border-radius: 6px; }
   .fz-entry:hover { background: #222C31 !important; }
   .fz-fzpanel::after { content: ""; position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 100px; background: #F9FAFA; pointer-events: none; }
+  /* GIF & sticker drawer */
+  .gz-sheet { transition: top .35s cubic-bezier(.22,1,.36,1); animation: fzSlideUp .34s cubic-bezier(.22,1,.36,1); }
+  .gz-scroll::-webkit-scrollbar { width: 0; height: 0; }
+  .gz-scroll { scrollbar-width: none; }
+  .gz-item { border: 0; padding: 0; background: transparent; cursor: pointer; display: block; }
+  .gz-item:focus-visible, .gz-tab:focus-visible { outline: 2px solid #F9FAFA; outline-offset: 2px; }
+  .gz-search::placeholder { color: #6D7377; opacity: 1; }
+  .gz-sk { background: linear-gradient(90deg, #283035 0%, #283035 35%, #333C41 50%, #283035 65%, #283035 100%); background-size: 300% 100%; animation: fzShim 1.4s cubic-bezier(.4,0,.6,1) infinite; }
   @keyframes fzPushIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
   @keyframes fzPushOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
 </style>
@@ -257,6 +265,60 @@
       <div style="position:absolute;top:54px;left:0;right:0;height:211px;z-index:2;{{ fzOwnStageStyle }}">
         <img src="assets/img/5cf91294bb9d1098.png" alt="live match" style="width:100%;height:100%;object-fit:cover;display:block;">
       </div>
+      <!-- ===================== GIF & STICKER DRAWER (Figma "Giphy - Stickers - Dev") ===================== -->
+      <sc-if value="{{ gzOpen }}" hint-placeholder-val="{{ false }}">
+        <div class="gz-sheet" role="dialog" aria-label="GIFs and stickers" style="position:absolute;left:0;right:0;bottom:0;top:{{ gzTop }}px;z-index:5;pointer-events:auto;background:#1B2326;border-radius:24px 24px 0 0;box-shadow:0 -1px 0 rgba(249,250,250,.2);display:flex;flex-direction:column;overflow:hidden;font-family:'DAZN Oscine',sans-serif;color:#F9FAFA;">
+          <!-- sheet header: handle + close -->
+          <div style="position:relative;flex-shrink:0;height:48px;">
+            <span aria-hidden="true" style="position:absolute;left:50%;top:12px;transform:translateX(-50%);width:44px;height:4px;border-radius:9999px;background:#CED0D2;"></span>
+            <button onClick="{{ closeGiphy }}" aria-label="Close" style="position:absolute;right:12px;top:12px;width:24px;height:24px;border:0;padding:0;border-radius:50%;background:#3D4549;display:flex;align-items:center;justify-content:center;cursor:pointer;"><img src="assets/icons/fz-close.svg" alt="" width="16" height="16" style="display:block;"></button>
+          </div>
+          <!-- GIF / Sticker -->
+          <div style="flex-shrink:0;height:56px;box-sizing:border-box;padding:8px 16px;display:flex;justify-content:center;">
+            <div role="tablist" aria-label="GIF or sticker" style="width:153px;height:40px;box-sizing:border-box;padding:3px 4px;border:1px solid #3D4549;border-radius:9px;background:#1B2326;display:flex;align-items:center;">
+              <button class="gz-tab" role="tab" aria-selected="{{ gzGifSel }}" aria-label="GIFs" onClick="{{ gzPickGif }}" style="width:72px;height:32px;border:0;padding:0;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:{{ gzGifTabBg }};"><img src="assets/icons/gz-tab-gif.svg" alt="" width="24" height="24" style="display:block;"></button>
+              <button class="gz-tab" role="tab" aria-selected="{{ gzStickerSel }}" aria-label="Stickers" onClick="{{ gzPickSticker }}" style="width:72px;height:32px;border:0;padding:0;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:{{ gzStickerTabBg }};"><img src="assets/icons/gz-tab-sticker.svg" alt="" width="24" height="24" style="display:block;"></button>
+            </div>
+          </div>
+          <!-- search -->
+          <div style="flex-shrink:0;height:72px;box-sizing:border-box;padding:12px 16px;">
+            <label style="height:48px;box-sizing:border-box;padding:12px;border:1px solid {{ gzFieldBorder }};border-radius:8px;display:flex;align-items:center;gap:8px;cursor:text;">
+              <img src="assets/icons/gz-search.svg" alt="" width="24" height="24" style="display:block;flex-shrink:0;">
+              <input class="gz-search" type="text" value="{{ gzQuery }}" onInput="{{ gzOnInput }}" onFocus="{{ gzOnFocus }}" onKeyDown="{{ gzOnKey }}" placeholder="{{ gzPlaceholder }}" aria-label="{{ gzPlaceholder }}" autocomplete="off" enterkeyhint="search" style="flex:1;min-width:0;border:0;outline:0;background:transparent;color:#F9FAFA;font-family:inherit;font-size:16px;line-height:24px;padding:0;margin:0;">
+              <sc-if value="{{ gzHasQuery }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ gzClear }}" aria-label="Clear search" style="flex-shrink:0;width:24px;height:24px;border:0;padding:0;background:transparent;cursor:pointer;display:block;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="#B3B9BB" stroke-width="1.6"></circle><path d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6" stroke="#B3B9BB" stroke-width="1.6" stroke-linecap="round"></path></svg></button>
+              </sc-if>
+            </label>
+          </div>
+          <!-- grid -->
+          <div class="gz-scroll" style="flex:1;min-height:0;overflow-y:auto;margin-top:8px;padding:0 16px 24px;">
+            <sc-if value="{{ gzLoading }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:8px;">
+                <div style="width:168px;display:flex;flex-direction:column;gap:8px;"><span class="gz-sk" style="display:block;height:124px;"></span><span class="gz-sk" style="display:block;height:166px;"></span><span class="gz-sk" style="display:block;height:124px;"></span></div>
+                <div style="width:168px;display:flex;flex-direction:column;gap:8px;"><span class="gz-sk" style="display:block;height:166px;"></span><span class="gz-sk" style="display:block;height:124px;"></span><span class="gz-sk" style="display:block;height:166px;"></span></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ gzShowGifs }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:8px;align-items:flex-start;">
+                <sc-for list="{{ gzGifCols }}" as="col" hint-placeholder-count="2">
+                  <div style="width:168px;display:flex;flex-direction:column;gap:8px;">
+                    <sc-for list="{{ col.items }}" as="g" hint-placeholder-count="4">
+                      <button class="gz-item" onClick="{{ g.send }}" aria-label="Send this GIF"><img src="{{ g.src }}" alt="" draggable="false" style="display:block;width:168px;height:{{ g.h }}px;object-fit:cover;"></button>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ gzShowStickers }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:repeat(3, 85px);justify-content:space-between;row-gap:8px;">
+                <sc-for list="{{ gzStickers }}" as="st" hint-placeholder-count="9">
+                  <button class="gz-item" onClick="{{ st.send }}" aria-label="Send this sticker"><img src="{{ st.src }}" alt="" draggable="false" style="display:block;width:85px;height:85px;object-fit:contain;"></button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
       <!-- FanZone panel -->
       <div class="fz-fzpanel {{ fzPanelCls }}" style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transform:{{ fzPanelTransform }};transition:top .55s cubic-bezier(.22,1,.36,1),transform .45s cubic-bezier(.22,1,.36,1);pointer-events:auto;background:#0C161C;border-radius:24px 24px 0 0;display:flex;flex-direction:column;padding-bottom:21px;box-sizing:border-box;">
         <sc-if value="{{ fzPlainHeader }}" hint-placeholder-val="{{ true }}">
@@ -371,7 +433,15 @@
                 </div>
                 <div style="flex:1;min-width:0;">
                   <div onClick="{{ m.onOpen }}" style="font-size:14px;font-weight:700;color:#F9FAFA;line-height:24px;height:24px;cursor:pointer;display:inline-block;">{{ m.name }}</div>
-                  <div style="font-size:16px;font-weight:400;color:#B3B9BB;line-height:1.3;margin-top:4px;">{{ m.text }}</div>
+                  <sc-if value="{{ m.text }}" hint-placeholder-val="{{ true }}">
+                    <div style="font-size:16px;font-weight:400;color:#B3B9BB;line-height:1.3;margin-top:4px;">{{ m.text }}</div>
+                  </sc-if>
+                  <sc-if value="{{ m.gif }}" hint-placeholder-val="{{ false }}">
+                    <img src="{{ m.gif }}" alt="GIF" style="display:block;margin-top:6px;width:144px;height:144px;object-fit:cover;border-radius:8px;border:1px solid rgba(249,250,250,.2);box-sizing:border-box;">
+                  </sc-if>
+                  <sc-if value="{{ m.sticker }}" hint-placeholder-val="{{ false }}">
+                    <img src="{{ m.sticker }}" alt="Sticker" style="display:block;margin-top:6px;width:144px;height:144px;object-fit:contain;">
+                  </sc-if>
                 </div>
               </div>
             </sc-for>
@@ -416,7 +486,7 @@
               <sc-if value="{{ fzHasDraft }}" hint-placeholder-val="{{ false }}">
                 <button onClick="{{ sendFzMessage }}" aria-label="Send message" style="flex-shrink:0;width:36px;height:36px;margin-right:-8px;border:0;padding:0;border-radius:50%;background:#F9FAFA;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="18" height="18" viewBox="335 69 18 18" aria-hidden="true"><path d="M337.004 71.9394C336.683 70.6769 338.031 69.6447 339.166 70.2831L350.59 76.7089C351.597 77.2753 351.597 78.7255 350.59 79.2919L339.166 85.7177C338.031 86.3562 336.683 85.3239 337.004 84.0615L337.891 80.5673L341.227 78.6415C341.721 78.3564 341.721 77.6435 341.227 77.3583L337.891 75.4316L337.004 71.9394Z" fill="#1B2326"></path></svg></button>
               </sc-if>
-              <img src="assets/icons/face-sticker.svg" alt="" width="24" height="24" style="display:block;flex-shrink:0;{{ fzStickerStyle }}">
+              <button onClick="{{ openGiphy }}" aria-label="GIFs and stickers" style="flex-shrink:0;border:0;padding:0;background:transparent;cursor:pointer;{{ fzStickerStyle }}"><img src="assets/icons/face-sticker.svg" alt="" width="24" height="24" style="display:block;"></button>
             </div>
             <!-- reactions -->
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;height:48px;padding-right:12px;">
@@ -2323,6 +2393,8 @@ const CHAT_POOL = [
   { name: "Akari",  text: "Bayern\u2019s high line is so risky against Adeyemi\u2019s pace, one ball over the top and it\u2019s a 1v1 every time", avatar: "uploads/15-0b0a6991.png" },
 ];
 
+// GIFs & stickers (Figma "Giphy - Stickers - Dev")
+const GZ = {"gifDefault": [[["assets/gif/g01.jpg", 166], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g06.jpg", 166]], [["assets/gif/g02.jpg", 165], ["assets/gif/g04.jpg", 124], ["assets/gif/g08.jpg", 163], ["assets/gif/g05.jpg", 121]]], "gifResult": [[["assets/gif/g05.jpg", 124], ["assets/gif/g06.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g03.jpg", 166]], [["assets/gif/g02.jpg", 165], ["assets/gif/g08.jpg", 163], ["assets/gif/g09.jpg", 166], ["assets/gif/g04.jpg", 121], ["assets/gif/g01.jpg", 166]]], "stickerDefault": ["assets/stickers/s01.png", "assets/stickers/s02.png", "assets/stickers/s03.png", "assets/stickers/s04.png", "assets/stickers/s05.png", "assets/stickers/s06.png", "assets/stickers/s07.png", "assets/stickers/s08.png", "assets/stickers/s09.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png"], "stickerResult": ["assets/stickers/s10.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s15.png", "assets/stickers/s03.png", "assets/stickers/s12.png", "assets/stickers/s16.png", "assets/stickers/s17.png", "assets/stickers/s18.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png"]};
 // FanZone chat: which team each fan supports (drives their avatar ring and Fan Card favorite)
 const FZ_FAN_TEAM = {"Ayaka": "bayern", "Hina": "bayern", "Sora": "bayern", "Mei": "bayern", "Aoi": "bayern", "Riku": "bayern", "Nao": "bayern", "Kenji": "bayern", "Rina": "bayern", "Daiki": "bayern", "Sho": "bayern", "Ai": "bvb", "Misaki": "bvb", "Kaito": "bvb", "Ren": "bvb", "Yuki": "bvb", "Haruto": "bvb", "Emi": "bvb", "Taiga": "bvb", "Sana": "bvb", "Yui": "bvb", "Miku": "bvb", "Ryo": "bvb", "Akari": "bvb"};
 // ---------- teams ----------
@@ -2655,7 +2727,7 @@ class Component extends DCLogic {
   componentDidUpdate() {
     if (this.state.atBottom && this._feedEl) this._feedEl.scrollTop = this._feedEl.scrollHeight;
   }
-  componentWillUnmount() { clearTimeout(this._fzAutoT); clearTimeout(this._fzLoadT); window.removeEventListener("message", this._onShellMsg); this.pollClear(); clearTimeout(this._pollOutT); clearTimeout(this._crLoadTimer); clearTimeout(this._crLoadMoreTimer); clearTimeout(this._crToastTimer); clearTimeout(this._introT); clearTimeout(this._introCloseT); clearTimeout(this._homeTipTimer); clearTimeout(this._ftueTimer); clearInterval(this._feedTimer); clearTimeout(this._closeT); clearTimeout(this._avatarVidStart); clearTimeout(this._avatarVidGap); }
+  componentWillUnmount() { clearTimeout(this._gzT); clearTimeout(this._fzAutoT); clearTimeout(this._fzLoadT); window.removeEventListener("message", this._onShellMsg); this.pollClear(); clearTimeout(this._pollOutT); clearTimeout(this._crLoadTimer); clearTimeout(this._crLoadMoreTimer); clearTimeout(this._crToastTimer); clearTimeout(this._introT); clearTimeout(this._introCloseT); clearTimeout(this._homeTipTimer); clearTimeout(this._ftueTimer); clearInterval(this._feedTimer); clearTimeout(this._closeT); clearTimeout(this._avatarVidStart); clearTimeout(this._avatarVidGap); }
 
   startAvatarVidCycle = () => {
     if (this.state.avatarsSeen || this.state.avatar) return;
@@ -2725,6 +2797,50 @@ class Component extends DCLogic {
     const msg = { id: "me" + Date.now(), name: s.nickname || "Charlie", avatar: av, text, mine: true };
     this.setState(st => ({ feed: st.feed.concat(msg).slice(-40), fzDraft: "", atBottom: true, showFtue: false }));
   };
+  openGiphy = (e) => { if (e && e.stopPropagation) e.stopPropagation(); clearTimeout(this._gzT); this.setState({ gzOpen: true, gzTab: this.state.gzTab || "gif", gzExpanded: false, gzQuery: "", gzLoading: false, showFtue: false }); };
+  closeGiphy = () => { clearTimeout(this._gzT); this.setState({ gzOpen: false, gzExpanded: false, gzQuery: "", gzLoading: false }); };
+  gzSetTab = (tab) => { clearTimeout(this._gzT); const q = this.state.gzQuery || ""; this.setState({ gzTab: tab, gzLoading: !!q.trim() }); if (q.trim()) this._gzT = setTimeout(() => this.setState({ gzLoading: false }), 700); };
+  gzOnFocus = () => { if (!this.state.gzExpanded) this.setState({ gzExpanded: true }); };
+  gzOnInput = (e) => {
+    const q = String((e && e.target && e.target.value) || "").slice(0, 60);
+    clearTimeout(this._gzT);
+    this.setState({ gzQuery: q, gzLoading: !!q.trim(), gzExpanded: true });
+    if (q.trim()) this._gzT = setTimeout(() => this.setState({ gzLoading: false }), 700);
+  };
+  gzOnKey = (e) => { if (e && e.key === "Enter") { e.preventDefault(); try { e.target.blur(); } catch (err) {} } if (e && e.key === "Escape") this.closeGiphy(); };
+  gzClear = (e) => { if (e && e.preventDefault) e.preventDefault(); clearTimeout(this._gzT); this.setState({ gzQuery: "", gzLoading: false }); };
+  gzSend = (kind, src) => {
+    const s = this.state;
+    const av = s.avatar && AV_MAP[s.avatar] && AV_MAP[s.avatar].src ? AV_MAP[s.avatar].src : "";
+    const msg = { id: "me" + Date.now(), name: s.nickname || "Charlie", avatar: av, text: "", mine: true };
+    msg[kind] = src;
+    clearTimeout(this._gzT);
+    this.setState(st => ({ feed: st.feed.concat(msg).slice(-40), atBottom: true, gzOpen: false, gzExpanded: false, gzQuery: "", gzLoading: false }));
+  };
+  gzVals() {
+    const s = this.state;
+    const tab = s.gzTab || "gif";
+    const searched = !!(s.gzQuery || "").trim();
+    const loading = !!s.gzLoading;
+    const cols = (searched ? GZ.gifResult : GZ.gifDefault).map((col, ci) => ({ id: "c" + ci, items: col.map(([src, h], i) => ({ id: ci + "-" + i, src, h, send: () => this.gzSend("gif", src) })) }));
+    const stickers = (searched ? GZ.stickerResult : GZ.stickerDefault).map((src, i) => ({ id: "s" + i, src, send: () => this.gzSend("sticker", src) }));
+    const base = s.fzOver ? 282 : 273;
+    return {
+      gzOpen: !!s.gzOpen && s.screen === "fanzone",
+      gzTop: s.gzExpanded ? (s.fzOver ? 62 : 54) : base,
+      openGiphy: this.openGiphy, closeGiphy: this.closeGiphy,
+      gzGifSel: tab === "gif" ? "true" : "false", gzStickerSel: tab === "sticker" ? "true" : "false",
+      gzGifTabBg: tab === "gif" ? "#3D4549" : "transparent", gzStickerTabBg: tab === "sticker" ? "#3D4549" : "transparent",
+      gzPickGif: () => this.gzSetTab("gif"), gzPickSticker: () => this.gzSetTab("sticker"),
+      gzPlaceholder: tab === "gif" ? "Search GIFs" : "Search stickers",
+      gzQuery: s.gzQuery || "", gzHasQuery: searched,
+      gzFieldBorder: s.gzExpanded ? "#CED0D2" : "#6D7377",
+      gzOnInput: this.gzOnInput, gzOnFocus: this.gzOnFocus, gzOnKey: this.gzOnKey, gzClear: this.gzClear,
+      gzLoading: loading,
+      gzShowGifs: tab === "gif" && !loading, gzShowStickers: tab === "sticker" && !loading,
+      gzGifCols: cols, gzStickers: stickers,
+    };
+  }
   openFanZoneOver = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     clearTimeout(this._fzLoadT);
@@ -2837,7 +2953,7 @@ class Component extends DCLogic {
     clearTimeout(this._commentsT);
     this._commentsT = setTimeout(() => this.setState({ commentsOpen: false, commentsClosing: false, commentsView: "list", commentsBack: false, opSub: null, opSubClosing: false }), 280);
   };
-  goHome = () => { this.pollEnd(true); clearTimeout(this._ftueTimer); this.setState({ screen: this.state.fanzoneFrom === "fixture" ? "fixture" : "home", showFtue: false }); };
+  goHome = () => { this.pollEnd(true); clearTimeout(this._gzT); if (this.state.gzOpen) this.setState({ gzOpen: false, gzExpanded: false, gzQuery: "" }); clearTimeout(this._ftueTimer); this.setState({ screen: this.state.fanzoneFrom === "fixture" ? "fixture" : "home", showFtue: false }); };
 
   // ---- navigation ----
   animateClose = (cb) => {
@@ -4150,6 +4266,7 @@ class Component extends DCLogic {
 
     return {
       ...this.crVals(),
+      ...this.gzVals(),
       ...this.pollVals(),
       // fanzone
       avatarSrc,
