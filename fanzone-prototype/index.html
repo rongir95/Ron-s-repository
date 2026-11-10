@@ -6,13 +6,16 @@
     color-scheme: dark;
     --ground: #06080a;
     --stage: #0b0f12;
-    --rail: #11171b;
-    --raise: #1b2328;
-    --line: rgba(233, 238, 240, 0.10);
-    --text: #eef1f2;
-    --muted: #a3acb1;
-    --accent: #f7ff1a;          /* DAZN yellow, used only for the selected state */
-    --on-accent: #0b0f12;
+    --rail: #0f1418;
+    --surface: #161d22;         /* control tracks, cards */
+    --raise: #262f36;           /* the selected option, lifted off its track */
+    --line: rgba(233, 238, 240, 0.09);
+    --line-strong: rgba(233, 238, 240, 0.16);
+    --text: #f2f4f5;
+    --muted: #98a2a8;
+    --primary: #f2f4f5;         /* main actions: white, like the app's Watch now button */
+    --on-primary: #0b0f12;
+    --live: #e5484d;            /* live-moment dot, as in the app's LIVE badge */
     --bezel: #1c1c20;
     --font: "DAZN Oscine", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   }
@@ -21,7 +24,7 @@
   html, body { height: 100%; }
   body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.45; overflow: hidden; }
   button { font: inherit; color: inherit; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 
   .shell { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 340px; }
   .stage { position: relative; min-width: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(110% 90% at 50% 0%, #161b20 0%, var(--stage) 55%, var(--ground) 100%); padding-block: 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; }
@@ -35,37 +38,42 @@
 
   .group { display: flex; flex-direction: column; gap: 10px; }
   .label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; padding: 4px; background: var(--raise); border-radius: 12px; }
-  .seg button { border: 0; background: transparent; padding: 9px 6px; border-radius: 9px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--muted); line-height: 1.2; }
-  .seg button small { display: block; font-weight: 400; font-size: 11px; margin-top: 2px; opacity: 0.85; }
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  .seg button { border: 0; background: transparent; padding: 9px 6px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--muted); line-height: 1.2; transition: background-color .15s ease, color .15s ease; }
+  .seg button small { display: block; font-weight: 400; font-size: 11px; margin-top: 2px; color: var(--muted); }
   .seg button:hover { color: var(--text); }
-  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+  .seg button[aria-pressed="true"] { background: var(--raise); color: var(--text); box-shadow: inset 0 0 0 1px var(--line-strong), 0 1px 2px rgba(0, 0, 0, 0.4); }
+  .seg button[aria-pressed="true"] small { color: #b9c1c5; }
   .hint { margin: 0; font-size: 12px; color: var(--muted); }
 
-  .restart { border: 1px solid var(--line); background: transparent; border-radius: 12px; padding: 11px 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .restart { border: 1px solid var(--line-strong); background: transparent; border-radius: 12px; padding: 11px 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .restart:hover { background: var(--raise); }
 
-  .live { display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--stage); }
-  .live-btn { border: 0; border-radius: 12px; padding: 12px 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--accent); color: var(--on-accent); }
-  .live-btn:disabled { background: var(--raise); color: var(--muted); cursor: not-allowed; }
-  .live-btn[aria-pressed="true"] { background: var(--raise); color: var(--text); border: 1px solid var(--line); }
+  .live { display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+  .live .label { display: flex; align-items: center; gap: 7px; }
+  .live .label::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--live); }
+  .live-btn { border: 1px solid transparent; border-radius: 10px; padding: 11px 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--primary); color: var(--on-primary); }
+  .live-btn:hover:not(:disabled) { background: #ffffff; }
+  .live-btn:disabled { background: transparent; border-color: var(--line-strong); color: var(--muted); cursor: not-allowed; }
+  .live-btn[aria-pressed="true"] { background: transparent; color: var(--text); border-color: var(--line-strong); }
+  .live-btn[aria-pressed="true"]:hover { background: var(--raise); }
   .topbar .bar-actions { display: flex; gap: 8px; }
   .topbar .poll-mini:disabled { opacity: .45; cursor: not-allowed; }
-  .topbar .poll-mini[aria-pressed="false"]:not(:disabled) { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+  .topbar .poll-mini[aria-pressed="false"]:not(:disabled) { background: var(--primary); color: var(--on-primary); border-color: transparent; }
   .try { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
   .try li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; }
-  .try .n { width: 22px; height: 22px; border-radius: 50%; background: var(--raise); color: var(--muted); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+  .try .n { width: 22px; height: 22px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); color: var(--muted); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
   .try b { font-weight: 700; }
   .try span { color: var(--muted); }
   .try li > div { min-width: 0; }
-  .stage-restart { position: absolute; top: 20px; right: 20px; z-index: 2; padding: 9px 14px; font-size: 13px; background: var(--rail); }
+  .stage-restart { position: absolute; top: 20px; right: 20px; z-index: 2; padding: 9px 14px; font-size: 13px; background: var(--surface); }
   .stage-restart:hover { background: var(--raise); }
   @media (max-width: 860px) { .stage-restart { display: none; } }
   .topbar .restart-mini { padding: 6px 10px; display: flex; align-items: center; }
-  .tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--raise); border-radius: 12px; margin-bottom: -8px; }
-  .tabs button { border: 0; background: transparent; border-radius: 9px; padding: 9px 6px; font-weight: 700; font-size: 13px; color: var(--muted); cursor: pointer; }
+  .tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--line); margin-bottom: -6px; }
+  .tabs button { border: 0; background: transparent; padding: 4px 0 11px; margin-bottom: -1px; border-bottom: 2px solid transparent; font-weight: 700; font-size: 14px; color: var(--muted); cursor: pointer; }
   .tabs button:hover { color: var(--text); }
-  .tabs button[aria-selected="true"] { background: var(--rail); color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+  .tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--text); }
   .tabpanel { display: flex; flex-direction: column; gap: 26px; }
   .tabpanel[hidden] { display: none; }
 
