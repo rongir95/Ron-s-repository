@@ -171,6 +171,7 @@
   /* FanZone opening over the match page */
   @keyframes fzOverIn { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
   .fz-over-panel { animation: fzOverIn .38s cubic-bezier(.22,1,.36,1) backwards; }
+  .fz-msg-input::placeholder { color: #7C868C; opacity: 1; }
   .fz-collapse-btn:focus-visible { outline: 2px solid #F9FAFA; outline-offset: 2px; border-radius: 6px; }
   .fz-entry:hover { background: #222C31 !important; }
   @keyframes fzPushIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
@@ -255,10 +256,30 @@
       <div style="position:absolute;top:54px;left:0;right:0;height:211px;z-index:2;{{ fzOwnStageStyle }}">
         <img src="assets/img/5cf91294bb9d1098.png" alt="live match" style="width:100%;height:100%;object-fit:cover;display:block;">
       </div>
-      <!-- ===================== LIVE POLL (from the landscape FanZone prototype): enters under the stream ===================== -->
+      <!-- FanZone panel -->
+      <div class="{{ fzPanelCls }}" style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transform:{{ fzPanelTransform }};transition:top .55s cubic-bezier(.22,1,.36,1),transform .45s cubic-bezier(.22,1,.36,1);pointer-events:auto;background:#080E12;border-radius:12px 12px 0 0;display:flex;flex-direction:column;">
+        <!-- header -->
+        <div style="position:relative;z-index:3;flex-shrink:0;height:48px;display:flex;align-items:center;gap:16px;padding:0 20px 0 16px;background:#1B2326;border-radius:12px 12px 0 0;border-top:1px solid rgba(249,250,250,.2);box-shadow:0 4px 4px rgba(0,0,0,.25);">
+          <button class="fz-collapse-btn" onClick="{{ toggleFzCollapse }}" aria-label="{{ fzCollapseLabel }}" aria-expanded="{{ fzExpandedAttr }}" style="display:flex;align-items:center;gap:16px;border:0;padding:8px 6px;margin:-8px -6px;background:transparent;cursor:pointer;font-family:inherit;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="flex-shrink:0;transform:rotate({{ fzCollapseRot }}deg);transition:transform .3s ease;">
+              <path d="M17 6H3" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M14.667 15.667L10 11L5.333 15.667" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span style="font-size:17px;font-weight:700;letter-spacing:-.01em;color:#F9FAFA;">FanZone</span>
+          </button>
+          <span style="flex:1;"></span>
+          <svg width="17" height="18" viewBox="0 0 19 20" fill="none" style="flex-shrink:0;">
+            <path d="M12.093 1.017C13.243 1.017 14.177 1.95 14.177 3.1V3.512H14.593C15.743 3.513 16.676 4.445 16.676 5.595V6.762C16.676 7.537 16.486 8.318 16.105 8.927C15.726 9.533 15.12 10.012 14.364 10.012H14.148C13.826 12.629 11.771 14.707 9.166 15.066C9.171 15.102 9.175 15.14 9.175 15.177V16.013H10.904C11.363 16.014 11.737 16.386 11.737 16.846C11.737 17.306 11.363 17.679 10.904 17.679H5.789C5.329 17.679 4.956 17.306 4.956 16.846C4.956 16.386 5.329 16.013 5.789 16.013H7.509V15.177C7.509 15.138 7.512 15.098 7.517 15.06C4.933 14.684 2.902 12.614 2.581 10.012H2.333C1.577 10.012 0.971 9.533 0.592 8.927C0.211 8.318 0.02 7.537 0.02 6.762V5.595C0.02 4.445 0.954 3.512 2.104 3.512H2.517V3.1C2.517 1.95 3.449 1.017 4.6 1.017H12.093ZM4.6 2.683C4.37 2.683 4.183 2.87 4.183 3.1V8.084L4.202 9.281V9.293C4.202 11.592 6.066 13.455 8.365 13.455C10.659 13.455 12.52 11.598 12.527 9.305L12.51 8.11V3.1C12.51 2.87 12.323 2.683 12.093 2.683H4.6ZM2.104 5.012C1.782 5.012 1.521 5.273 1.521 5.595V6.762C1.521 7.313 1.66 7.804 1.865 8.132C2.072 8.464 2.262 8.512 2.333 8.512H2.523L2.517 8.111V5.012H2.104ZM13.677 8.087L13.683 8.512H14.364C14.436 8.512 14.626 8.463 14.832 8.132C15.037 7.804 15.176 7.313 15.176 6.762V5.595C15.176 5.273 14.915 5.013 14.593 5.012H14.177V8.087H13.677Z" fill="#F9FAFA"></path>
+          </svg>
+          <span style="width:1px;height:17px;background:rgba(249,250,250,.6);flex-shrink:0;"></span>
+          <button onClick="{{ goHome }}" title="Close FanZone" style="flex-shrink:0;border:0;padding:6px;margin:-6px;background:transparent;cursor:pointer;display:flex;"><svg width="12" height="13" viewBox="0 0 13 14" fill="none" style="flex-shrink:0;">
+            <path d="M10.41 0.459C10.722 0.147 11.228 0.147 11.541 0.459C11.853 0.772 11.853 1.278 11.541 1.59L7.131 6L11.541 10.41C11.853 10.722 11.853 11.228 11.541 11.54C11.228 11.853 10.722 11.853 10.41 11.54L6 7.13L1.59 11.54C1.278 11.853 0.772 11.853 0.46 11.54C0.147 11.228 0.147 10.722 0.46 10.41L4.869 6L0.46 1.59C0.147 1.278 0.147 0.772 0.46 0.459C0.772 0.147 1.278 0.147 1.59 0.459L6 4.869L10.41 0.459Z" fill="#F9FAFA"></path>
+          </svg></button>
+        </div>
+        <!-- ===================== LIVE POLL (from the landscape FanZone prototype): slides down from under the FanZone header, over the top of the chat ===================== -->
       <sc-if value="{{ pollMounted }}" hint-placeholder-val="{{ false }}">
-        <div style="position:absolute;left:0;right:0;top:{{ pollTop }}px;z-index:1;height:{{ pollH }}px;overflow:hidden;pointer-events:auto;transition:height .45s cubic-bezier(.22,1,.36,1);">
-        <section class="fz-poll {{ pollCls }}" aria-label="Poll" style="position:relative;height:100%;background:#1B232B;border-radius:0 0 14px 14px;box-shadow:0 10px 24px rgba(0,0,0,.45);overflow:hidden;font-family:'DAZN Oscine',sans-serif;color:#F9FAFA;">
+        <div style="position:absolute;left:0;right:0;top:48px;z-index:2;height:{{ pollClipH }}px;overflow:hidden;pointer-events:none;transition:opacity .25s ease;{{ fzPollWrapStyle }}">
+        <section class="fz-poll {{ pollCls }}" aria-label="Poll" style="position:relative;height:{{ pollH }}px;pointer-events:auto;background:#1B232B;border-radius:0 0 14px 14px;box-shadow:0 10px 24px rgba(0,0,0,.45);overflow:hidden;font-family:'DAZN Oscine',sans-serif;color:#F9FAFA;">
           <div style="height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;">
             <div style="display:flex;align-items:center;gap:10px;">
               <svg width="24" height="24" viewBox="0 0 100 100" fill="none" aria-hidden="true"><path d="M64.2857 20.8332C64.2857 18.532 62.6867 16.6665 60.7143 16.6665H26.7857C25.7995 16.6665 25 17.5992 25 18.7498V31.2498C25 32.4004 25.7995 33.3332 26.7857 33.3332H60.7143C62.6867 33.3332 64.2857 31.4677 64.2857 29.1665V20.8332Z" fill="#F9FAFA"></path><path d="M75 45.8332C75 43.532 73.401 41.6665 71.4286 41.6665H26.7857C25.7995 41.6665 25 42.5992 25 43.7498V56.2498C25 57.4004 25.7995 58.3332 26.7857 58.3332H71.4286C73.401 58.3332 75 56.4677 75 54.1665V45.8332Z" fill="#F9FAFA"></path><path d="M46.4286 70.8332C46.4286 68.532 44.8296 66.6665 42.8571 66.6665H26.7857C25.7995 66.6665 25 67.5992 25 68.7498V81.2498C25 82.4004 25.7995 83.3332 26.7857 83.3332H42.8571C44.8296 83.3332 46.4286 81.4677 46.4286 79.1665V70.8332Z" fill="#F9FAFA"></path></svg>
@@ -308,26 +329,6 @@
         </section>
         </div>
       </sc-if>
-      <!-- FanZone panel -->
-      <div class="{{ fzPanelCls }}" style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transform:{{ fzPanelTransform }};transition:top .55s cubic-bezier(.22,1,.36,1),transform .45s cubic-bezier(.22,1,.36,1);pointer-events:auto;background:#080E12;border-radius:12px 12px 0 0;display:flex;flex-direction:column;">
-        <!-- header -->
-        <div style="position:relative;z-index:3;flex-shrink:0;height:48px;display:flex;align-items:center;gap:16px;padding:0 20px 0 16px;background:#1B2326;border-radius:12px 12px 0 0;border-top:1px solid rgba(249,250,250,.2);box-shadow:0 4px 4px rgba(0,0,0,.25);">
-          <button class="fz-collapse-btn" onClick="{{ toggleFzCollapse }}" aria-label="{{ fzCollapseLabel }}" aria-expanded="{{ fzExpandedAttr }}" style="display:flex;align-items:center;gap:16px;border:0;padding:8px 6px;margin:-8px -6px;background:transparent;cursor:pointer;font-family:inherit;">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="flex-shrink:0;transform:rotate({{ fzCollapseRot }}deg);transition:transform .3s ease;">
-              <path d="M17 6H3" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-              <path d="M14.667 15.667L10 11L5.333 15.667" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
-            <span style="font-size:17px;font-weight:700;letter-spacing:-.01em;color:#F9FAFA;">FanZone</span>
-          </button>
-          <span style="flex:1;"></span>
-          <svg width="17" height="18" viewBox="0 0 19 20" fill="none" style="flex-shrink:0;">
-            <path d="M12.093 1.017C13.243 1.017 14.177 1.95 14.177 3.1V3.512H14.593C15.743 3.513 16.676 4.445 16.676 5.595V6.762C16.676 7.537 16.486 8.318 16.105 8.927C15.726 9.533 15.12 10.012 14.364 10.012H14.148C13.826 12.629 11.771 14.707 9.166 15.066C9.171 15.102 9.175 15.14 9.175 15.177V16.013H10.904C11.363 16.014 11.737 16.386 11.737 16.846C11.737 17.306 11.363 17.679 10.904 17.679H5.789C5.329 17.679 4.956 17.306 4.956 16.846C4.956 16.386 5.329 16.013 5.789 16.013H7.509V15.177C7.509 15.138 7.512 15.098 7.517 15.06C4.933 14.684 2.902 12.614 2.581 10.012H2.333C1.577 10.012 0.971 9.533 0.592 8.927C0.211 8.318 0.02 7.537 0.02 6.762V5.595C0.02 4.445 0.954 3.512 2.104 3.512H2.517V3.1C2.517 1.95 3.449 1.017 4.6 1.017H12.093ZM4.6 2.683C4.37 2.683 4.183 2.87 4.183 3.1V8.084L4.202 9.281V9.293C4.202 11.592 6.066 13.455 8.365 13.455C10.659 13.455 12.52 11.598 12.527 9.305L12.51 8.11V3.1C12.51 2.87 12.323 2.683 12.093 2.683H4.6ZM2.104 5.012C1.782 5.012 1.521 5.273 1.521 5.595V6.762C1.521 7.313 1.66 7.804 1.865 8.132C2.072 8.464 2.262 8.512 2.333 8.512H2.523L2.517 8.111V5.012H2.104ZM13.677 8.087L13.683 8.512H14.364C14.436 8.512 14.626 8.463 14.832 8.132C15.037 7.804 15.176 7.313 15.176 6.762V5.595C15.176 5.273 14.915 5.013 14.593 5.012H14.177V8.087H13.677Z" fill="#F9FAFA"></path>
-          </svg>
-          <span style="width:1px;height:17px;background:rgba(249,250,250,.6);flex-shrink:0;"></span>
-          <button onClick="{{ goHome }}" title="Close FanZone" style="flex-shrink:0;border:0;padding:6px;margin:-6px;background:transparent;cursor:pointer;display:flex;"><svg width="12" height="13" viewBox="0 0 13 14" fill="none" style="flex-shrink:0;">
-            <path d="M10.41 0.459C10.722 0.147 11.228 0.147 11.541 0.459C11.853 0.772 11.853 1.278 11.541 1.59L7.131 6L11.541 10.41C11.853 10.722 11.853 11.228 11.541 11.54C11.228 11.853 10.722 11.853 10.41 11.54L6 7.13L1.59 11.54C1.278 11.853 0.772 11.853 0.46 11.54C0.147 11.228 0.147 10.722 0.46 10.41L4.869 6L0.46 1.59C0.147 1.278 0.147 0.772 0.46 0.459C0.772 0.147 1.278 0.147 1.59 0.459L6 4.869L10.41 0.459Z" fill="#F9FAFA"></path>
-          </svg></button>
-        </div>
         <!-- loading (FanZone just opened) -->
         <sc-if value="{{ fzLoading }}" hint-placeholder-val="{{ false }}">
           <div style="position:absolute;left:0;right:0;top:48px;bottom:72px;z-index:2;background:#080E12;display:flex;align-items:center;justify-content:center;" aria-label="Loading FanZone">
@@ -384,8 +385,11 @@
             </button>
             <!-- message input -->
             <div style="flex:0 0 calc(100% - 144px);display:flex;align-items:center;height:56px;background:#242D33;border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:0 16px 0 20px;">
-              <span style="flex:1;color:#7C868C;font-size:16px;">Message</span>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
+              <input class="fz-msg-input" type="text" value="{{ fzDraft }}" onInput="{{ onFzDraft }}" onKeyDown="{{ onFzKey }}" placeholder="Message" aria-label="Message" maxlength="200" enterkeyhint="send" autocomplete="off" style="flex:1;min-width:0;border:0;outline:0;background:transparent;color:#F9FAFA;font-size:16px;font-family:inherit;padding:0;margin:0;">
+              <sc-if value="{{ fzHasDraft }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ sendFzMessage }}" aria-label="Send message" style="flex-shrink:0;width:36px;height:36px;margin-right:-8px;border:0;padding:0;border-radius:50%;background:#F9FAFA;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="18" height="18" viewBox="335 69 18 18" aria-hidden="true"><path d="M337.004 71.9394C336.683 70.6769 338.031 69.6447 339.166 70.2831L350.59 76.7089C351.597 77.2753 351.597 78.7255 350.59 79.2919L339.166 85.7177C338.031 86.3562 336.683 85.3239 337.004 84.0615L337.891 80.5673L341.227 78.6415C341.721 78.3564 341.721 77.6435 341.227 77.3583L337.891 75.4316L337.004 71.9394Z" fill="#1B2326"></path></svg></button>
+              </sc-if>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;{{ fzStickerStyle }}">
                 <path d="M7 4H17C18.6569 4 20 5.34315 20 7V12.3428C20 13.1384 19.6837 13.9022 19.1211 14.4648L14.4648 19.1211C13.9022 19.6837 13.1384 20 12.3428 20H7C5.34315 20 4 18.6569 4 17V7C4 5.34315 5.34315 4 7 4Z" stroke="#CED0D2" stroke-width="2"></path>
                 <path d="M14 13H20V13.5859L13.5859 20H13V14C13 13.4477 13.4477 13 14 13Z" stroke="#CED0D2" stroke-width="2"></path>
               </svg>
@@ -2683,6 +2687,16 @@ class Component extends DCLogic {
   backFromProfile = () => { clearTimeout(this._introT); this.setState({ screen: "home", showHomeTip: false, profileIntro: false, profileScrolled: false }); };
   goFixture = (e) => { if (e && e.stopPropagation) e.stopPropagation(); clearTimeout(this._homeTipTimer); this.setState({ screen: "fixture", showHomeTip: false, fzEntrySeen: false });
     clearTimeout(this._fzAutoT); this._fzAutoT = setTimeout(() => { if (this.state.screen === "fixture" && !this.state.commentsOpen) this.openFanZoneOver(); }, 650); };
+  onFzDraft = (e) => this.setState({ fzDraft: String((e && e.target && e.target.value) || "").slice(0, 200) });
+  onFzKey = (e) => { if (e && e.key === "Enter" && !e.shiftKey) { e.preventDefault(); this.sendFzMessage(); } };
+  sendFzMessage = () => {
+    const text = (this.state.fzDraft || "").trim();
+    if (!text) return;
+    const s = this.state;
+    const av = s.avatar && AV_MAP[s.avatar] && AV_MAP[s.avatar].src ? AV_MAP[s.avatar].src : "assets/comments/avin.png";
+    const msg = { id: "me" + Date.now(), name: s.nickname || "Charlie", avatar: av, text, mine: true };
+    this.setState(st => ({ feed: st.feed.concat(msg).slice(-40), fzDraft: "", atBottom: true, showFtue: false }));
+  };
   openFanZoneOver = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     clearTimeout(this._fzLoadT);
@@ -3944,8 +3958,8 @@ class Component extends DCLogic {
       pollMounted: on,
       pollCls: s.pollClosing ? "is-out" : "",
       pollH: h,
-      pollTop: s.fzOver ? 274 : 265,
-      fzPanelTop: s.fzOver ? (on && !s.pollClosing ? 274 + h : 274) : (on && !s.pollClosing ? 265 + h + 8 : 273),
+      pollClipH: h + 24, // room for the card's shadow
+      fzPanelTop: s.fzOver ? 274 : 273,
       pollTimerPct: Math.max(0, Math.min(100, s.pollTime ?? 100)),
       pollToggleCollapse: () => this.setState({ pollCollapsed: !collapsed }),
       pollCollapseLabel: collapsed ? "Expand poll" : "Collapse poll",
@@ -4100,6 +4114,7 @@ class Component extends DCLogic {
       chatMessages: s.feed.map(m => {
         const p = this.synthProfile(m.name, m.avatar);
         const t = teamById(p.favoriteId);
+        if (m.mine) return { ...m, stroke: "#F2C400", imgScale: "", onOpen: this.openCard };
         return { ...m, stroke: t ? t.card : "#F2C400", imgScale: "transform:scale(1.05);", onOpen: () => this.openUserCard(m) };
       }),
       feedRef: this.feedRef,
@@ -4114,11 +4129,16 @@ class Component extends DCLogic {
       fzLoading: !!s.fzLoading && s.screen === "fanzone",
       showFzEntry: s.screen === "fixture" && !!s.fzEntrySeen,
       openFanZoneOver: this.openFanZoneOver,
+      fzDraft: s.fzDraft || "",
+      fzHasDraft: !!(s.fzDraft || "").trim(),
+      fzStickerStyle: (s.fzDraft || "").trim() ? "display:none;" : "",
+      onFzDraft: this.onFzDraft, onFzKey: this.onFzKey, sendFzMessage: this.sendFzMessage,
       fzPanelTransform: s.fzCollapsed ? "translateY(calc(100% - 68px))" : "none",
       toggleFzCollapse: () => this.setState({ fzCollapsed: !s.fzCollapsed, showFtue: false }),
       fzCollapseLabel: s.fzCollapsed ? "Expand FanZone" : "Collapse FanZone",
       fzExpandedAttr: s.fzCollapsed ? "false" : "true",
       fzCollapseRot: s.fzCollapsed ? 180 : 0,
+      fzPollWrapStyle: s.fzCollapsed ? "opacity:0;visibility:hidden;" : "",
       fixVidRef: this.fixVidRef,
       onFixTime: this.onFixTime,
       showFixCtrls: this.showFixCtrls,

@@ -39,12 +39,6 @@ rep('      <div style="position:absolute;top:0;left:0;right:0;height:54px;z-inde
 rep('      <div style="position:absolute;top:54px;left:0;right:0;height:211px;z-index:2;">',
     '      <div style="position:absolute;top:54px;left:0;right:0;height:211px;z-index:2;{{ fzOwnStageStyle }}">')
 
-# poll: clipped under the video in both modes
-rep('<section class="fz-poll {{ pollCls }}" aria-label="Poll" style="position:absolute;left:0;right:0;top:265px;z-index:1;height:{{ pollH }}px;',
-    '<div style="position:absolute;left:0;right:0;top:{{ pollTop }}px;z-index:1;height:{{ pollH }}px;overflow:hidden;pointer-events:auto;transition:height .45s cubic-bezier(.22,1,.36,1);">\n        <section class="fz-poll {{ pollCls }}" aria-label="Poll" style="position:relative;height:100%;')
-rep('        </section>\n      </sc-if>\n      <!-- FanZone panel -->',
-    '        </section>\n        </div>\n      </sc-if>\n      <!-- FanZone panel -->')
-
 # panel: opening animation + loading spinner
 rep('      <div style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transition:top .55s cubic-bezier(.22,1,.36,1);background:#080E12;',
     '      <div class="{{ fzPanelCls }}" style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transition:top .55s cubic-bezier(.22,1,.36,1);pointer-events:auto;background:#080E12;')
@@ -105,9 +99,8 @@ rep('      isFixture: s.screen === "fixture",',
     '      showFzEntry: s.screen === "fixture" && !!s.fzEntrySeen,\n'
     '      openFanZoneOver: this.openFanZoneOver,')
 # poll + panel positions follow the video bottom (match video ends at 274, FanZone's own at 265)
-rep('      fzPanelTop: on && !s.pollClosing ? 265 + h + 8 : 273,',
-    '      pollTop: s.fzOver ? 274 : 265,\n'
-    '      fzPanelTop: s.fzOver ? (on && !s.pollClosing ? 274 + h : 274) : (on && !s.pollClosing ? 265 + h + 8 : 273),')
+rep('      fzPanelTop: 273,',
+    '      fzPanelTop: s.fzOver ? 274 : 273,')
 rep('  componentWillUnmount() { ', '  componentWillUnmount() { clearTimeout(this._fzAutoT); clearTimeout(this._fzLoadT); ')
 
 open(PATH, 'w', encoding='utf-8').write(src)

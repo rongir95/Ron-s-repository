@@ -8,14 +8,16 @@ One clickable prototype of the FanZone product, built by merging two earlier pro
 | **Replies – Mobile** (Claude Design) | The Comments & Replies experience: threads, replying with @mentions, reaction picker, delete / report, toasts, keyboard, No Internet state |
 
 From a third prototype, **FanZone Prototype** (landscape player + FanZone, Design canvas), only the
-**Poll** was taken. In the portrait FanZone screen it drops in under the stream when a tester presses
+**Poll** was taken. In the portrait FanZone screen it slides down from under the FanZone header, over
+the top of the chat, when a tester presses
 **Start poll** in the shell (side panel on desktop, top bar on phones). The button works only while
 FanZone is open. Fans vote, see live results, and can collapse the poll. It closes when its timer runs out.
 
 **FanZone entry** (from a screen recording of the product): Home > Watch now opens the match page,
 and FanZone opens by itself over it, under the video, after a short loading spinner. X closes FanZone
 and leaves a FanZone card ("Join chat") on the match page; tapping it opens FanZone again. The arrow
-next to the FanZone title collapses the panel to its header bar and expands it again.
+next to the FanZone title collapses the panel to its header bar and expands it again. The Message
+field works: type, press Enter or the send button, and the message joins the chat as you.
 
 **Tooltips**: "Let's make a unique fan profile" (Home) and "Meet your Fan Card" (FanZone) are off by
 default; each has an On / Off switch in the shell's Settings tab.

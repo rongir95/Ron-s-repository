@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Add the live Poll (from the landscape 'FanZone Prototype' canvas) to the portrait FanZone screen.
 
-The poll card enters from under the stream and pushes the FanZone panel down. It is started
+The poll card slides down from under the FanZone panel header and sits over the top of the chat
+(the panel does not move). It is started
 from the prototype shell (index.html) with a postMessage, and only while the FanZone screen is open.
 Run after merge-prototypes.py:  python3 tools/add-poll.py FanZone.dc.html
 """
@@ -34,9 +35,10 @@ src = must_replace(src,
     '      <!-- Match video -->\n      <div style="position:absolute;top:54px;left:0;right:0;height:211px;">',
     '      <!-- Match video -->\n      <div style="position:absolute;top:54px;left:0;right:0;height:211px;z-index:2;">')
 
-POLL = r'''      <!-- ===================== LIVE POLL (from the landscape FanZone prototype): enters under the stream ===================== -->
+POLL = r'''        <!-- ===================== LIVE POLL (from the landscape FanZone prototype): slides down from under the FanZone header, over the top of the chat ===================== -->
       <sc-if value="{{ pollMounted }}" hint-placeholder-val="{{ false }}">
-        <section class="fz-poll {{ pollCls }}" aria-label="Poll" style="position:absolute;left:0;right:0;top:265px;z-index:1;height:{{ pollH }}px;background:#1B232B;border-radius:0 0 14px 14px;box-shadow:0 10px 24px rgba(0,0,0,.45);overflow:hidden;font-family:'DAZN Oscine',sans-serif;color:#F9FAFA;">
+        <div style="position:absolute;left:0;right:0;top:48px;z-index:2;height:{{ pollClipH }}px;overflow:hidden;pointer-events:none;">
+        <section class="fz-poll {{ pollCls }}" aria-label="Poll" style="position:relative;height:{{ pollH }}px;pointer-events:auto;background:#1B232B;border-radius:0 0 14px 14px;box-shadow:0 10px 24px rgba(0,0,0,.45);overflow:hidden;font-family:'DAZN Oscine',sans-serif;color:#F9FAFA;">
           <div style="height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;">
             <div style="display:flex;align-items:center;gap:10px;">
               <svg width="24" height="24" viewBox="0 0 100 100" fill="none" aria-hidden="true"><path d="M64.2857 20.8332C64.2857 18.532 62.6867 16.6665 60.7143 16.6665H26.7857C25.7995 16.6665 25 17.5992 25 18.7498V31.2498C25 32.4004 25.7995 33.3332 26.7857 33.3332H60.7143C62.6867 33.3332 64.2857 31.4677 64.2857 29.1665V20.8332Z" fill="#F9FAFA"></path><path d="M75 45.8332C75 43.532 73.401 41.6665 71.4286 41.6665H26.7857C25.7995 41.6665 25 42.5992 25 43.7498V56.2498C25 57.4004 25.7995 58.3332 26.7857 58.3332H71.4286C73.401 58.3332 75 56.4677 75 54.1665V45.8332Z" fill="#F9FAFA"></path><path d="M46.4286 70.8332C46.4286 68.532 44.8296 66.6665 42.8571 66.6665H26.7857C25.7995 66.6665 25 67.5992 25 68.7498V81.2498C25 82.4004 25.7995 83.3332 26.7857 83.3332H42.8571C44.8296 83.3332 46.4286 81.4677 46.4286 79.1665V70.8332Z" fill="#F9FAFA"></path></svg>
@@ -84,12 +86,14 @@ POLL = r'''      <!-- ===================== LIVE POLL (from the landscape FanZon
             <span style="font-size:13px;color:#8C959E;">{{ pollVotesLabel }} fans voted</span>
           </div>
         </section>
+        </div>
       </sc-if>
-      <!-- FanZone panel -->
-      <div style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transition:top .55s cubic-bezier(.22,1,.36,1);background:#080E12;'''
+        <!-- chat feed -->
+'''
+src = must_replace(src, '        <!-- chat feed -->\n', POLL)
 src = must_replace(src,
     '      <!-- FanZone panel -->\n      <div style="position:absolute;left:0;right:0;bottom:0;top:273px;background:#080E12;',
-    POLL)
+    '      <!-- FanZone panel -->\n      <div style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transition:top .55s cubic-bezier(.22,1,.36,1);background:#080E12;')
 
 # ---------------------------------------------------------------- logic
 LOGIC = r'''
@@ -172,7 +176,8 @@ LOGIC = r'''
       pollMounted: on,
       pollCls: s.pollClosing ? "is-out" : "",
       pollH: h,
-      fzPanelTop: on && !s.pollClosing ? 265 + h + 8 : 273,
+      pollClipH: h + 24, // room for the card's shadow
+      fzPanelTop: 273,
       pollTimerPct: Math.max(0, Math.min(100, s.pollTime ?? 100)),
       pollToggleCollapse: () => this.setState({ pollCollapsed: !collapsed }),
       pollCollapseLabel: collapsed ? "Expand poll" : "Collapse poll",

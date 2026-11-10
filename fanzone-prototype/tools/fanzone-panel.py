@@ -59,6 +59,43 @@ rep('  startFanZoneFtue = () => {\n    clearTimeout(this._ftueTimer);\n',
 rep('    if (q.get("reset") === "1") o.resetOnLoad = true;',
     '    if (q.get("reset") === "1") o.resetOnLoad = true;\n    if (q.get("fancardtip") === "1") o.fanCardTip = true;')
 
+# poll inside the drawer: hidden while the drawer is collapsed (only the header shows)
+rep('<div style="position:absolute;left:0;right:0;top:48px;z-index:2;height:{{ pollClipH }}px;overflow:hidden;pointer-events:none;">',
+    '<div style="position:absolute;left:0;right:0;top:48px;z-index:2;height:{{ pollClipH }}px;overflow:hidden;pointer-events:none;transition:opacity .25s ease;{{ fzPollWrapStyle }}">')
+rep('      fzCollapseRot: s.fzCollapsed ? 180 : 0,',
+    '      fzCollapseRot: s.fzCollapsed ? 180 : 0,\n      fzPollWrapStyle: s.fzCollapsed ? "opacity:0;visibility:hidden;" : "",')
+
+# ---------------------------------------------------------------- FanZone: write and send a message
+rep('              <span style="flex:1;color:#7C868C;font-size:16px;">Message</span>\n              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">',
+    '              <input class="fz-msg-input" type="text" value="{{ fzDraft }}" onInput="{{ onFzDraft }}" onKeyDown="{{ onFzKey }}" placeholder="Message" aria-label="Message" maxlength="200" enterkeyhint="send" autocomplete="off" style="flex:1;min-width:0;border:0;outline:0;background:transparent;color:#F9FAFA;font-size:16px;font-family:inherit;padding:0;margin:0;">\n'
+    '              <sc-if value="{{ fzHasDraft }}" hint-placeholder-val="{{ false }}">\n'
+    '                <button onClick="{{ sendFzMessage }}" aria-label="Send message" style="flex-shrink:0;width:36px;height:36px;margin-right:-8px;border:0;padding:0;border-radius:50%;background:#F9FAFA;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="18" height="18" viewBox="335 69 18 18" aria-hidden="true"><path d="M337.004 71.9394C336.683 70.6769 338.031 69.6447 339.166 70.2831L350.59 76.7089C351.597 77.2753 351.597 78.7255 350.59 79.2919L339.166 85.7177C338.031 86.3562 336.683 85.3239 337.004 84.0615L337.891 80.5673L341.227 78.6415C341.721 78.3564 341.721 77.6435 341.227 77.3583L337.891 75.4316L337.004 71.9394Z" fill="#1B2326"></path></svg></button>\n'
+    '              </sc-if>\n'
+    '              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;{{ fzStickerStyle }}">')
+rep("  .fz-collapse-btn:focus-visible {",
+    "  .fz-msg-input::placeholder { color: #7C868C; opacity: 1; }\n  .fz-collapse-btn:focus-visible {")
+rep('        return { ...m, stroke: t ? t.card : "#F2C400", imgScale: "transform:scale(1.05);", onOpen: () => this.openUserCard(m) };',
+    '        if (m.mine) return { ...m, stroke: "#F2C400", imgScale: "", onOpen: this.openCard };\n'
+    '        return { ...m, stroke: t ? t.card : "#F2C400", imgScale: "transform:scale(1.05);", onOpen: () => this.openUserCard(m) };')
+rep('  openFanZoneOver = (e) => {',
+    '''  onFzDraft = (e) => this.setState({ fzDraft: String((e && e.target && e.target.value) || "").slice(0, 200) });
+  onFzKey = (e) => { if (e && e.key === "Enter" && !e.shiftKey) { e.preventDefault(); this.sendFzMessage(); } };
+  sendFzMessage = () => {
+    const text = (this.state.fzDraft || "").trim();
+    if (!text) return;
+    const s = this.state;
+    const av = s.avatar && AV_MAP[s.avatar] && AV_MAP[s.avatar].src ? AV_MAP[s.avatar].src : "assets/comments/avin.png";
+    const msg = { id: "me" + Date.now(), name: s.nickname || "Charlie", avatar: av, text, mine: true };
+    this.setState(st => ({ feed: st.feed.concat(msg).slice(-40), fzDraft: "", atBottom: true, showFtue: false }));
+  };
+  openFanZoneOver = (e) => {''')
+rep('      openFanZoneOver: this.openFanZoneOver,',
+    '      openFanZoneOver: this.openFanZoneOver,\n'
+    '      fzDraft: s.fzDraft || "",\n'
+    '      fzHasDraft: !!(s.fzDraft || "").trim(),\n'
+    '      fzStickerStyle: (s.fzDraft || "").trim() ? "display:none;" : "",\n'
+    '      onFzDraft: this.onFzDraft, onFzKey: this.onFzKey, sendFzMessage: this.sendFzMessage,')
+
 # "Let's make a unique fan profile" tip on Home: off unless the shell turns it on (?hometip=1)
 rep('      this._homeTipTimer = setTimeout(() => { if (!this.state.sheet && this.state.screen === "home") this.setState({ showHomeTip: true }); }, 2000);',
     '      if (this.P.homeTip === true) this._homeTipTimer = setTimeout(() => { if (!this.state.sheet && this.state.screen === "home") this.setState({ showHomeTip: true }); }, 2000);')
