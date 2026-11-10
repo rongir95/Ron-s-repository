@@ -58,6 +58,15 @@
   .try b { font-weight: 700; }
   .try span { color: var(--muted); }
   .try li > div { min-width: 0; }
+  .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .brand-row .restart { padding: 8px 12px; font-size: 13px; }
+  .topbar .restart-mini { padding: 6px 10px; display: flex; align-items: center; }
+  .tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--raise); border-radius: 12px; margin-bottom: -8px; }
+  .tabs button { border: 0; background: transparent; border-radius: 9px; padding: 9px 6px; font-weight: 700; font-size: 13px; color: var(--muted); cursor: pointer; }
+  .tabs button:hover { color: var(--text); }
+  .tabs button[aria-selected="true"] { background: var(--rail); color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+  .tabpanel { display: flex; flex-direction: column; gap: 26px; }
+  .tabpanel[hidden] { display: none; }
 
   .topbar, .sheet-head { display: none; }
 
@@ -80,6 +89,7 @@
   <header class="topbar">
     <strong>FanZone</strong>
     <div class="bar-actions">
+      <button type="button" class="restart-mini js-restart" aria-label="Restart prototype" title="Restart prototype"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="display:block;"><path d="M13.5 8a5.5 5.5 0 1 1-1.61-3.89M13.5 2.5v3h-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button type="button" class="poll-mini" id="pollMini" aria-pressed="false" disabled>Start poll</button>
       <button type="button" id="openSettings" aria-controls="rail" aria-expanded="false">Settings &amp; tips</button>
     </div>
@@ -95,7 +105,13 @@
     <div class="sheet-head"><button type="button" id="closeSettings">Back to the prototype</button></div>
 
     <div class="brand">
-      <h1>FanZone</h1>
+      <div class="brand-row">
+        <h1>FanZone</h1>
+        <button type="button" class="restart js-restart">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.61-3.89M13.5 2.5v3h-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Restart prototype
+        </button>
+      </div>
       <p>Interactive prototype: Home, the match page with Comments &amp; Replies, the Fan Card and FanZone live chat.</p>
     </div>
 
@@ -108,6 +124,12 @@
       <p class="hint" id="pollHint">Open FanZone to start a poll. It drops in under the stream.</p>
     </div>
 
+    <div class="tabs" role="tablist" aria-label="Prototype panel">
+      <button type="button" role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="true">Settings</button>
+      <button type="button" role="tab" id="tab-try" aria-controls="panel-try" aria-selected="false" tabindex="-1">Things to try</button>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" id="panel-settings" aria-labelledby="tab-settings">
     <div class="group">
       <span class="label" id="l-start">Start screen</span>
       <div class="seg" role="group" aria-labelledby="l-start" data-key="start">
@@ -142,22 +164,36 @@
       <p class="hint">Hide shows the no-following version of My Card.</p>
     </div>
 
-    <button type="button" class="restart" id="restart">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.61-3.89M13.5 2.5v3h-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Restart prototype
-    </button>
+    <div class="group">
+      <span class="label" id="l-hometip">Home tooltip</span>
+      <div class="seg" role="group" aria-labelledby="l-hometip" data-key="hometip">
+        <button type="button" data-val="0">Off</button>
+        <button type="button" data-val="1">On</button>
+      </div>
+      <p class="hint">"Let's make a unique fan profile", under the avatar on Home.</p>
+    </div>
 
     <div class="group">
-      <span class="label">Things to try</span>
+      <span class="label" id="l-fctip">FanZone tooltip</span>
+      <div class="seg" role="group" aria-labelledby="l-fctip" data-key="fancardtip">
+        <button type="button" data-val="0">Off</button>
+        <button type="button" data-val="1">On</button>
+      </div>
+      <p class="hint">"Meet your Fan Card", above your avatar in FanZone.</p>
+    </div>
+    </div>
+
+    <div class="tabpanel" role="tabpanel" id="panel-try" aria-labelledby="tab-try" hidden>
       <ol class="try">
         <li><span class="n">1</span><div><b>Make your Fan Card.</b> <span>On Home, tap your avatar (top right) to pick an avatar, a favorite team and a status.</span></div></li>
         <li><span class="n">2</span><div><b>Open FanZone.</b> <span>Tap Watch now. The match page opens and FanZone opens over it by itself. Close it with X; the FanZone card on the match page opens it again.</span></div></li>
-        <li><span class="n">2b</span><div><b>Join the comments.</b> <span>On the match page, tap Comments. View replies, reply, post a comment, and long-press the heart for more reactions.</span></div></li>
-        <li><span class="n">3</span><div><b>Meet other fans.</b> <span>In Comments, tap Futcrunch, Mariana, Sandra45 or MisterFotball12 to open their Fan Card. Tap your own avatar to open yours.</span></div></li>
-        <li><span class="n">4</span><div><b>Manage your comments.</b> <span>Long-press your comment to delete it, or someone else's to report it.</span></div></li>
-        <li><span class="n">5</span><div><b>Lose the connection.</b> <span>Tap the status bar on the match page to turn on No Internet, then try to post.</span></div></li>
-        <li><span class="n">6</span><div><b>Skip to FanZone.</b> <span>Set Start screen to FanZone to start on the match page with FanZone already open.</span></div></li>
-        <li><span class="n">7</span><div><b>Vote in a live poll.</b> <span>In FanZone, press Start poll. Pick a team to see the results; the arrow collapses the poll.</span></div></li>
+        <li><span class="n">3</span><div><b>Collapse FanZone.</b> <span>Tap the arrow next to the FanZone title to slide the panel down and see the match page; tap it again to bring it back.</span></div></li>
+        <li><span class="n">4</span><div><b>Vote in a live poll.</b> <span>In FanZone, press Start poll. Pick a team to see the results; the arrow collapses the poll.</span></div></li>
+        <li><span class="n">5</span><div><b>Join the comments.</b> <span>On the match page, tap Comments. View replies, reply, post a comment, and long-press the heart for more reactions.</span></div></li>
+        <li><span class="n">6</span><div><b>Meet other fans.</b> <span>In Comments, tap Futcrunch, Mariana, Sandra45 or MisterFotball12 to open their Fan Card. Tap your own avatar to open yours.</span></div></li>
+        <li><span class="n">7</span><div><b>Manage your comments.</b> <span>Long-press your comment to delete it, or someone else's to report it.</span></div></li>
+        <li><span class="n">8</span><div><b>Lose the connection.</b> <span>Tap the status bar on the match page to turn on No Internet, then try to post.</span></div></li>
+        <li><span class="n">9</span><div><b>Skip to FanZone.</b> <span>In Settings, set Start screen to FanZone to start on the match page with FanZone already open.</span></div></li>
       </ol>
     </div>
   </aside>
@@ -165,10 +201,28 @@
 
 <script>
 (function () {
-  var DEFAULTS = { start: "home", profile: "empty", card: "A", following: "1" };
+  var DEFAULTS = { start: "home", profile: "empty", card: "A", following: "1", hometip: "0", fancardtip: "0" };
   var KEY = "fanzone-prototype-settings";
   var settings = Object.assign({}, DEFAULTS);
   try { Object.assign(settings, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
+
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  function selectTab(tab) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute("aria-selected", String(on));
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { selectTab(t); });
+    t.addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      var next = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+      selectTab(next); next.focus();
+    });
+  });
 
   var frame = document.getElementById("app");
   var device = document.getElementById("device");
@@ -178,7 +232,7 @@
   var loads = 0;
 
   function query() {
-    var q = "embed=1&reset=1&start=" + settings.start + "&profile=" + settings.profile + "&card=" + settings.card + "&following=" + settings.following;
+    var q = "embed=1&reset=1&start=" + settings.start + "&profile=" + settings.profile + "&card=" + settings.card + "&following=" + settings.following + "&hometip=" + settings.hometip + "&fancardtip=" + settings.fancardtip;
     return q;
   }
   function load() {
@@ -250,7 +304,7 @@
       load();
     });
   });
-  document.getElementById("restart").addEventListener("click", function () { load(); setOpen(false); });
+  document.querySelectorAll(".js-restart").forEach(function (b) { b.addEventListener("click", function () { load(); setOpen(false); }); });
   openBtn.addEventListener("click", function () { setOpen(true); });
   document.getElementById("closeSettings").addEventListener("click", function () { setOpen(false); });
   window.addEventListener("resize", fit);

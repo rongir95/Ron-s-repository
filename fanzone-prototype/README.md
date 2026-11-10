@@ -14,7 +14,11 @@ FanZone is open. Fans vote, see live results, and can collapse the poll. It clos
 
 **FanZone entry** (from a screen recording of the product): Home > Watch now opens the match page,
 and FanZone opens by itself over it, under the video, after a short loading spinner. X closes FanZone
-and leaves a FanZone card ("Join chat") on the match page; tapping it opens FanZone again.
+and leaves a FanZone card ("Join chat") on the match page; tapping it opens FanZone again. The arrow
+next to the FanZone title collapses the panel to its header bar and expands it again.
+
+**Tooltips**: "Let's make a unique fan profile" (Home) and "Meet your Fan Card" (FanZone) are off by
+default; each has an On / Off switch in the shell's Settings tab.
 
 The Fan Card prototype had its own static comment list on the match page. The Comments & Replies
 experience replaced it. Fans who already appeared in the Fan Card comments (Futcrunch, Mariana,
@@ -23,16 +27,18 @@ Tapping your own avatar opens My Card.
 
 ## Files
 
-- `index.html`: the shell testers open. It shows the device, a settings panel (start screen,
-  new or existing fan, My Card design A/B/C, Following section on/off, restart) and a list of
-  things to try. On a phone the device fills the screen and settings open from the top bar.
+- `index.html`: the shell testers open. It shows the device, an always-visible Restart button, the
+  Start poll button, and two tabs: Settings (start screen, new or existing fan, My Card design A/B/C,
+  Following section, tooltips) and Things to try. On a phone the device fills the screen; Restart and
+  Start poll sit in the top bar and the tabs open from Settings & tips.
 - `FanZone.dc.html`: the merged app (Claude Design `.dc.html` format, rendered by `support.js`).
   You can also open it directly. It reads its settings from the URL:
   `?start=fanzone&profile=full&card=B&following=0&reset=1`.
 - `assets/`, `uploads/`: images, video and DAZN Oscine fonts used by the app.
 - `tools/merge-prototypes.py`: the script that produced `FanZone.dc.html` from the two source pages.
 - `tools/add-poll.py`: adds the live poll to `FanZone.dc.html` (run after the merge script).
-- `tools/fanzone-entry.py`: the FanZone entry flow above (run last).
+- `tools/fanzone-entry.py`: the FanZone entry flow above.
+- `tools/fanzone-panel.py`: collapse / expand for the FanZone panel and the tooltip switches (run last).
 
 ## Run locally
 
