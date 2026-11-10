@@ -49,8 +49,8 @@ rep('      avatarImgScale: "transform:scale(1.16);",',
 rep('<img src="{{ avatarImg }}" alt="your avatar" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">',
     '<img src="{{ avatarImg }}" alt="your avatar" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;{{ avatarImgScale }}">')
 
-# two fans without a picture, so the initial variant shows in the chat
-for name in ('Daiki', 'Sho'):
+# fans without a picture show the nickname's initial in the ring
+for name in ('Daiki', 'Sho', 'Kaito', 'Yuki', 'Mei', 'Emi'):
     n = 0
     def sub(mm):
         global n
