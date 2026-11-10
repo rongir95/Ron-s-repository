@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Align the FanZone drawer with the Figma screen "FanZone" (file EyEm3J8Y3qrWV40vOPOkjV, node 496:103459):
 
-  - Live chat header: sponsor red (#F40009) with the Coca-Cola logo, leaderboard + close icons as exported from Figma
+  - Live chat header, sponsored variant (shell setting, ?sponsor=1): sponsor red (#F40009) with the Coca-Cola logo,
+    leaderboard + close icons as exported from Figma; the regular header stays the default
   - Messages: #0C161C, rows 8px/12px, 24px avatars (18px image inside the team ring), 14px bold names, 16px text
   - My avatar by the Message field: 30px image inside a 2px ring in my favorite team's color
 
@@ -49,7 +50,16 @@ HEADER = '''        <!-- header (Figma "Live chat header", sponsor-branded) -->
           </div>
         </div>
 '''
-src = src[:m.start()] + HEADER + src[m.end():]
+# both headers stay: the regular one by default, the sponsored one when the shell turns it on (?sponsor=1)
+PLAIN = m.group(0).replace('        <!-- header -->\n', '        <!-- header (regular) -->\n', 1)
+HEADER = HEADER.replace('        <!-- header (Figma "Live chat header", sponsor-branded) -->\n', '        <!-- header (Figma "Live chat header", sponsor-branded) -->\n', 1)
+both = ('        <sc-if value="{{ fzPlainHeader }}" hint-placeholder-val="{{ true }}">\n' + PLAIN + '        </sc-if>\n'
+        '        <sc-if value="{{ fzSponsorHeader }}" hint-placeholder-val="{{ false }}">\n' + HEADER + '        </sc-if>\n')
+src = src[:m.start()] + both + src[m.end():]
+rep('    if (q.get("reset") === "1") o.resetOnLoad = true;',
+    '    if (q.get("reset") === "1") o.resetOnLoad = true;\n    if (q.get("sponsor") === "1") o.fzSponsor = true;')
+rep('      openFanZoneOver: this.openFanZoneOver,',
+    '      openFanZoneOver: this.openFanZoneOver,\n      fzSponsorHeader: this.P.fzSponsor === true,\n      fzPlainHeader: this.P.fzSponsor !== true,')
 
 # ---------------------------------------------------------------- messages
 rep('<div style="min-height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:2px 16px 2px;">',

@@ -259,6 +259,27 @@
       </div>
       <!-- FanZone panel -->
       <div class="fz-fzpanel {{ fzPanelCls }}" style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transform:{{ fzPanelTransform }};transition:top .55s cubic-bezier(.22,1,.36,1),transform .45s cubic-bezier(.22,1,.36,1);pointer-events:auto;background:#0C161C;border-radius:24px 24px 0 0;display:flex;flex-direction:column;padding-bottom:21px;box-sizing:border-box;">
+        <sc-if value="{{ fzPlainHeader }}" hint-placeholder-val="{{ true }}">
+        <!-- header (regular) -->
+        <div style="position:relative;z-index:3;flex-shrink:0;height:48px;display:flex;align-items:center;gap:16px;padding:0 20px 0 16px;background:#1B2326;border-radius:24px 24px 0 0;border-top:1px solid rgba(249,250,250,.2);box-shadow:0 4px 4px rgba(0,0,0,.25);">
+          <button class="fz-collapse-btn" onClick="{{ toggleFzCollapse }}" aria-label="{{ fzCollapseLabel }}" aria-expanded="{{ fzExpandedAttr }}" style="display:flex;align-items:center;gap:16px;border:0;padding:8px 6px;margin:-8px -6px;background:transparent;cursor:pointer;font-family:inherit;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="flex-shrink:0;transform:rotate({{ fzCollapseRot }}deg);transition:transform .3s ease;">
+              <path d="M17 6H3" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M14.667 15.667L10 11L5.333 15.667" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span style="font-size:17px;font-weight:700;letter-spacing:-.01em;color:#F9FAFA;">FanZone</span>
+          </button>
+          <span style="flex:1;"></span>
+          <svg width="17" height="18" viewBox="0 0 19 20" fill="none" style="flex-shrink:0;">
+            <path d="M12.093 1.017C13.243 1.017 14.177 1.95 14.177 3.1V3.512H14.593C15.743 3.513 16.676 4.445 16.676 5.595V6.762C16.676 7.537 16.486 8.318 16.105 8.927C15.726 9.533 15.12 10.012 14.364 10.012H14.148C13.826 12.629 11.771 14.707 9.166 15.066C9.171 15.102 9.175 15.14 9.175 15.177V16.013H10.904C11.363 16.014 11.737 16.386 11.737 16.846C11.737 17.306 11.363 17.679 10.904 17.679H5.789C5.329 17.679 4.956 17.306 4.956 16.846C4.956 16.386 5.329 16.013 5.789 16.013H7.509V15.177C7.509 15.138 7.512 15.098 7.517 15.06C4.933 14.684 2.902 12.614 2.581 10.012H2.333C1.577 10.012 0.971 9.533 0.592 8.927C0.211 8.318 0.02 7.537 0.02 6.762V5.595C0.02 4.445 0.954 3.512 2.104 3.512H2.517V3.1C2.517 1.95 3.449 1.017 4.6 1.017H12.093ZM4.6 2.683C4.37 2.683 4.183 2.87 4.183 3.1V8.084L4.202 9.281V9.293C4.202 11.592 6.066 13.455 8.365 13.455C10.659 13.455 12.52 11.598 12.527 9.305L12.51 8.11V3.1C12.51 2.87 12.323 2.683 12.093 2.683H4.6ZM2.104 5.012C1.782 5.012 1.521 5.273 1.521 5.595V6.762C1.521 7.313 1.66 7.804 1.865 8.132C2.072 8.464 2.262 8.512 2.333 8.512H2.523L2.517 8.111V5.012H2.104ZM13.677 8.087L13.683 8.512H14.364C14.436 8.512 14.626 8.463 14.832 8.132C15.037 7.804 15.176 7.313 15.176 6.762V5.595C15.176 5.273 14.915 5.013 14.593 5.012H14.177V8.087H13.677Z" fill="#F9FAFA"></path>
+          </svg>
+          <span style="width:1px;height:17px;background:rgba(249,250,250,.6);flex-shrink:0;"></span>
+          <button onClick="{{ goHome }}" title="Close FanZone" style="flex-shrink:0;border:0;padding:6px;margin:-6px;background:transparent;cursor:pointer;display:flex;"><svg width="12" height="13" viewBox="0 0 13 14" fill="none" style="flex-shrink:0;">
+            <path d="M10.41 0.459C10.722 0.147 11.228 0.147 11.541 0.459C11.853 0.772 11.853 1.278 11.541 1.59L7.131 6L11.541 10.41C11.853 10.722 11.853 11.228 11.541 11.54C11.228 11.853 10.722 11.853 10.41 11.54L6 7.13L1.59 11.54C1.278 11.853 0.772 11.853 0.46 11.54C0.147 11.228 0.147 10.722 0.46 10.41L4.869 6L0.46 1.59C0.147 1.278 0.147 0.772 0.46 0.459C0.772 0.147 1.278 0.147 1.59 0.459L6 4.869L10.41 0.459Z" fill="#F9FAFA"></path>
+          </svg></button>
+        </div>
+        </sc-if>
+        <sc-if value="{{ fzSponsorHeader }}" hint-placeholder-val="{{ false }}">
         <!-- header (Figma "Live chat header", sponsor-branded) -->
         <div style="position:relative;z-index:3;flex-shrink:0;height:48px;box-sizing:border-box;background:#F40009;border-radius:24px 24px 0 0;border-bottom:1px solid rgba(8,14,18,.6);box-shadow:0 -1px 0 rgba(249,250,250,.2);">
           <button class="fz-collapse-btn" onClick="{{ toggleFzCollapse }}" aria-label="{{ fzCollapseLabel }}" aria-expanded="{{ fzExpandedAttr }}" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:16px;border:0;padding:0;background:transparent;cursor:pointer;">
@@ -274,6 +295,7 @@
             <button onClick="{{ goHome }}" aria-label="Close FanZone" title="Close FanZone" style="width:20px;height:20px;border:0;padding:0;background:transparent;cursor:pointer;display:block;"><img src="assets/icons/fz-close.svg" alt="" width="20" height="20" style="display:block;"></button>
           </div>
         </div>
+        </sc-if>
         <!-- ===================== LIVE POLL (from the landscape FanZone prototype): slides down from under the FanZone header, over the top of the chat ===================== -->
       <sc-if value="{{ pollMounted }}" hint-placeholder-val="{{ false }}">
         <div style="position:absolute;left:0;right:0;top:48px;z-index:2;height:{{ pollClipH }}px;overflow:hidden;pointer-events:none;transition:opacity .25s ease;{{ fzPollWrapStyle }}">
@@ -2499,6 +2521,7 @@ const FZ_URL_PROPS = (function () {
     if (q.get("profile") === "full") o.startState = "Full profile";
     if (q.get("profile") === "empty") o.startState = "Empty profile";
     if (q.get("reset") === "1") o.resetOnLoad = true;
+    if (q.get("sponsor") === "1") o.fzSponsor = true;
     if (q.get("fancardtip") === "1") o.fanCardTip = true;
     if (q.get("hometip") === "1") o.homeTip = true;
   } catch (e) {}
@@ -4128,6 +4151,8 @@ class Component extends DCLogic {
       fzLoading: !!s.fzLoading && s.screen === "fanzone",
       showFzEntry: s.screen === "fixture" && !!s.fzEntrySeen,
       openFanZoneOver: this.openFanZoneOver,
+      fzSponsorHeader: this.P.fzSponsor === true,
+      fzPlainHeader: this.P.fzSponsor !== true,
       fzDraft: s.fzDraft || "",
       fzHasDraft: !!(s.fzDraft || "").trim(),
       fzStickerStyle: (s.fzDraft || "").trim() ? "display:none;" : "",

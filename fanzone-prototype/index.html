@@ -181,6 +181,16 @@
     </div>
 
     <div class="group">
+      <span class="label">FanZone header</span>
+      <div class="switches">
+        <div class="switch-row">
+          <span class="switch-text" id="l-sponsor">Sponsored<small>Coca-Cola branded header</small></span>
+          <button type="button" class="switch" role="switch" aria-checked="false" aria-labelledby="l-sponsor" data-key="sponsor"><span class="knob"></span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
       <span class="label">Tooltips</span>
       <div class="switches">
         <div class="switch-row">
@@ -214,7 +224,7 @@
 
 <script>
 (function () {
-  var DEFAULTS = { start: "home", profile: "empty", card: "A", following: "1", hometip: "0", fancardtip: "0" };
+  var DEFAULTS = { start: "home", profile: "empty", card: "A", following: "1", hometip: "0", fancardtip: "0", sponsor: "0" };
   var KEY = "fanzone-prototype-settings";
   var settings = Object.assign({}, DEFAULTS);
   try { Object.assign(settings, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
@@ -245,7 +255,7 @@
   var loads = 0;
 
   function query() {
-    var q = "embed=1&reset=1&start=" + settings.start + "&profile=" + settings.profile + "&card=" + settings.card + "&following=" + settings.following + "&hometip=" + settings.hometip + "&fancardtip=" + settings.fancardtip;
+    var q = "embed=1&reset=1&start=" + settings.start + "&profile=" + settings.profile + "&card=" + settings.card + "&following=" + settings.following + "&hometip=" + settings.hometip + "&fancardtip=" + settings.fancardtip + "&sponsor=" + settings.sponsor;
     return q;
   }
   function load() {
