@@ -163,7 +163,7 @@ a = out.index('            <!-- Messages (scrollable) -->')
 b = out.index('            <!-- home indicator -->', a)
 new_body = (
     '            <!-- Comments & Replies feed (merged from the Replies prototype) -->\n'
-    '            <div style="position:absolute;left:0;right:0;top:48px;height:380px;display:flex;flex-direction:column;border-top:1px solid rgba(36,45,51,0.6);">\n'
+    '            <div style="position:absolute;left:0;right:0;top:48px;height:380px;display:flex;flex-direction:column;">\n'
     + feed.replace('<div id="crComments-feed" ref="{{ crSetFeedRef }}" style="{{ crFeedStyle }}">',
                    '<div id="crComments-feed" ref="{{ crSetFeedRef }}" style="{{ crFeedStyle }}">', 1) + '\n'
     '            </div>\n'
