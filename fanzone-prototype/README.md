@@ -41,9 +41,10 @@ Tapping your own avatar opens My Card.
 - `tools/add-poll.py`: adds the live poll to `FanZone.dc.html` (run after the merge script).
 - `tools/fanzone-entry.py`: the FanZone entry flow above.
 - `tools/fanzone-panel.py`: collapse / expand for the FanZone panel, FanZone messages and the tooltip switches.
-- `tools/chat-bayern-bvb.py`: rewrites the FanZone chat for Bayern vs Dortmund (run last).
+- `tools/chat-bayern-bvb.py`: rewrites the FanZone chat for Bayern vs Dortmund.
+- `tools/fanzone-figma.py`: aligns the FanZone drawer with the Figma screen (node 496:103459): sponsor header, message rows, my avatar ring (run last).
 
-To rebuild `FanZone.dc.html`, run the five scripts in the order above on the two source pages.
+To rebuild `FanZone.dc.html`, run the six scripts in the order above on the two source pages.
 
 ## Run locally
 
