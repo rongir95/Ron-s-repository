@@ -257,9 +257,9 @@
         <img src="assets/img/5cf91294bb9d1098.png" alt="live match" style="width:100%;height:100%;object-fit:cover;display:block;">
       </div>
       <!-- FanZone panel -->
-      <div class="{{ fzPanelCls }}" style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transform:{{ fzPanelTransform }};transition:top .55s cubic-bezier(.22,1,.36,1),transform .45s cubic-bezier(.22,1,.36,1);pointer-events:auto;background:#080E12;border-radius:12px 12px 0 0;display:flex;flex-direction:column;">
+      <div class="{{ fzPanelCls }}" style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transform:{{ fzPanelTransform }};transition:top .55s cubic-bezier(.22,1,.36,1),transform .45s cubic-bezier(.22,1,.36,1);pointer-events:auto;background:#080E12;border-radius:24px 24px 0 0;display:flex;flex-direction:column;">
         <!-- header -->
-        <div style="position:relative;z-index:3;flex-shrink:0;height:48px;display:flex;align-items:center;gap:16px;padding:0 20px 0 16px;background:#1B2326;border-radius:12px 12px 0 0;border-top:1px solid rgba(249,250,250,.2);box-shadow:0 4px 4px rgba(0,0,0,.25);">
+        <div style="position:relative;z-index:3;flex-shrink:0;height:48px;display:flex;align-items:center;gap:16px;padding:0 20px 0 16px;background:#1B2326;border-radius:24px 24px 0 0;border-top:1px solid rgba(249,250,250,.2);box-shadow:0 4px 4px rgba(0,0,0,.25);">
           <button class="fz-collapse-btn" onClick="{{ toggleFzCollapse }}" aria-label="{{ fzCollapseLabel }}" aria-expanded="{{ fzExpandedAttr }}" style="display:flex;align-items:center;gap:16px;border:0;padding:8px 6px;margin:-8px -6px;background:transparent;cursor:pointer;font-family:inherit;">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="flex-shrink:0;transform:rotate({{ fzCollapseRot }}deg);transition:transform .3s ease;">
               <path d="M17 6H3" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -341,7 +341,7 @@
             <!-- messages -->
             <sc-for list="{{ chatMessages }}" as="m" key="m.id" hint-placeholder-count="4">
               <div style="flex-shrink:0;display:flex;gap:10px;margin-bottom:16px;animation:fzMsgIn .45s cubic-bezier(.22,1,.36,1);">
-                <div onClick="{{ m.onOpen }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;overflow:hidden;cursor:pointer;box-shadow:0 0 0 1.5px {{ m.stroke }};border:1px solid #080E12;">
+                <div onClick="{{ m.onOpen }}" style="width:24px;height:24px;border-radius:50%;flex-shrink:0;overflow:hidden;cursor:pointer;box-sizing:content-box;border:1.5px solid transparent;padding:1px;margin:-1.5px;background:linear-gradient(#080E12,#080E12) padding-box,{{ m.ring }} border-box;">
                   <img src="{{ m.avatar }}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;{{ m.imgScale }}">
                 </div>
                 <div style="min-width:0;">
@@ -1710,7 +1710,7 @@
     <!-- ===================== EDIT MY FAVORITE (mini sheet) ===================== -->
     <sc-if value="{{ editFavOpen }}" hint-placeholder-val="{{ false }}">
       <div onClick="{{ closeEditFav }}" style="position:absolute;inset:0;z-index:29;background:rgba(0,0,0,.55);animation:fzFadeIn .2s ease;"></div>
-      <div style="position:absolute;left:0;right:0;bottom:0;z-index:30;background:#1B2326;border-radius:12px 12px 0 0;padding:0 0 28px;animation:fzSlideUp .28s cubic-bezier(.22,1,.36,1);box-shadow:0 -8px 30px rgba(0,0,0,.5);">
+      <div style="position:absolute;left:0;right:0;bottom:0;z-index:30;background:#1B2326;border-radius:24px 24px 0 0;padding:0 0 28px;animation:fzSlideUp .28s cubic-bezier(.22,1,.36,1);box-shadow:0 -8px 30px rgba(0,0,0,.5);">
         <div style="position:relative;height:64px;flex-shrink:0;">
           <div style="position:absolute;left:50%;top:8px;transform:translateX(-50%);width:36px;height:5px;border-radius:3px;background:rgba(255,255,255,.2);"></div>
           <div style="position:absolute;left:0;right:0;top:26px;text-align:center;font-size:16px;font-weight:700;pointer-events:none;">Edit my favorite</div>
@@ -4114,8 +4114,9 @@ class Component extends DCLogic {
       chatMessages: s.feed.map(m => {
         const p = this.synthProfile(m.name, m.avatar);
         const t = teamById(p.favoriteId);
-        if (m.mine) return { ...m, stroke: "#F2C400", imgScale: "", onOpen: this.openCard };
-        return { ...m, stroke: t ? t.card : "#F2C400", imgScale: "transform:scale(1.05);", onOpen: () => this.openUserCard(m) };
+        // my messages: the same ring as my avatar next to the Message field (my favorite team, or the default gradient)
+        if (m.mine) { const myFav = s.favoriteId ? teamById(s.favoriteId) : null; return { ...m, ring: myFav ? myFav.card : "linear-gradient(210deg,#8923A0 0%,#F1A322 38%,#FFFA00 100%)", imgScale: "", onOpen: this.openCard }; }
+        return { ...m, ring: t ? t.card : "#F2C400", imgScale: "transform:scale(1.05);", onOpen: () => this.openUserCard(m) };
       }),
       feedRef: this.feedRef,
       barRef: this.barRef,

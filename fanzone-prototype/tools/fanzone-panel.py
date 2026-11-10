@@ -59,6 +59,9 @@ rep('  startFanZoneFtue = () => {\n    clearTimeout(this._ftueTimer);\n',
 rep('    if (q.get("reset") === "1") o.resetOnLoad = true;',
     '    if (q.get("reset") === "1") o.resetOnLoad = true;\n    if (q.get("fancardtip") === "1") o.fanCardTip = true;')
 
+# every drawer (FanZone included) has the same 24px top corners
+rep('border-radius:12px 12px 0 0', 'border-radius:24px 24px 0 0', count=3)
+
 # poll inside the drawer: hidden while the drawer is collapsed (only the header shows)
 rep('<div style="position:absolute;left:0;right:0;top:48px;z-index:2;height:{{ pollClipH }}px;overflow:hidden;pointer-events:none;">',
     '<div style="position:absolute;left:0;right:0;top:48px;z-index:2;height:{{ pollClipH }}px;overflow:hidden;pointer-events:none;transition:opacity .25s ease;{{ fzPollWrapStyle }}">')
@@ -75,8 +78,12 @@ rep('              <span style="flex:1;color:#7C868C;font-size:16px;">Message</s
 rep("  .fz-collapse-btn:focus-visible {",
     "  .fz-msg-input::placeholder { color: #7C868C; opacity: 1; }\n  .fz-collapse-btn:focus-visible {")
 rep('        return { ...m, stroke: t ? t.card : "#F2C400", imgScale: "transform:scale(1.05);", onOpen: () => this.openUserCard(m) };',
-    '        if (m.mine) return { ...m, stroke: "#F2C400", imgScale: "", onOpen: this.openCard };\n'
-    '        return { ...m, stroke: t ? t.card : "#F2C400", imgScale: "transform:scale(1.05);", onOpen: () => this.openUserCard(m) };')
+    '        // my messages: the same ring as my avatar next to the Message field (my favorite team, or the default gradient)\n'
+    '        if (m.mine) { const myFav = s.favoriteId ? teamById(s.favoriteId) : null; return { ...m, ring: myFav ? myFav.card : "linear-gradient(210deg,#8923A0 0%,#F1A322 38%,#FFFA00 100%)", imgScale: "", onOpen: this.openCard }; }\n'
+    '        return { ...m, ring: t ? t.card : "#F2C400", imgScale: "transform:scale(1.05);", onOpen: () => this.openUserCard(m) };')
+# chat avatars: the ring is drawn as a background so it can be a team color or a gradient
+rep('<div onClick="{{ m.onOpen }}" style="width:26px;height:26px;border-radius:50%;flex-shrink:0;overflow:hidden;cursor:pointer;box-shadow:0 0 0 1.5px {{ m.stroke }};border:1px solid #080E12;">',
+    '<div onClick="{{ m.onOpen }}" style="width:24px;height:24px;border-radius:50%;flex-shrink:0;overflow:hidden;cursor:pointer;box-sizing:content-box;border:1.5px solid transparent;padding:1px;margin:-1.5px;background:linear-gradient(#080E12,#080E12) padding-box,{{ m.ring }} border-box;">')
 rep('  openFanZoneOver = (e) => {',
     '''  onFzDraft = (e) => this.setState({ fzDraft: String((e && e.target && e.target.value) || "").slice(0, 200) });
   onFzKey = (e) => { if (e && e.key === "Enter" && !e.shiftKey) { e.preventDefault(); this.sendFzMessage(); } };
