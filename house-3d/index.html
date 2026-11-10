@@ -1184,7 +1184,7 @@ function wall(p, a, b, o) {
     if (o.base === 0 && z0 === 0 && !o.noSkirt) {
       // inside faces only: both sides of an interior wall, the room side of an exterior one
       const dep = outSide ? t / 2 + 0.8 : t + 1.6, off = outSide ? -outSide * dep / 2 : 0;
-      const k = shadowy(new THREE.Mesh(UNIT, M.skirt)); k.userData.skirt = true; skirts.push(k); const sh = 0.07 + (skirts.length % 3) * 0.0015; k.scale.set((e - s) / 100, sh, dep / 100); // heights differ by 1.5 mm so boards meeting at a corner never share a top face
+      const k = shadowy(new THREE.Mesh(UNIT, M.skirt)); k.userData.skirt = true; skirts.push(k); const sh = 0.07 + (skirts.length % 3) * 0.0015; k.scale.set((e - s) / 100 + .003, sh, dep / 100); // 1.5 mm proud of the wall end, so its end face never shares the wall's plane // heights differ by 1.5 mm so boards meeting at a corner never share a top face
       const ox = -uy * off, oy = ux * off;
       k.position.set(wx(a[0] + ux * c + ox), sh / 2, wz(a[1] + uy * c + oy)); k.rotation.y = theta; p.add(k);
       k.userData.wall = { base: 0, y0: 0, y1: sh, sy: sh }; wallPieces.push(k);
