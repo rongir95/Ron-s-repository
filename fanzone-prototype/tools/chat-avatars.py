@@ -50,12 +50,13 @@ rep('<img src="{{ avatarImg }}" alt="your avatar" style="position:absolute;inset
     '<img src="{{ avatarImg }}" alt="your avatar" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;{{ avatarImgScale }}">')
 
 # profile / Fan Card avatars with no picture, per Figma "Initials" (EyEm3J8Y3qrWV40vOPOkjV, node 955:153494):
-# 96px, 4px ring (favorite team color, or the purple-orange-yellow gradient when no favorite), 80px #080E12 @80% circle,
+# 96px, 4px ring (favorite team color, or the purple-orange-yellow gradient when no favorite), 80px #080E12 circle (opaque:
+# at 80% the team-colour glow behind the avatar tinted it),
 # initial 36px bold #F9FAFA. Same for my card (all 3 designs), other fans' cards and the Profile & Settings avatar.
 rep('position:absolute;inset:8px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#3D4549;',
-    'position:absolute;inset:8px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(8,14,18,.8);', count=5)
+    'position:absolute;inset:8px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#080E12;', count=5)
 rep("border-radius:50%;background:#2b3236;font-size:26px;font-weight:800;color:#F9FAFA;font-family:'DAZN Oscine',sans-serif;\">{{ cardInitial }}</span>",
-    "border-radius:50%;background:rgba(8,14,18,.8);font-size:22px;font-weight:700;color:#F9FAFA;font-family:'DAZN Oscine',sans-serif;\">{{ cardInitial }}</span>")
+    "border-radius:50%;background:#080E12;font-size:22px;font-weight:700;color:#F9FAFA;font-family:'DAZN Oscine',sans-serif;\">{{ cardInitial }}</span>")
 rep('ring: p.ring || (t ? t.card : "#3D4549")',
     'ring: p.ring || (t ? t.card : "linear-gradient(210deg,#8923A0 0%,#F1A322 38%,#FFFA00 100%)")')
 
