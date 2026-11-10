@@ -2319,11 +2319,11 @@ function desk(p, base, r, chairAt, faceTo) {
   onWall(B(p, 215, 504, 255, 512, 198, 205, M.steel, b), b, 198, 205);
   B(p, 300, 503, 345, 543, 0, 90, M.wenge, b); B(p, 290, 503, 345, 541, 150, 270, M.wenge, b);
   // tub along the south wall with brown tiled apron and a folding glass screen; washer under a tall cabinet; bamboo shelf by the window
-  { const w = B(p.parent || p, 186, 652, 192, 724, 0, 270, M.interior, b); onWall(w, b, 0, 270); }
-  B(p, 192, 652, 358, 724, 0, 54, M.bathBrown, b); RB(p, 190, 654, 357, 723, 50, 58, M.ceramic, b, .02); B(p, 198, 662, 349, 715, 46, 58.3, M.water, b);
+  { const w = B(p.parent || p, 186, 652.3, 192, 724, 0, 270, M.interior, b); onWall(w, b, 0, 270); }
+  B(p, 192.4, 652.4, 358, 724, 0, 54, M.bathBrown, b); RB(p, 190, 654, 357, 723, 50, 58, M.ceramic, b, .02); B(p, 198, 662, 349, 715, 46, 58.3, M.water, b);
   { const gl = B(p, 272, 652.5, 352, 653.5, 58, 200, M.glass, b); gl.castShadow = false; } B(p, 272, 652, 352, 654, 198, 200, M.steel, b); // bath screen on the outer rim
-  B(p, 125, 652, 185, 712, 0, 85, M.white, b); CY(p, 155, 651, 17, 30, 31, M.black, b, 24).rotation.x = Math.PI / 2;
-  B(p, 125, 652, 185, 723, 90, 272, M.wenge, b); B(p, 154.6, 651.5, 155.4, 652, 92, 270, M.black, b);
+  B(p, 125, 652, 185.6, 712, 0, 85, M.white, b); CY(p, 155, 651, 17, 30, 31, M.black, b, 24).rotation.x = Math.PI / 2;
+  B(p, 125, 652, 185.6, 723, 90, 269.5, M.wenge, b); B(p, 154.6, 651.5, 155.4, 652, 92, 270, M.black, b);
   B(p, 70, 690, 110, 722, 0, 95, M.oak, b);
   { const sh = new THREE.Mesh(new THREE.CylinderGeometry(.09, .12, .16, 16), std({ color: 0xb87a3a, roughness: .4, emissive: 0x3a1a00 })); sh.position.set(wx(110), b + 2.1, wz(590)); p.add(sh); CY(p, 110, 590, .3, 218, 274, M.black, b, 6); }
   { // accessories (before): bottles on the tub rim, bath mat, towels on hooks by the door
@@ -2346,15 +2346,15 @@ function desk(p, base, r, chairAt, faceTo) {
     pa(210, 722, 250, 723, 120, 135, M.beigeStack); pa(210, 722.5, 250, 723, 134, 135, M.led);
     for (const x of [218, 226]) onWall(CY(p, x, 719, 2.4, 120, 135, std({ color: 0x5a3a1e, roughness: .2 }), b, 10), b, 120, 135);
     // shower: low terrazzo tray, black-framed glass front and door, black rain head and hand shower
-    B(p, 192, 652, 358, 723, 0, 1.5, M.terrazzo, b); B(p, 194, 715, 356, 717, 1.4, 1.7, M.black, b);
+    B(p, 192.4, 652, 358, 723, 0, 1.5, M.terrazzo, b); B(p, 194, 715, 356, 717, 1.4, 1.7, M.black, b);
     { const gl = B(p, 192, 651.5, 358, 652.5, 2, 205, M.glass, b); gl.castShadow = false; gl.renderOrder = 3; }
     B(p, 192, 651, 358, 653, 203, 205, M.black, b); B(p, 192, 651, 194, 653, 0, 205, M.black, b); B(p, 272, 651, 274, 653, 0, 205, M.black, b);
     B(p, 262, 649.5, 264, 652, 90, 130, M.black, b);
     CY(p, 270, 690, 12, 222, 224, M.black, b, 28); B(p, 269, 690, 271, 723, 236, 238, M.black, b); CY(p, 270, 690, .8, 224, 237, M.black, b, 6);
     B(p, 330, 721, 333, 723, 80, 160, M.black, b);
     // washer under a tall oak cabinet, slatted oak laundry cabinet beside it
-    B(p, 125, 652, 185, 712, 0, 85, M.white, b); CY(p, 155, 651, 17, 30, 31, M.black, b, 24).rotation.x = Math.PI / 2;
-    B(p, 125, 652, 185, 723, 90, 270, M.oakLight, b); B(p, 154.6, 651.5, 155.4, 652, 92, 268, M.espresso, b);
+    B(p, 125, 652, 185.6, 712, 0, 85, M.white, b); CY(p, 155, 651, 17, 30, 31, M.black, b, 24).rotation.x = Math.PI / 2;
+    B(p, 125, 652, 185.6, 723, 90, 269.5, M.oakLight, b); B(p, 154.6, 651.5, 155.4, 652, 92, 268, M.espresso, b);
     B(p, 80, 690, 120, 722, 0, 85, M.oakLight, b); for (let x = 82; x < 120; x += 4) B(p, x, 689.5, x + 2, 690, 6, 80, M.wood, b);
     // wall-hung toilet on the west wall, oak cabinet above with a lit niche
     wallToilet(p, b, 72, 503, 0, M.white);
