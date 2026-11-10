@@ -27,7 +27,7 @@ Tapping your own avatar opens My Card.
 
 ## Files
 
-- `index.html`: the shell testers open. It shows the device, an always-visible Restart button, the
+- `index.html`: the shell testers open. It shows the device with an always-visible Restart button beside it, the
   Start poll button, and two tabs: Settings (start screen, new or existing fan, My Card design A/B/C,
   Following section, tooltips) and Things to try. On a phone the device fills the screen; Restart and
   Start poll sit in the top bar and the tabs open from Settings & tips.
