@@ -284,6 +284,11 @@
       settings[k] = settings[k] === "1" ? "0" : "1";
       try { localStorage.setItem(KEY, JSON.stringify(settings)); } catch (err) {}
       paint();
+      if (k === "sponsor") {
+        // swap the FanZone header in place: no reload, the prototype keeps its state
+        try { frame.contentWindow.postMessage({ fz: "sponsor", on: settings.sponsor === "1" }, "*"); } catch (err) {}
+        return;
+      }
       load();
     });
   });

@@ -2609,6 +2609,7 @@ class Component extends DCLogic {
   componentDidMount() {
     this._onShellMsg = (e) => {
       const d = e && e.data;
+      if (d && d.fz === "sponsor") { this.setState({ fzSponsorLive: !!d.on }); return; }
       if (!d || d.fz !== "poll") return;
       if (d.on) this.pollStart(); else this.pollEnd();
     };
@@ -4151,8 +4152,8 @@ class Component extends DCLogic {
       fzLoading: !!s.fzLoading && s.screen === "fanzone",
       showFzEntry: s.screen === "fixture" && !!s.fzEntrySeen,
       openFanZoneOver: this.openFanZoneOver,
-      fzSponsorHeader: this.P.fzSponsor === true,
-      fzPlainHeader: this.P.fzSponsor !== true,
+      fzSponsorHeader: (s.fzSponsorLive != null ? s.fzSponsorLive : this.P.fzSponsor === true),
+      fzPlainHeader: !(s.fzSponsorLive != null ? s.fzSponsorLive : this.P.fzSponsor === true),
       fzDraft: s.fzDraft || "",
       fzHasDraft: !!(s.fzDraft || "").trim(),
       fzStickerStyle: (s.fzDraft || "").trim() ? "display:none;" : "",

@@ -59,7 +59,12 @@ src = src[:m.start()] + both + src[m.end():]
 rep('    if (q.get("reset") === "1") o.resetOnLoad = true;',
     '    if (q.get("reset") === "1") o.resetOnLoad = true;\n    if (q.get("sponsor") === "1") o.fzSponsor = true;')
 rep('      openFanZoneOver: this.openFanZoneOver,',
-    '      openFanZoneOver: this.openFanZoneOver,\n      fzSponsorHeader: this.P.fzSponsor === true,\n      fzPlainHeader: this.P.fzSponsor !== true,')
+    '      openFanZoneOver: this.openFanZoneOver,\n'
+    '      fzSponsorHeader: (s.fzSponsorLive != null ? s.fzSponsorLive : this.P.fzSponsor === true),\n'
+    '      fzPlainHeader: !(s.fzSponsorLive != null ? s.fzSponsorLive : this.P.fzSponsor === true),')
+# the shell switches the header live (postMessage { fz: "sponsor", on }), without reloading the prototype
+rep('      if (!d || d.fz !== "poll") return;',
+    '      if (d && d.fz === "sponsor") { this.setState({ fzSponsorLive: !!d.on }); return; }\n      if (!d || d.fz !== "poll") return;')
 
 # ---------------------------------------------------------------- messages
 rep('<div style="min-height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:2px 16px 2px;">',
