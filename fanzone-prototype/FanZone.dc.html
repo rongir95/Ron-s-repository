@@ -168,6 +168,10 @@
   @keyframes fzPollMe { 0% { opacity: 0; transform: scale(.3); } 100% { opacity: 1; transform: none; } }
   .fz-poll-opt { transition: border-color .2s ease, background-color .2s ease; }
   .fz-poll-opt:disabled { cursor: default; }
+  /* FanZone opening over the match page */
+  @keyframes fzOverIn { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+  .fz-over-panel { animation: fzOverIn .38s cubic-bezier(.22,1,.36,1) both; }
+  .fz-entry:hover { background: #222C31 !important; }
   @keyframes fzPushIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
   @keyframes fzPushOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
 </style>
@@ -240,19 +244,20 @@
       </div>
     </sc-if>
 
-    <!-- ===================== FANZONE BASE ===================== -->
-    <div style="position:absolute;inset:0;background:#000;overflow:hidden;">
+    <!-- ===================== FANZONE BASE (over the match page: only its panel shows, under the match video) ===================== -->
+    <div style="position:absolute;inset:0;overflow:hidden;{{ fzBaseStyle }}">
       <!-- status bar -->
-      <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:2;background:#000;">
+      <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:2;background:#000;{{ fzOwnStageStyle }}">
         <img src="assets/img/status-bar.svg" alt="" style="width:100%;height:auto;display:block;">
       </div>
       <!-- Match video -->
-      <div style="position:absolute;top:54px;left:0;right:0;height:211px;z-index:2;">
+      <div style="position:absolute;top:54px;left:0;right:0;height:211px;z-index:2;{{ fzOwnStageStyle }}">
         <img src="assets/img/5cf91294bb9d1098.png" alt="live match" style="width:100%;height:100%;object-fit:cover;display:block;">
       </div>
       <!-- ===================== LIVE POLL (from the landscape FanZone prototype): enters under the stream ===================== -->
       <sc-if value="{{ pollMounted }}" hint-placeholder-val="{{ false }}">
-        <section class="fz-poll {{ pollCls }}" aria-label="Poll" style="position:absolute;left:0;right:0;top:265px;z-index:1;height:{{ pollH }}px;background:#1B232B;border-radius:0 0 14px 14px;box-shadow:0 10px 24px rgba(0,0,0,.45);overflow:hidden;font-family:'DAZN Oscine',sans-serif;color:#F9FAFA;">
+        <div style="position:absolute;left:0;right:0;top:{{ pollTop }}px;z-index:1;height:{{ pollH }}px;overflow:hidden;pointer-events:auto;transition:height .45s cubic-bezier(.22,1,.36,1);">
+        <section class="fz-poll {{ pollCls }}" aria-label="Poll" style="position:relative;height:100%;background:#1B232B;border-radius:0 0 14px 14px;box-shadow:0 10px 24px rgba(0,0,0,.45);overflow:hidden;font-family:'DAZN Oscine',sans-serif;color:#F9FAFA;">
           <div style="height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;">
             <div style="display:flex;align-items:center;gap:10px;">
               <svg width="24" height="24" viewBox="0 0 100 100" fill="none" aria-hidden="true"><path d="M64.2857 20.8332C64.2857 18.532 62.6867 16.6665 60.7143 16.6665H26.7857C25.7995 16.6665 25 17.5992 25 18.7498V31.2498C25 32.4004 25.7995 33.3332 26.7857 33.3332H60.7143C62.6867 33.3332 64.2857 31.4677 64.2857 29.1665V20.8332Z" fill="#F9FAFA"></path><path d="M75 45.8332C75 43.532 73.401 41.6665 71.4286 41.6665H26.7857C25.7995 41.6665 25 42.5992 25 43.7498V56.2498C25 57.4004 25.7995 58.3332 26.7857 58.3332H71.4286C73.401 58.3332 75 56.4677 75 54.1665V45.8332Z" fill="#F9FAFA"></path><path d="M46.4286 70.8332C46.4286 68.532 44.8296 66.6665 42.8571 66.6665H26.7857C25.7995 66.6665 25 67.5992 25 68.7498V81.2498C25 82.4004 25.7995 83.3332 26.7857 83.3332H42.8571C44.8296 83.3332 46.4286 81.4677 46.4286 79.1665V70.8332Z" fill="#F9FAFA"></path></svg>
@@ -300,9 +305,10 @@
             <span style="font-size:13px;color:#8C959E;">{{ pollVotesLabel }} fans voted</span>
           </div>
         </section>
+        </div>
       </sc-if>
       <!-- FanZone panel -->
-      <div style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transition:top .55s cubic-bezier(.22,1,.36,1);background:#080E12;border-radius:12px 12px 0 0;display:flex;flex-direction:column;">
+      <div class="{{ fzPanelCls }}" style="position:absolute;left:0;right:0;bottom:0;top:{{ fzPanelTop }}px;transition:top .55s cubic-bezier(.22,1,.36,1);pointer-events:auto;background:#080E12;border-radius:12px 12px 0 0;display:flex;flex-direction:column;">
         <!-- header -->
         <div style="position:relative;z-index:3;flex-shrink:0;height:48px;display:flex;align-items:center;gap:16px;padding:0 20px 0 16px;background:#1B2326;border-radius:12px 12px 0 0;border-top:1px solid rgba(249,250,250,.2);box-shadow:0 4px 4px rgba(0,0,0,.25);">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="flex-shrink:0;">
@@ -319,6 +325,12 @@
             <path d="M10.41 0.459C10.722 0.147 11.228 0.147 11.541 0.459C11.853 0.772 11.853 1.278 11.541 1.59L7.131 6L11.541 10.41C11.853 10.722 11.853 11.228 11.541 11.54C11.228 11.853 10.722 11.853 10.41 11.54L6 7.13L1.59 11.54C1.278 11.853 0.772 11.853 0.46 11.54C0.147 11.228 0.147 10.722 0.46 10.41L4.869 6L0.46 1.59C0.147 1.278 0.147 0.772 0.46 0.459C0.772 0.147 1.278 0.147 1.59 0.459L6 4.869L10.41 0.459Z" fill="#F9FAFA"></path>
           </svg></button>
         </div>
+        <!-- loading (FanZone just opened) -->
+        <sc-if value="{{ fzLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:0;right:0;top:48px;bottom:72px;z-index:2;background:#080E12;display:flex;align-items:center;justify-content:center;" aria-label="Loading FanZone">
+            <span style="width:30px;height:30px;border-radius:50%;border:2.5px solid rgba(249,250,250,.18);border-top-color:#F9FAFA;animation:fzSpin .8s linear infinite;"></span>
+          </div>
+        </sc-if>
         <!-- chat feed -->
         <div class="fz-scroll" ref="{{ feedRef }}" onScroll="{{ onFeedScroll }}" style="flex:1;overflow-y:auto;min-height:0;">
           <div style="min-height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:2px 16px 2px;">
@@ -597,7 +609,7 @@
 
     <!-- ===================== FIXTURE PAGE (Figma 496:97363) ===================== -->
     <sc-if value="{{ isFixture }}" hint-placeholder-val="{{ false }}">
-      <div style="position:absolute;inset:0;z-index:9;background:#080E12;overflow:hidden;animation:fzPushIn .32s cubic-bezier(.22,1,.36,1);">
+      <div style="position:absolute;inset:0;z-index:8;background:#080E12;overflow:hidden;animation:fzPushIn .32s cubic-bezier(.22,1,.36,1);">
         <!-- status bar -->
         <div onClick="{{ crOnToggleOnline }}" title="Tap to simulate No Internet" style="position:absolute;left:0;right:0;top:0;height:62px;background:#080E12;z-index:2;cursor:pointer;"><img src="assets/icons/status-941.svg" alt="" width="375" height="62" style="display:block;"><sc-if value="{{ crOffline }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:108px;top:22px;font-size:11px;font-weight:700;color:#ff6b6b;border:1px solid #ff6b6b;border-radius:5px;padding:1px 5px;background:#080E12;">No Internet</span></sc-if></div>
         <!-- content (scrolls under the fixed player) -->
@@ -625,6 +637,23 @@
             <span style="flex-shrink:0;width:48px;min-height:32px;box-sizing:border-box;padding:4px 12px;border-radius:9999px;background:#242D33;display:flex;align-items:center;justify-content:center;"><img src="assets/icons/reminder.svg" alt="" width="24" height="24" style="display:block;"></span>
             <span style="flex-shrink:0;width:8px;"></span>
           </div>
+          <!-- FanZone card (shown after FanZone was closed): opens FanZone over the match again -->
+          <sc-if value="{{ showFzEntry }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:10px 16px 2px;">
+              <button class="fz-entry" onClick="{{ openFanZoneOver }}" aria-label="Open FanZone" style="width:100%;box-sizing:border-box;border:1px solid rgba(249,250,250,.12);border-radius:12px;background:#1B2326;padding:12px 14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;text-align:left;font-family:'DAZN Oscine',sans-serif;animation:fzFadeIn .3s ease;">
+                <span style="display:flex;align-items:center;gap:8px;">
+                  <img src="assets/icons/bubbles.svg" alt="" width="18" height="21" style="display:block;">
+                  <span style="font-size:15px;font-weight:700;color:#F9FAFA;">FanZone</span>
+                </span>
+                <span style="display:flex;align-items:center;gap:10px;width:100%;">
+                  <span style="flex:1;min-width:0;height:32px;box-sizing:border-box;padding:0 12px;border-radius:10px;background:rgba(249,250,250,.12);display:flex;align-items:center;font-size:13px;color:#C5C7CA;">Join chat</span>
+                  <img src="assets/img/reaction1.png" alt="" width="26" height="26" style="display:block;">
+                  <img src="assets/img/reaction2.png" alt="" width="26" height="26" style="display:block;">
+                  <img src="assets/img/reaction3.png" alt="" width="26" height="26" style="display:block;">
+                </span>
+              </button>
+            </div>
+          </sc-if>
           <!-- tab system -->
           <div style="padding-top:8px;">
             <div class="fz-scroll" style="display:flex;align-items:flex-end;padding:4px 0 0 16px;border-bottom:1px solid #3D4549;overflow-x:auto;background:#080E12;">
@@ -2487,6 +2516,7 @@ class Component extends DCLogic {
     this.state = {
       sheet: null,          // null | card | avatars | favorite | following | competitions
       screen: this.P.startScreen === "FanZone" ? "fanzone" : "home", // flow entry: home -> fanzone
+      fzOver: this.P.startScreen === "FanZone", fanzoneFrom: this.P.startScreen === "FanZone" ? "fixture" : "home", fzEntrySeen: this.P.startScreen === "FanZone",
       showHomeTip: false,
       cardSeen: false,
       profileIntro: false,
@@ -2588,7 +2618,7 @@ class Component extends DCLogic {
   componentDidUpdate() {
     if (this.state.atBottom && this._feedEl) this._feedEl.scrollTop = this._feedEl.scrollHeight;
   }
-  componentWillUnmount() { window.removeEventListener("message", this._onShellMsg); this.pollClear(); clearTimeout(this._pollOutT); clearTimeout(this._crLoadTimer); clearTimeout(this._crLoadMoreTimer); clearTimeout(this._crToastTimer); clearTimeout(this._introT); clearTimeout(this._introCloseT); clearTimeout(this._homeTipTimer); clearTimeout(this._ftueTimer); clearInterval(this._feedTimer); clearTimeout(this._closeT); clearTimeout(this._avatarVidStart); clearTimeout(this._avatarVidGap); }
+  componentWillUnmount() { clearTimeout(this._fzAutoT); clearTimeout(this._fzLoadT); window.removeEventListener("message", this._onShellMsg); this.pollClear(); clearTimeout(this._pollOutT); clearTimeout(this._crLoadTimer); clearTimeout(this._crLoadMoreTimer); clearTimeout(this._crToastTimer); clearTimeout(this._introT); clearTimeout(this._introCloseT); clearTimeout(this._homeTipTimer); clearTimeout(this._ftueTimer); clearInterval(this._feedTimer); clearTimeout(this._closeT); clearTimeout(this._avatarVidStart); clearTimeout(this._avatarVidGap); }
 
   startAvatarVidCycle = () => {
     if (this.state.avatarsSeen || this.state.avatar) return;
@@ -2645,8 +2675,15 @@ class Component extends DCLogic {
   };
   joinFromIntro = () => this.closeProfileIntro(() => this.goFanZone());
   backFromProfile = () => { clearTimeout(this._introT); this.setState({ screen: "home", showHomeTip: false, profileIntro: false, profileScrolled: false }); };
-  goFixture = (e) => { if (e && e.stopPropagation) e.stopPropagation(); clearTimeout(this._homeTipTimer); this.setState({ screen: "fixture", showHomeTip: false }); };
-  backFromFixture = (e) => { if (e && e.stopPropagation) e.stopPropagation(); clearTimeout(this._fixHideT); this.setState({ screen: "home", commentsOpen: false, fixCtrls: false, fixPlaying: true, fixProgress: 0 }); };
+  goFixture = (e) => { if (e && e.stopPropagation) e.stopPropagation(); clearTimeout(this._homeTipTimer); this.setState({ screen: "fixture", showHomeTip: false, fzEntrySeen: false });
+    clearTimeout(this._fzAutoT); this._fzAutoT = setTimeout(() => { if (this.state.screen === "fixture" && !this.state.commentsOpen) this.openFanZoneOver(); }, 650); };
+  openFanZoneOver = (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    clearTimeout(this._fzLoadT);
+    this.setState({ screen: "fanzone", fanzoneFrom: "fixture", fzOver: true, fzLoading: true, fzEntrySeen: true, fzOpenN: (this.state.fzOpenN || 0) + 1 }, this.startFanZoneFtue);
+    this._fzLoadT = setTimeout(() => this.setState({ fzLoading: false }), 1300);
+  };
+  backFromFixture = (e) => { if (e && e.stopPropagation) e.stopPropagation(); clearTimeout(this._fixHideT); clearTimeout(this._fzAutoT); this.pollEnd(true); this.setState({ screen: "home", commentsOpen: false, fixCtrls: false, fixPlaying: true, fixProgress: 0 }); };
   openComments = () => this.setState({ commentsOpen: true, commentsClosing: false, commentsView: "list", commentsBack: false });
   openOtherProfile = (i, e) => { if (e && e.stopPropagation) e.stopPropagation(); this.setState({ commentsView: "profile", otherIdx: i, opLoading: true, opSub: null, opSubClosing: false }); clearTimeout(this._opLoadT); this._opLoadT = setTimeout(() => this.setState({ opLoading: false }), 1200); };
   // ---- other's profile drill-downs: Favorite / Following push in from the right ----
@@ -3901,7 +3938,8 @@ class Component extends DCLogic {
       pollMounted: on,
       pollCls: s.pollClosing ? "is-out" : "",
       pollH: h,
-      fzPanelTop: on && !s.pollClosing ? 265 + h + 8 : 273,
+      pollTop: s.fzOver ? 274 : 265,
+      fzPanelTop: s.fzOver ? (on && !s.pollClosing ? 274 + h : 274) : (on && !s.pollClosing ? 265 + h + 8 : 273),
       pollTimerPct: Math.max(0, Math.min(100, s.pollTime ?? 100)),
       pollToggleCollapse: () => this.setState({ pollCollapsed: !collapsed }),
       pollCollapseLabel: collapsed ? "Expand poll" : "Collapse poll",
@@ -4063,7 +4101,13 @@ class Component extends DCLogic {
       onFeedScroll: this.onFeedScroll,
       showFtue: s.showFtue && !s.sheet && s.screen === "fanzone" && this.P.selfCard !== false,
       isHome: s.screen === "home" || s.screen === "profile" || s.screen === "fixture",
-      isFixture: s.screen === "fixture",
+      isFixture: s.screen === "fixture" || (s.screen === "fanzone" && !!s.fzOver),
+      fzBaseStyle: (s.screen === "fanzone" && s.fzOver) ? "z-index:9;background:transparent;pointer-events:none;" : "background:#000;",
+      fzOwnStageStyle: s.fzOver ? "display:none;" : "",
+      fzPanelCls: (s.screen === "fanzone" && s.fzOver) ? "fz-over-panel" : "",
+      fzLoading: !!s.fzLoading && s.screen === "fanzone",
+      showFzEntry: s.screen === "fixture" && !!s.fzEntrySeen,
+      openFanZoneOver: this.openFanZoneOver,
       fixVidRef: this.fixVidRef,
       onFixTime: this.onFixTime,
       showFixCtrls: this.showFixCtrls,
