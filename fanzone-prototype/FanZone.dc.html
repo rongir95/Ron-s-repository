@@ -2298,7 +2298,7 @@ const CHAT = [
   { name: "Ayaka",  text: "Mia san mia\u203c\ufe0f",                                                                                          avatar: "uploads/4-d33fc601.png" },
   { name: "Hina",   text: "Musiala is unplayable tonight, Dortmund can\u2019t get near him",                                                  avatar: "uploads/9-244c1b8c.png" },
   { name: "Ai",     text: "how is that not a yellow \ud83d\ude21",                                                                          avatar: "uploads/1-fd1da97a.png" },
-  { name: "Misaki", text: "Honestly the midfield battle is what\u2019s deciding this, Kimmich and Brandt haven\u2019t given each other a second of space all half", avatar: "uploads/15-0b0a6991.png" },
+  { name: "Misaki", text: "Echte Liebe \ud83d\udc9b\ud83d\udda4 Brandt has won every duel with Kimmich in midfield so far", avatar: "uploads/15-0b0a6991.png" },
 ];
 // rolling pool used to spawn new incoming messages
 const CHAT_POOL = [
@@ -2309,7 +2309,7 @@ const CHAT_POOL = [
   { name: "Haruto", text: "Guirassy has been so quiet this half, Dortmund need to get him on the ball more or Bayern just run the game",         avatar: "assets/img/av124.png" },
   { name: "Mei",    text: "Der Klassiker never disappoints \u2764\ufe0f",                                                              avatar: "uploads/3-0a35ccd5.png" },
   { name: "Aoi",    text: "penalty!!!",                                                                                                    avatar: "uploads/9-244c1b8c.png" },
-  { name: "Riku",   text: "Neuer rushing off his line every time, it\u2019s going to cost them one of these days",                     avatar: "uploads/1-fd1da97a.png" },
+  { name: "Riku",   text: "Neuer rushing off his line every time, he\u2019s giving me a heart attack \ud83d\ude2c",                     avatar: "uploads/1-fd1da97a.png" },
   { name: "Nao",    text: "Olise\u2019s work rate is insane",                                                                          avatar: "uploads/4-d33fc601.png" },
   { name: "Emi",    text: "still 0-0 and my nerves are gone \ud83d\ude2d",                                                                                  avatar: "uploads/15-0b0a6991.png" },
   { name: "Taiga",  text: "Adeyemi coming on changes everything, Dortmund finally have pace on the break",                             avatar: "assets/img/av139.png" },
@@ -2324,6 +2324,8 @@ const CHAT_POOL = [
   { name: "Akari",  text: "Bayern\u2019s high line is so risky against Adeyemi\u2019s pace, one ball over the top and it\u2019s a 1v1 every time", avatar: "uploads/15-0b0a6991.png" },
 ];
 
+// FanZone chat: which team each fan supports (drives their avatar ring and Fan Card favorite)
+const FZ_FAN_TEAM = {"Ayaka": "bayern", "Hina": "bayern", "Sora": "bayern", "Mei": "bayern", "Aoi": "bayern", "Riku": "bayern", "Nao": "bayern", "Kenji": "bayern", "Rina": "bayern", "Daiki": "bayern", "Sho": "bayern", "Ai": "bvb", "Misaki": "bvb", "Kaito": "bvb", "Ren": "bvb", "Yuki": "bvb", "Haruto": "bvb", "Emi": "bvb", "Taiga": "bvb", "Sana": "bvb", "Yui": "bvb", "Miku": "bvb", "Ryo": "bvb", "Akari": "bvb"};
 // ---------- teams ----------
 // real crests from figma
 const CREST = {
@@ -2897,7 +2899,7 @@ class Component extends DCLogic {
   synthProfile(name, avatar) {
     let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
     const ids = Object.keys(TEAMS).filter(k => /^assets\//.test(TEAMS[k].crest) && ["premier", "champions", "nfl"].indexOf(k) < 0);
-    const favoriteId = ids[h % ids.length];
+    const favoriteId = FZ_FAN_TEAM[name] || ids[h % ids.length];
     const n = 2 + (h % 4); // 2..5 following
     const following = [];
     for (let i = 0; i < n; i++) {

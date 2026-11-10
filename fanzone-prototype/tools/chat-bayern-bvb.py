@@ -13,7 +13,7 @@ OPENING = [
     "Mia san mia‼️",
     "Musiala is unplayable tonight, Dortmund can’t get near him",
     "how is that not a yellow 😡",
-    "Honestly the midfield battle is what’s deciding this, Kimmich and Brandt haven’t given each other a second of space all half",
+    "Echte Liebe \U0001F49B\U0001F5A4 Brandt has won every duel with Kimmich in midfield so far",
 ]
 POOL = [
     "Kane offside AGAIN",
@@ -23,7 +23,7 @@ POOL = [
     "Guirassy has been so quiet this half, Dortmund need to get him on the ball more or Bayern just run the game",
     "Der Klassiker never disappoints ❤️",
     "penalty!!!",
-    "Neuer rushing off his line every time, it’s going to cost them one of these days",
+    "Neuer rushing off his line every time, he’s giving me a heart attack \U0001F62C",
     "Olise’s work rate is insane",
     "still 0-0 and my nerves are gone 😭",
     "Adeyemi coming on changes everything, Dortmund finally have pace on the break",
@@ -56,6 +56,27 @@ def rewrite(block_name, texts):
 
 rewrite('CHAT', OPENING)
 rewrite('CHAT_POOL', POOL)
+
+# every fan in the chat supports one of the two teams on the pitch: their ring and their Fan Card favorite
+FAN_TEAM = {
+    # Bayern
+    "Ayaka": "bayern", "Hina": "bayern", "Sora": "bayern", "Mei": "bayern", "Aoi": "bayern", "Riku": "bayern",
+    "Nao": "bayern", "Kenji": "bayern", "Rina": "bayern", "Daiki": "bayern", "Sho": "bayern",
+    # Dortmund
+    "Ai": "bvb", "Misaki": "bvb", "Kaito": "bvb", "Ren": "bvb", "Yuki": "bvb", "Haruto": "bvb", "Emi": "bvb",
+    "Taiga": "bvb", "Sana": "bvb", "Yui": "bvb", "Miku": "bvb", "Ryo": "bvb", "Akari": "bvb",
+}
+names = re.findall(r'\{ name: "([^"]+)"', src[src.index('const CHAT = ['):src.index('// ---------- teams ----------')])
+missing = [n for n in names if n not in FAN_TEAM]
+if missing:
+    raise SystemExit('no team for: ' + ', '.join(missing))
+old = '// ---------- teams ----------'
+src = src.replace(old, '// FanZone chat: which team each fan supports (drives their avatar ring and Fan Card favorite)\n'
+                       'const FZ_FAN_TEAM = ' + json.dumps(FAN_TEAM) + ';\n' + old, 1)
+old = '    const favoriteId = ids[h % ids.length];'
+if src.count(old) != 1:
+    raise SystemExit('synthProfile favorite not found')
+src = src.replace(old, '    const favoriteId = FZ_FAN_TEAM[name] || ids[h % ids.length];')
 
 # never post the same message twice in a row
 old = '      const pick = CHAT_POOL[Math.floor(Math.random() * CHAT_POOL.length)];'
