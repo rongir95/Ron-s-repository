@@ -7,7 +7,7 @@
 
 Run after fanzone-entry.py:  python3 tools/fanzone-panel.py FanZone.dc.html
 """
-import sys
+import re, sys
 
 PATH = sys.argv[1]
 src = open(PATH, encoding='utf-8').read()
@@ -102,6 +102,23 @@ rep('      openFanZoneOver: this.openFanZoneOver,',
     '      fzHasDraft: !!(s.fzDraft || "").trim(),\n'
     '      fzStickerStyle: (s.fzDraft || "").trim() ? "display:none;" : "",\n'
     '      onFzDraft: this.onFzDraft, onFzKey: this.onFzKey, sendFzMessage: this.sendFzMessage,')
+
+# ---------------------------------------------------------------- FanZone message bar, matched to Figma "Chat Input Field" (496:103499)
+rep('        <div style="position:relative;display:flex;align-items:center;gap:14px;padding:0 0 0 16px;height:72px;">',
+    '        <div style="position:relative;display:flex;align-items:center;gap:12px;padding:8px 0 8px 12px;height:72px;box-sizing:border-box;background:#0C161C;">')
+rep('<div class="fz-scroll" ref="{{ barRef }}" style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;',
+    '<div class="fz-scroll" ref="{{ barRef }}" style="flex:1;min-width:0;display:flex;align-items:center;gap:12px;')
+rep('            <div style="flex:0 0 calc(100% - 144px);display:flex;align-items:center;height:56px;background:#242D33;border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:0 16px 0 20px;">',
+    '            <div style="flex:0 0 235px;width:235px;box-sizing:border-box;display:flex;align-items:center;gap:8px;height:57px;background:#242D33;border:1px solid #3D4549;border-radius:24px;padding:16px 12px;">')
+rep('style="flex:1;min-width:0;border:0;outline:0;background:transparent;color:#F9FAFA;font-size:16px;font-family:inherit;padding:0;margin:0;">',
+    'style="flex:1;min-width:0;border:0;outline:0;background:transparent;color:#F9FAFA;font-size:16px;line-height:1.55;font-weight:400;font-family:inherit;padding:0;margin:0;">')
+rep('  .fz-msg-input::placeholder { color: #7C868C; opacity: 1; }', '  .fz-msg-input::placeholder { color: #CED0D2; opacity: 1; }')
+# sticker icon: the exact "Face Sticker" asset exported from Figma (assets/icons/face-sticker.svg)
+_m = re.search(r'              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;\{\{ fzStickerStyle \}\}">.*?</svg>', src, re.S)
+if not _m: raise SystemExit('sticker icon not found')
+src = src[:_m.start()] + '              <img src="assets/icons/face-sticker.svg" alt="" width="24" height="24" style="display:block;flex-shrink:0;{{ fzStickerStyle }}">' + src[_m.end():]
+rep('            <div style="display:flex;align-items:center;gap:2px;flex-shrink:0;">\n              <sc-for list="{{ reactions }}" as="r" hint-placeholder-count="5">\n                <img src="{{ r }}" alt="" style="scroll-snap-align:end;flex-shrink:0;width:40px;height:40px;object-fit:contain;cursor:pointer;">',
+    '            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;height:48px;">\n              <sc-for list="{{ reactions }}" as="r" hint-placeholder-count="5">\n                <img src="{{ r }}" alt="" style="scroll-snap-align:end;flex-shrink:0;width:40px;height:40px;margin:-2px;object-fit:contain;cursor:pointer;">')  # 36px slot; the emoji files carry their own padding
 
 # "Let's make a unique fan profile" tip on Home: off unless the shell turns it on (?hometip=1)
 rep('      this._homeTipTimer = setTimeout(() => { if (!this.state.sheet && this.state.screen === "home") this.setState({ showHomeTip: true }); }, 2000);',

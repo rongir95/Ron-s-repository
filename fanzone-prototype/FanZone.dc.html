@@ -171,7 +171,7 @@
   /* FanZone opening over the match page */
   @keyframes fzOverIn { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
   .fz-over-panel { animation: fzOverIn .38s cubic-bezier(.22,1,.36,1) backwards; }
-  .fz-msg-input::placeholder { color: #7C868C; opacity: 1; }
+  .fz-msg-input::placeholder { color: #CED0D2; opacity: 1; }
   .fz-collapse-btn:focus-visible { outline: 2px solid #F9FAFA; outline-offset: 2px; border-radius: 6px; }
   .fz-entry:hover { background: #222C31 !important; }
   @keyframes fzPushIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
@@ -353,7 +353,7 @@
           </div>
         </div>
         <!-- message bar -->
-        <div style="position:relative;display:flex;align-items:center;gap:14px;padding:0 0 0 16px;height:72px;">
+        <div style="position:relative;display:flex;align-items:center;gap:12px;padding:8px 0 8px 12px;height:72px;box-sizing:border-box;background:#0C161C;">
           <!-- FTUE coach-mark -->
           <sc-if value="{{ showFtue }}" hint-placeholder-val="{{ false }}">
             <div style="position:absolute;left:10px;right:10px;bottom:76px;background:linear-gradient(105deg,#F1F2F2 0%,#F1F2F2 52%,#F5EBDD 78%,#F7E4CE 100%);color:#1B2326;border-radius:18px;padding:14px 18px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fzPop .28s cubic-bezier(.22,1,.36,1);z-index:5;">
@@ -368,7 +368,7 @@
             </div>
           </sc-if>
           <!-- scrollable track: avatar + input + reactions (2 pages) -->
-          <div class="fz-scroll" ref="{{ barRef }}" style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;height:72px;cursor:grab;padding-right:12px;">
+          <div class="fz-scroll" ref="{{ barRef }}" style="flex:1;min-width:0;display:flex;align-items:center;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;height:72px;cursor:grab;padding-right:12px;">
             <!-- entry point: your avatar (B + avatar in gradient ring) -->
             <button onClick="{{ openCard }}" title="Open your Fan Card" style="scroll-snap-align:start;border:0;padding:2px;{{ selfCardCursor }}flex-shrink:0;width:40px;height:40px;border-radius:50%;background:{{ ringBg }};">
               <span style="position:relative;display:block;width:100%;height:100%;border-radius:50%;overflow:hidden;background:#080E12;padding:3px;box-sizing:border-box;">
@@ -384,20 +384,17 @@
               </span>
             </button>
             <!-- message input -->
-            <div style="flex:0 0 calc(100% - 144px);display:flex;align-items:center;height:56px;background:#242D33;border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:0 16px 0 20px;">
-              <input class="fz-msg-input" type="text" value="{{ fzDraft }}" onInput="{{ onFzDraft }}" onKeyDown="{{ onFzKey }}" placeholder="Message" aria-label="Message" maxlength="200" enterkeyhint="send" autocomplete="off" style="flex:1;min-width:0;border:0;outline:0;background:transparent;color:#F9FAFA;font-size:16px;font-family:inherit;padding:0;margin:0;">
+            <div style="flex:0 0 235px;width:235px;box-sizing:border-box;display:flex;align-items:center;gap:8px;height:57px;background:#242D33;border:1px solid #3D4549;border-radius:24px;padding:16px 12px;">
+              <input class="fz-msg-input" type="text" value="{{ fzDraft }}" onInput="{{ onFzDraft }}" onKeyDown="{{ onFzKey }}" placeholder="Message" aria-label="Message" maxlength="200" enterkeyhint="send" autocomplete="off" style="flex:1;min-width:0;border:0;outline:0;background:transparent;color:#F9FAFA;font-size:16px;line-height:1.55;font-weight:400;font-family:inherit;padding:0;margin:0;">
               <sc-if value="{{ fzHasDraft }}" hint-placeholder-val="{{ false }}">
                 <button onClick="{{ sendFzMessage }}" aria-label="Send message" style="flex-shrink:0;width:36px;height:36px;margin-right:-8px;border:0;padding:0;border-radius:50%;background:#F9FAFA;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="18" height="18" viewBox="335 69 18 18" aria-hidden="true"><path d="M337.004 71.9394C336.683 70.6769 338.031 69.6447 339.166 70.2831L350.59 76.7089C351.597 77.2753 351.597 78.7255 350.59 79.2919L339.166 85.7177C338.031 86.3562 336.683 85.3239 337.004 84.0615L337.891 80.5673L341.227 78.6415C341.721 78.3564 341.721 77.6435 341.227 77.3583L337.891 75.4316L337.004 71.9394Z" fill="#1B2326"></path></svg></button>
               </sc-if>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;{{ fzStickerStyle }}">
-                <path d="M7 4H17C18.6569 4 20 5.34315 20 7V12.3428C20 13.1384 19.6837 13.9022 19.1211 14.4648L14.4648 19.1211C13.9022 19.6837 13.1384 20 12.3428 20H7C5.34315 20 4 18.6569 4 17V7C4 5.34315 5.34315 4 7 4Z" stroke="#CED0D2" stroke-width="2"></path>
-                <path d="M14 13H20V13.5859L13.5859 20H13V14C13 13.4477 13.4477 13 14 13Z" stroke="#CED0D2" stroke-width="2"></path>
-              </svg>
+              <img src="assets/icons/face-sticker.svg" alt="" width="24" height="24" style="display:block;flex-shrink:0;{{ fzStickerStyle }}">
             </div>
             <!-- reactions -->
-            <div style="display:flex;align-items:center;gap:2px;flex-shrink:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;height:48px;">
               <sc-for list="{{ reactions }}" as="r" hint-placeholder-count="5">
-                <img src="{{ r }}" alt="" style="scroll-snap-align:end;flex-shrink:0;width:40px;height:40px;object-fit:contain;cursor:pointer;">
+                <img src="{{ r }}" alt="" style="scroll-snap-align:end;flex-shrink:0;width:40px;height:40px;margin:-2px;object-fit:contain;cursor:pointer;">
               </sc-for>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-left:6px;">
                 <path d="M4 9C4.6 6.7 6.7 5 9.2 5H15M15 5L12.5 2.5M15 5L12.5 7.5" stroke="#F9FAFA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
