@@ -11,6 +11,9 @@
     team colour stays fixed in the drawer's background and the top strip shows the same slice of it, so the
     content scrolls under the strip without a seam (the colour used to scroll away with the content).
 
+  - Fan Card reveal: after the loading skeleton the whole card appears at once (one short fade), instead of
+    the avatar, name, team and rows coming in one after another.
+
 Run after the other scripts:  python3 tools/ui-fixes.py FanZone.dc.html
 """
 import sys
@@ -44,5 +47,12 @@ rep('''        <sc-if value="{{ cardReady }}" hint-placeholder-val="{{ true }}">
         <!-- Top - Sheet''', '''        <!-- Top - Sheet''')
 rep('''overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#080E12;box-shadow:0 -1px 0 rgba(249,250,250,.2);{{ sheetAnimStyle }}''',
     '''overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;background-color:#080E12;background-image:{{ cardWash }};background-size:100% 350px;background-repeat:no-repeat;background-position:top;background-attachment:scroll;box-shadow:0 -1px 0 rgba(249,250,250,.2);{{ sheetAnimStyle }}''')
+import re as _re
+m = _re.search(r'  \.fz-r-avatar \{ animation:.*?\n  \.fz-r-wash \{ animation:[^\n]*\n', src, _re.S)
+if not m:
+    raise SystemExit('card reveal animations not found')
+src = src[:m.start()] + ('  @keyframes fzCardIn { from { opacity: 0; } to { opacity: 1; } }\n'
+    '  .fz-r-avatar, .fz-r-glow, .fz-r-name, .fz-r-bubble, .fz-r-team, .fz-r-int, .fz-r-chips, .fz-r-mwt, .fz-r-row, .fz-r-wash { animation: fzCardIn .25s ease both; }\n') + src[m.end():]
+
 open(PATH, 'w', encoding='utf-8').write(src)
 print('ok')
