@@ -204,6 +204,16 @@
     </div>
 
     <div class="group">
+      <span class="label">FanZone mode</span>
+      <div class="switches">
+        <div class="switch-row">
+          <span class="switch-text" id="l-light">FanZone Light<small>Predefined messages only (GIFs and stickers too)</small></span>
+          <button type="button" class="switch" role="switch" aria-checked="false" aria-labelledby="l-light" data-key="light"><span class="knob"></span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
       <span class="label">Tooltips</span>
       <div class="switches">
         <div class="switch-row">
@@ -237,7 +247,7 @@
 
 <script>
 (function () {
-  var DEFAULTS = { start: "home", profile: "empty", card: "A", following: "1", hometip: "0", fancardtip: "0", sponsor: "0" };
+  var DEFAULTS = { start: "home", profile: "empty", card: "A", following: "1", hometip: "0", fancardtip: "0", sponsor: "0", light: "0" };
   var KEY = "fanzone-prototype-settings";
   var settings = Object.assign({}, DEFAULTS);
   try { Object.assign(settings, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
@@ -268,7 +278,7 @@
   var loads = 0;
 
   function query() {
-    var q = "embed=1&reset=1&start=" + settings.start + "&profile=" + settings.profile + "&card=" + settings.card + "&following=" + settings.following + "&hometip=" + settings.hometip + "&fancardtip=" + settings.fancardtip + "&sponsor=" + settings.sponsor;
+    var q = "embed=1&reset=1&start=" + settings.start + "&profile=" + settings.profile + "&card=" + settings.card + "&following=" + settings.following + "&hometip=" + settings.hometip + "&fancardtip=" + settings.fancardtip + "&sponsor=" + settings.sponsor + "&light=" + settings.light;
     return q;
   }
   function load() {
@@ -298,6 +308,11 @@
       if (k === "sponsor") {
         // swap the FanZone header in place: no reload, the prototype keeps its state
         try { frame.contentWindow.postMessage({ fz: "sponsor", on: settings.sponsor === "1" }, "*"); } catch (err) {}
+        return;
+      }
+      if (k === "light") {
+        // switch between FanZone and FanZone Light in place
+        try { frame.contentWindow.postMessage({ fz: "light", on: settings.light === "1" }, "*"); } catch (err) {}
         return;
       }
       load();

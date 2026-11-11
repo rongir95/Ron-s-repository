@@ -200,6 +200,8 @@
   @keyframes qzConf { from { translate: 0 0; } to { translate: 4px 10px; rotate: 35deg; } }
   @keyframes qzLoad { from { width: 4px; } to { width: 100%; } }
   @keyframes pinIn { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+  @keyframes fzSkel { from { opacity: .55; } to { opacity: 1; } }
+  .gz-chip:hover { background: #2E383E !important; }
   @keyframes fzPushIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
   @keyframes fzPushOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
 </style>
@@ -292,13 +294,13 @@
           </div>
           <!-- GIF / Sticker -->
           <div style="flex-shrink:0;height:56px;box-sizing:border-box;padding:8px 16px;display:flex;justify-content:center;">
-            <div role="tablist" aria-label="GIF or sticker" style="width:153px;height:40px;box-sizing:border-box;padding:3px 4px;border:1px solid #3D4549;border-radius:9px;background:#1B2326;display:flex;align-items:center;">
-              <button class="gz-tab" role="tab" aria-selected="{{ gzGifSel }}" aria-label="GIFs" onClick="{{ gzPickGif }}" style="width:72px;height:32px;border:0;padding:0;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:{{ gzGifTabBg }};"><img src="assets/icons/gz-tab-gif.svg" alt="" width="24" height="24" style="display:block;"></button>
-              <button class="gz-tab" role="tab" aria-selected="{{ gzStickerSel }}" aria-label="Stickers" onClick="{{ gzPickSticker }}" style="width:72px;height:32px;border:0;padding:0;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:{{ gzStickerTabBg }};"><img src="assets/icons/gz-tab-sticker.svg" alt="" width="24" height="24" style="display:block;"></button>
+            <div role="tablist" aria-label="GIF or sticker" style="width:{{ gzTabsW }}px;height:40px;box-sizing:border-box;padding:3px 4px;border:1px solid #3D4549;border-radius:9px;background:#1B2326;display:flex;align-items:center;">
+              <sc-if value="{{ fzLight }}" hint-placeholder-val="{{ false }}"><button class="gz-tab" role="tab" aria-selected="{{ gzQuickSel }}" aria-label="Quick messages" onClick="{{ gzPickQuick }}" style="width:{{ gzTabW }}px;height:32px;border:0;padding:0;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:{{ gzQuickTabBg }};"><img src="assets/icons/quick-message.svg" alt="" width="24" height="24" style="display:block;"></button></sc-if><button class="gz-tab" role="tab" aria-selected="{{ gzGifSel }}" aria-label="GIFs" onClick="{{ gzPickGif }}" style="width:{{ gzTabW }}px;height:32px;border:0;padding:0;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:{{ gzGifTabBg }};"><img src="assets/icons/gz-tab-gif.svg" alt="" width="24" height="24" style="display:block;"></button>
+              <button class="gz-tab" role="tab" aria-selected="{{ gzStickerSel }}" aria-label="Stickers" onClick="{{ gzPickSticker }}" style="width:{{ gzTabW }}px;height:32px;border:0;padding:0;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:{{ gzStickerTabBg }};"><img src="assets/icons/gz-tab-sticker.svg" alt="" width="24" height="24" style="display:block;"></button>
             </div>
           </div>
           <!-- search -->
-          <div style="flex-shrink:0;height:72px;box-sizing:border-box;padding:12px 16px;">
+          <div style="flex-shrink:0;height:72px;box-sizing:border-box;padding:12px 16px;{{ gzSearchDisplay }}">
             <label style="height:48px;box-sizing:border-box;padding:12px;border:1px solid {{ gzFieldBorder }};border-radius:8px;display:flex;align-items:center;gap:8px;cursor:text;">
               <img src="assets/icons/gz-search.svg" alt="" width="24" height="24" style="display:block;flex-shrink:0;">
               <input class="gz-search" type="text" value="{{ gzQuery }}" onInput="{{ gzOnInput }}" onFocus="{{ gzOnFocus }}" onKeyDown="{{ gzOnKey }}" placeholder="{{ gzPlaceholder }}" aria-label="{{ gzPlaceholder }}" autocomplete="off" enterkeyhint="search" style="flex:1;min-width:0;border:0;outline:0;background:transparent;color:#F9FAFA;font-family:inherit;font-size:16px;line-height:24px;padding:0;margin:0;">
@@ -313,6 +315,20 @@
               <div style="display:flex;gap:8px;">
                 <div style="width:168px;display:flex;flex-direction:column;gap:8px;"><span class="gz-sk" style="display:block;height:124px;"></span><span class="gz-sk" style="display:block;height:166px;"></span><span class="gz-sk" style="display:block;height:124px;"></span></div>
                 <div style="width:168px;display:flex;flex-direction:column;gap:8px;"><span class="gz-sk" style="display:block;height:166px;"></span><span class="gz-sk" style="display:block;height:124px;"></span><span class="gz-sk" style="display:block;height:166px;"></span></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ gzShowQuick }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:8px 0 24px;text-align:center;font-family:'DAZN Oscine',sans-serif;">
+                <div style="font-weight:700;font-size:16px;line-height:25px;color:#F9FAFA;">Quick message</div>
+                <div style="margin-top:4px;font-size:14px;line-height:20px;color:#B3B9BB;">Share your voice on every play with quick messages.</div>
+                <div style="margin-top:24px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px;">
+                  <sc-if value="{{ gzQuickLoading }}" hint-placeholder-val="{{ false }}"><span style="display:block;width:44px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span><span style="display:block;width:72px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span><span style="display:block;width:96px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span><span style="display:block;width:84px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span><span style="display:block;width:54px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span><span style="display:block;width:82px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span><span style="display:block;width:150px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span><span style="display:block;width:70px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span><span style="display:block;width:100px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span><span style="display:block;width:76px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span><span style="display:block;width:74px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span><span style="display:block;width:100px;height:32px;border-radius:8px;background:#2A3439;animation:fzSkel 1.1s ease-in-out infinite alternate;"></span></sc-if>
+                  <sc-if value="{{ gzQuickReady }}" hint-placeholder-val="{{ true }}">
+                    <sc-for list="{{ gzQuickItems }}" as="c" hint-placeholder-count="8">
+                      <button class="gz-chip" onClick="{{ c.send }}" style="position:relative;height:32px;box-sizing:border-box;padding:2px 8px;border:0;border-radius:8px;background:#242D33;cursor:pointer;font-family:'DAZN Oscine',sans-serif;font-size:12px;color:#F9FAFA;white-space:nowrap;">{{ c.text }}<span aria-hidden="true" style="position:absolute;left:4px;bottom:-3px;width:9px;height:9px;border-radius:2px;background:#242D33;transform:skewX(-35deg);"></span></button>
+                    </sc-for>
+                  </sc-if>
+                </div>
               </div>
             </sc-if>
             <sc-if value="{{ gzShowGifs }}" hint-placeholder-val="{{ true }}">
@@ -716,6 +732,10 @@
           <!-- scrollable track: avatar + input + reactions (2 pages) -->
           <div ref="{{ barRef }}" style="flex:1;min-width:0;height:72px;overflow:hidden;cursor:grab;touch-action:pan-y;">
           <div data-fz-bar-row="1" style="display:flex;align-items:center;gap:12px;height:72px;padding-left:12px;width:max-content;transform:translateX({{ fzBarX }}px);transition:transform .35s cubic-bezier(.22,1,.36,1);">
+            <sc-if value="{{ fzLight }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ openQuick }}" aria-label="Quick messages" style="position:relative;flex-shrink:0;width:56px;height:56px;box-sizing:border-box;border:1px solid rgba(255,255,255,.1);border-radius:24px;background:#242D33;display:flex;align-items:center;justify-content:center;cursor:pointer;"><img src="assets/icons/quick-message.svg" alt="" width="24" height="24" style="display:block;"><span style="position:absolute;left:31px;top:-4px;padding:2px 5px;border-radius:9999px;background:#FFFA00;font-family:'DAZN Oscine',sans-serif;font-weight:700;font-size:12px;line-height:13px;color:#080E12;">New</span></button>
+            </sc-if>
+            <sc-if value="{{ fzRegular }}" hint-placeholder-val="{{ true }}">
             <!-- entry point: your avatar (B + avatar in gradient ring) -->
             <button onClick="{{ openCard }}" title="Open your Fan Card" style="position:relative;border:0;padding:5px;{{ selfCardCursor }}flex-shrink:0;width:40px;height:40px;box-sizing:border-box;border-radius:50%;background:transparent;">
               <span aria-hidden="true" style="position:absolute;inset:0;border-radius:50%;box-sizing:border-box;border:2px solid transparent;background:linear-gradient(#0C161C,#0C161C) padding-box,{{ ringBg }} border-box;"></span>
@@ -739,6 +759,7 @@
               </sc-if>
               <button onClick="{{ openGiphy }}" aria-label="GIFs and stickers" style="flex-shrink:0;border:0;padding:0;background:transparent;cursor:pointer;{{ fzStickerStyle }}"><img src="assets/icons/face-sticker.svg" alt="" width="24" height="24" style="display:block;"></button>
             </div>
+            </sc-if>
             <sc-if value="{{ fzTyping }}" hint-placeholder-val="{{ false }}">
               <button onPointerDown="{{ kbKeep }}" onMouseDown="{{ kbKeep }}" onClick="{{ sendFzMessage }}" aria-label="Send message" style="flex-shrink:0;margin-left:4px;width:32px;height:32px;border:0;padding:0;border-radius:999px;background:#FFFA00;display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" aria-hidden="true" style="display:block;"><path d="M1.6 1.1 13 7.3a.8.8 0 0 1 0 1.4L1.6 14.9a.8.8 0 0 1-1.1-1l2-5.2a1 1 0 0 0 0-.7l-2-5.1a.8.8 0 0 1 1.1-1.8z" fill="#080E12"/></svg></button>
             </sc-if>
@@ -2617,6 +2638,8 @@ const LB_ROWS = [["4", "Mariposa", "uploads/11.png", "#DC052D", "10", "01:34:35"
 const QZ = [{"q": "What is the Bayern v Dortmund fixture called?", "a": ["Der Klassiker", "Revierderby", "El Clásico", "Nordderby"], "c": 0}, {"q": "Which stadium is Bayern München's home?", "a": ["Signal Iduna Park", "Allianz Arena", "Olympiastadion", "Volksparkstadion"], "c": 1}, {"q": "What is Dortmund's famous south stand called?", "a": ["The Kop", "Südkurve", "Die Gelbe Wand", "Curva Sud"], "c": 2}];
 // Report reasons (FanZone DS)
 const REPORT_REASONS = ["Offensive", "Harassments or abuse", "Violent or Harmful", "Spam", "Other"];
+// FanZone Light: predefined messages
+const FZ_QUICK = ["Goal! ⚽️", "What a save! 🔥", "Seriously, ref?! 🫵", "VAR again?! 😒", "Let's go! 🤘", "That's never a penalty! 🙈", "What a comeback! 🚀", "We needed that goal! 🙌", "He's a magician! 🪄", "About time! 👏", "Sub him off! 😤", "Keep pressing! 💪", "I can't take it anymore! 😩", "So close! 😱", "That's how it's done! 💪", "Mia san mia! ❤️", "Echte Liebe! 💛🖤"];
 // FanZone chat: which team each fan supports (drives their avatar ring and Fan Card favorite)
 const FZ_FAN_TEAM = {"Ayaka": "bayern", "Hina": "bayern", "Sora": "bayern", "Mei": "bayern", "Aoi": "bayern", "Riku": "bayern", "Nao": "bayern", "Kenji": "bayern", "Rina": "bayern", "Daiki": "bayern", "Sho": "bayern", "Ai": "bvb", "Misaki": "bvb", "Kaito": "bvb", "Ren": "bvb", "Yuki": "bvb", "Haruto": "bvb", "Emi": "bvb", "Taiga": "bvb", "Sana": "bvb", "Yui": "bvb", "Miku": "bvb", "Ryo": "bvb", "Akari": "bvb"};
 // ---------- teams ----------
@@ -2831,6 +2854,7 @@ const FZ_URL_PROPS = (function () {
     if (q.get("profile") === "empty") o.startState = "Empty profile";
     if (q.get("reset") === "1") o.resetOnLoad = true;
     if (q.get("sponsor") === "1") o.fzSponsor = true;
+    if (q.get("light") === "1") o.fzLight = true;
     if (q.get("fancardtip") === "1") o.fanCardTip = true;
     if (q.get("hometip") === "1") o.homeTip = true;
   } catch (e) {}
@@ -2919,6 +2943,7 @@ class Component extends DCLogic {
     this._onShellMsg = (e) => {
       const d = e && e.data;
       if (d && d.fz === "sponsor") { this.setState({ fzSponsorLive: !!d.on }); return; }
+      if (d && d.fz === "light") { this.setState({ fzLightLive: !!d.on, fzTyping: false, gzOpen: false }); return; }
       if (d && d.fz === "pin") { this.setState({ pinOn: !!d.on, pinExpanded: false }); return; }
       if (d && d.fz === "quiz") { if (d.on) this.startQuiz(); else this.closeQuiz(); return; }
       if (!d || d.fz !== "poll") return;
@@ -3082,7 +3107,7 @@ class Component extends DCLogic {
   };
   gzVals() {
     const s = this.state;
-    const tab = s.gzTab || "gif";
+    const tab = (s.gzTab === "quick" && !this.isLight()) ? "gif" : (s.gzTab || "gif");
     const searched = !!(s.gzQuery || "").trim();
     const loading = !!s.gzLoading;
     const cols = (searched ? GZ.gifResult : GZ.gifDefault).map((col, ci) => ({ id: "c" + ci, items: col.map(([src, h], i) => ({ id: ci + "-" + i, src, h, send: () => this.gzSend("gif", src) })) }));
@@ -3334,6 +3359,41 @@ class Component extends DCLogic {
       reportReasons: REPORT_REASONS.map((label, i) => { const on = s.reportReason === i; return { id: "r" + i, label, checked: on ? "true" : "false",
         color: on ? "#F9FAFA" : "#B3B9BB", ring: on ? "#F9FAFA" : "#B3B9BB", dot: on ? "" : "display:none;", pick: () => this.setState({ reportReason: i }) }; }),
       reportBtnStyle: s.reportReason != null ? "background:#F9FAFA;color:#080E12;cursor:pointer;" : "background:#CED0D2;color:#6D7377;cursor:default;",
+    };
+  }
+  // FanZone Light (predefined messages only)
+  isLight = () => (this.state.fzLightLive != null ? this.state.fzLightLive : this.P.fzLight === true);
+  lightText = (m) => {
+    if (!this.isLight() || !m.text) return m.text;
+    let h = 0; const k = String(m.id || m.name || "");
+    for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) >>> 0;
+    return FZ_QUICK[h % FZ_QUICK.length];
+  };
+  openQuick = (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    clearTimeout(this._qmT);
+    this.setState({ gzOpen: true, gzTab: "quick", gzExpanded: false, gzQuery: "", gzLoading: false, gzQuickLoading: true, showFtue: false });
+    this._qmT = setTimeout(() => this.setState({ gzQuickLoading: false }), 800);
+  };
+  sendQuick = (text) => {
+    const s = this.state;
+    const av = s.avatar && AV_MAP[s.avatar] && AV_MAP[s.avatar].src ? AV_MAP[s.avatar].src : "";
+    const msg = { id: "me" + Date.now(), name: s.nickname || "Charlie", avatar: av, text, mine: true };
+    this.setState(st => ({ feed: st.feed.concat(msg).slice(-40), atBottom: true, gzOpen: false, gzExpanded: false }));
+  };
+  lightVals() {
+    const s = this.state;
+    const light = this.isLight();
+    const tab = s.gzTab || "gif";
+    const quick = light && tab === "quick";
+    return {
+      fzLight: light, fzRegular: !light, openQuick: this.openQuick,
+      gzTabsW: light ? 343 : 153, gzTabW: light ? 111 : 72,
+      gzQuickSel: quick ? "true" : "false", gzQuickTabBg: quick ? "#3D4549" : "transparent",
+      gzPickQuick: () => { this.setState({ gzTab: "quick", gzQuickLoading: false }); },
+      gzSearchDisplay: quick ? "display:none;" : "",
+      gzShowQuick: quick, gzQuickLoading: quick && !!s.gzQuickLoading, gzQuickReady: quick && !s.gzQuickLoading,
+      gzQuickItems: FZ_QUICK.map((t, i) => ({ id: "q" + i, text: t, send: () => this.sendQuick(t) })),
     };
   }
   openFanZoneOver = (e) => {
@@ -4769,6 +4829,7 @@ class Component extends DCLogic {
     return {
       ...this.crVals(),
       ...this.gzVals(),
+      ...this.lightVals(),
       ...this.reportVals(),
       ...this.pinVals(),
       ...this.qzVals(),
@@ -4785,7 +4846,7 @@ class Component extends DCLogic {
         // my messages: the same ring as my avatar next to the Message field (my favorite team, or the default gradient)
         const fzAv = { hasImg: !!m.avatar, noImg: !m.avatar, initial: String(m.name || "?").charAt(0).toUpperCase(), imgScale: /(^|\/)uploads\//.test(m.avatar || "") ? "transform:scale(1.207);" : "" };
         if (m.mine) { const myFav = s.favoriteId ? teamById(s.favoriteId) : null; return { ...m, ...fzAv, ring: myFav ? myFav.card : "linear-gradient(210deg,#8923A0 0%,#F1A322 38%,#FFFA00 100%)", onOpen: this.openCard, onPress: null }; }
-        return { ...m, ...fzAv, ring: t ? t.card : "#F2C400", onOpen: () => this.openUserCard(m), onPress: (e) => this.msgPressStart(m, t ? t.card : "#F2C400", fzAv) };
+        return { ...m, ...fzAv, text: this.lightText(m), ring: t ? t.card : "#F2C400", onOpen: () => this.openUserCard(m), onPress: (e) => this.msgPressStart(m, t ? t.card : "#F2C400", fzAv) };
       }),
       feedRef: this.feedRef,
       barRef: this.barRef,
@@ -4799,7 +4860,7 @@ class Component extends DCLogic {
       fzLoading: !!s.fzLoading && s.screen === "fanzone",
       showFzEntry: s.screen === "fixture" && !!s.fzEntrySeen,
       openFanZoneOver: this.openFanZoneOver,
-      fzBarX: s.fzTyping ? 0 : (s.fzBar2 ? -245 : 0),
+      fzBarX: (s.fzTyping || this.isLight()) ? 0 : (s.fzBar2 ? -245 : 0),
       fzInputW: s.fzTyping ? 247 : (s.fzBar2 ? 280 : 240),
       fzTyping: !!s.fzTyping && s.screen === "fanzone", fzPanelBottom: (s.fzTyping && s.screen === "fanzone") ? 317 : 0,
       fzMsgBorder: s.fzTyping ? "rgba(255,255,255,.3)" : "#3D4549", fzTypingCls: s.fzTyping ? "fz-typing" : "", fzRxDisplay: s.fzTyping ? "display:none;" : "",
