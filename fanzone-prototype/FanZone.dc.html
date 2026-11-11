@@ -1922,15 +1922,6 @@
           <div style="padding:16px 0;{{ interestsBlockStyle }}">
             <sc-if value="{{ showCommonLine }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;align-items:center;gap:6px;margin:0 16px 12px;">
-                <span style="display:flex;flex-direction:row-reverse;align-items:center;flex-shrink:0;padding-left:8px;">
-                  <sc-if value="{{ myCommonHasAvatar }}" hint-placeholder-val="{{ true }}">
-                    <img src="{{ commonAvatarB }}" alt="" style="width:22px;height:22px;border-radius:50%;object-fit:cover;margin-left:-8px;">
-                  </sc-if>
-                  <sc-if value="{{ myCommonNoAvatar }}" hint-placeholder-val="{{ false }}">
-                    <span style="width:22px;height:22px;border-radius:50%;margin-left:-8px;background:#0A1014;box-shadow:inset 0 0 0 1.5px #2A3238;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#F9FAFA;">{{ myInitial }}</span>
-                  </sc-if>
-                  <img src="{{ commonAvatarA }}" alt="" style="width:22px;height:22px;border-radius:50%;object-fit:cover;margin-left:-8px;">
-                </span>
                 <span style="font-size:12px;line-height:1.52;color:#B3B9BB;min-width:0;"><strong style="color:#B3B9BB;font-weight:700;">{{ commonWho }}</strong> {{ commonRest }}</span>
               </div>
             </sc-if>
@@ -2105,32 +2096,37 @@
     <!-- ===================== AVATARS DRAWER ===================== -->
     <sc-if value="{{ isAvatars }}" hint-placeholder-val="{{ false }}">
       <div ref="{{ drawerRef }}" style="position:absolute;left:0;right:0;bottom:0;z-index:25;background:#1B2326;border-radius:24px 24px 0 0;display:flex;flex-direction:column;{{ drawerTopStyle }}{{ pushAnim }}overflow:hidden;">
-        <div style="position:relative;height:64px;flex-shrink:0;">
-          <div style="position:absolute;left:50%;top:8px;transform:translateX(-50%);width:36px;height:5px;border-radius:3px;background:rgba(255,255,255,.2);"></div>
-          <div style="position:absolute;left:0;right:0;top:26px;text-align:center;font-size:16px;font-weight:700;pointer-events:none;">Choose your avatar</div>
-          <button onClick="{{ backToCard }}" style="position:absolute;right:16px;top:22px;width:32px;height:32px;border:0;cursor:pointer;border-radius:50%;background:rgba(255,255,255,.14);color:#F9FAFA;display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="display:block;"><path d="M5 5L15 15M15 5L5 15" stroke="#F9FAFA" stroke-width="2" stroke-linecap="round"></path></svg></button>
+        <div style="position:relative;height:60px;flex-shrink:0;">
+          <div style="position:absolute;left:50%;top:5px;transform:translateX(-50%);width:36px;height:5px;border-radius:100px;background:rgba(249,250,250,.16);"></div>
+          <div style="position:absolute;left:0;right:0;top:20px;text-align:center;font-size:16px;font-weight:700;line-height:25px;color:#F9FAFA;pointer-events:none;">Choose your avatar</div>
+          <button onClick="{{ backToCard }}" style="position:absolute;right:16px;top:16px;width:32px;height:32px;border:0;cursor:pointer;border-radius:9999px;background:rgba(249,250,250,.12);color:#F9FAFA;display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="display:block;"><path d="M5 5L15 15M15 5L5 15" stroke="#F9FAFA" stroke-width="2" stroke-linecap="round"></path></svg></button>
         </div>
         <!-- grid -->
-        <div class="fz-scroll" style="flex:1;overflow-y:auto;padding:8px 16px 28px;scrollbar-gutter:stable both-edges;">
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px 16px;">
+        <div class="fz-scroll" style="flex:1;overflow-y:auto;padding:20px 24px 96px;">
+          <div style="display:grid;grid-template-columns:repeat(4,70px);justify-content:space-between;row-gap:12px;">
             <sc-for list="{{ avatarGrid }}" as="a" hint-placeholder-count="16">
-              <div onClick="{{ a.onTap }}" style="position:relative;aspect-ratio:1;cursor:pointer;">
-                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;{{ a.innerSizeStyle }}">
+              <div onClick="{{ a.onTap }}" role="button" aria-label="Avatar" aria-pressed="{{ a.pressed }}" style="position:relative;width:70px;height:70px;cursor:pointer;">
+                <sc-if value="{{ a.selected }}" hint-placeholder-val="{{ false }}">
+                  <span aria-hidden="true" style="position:absolute;inset:0;border-radius:50%;box-sizing:border-box;border:3px solid transparent;background:linear-gradient(#1B2326,#1B2326) padding-box,{{ ringBg }} border-box;animation:fzRxPop .25s cubic-bezier(.22,1.4,.36,1);"></span>
+                </sc-if>
+                <span style="position:absolute;left:6px;top:6px;width:58px;height:58px;box-sizing:border-box;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:rgba(8,14,18,.8);display:flex;align-items:center;justify-content:center;">
                   <sc-if value="{{ a.isInitial }}" hint-placeholder-val="{{ false }}">
-                    <span style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:50%;background:#2b3236;font-family:'DAZN Oscine',sans-serif;font-weight:800;font-size:30px;color:#F9FAFA;">{{ a.initialLetter }}</span>
+                    <span style="font-family:'DAZN Oscine',sans-serif;font-weight:700;font-size:30px;line-height:1;color:#F9FAFA;">{{ a.initialLetter }}</span>
                   </sc-if>
                   <sc-if value="{{ a.notInitial }}" hint-placeholder-val="{{ true }}">
-                    <img src="{{ a.src }}" alt="avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;{{ a.scaleStyle }}">
+                    <img src="{{ a.src }}" alt="" style="display:block;width:100%;height:100%;object-fit:cover;{{ a.scaleStyle }}">
                   </sc-if>
-                </div>
+                </span>
                 <sc-if value="{{ a.selected }}" hint-placeholder-val="{{ false }}">
-                  <img src="assets/img/avatar-selected-ring.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;">
+                  <span aria-hidden="true" style="position:absolute;left:40px;top:40px;width:30px;height:30px;box-sizing:border-box;border-radius:50%;border:3px solid #1B2326;background:#FFFA00;display:flex;align-items:center;justify-content:center;animation:fzRxPop .3s cubic-bezier(.22,1.6,.36,1);">
+                    <svg width="14" height="12" viewBox="0 0 14 12" fill="none"><path d="M1.5 6.3l3.6 3.6L12.5 2" stroke="#080E12" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
                 </sc-if>
               </div>
             </sc-for>
           </div>
         </div>
-        <img src="assets/img/avatars-bottom-fade.png" alt="" style="position:absolute;left:0;right:0;bottom:0;width:100%;height:96px;object-fit:fill;pointer-events:none;">
+        <div aria-hidden="true" style="position:absolute;left:0;right:0;bottom:0;height:96px;pointer-events:none;background:linear-gradient(180deg,rgba(27,35,38,0) 0%,#1B2326 85%);"></div>
       </div>
     </sc-if>
 
@@ -4755,8 +4751,8 @@ class Component extends DCLogic {
       isInitial: !!a.initial, notInitial: !a.initial,
       initialLetter: vInitial,
       selected: s.dAvatar === a.id,
-      scaleStyle: "",
-      innerSizeStyle: s.dAvatar === a.id ? "width:84%;height:84%;" : "width:84%;height:84%;",
+      scaleStyle: /(^|\/)uploads\//.test(a.src || "") ? "transform:scale(1.207);" : "",
+      pressed: s.dAvatar === a.id ? "true" : "false",
       onTap: () => this.pickAvatar(a.id),
     }));
 
@@ -4998,8 +4994,8 @@ class Component extends DCLogic {
       closeFollowMenu: this.closeFollowMenu, fmUnfollow: this.fmUnfollow, fmAlerts: this.fmAlerts, backFromCard: this.backFromCard, closeCardX: this.closeCardX,
       isCard: (s.sheet === "card" || ["favorite", "following", "avatars", "otherFav", "otherFollowing", "competitions", "editProfile"].indexOf(s.sheet) >= 0) && !(s.favOrigin === "other" && (s.sheet === "favorite" || s.sheet === "competitions")),
       cardPushStyle: (["favorite", "following", "avatars", "otherFav", "otherFollowing", "competitions"].indexOf(s.sheet) >= 0 && !s.subClosing && !s.closing
-        ? "transform:translateX(-30%);filter:brightness(.55);pointer-events:none;"
-        : "transform:translateX(0);filter:none;") + "transition:transform .32s cubic-bezier(.2,0,0,1), filter .32s ease;",
+        ? "transform:translateX(-30%);filter:brightness(.55);pointer-events:none;visibility:hidden;transition:transform .32s cubic-bezier(.2,0,0,1), filter .32s ease, visibility 0s linear .32s;"
+        : "transform:translateX(0);filter:none;visibility:visible;transition:transform .32s cubic-bezier(.2,0,0,1), filter .32s ease, visibility 0s;"),
       pushAnim: s.closing ? "animation:fzSlideDown .3s cubic-bezier(.4,0,1,1) forwards;"
         : (s.subClosing ? "animation:fzPushOut .26s cubic-bezier(.3,0,1,1) forwards;" : "animation:fzPushIn .32s cubic-bezier(.2,0,0,1);"),
       compAnim: s.closing ? "animation:fzSlideDown .3s cubic-bezier(.4,0,1,1) forwards;"
