@@ -25,9 +25,7 @@ def rep(old, new, count=1):
         raise SystemExit(f'expected {count} occurrence(s), found {n}: {old[:100]!r}')
     src = src.replace(old, new)
 
-HEART = ('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display:block;">'
-         '<path d="M12 20.3s-7.6-4.6-9.1-9.4C1.9 7.7 3.9 4.7 7 4.7c2 0 3.6 1.1 5 2.9 1.4-1.8 3-2.9 5-2.9 3.1 0 5.1 3 4.1 6.2-1.5 4.8-9.1 9.3-9.1 9.3z" '
-         'stroke="#F9FAFA" stroke-width="2" stroke-linejoin="round"/></svg>')
+HEART = '<img src="assets/icons/like-outline.svg" alt="" width="24" height="24" draggable="false" style="display:block;">'  # Figma EyEm3J8Y3qrWV40vOPOkjV 496:97402
 
 # ---------------------------------------------------------------- markup
 # the heart becomes a button: outline heart, or the reaction you picked
