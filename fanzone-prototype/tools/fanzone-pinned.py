@@ -9,6 +9,8 @@
 The image in Figma is a bitmap; here the banner is built in HTML/CSS (stadium-light gradients, DAZN logo
 SVG, title text) so it stays vector. Icons (pin, link, collapse) are SVGs from Figma in assets/pinned/.
 
+With a poll running, the poll sits under the pinned image (starting a poll closes an open pinned image).
+
 Run after the other scripts:  python3 tools/fanzone-pinned.py FanZone.dc.html
 """
 import sys
@@ -90,6 +92,14 @@ rep('      ...this.gzVals(),', '      ...this.gzVals(),\n      ...this.pinVals()
 rep('      if (d && d.fz === "quiz")', '      if (d && d.fz === "pin") { this.setState({ pinOn: !!d.on, pinExpanded: false }); return; }\n      if (d && d.fz === "quiz")')
 rep('+ "|" + (s.qzPhase ? "quiz" : "-");', '+ "|" + (s.qzPhase ? "quiz" : "-") + "|" + (s.pinOn ? "pin" : "-");')
 rep('quiz: !!s.qzPhase }, "*");', 'quiz: !!s.qzPhase, pin: !!s.pinOn }, "*");')
+
+# Poll + pinned image: the poll comes in under the pinned image. Starting a poll closes an open pinned image;
+# if you open the pinned image again, the poll moves down under it.
+rep('<div style="position:absolute;left:0;right:0;top:48px;z-index:2;height:{{ pollClipH }}px;',
+    '<div style="position:absolute;left:0;right:0;top:{{ pollTop }}px;z-index:2;height:{{ pollClipH }}px;')
+rep('      if (d.on) this.pollStart(); else this.pollEnd();',
+    '      if (d.on) { if (this.state.pinExpanded) this.setState({ pinExpanded: false }); this.pollStart(); } else this.pollEnd();')
+rep("    return { pinOn: on,", "    return { pollTop: on ? (s.pinExpanded ? 48 + 290 : 48 + 65) : 48, pinOn: on,")
 
 open(PATH, 'w', encoding='utf-8').write(src)
 print('ok')

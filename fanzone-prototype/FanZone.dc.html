@@ -398,7 +398,7 @@
         </sc-if>
         <!-- ===================== LIVE POLL (from the landscape FanZone prototype): slides down from under the FanZone header, over the top of the chat ===================== -->
       <sc-if value="{{ pollMounted }}" hint-placeholder-val="{{ false }}">
-        <div style="position:absolute;left:0;right:0;top:48px;z-index:2;height:{{ pollClipH }}px;overflow:hidden;pointer-events:none;transition:opacity .25s ease;{{ fzPollWrapStyle }}">
+        <div style="position:absolute;left:0;right:0;top:{{ pollTop }}px;z-index:2;height:{{ pollClipH }}px;overflow:hidden;pointer-events:none;transition:opacity .25s ease;{{ fzPollWrapStyle }}">
         <section class="fz-poll {{ pollCls }}" aria-label="Poll" style="position:relative;height:{{ pollH }}px;pointer-events:auto;background:#1B232B;border-radius:0 0 14px 14px;box-shadow:0 10px 24px rgba(0,0,0,.45);overflow:hidden;font-family:'DAZN Oscine',sans-serif;color:#F9FAFA;">
           <div style="height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;">
             <div style="display:flex;align-items:center;gap:10px;">
@@ -2976,7 +2976,7 @@ class Component extends DCLogic {
       if (d && d.fz === "pin") { this.setState({ pinOn: !!d.on, pinExpanded: false }); return; }
       if (d && d.fz === "quiz") { if (d.on) this.startQuiz(); else this.closeQuiz(); return; }
       if (!d || d.fz !== "poll") return;
-      if (d.on) this.pollStart(); else this.pollEnd();
+      if (d.on) { if (this.state.pinExpanded) this.setState({ pinExpanded: false }); this.pollStart(); } else this.pollEnd();
     };
     window.addEventListener("message", this._onShellMsg);
     if (this.state.screen === "home") {
@@ -3354,7 +3354,7 @@ class Component extends DCLogic {
   pinVals() {
     const s = this.state;
     const on = !!s.pinOn && s.screen === "fanzone";
-    return { pinOn: on, pinClosed: on && !s.pinExpanded, pinExpanded: on && !!s.pinExpanded,
+    return { pollTop: on ? (s.pinExpanded ? 48 + 290 : 48 + 65) : 48, pinOn: on, pinClosed: on && !s.pinExpanded, pinExpanded: on && !!s.pinExpanded,
       pinOpen: () => this.setState({ pinExpanded: true }), pinClose: () => this.setState({ pinExpanded: false }) };
   }
   // Long press a fan's message -> focus + Report; Report -> drawer (FanZone DS 12356:11041 / 12356:11859)
