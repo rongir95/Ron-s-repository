@@ -121,6 +121,7 @@
       <button type="button" class="poll-mini" id="pollMini" aria-pressed="false" disabled>Start poll</button>
       <button type="button" class="poll-mini" id="quizMini" aria-pressed="false" disabled>Quiz</button>
       <button type="button" class="poll-mini" id="pinMini" aria-pressed="false" disabled>Pin</button>
+      <button type="button" class="poll-mini" id="battleMini" aria-pressed="false" disabled>Battle</button>
       <button type="button" id="openSettings" aria-controls="rail" aria-expanded="false">Settings &amp; tips</button>
     </div>
   </header>
@@ -156,6 +157,10 @@
       <button type="button" class="live-btn" id="pinBtn" aria-pressed="false" disabled>
         <svg width="18" height="18" viewBox="6 6 12 12" fill="currentColor" aria-hidden="true"><path d="M14.93 6.27C14.70 6.04 14.36 5.94 14.04 6.02C13.72 6.10 13.46 6.33 13.36 6.65L12.84 8.37L10.75 10.45C8.48 9.94 7.96 10.45 7.27 11.15C6.90 11.52 6.90 12.17 7.27 12.54L8.67 13.95L6.28 16.34C5.91 16.71 5.90 17.35 6.27 17.72C6.64 18.09 7.29 18.09 7.66 17.72L10.05 15.32L11.45 16.72C11.82 17.09 12.47 17.09 12.84 16.72C13.53 16.02 14.05 15.50 13.53 13.24L15.62 11.15L17.34 10.63C17.66 10.53 17.89 10.27 17.97 9.95C18.05 9.63 17.95 9.29 17.72 9.06L14.93 6.27Z"/></svg>
         <span id="pinBtnText">Pin image</span>
+      </button>
+      <button type="button" class="live-btn" id="battleBtn" aria-pressed="false" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M9.5 17.5 21 6V3h-3L6.5 14.5M11 19l-6-6M8 16l-4 4M5 21l-2-2"/></svg>
+        <span id="battleBtnText">Start fan battle</span>
       </button>
     </div>
 
@@ -360,6 +365,18 @@
     try { frame.contentWindow.postMessage({ fz: "pin", on: !pinOn }, "*"); } catch (e) {}
   }
   pinBtn.addEventListener("click", togglePin);
+  var battleOn = false, battleBtn = document.getElementById("battleBtn"), battleMini = document.getElementById("battleMini");
+  function paintBattle() {
+    [battleBtn, battleMini].forEach(function (b) { b.disabled = !inFanZone; b.setAttribute("aria-pressed", String(battleOn)); });
+    document.getElementById("battleBtnText").textContent = battleOn ? "End fan battle" : "Start fan battle";
+    battleMini.textContent = battleOn ? "End battle" : "Battle";
+  }
+  function toggleBattle() {
+    if (!inFanZone) return;
+    try { frame.contentWindow.postMessage({ fz: "battle", on: !battleOn }, "*"); } catch (e) {}
+  }
+  battleBtn.addEventListener("click", toggleBattle);
+  battleMini.addEventListener("click", toggleBattle);
   pinMini.addEventListener("click", togglePin);
   quizMini.addEventListener("click", toggleQuiz);
   var pollBtn = document.getElementById("pollBtn"), pollMini = document.getElementById("pollMini");
@@ -383,7 +400,9 @@
     pollOn = !!d.poll;
     quizOn = !!d.quiz;
     pinOn = !!d.pin;
+    battleOn = !!d.battle;
     paintPoll();
+    paintBattle();
     paintQuiz();
     paintPin();
   });

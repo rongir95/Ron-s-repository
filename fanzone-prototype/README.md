@@ -62,6 +62,7 @@ Tapping your own avatar opens My Card.
 - `tools/fixture-reaction-list.py`: tap the reactions summary on the match page to see who reacted (loader, then the list).
 - `tools/avatar-drawer.py`: the Choose your avatar drawer per Figma.
 - `tools/ui-fixes.py`: small fixes (pushed Fan Card hidden under drawers, text-only common interests, Fan Card scroll).
+- `tools/fanzone-battle.py`: Fan Battle (shell: Start fan battle): strip entry, moderator text, Ready/Set/Go, team bars, 20s battle with gifts (5-500 coins) to your Choose-your-team pick, winner.
 - `sources/`: the two source prototypes the build starts from (`Personal Fan Card.dc.html`, `Comments & Replies.dc.html`).
 - `build.sh`: rebuilds `FanZone.dc.html` (runs the merge, then the other scripts in the order above).
 
