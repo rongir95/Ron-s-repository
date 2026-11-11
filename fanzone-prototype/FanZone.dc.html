@@ -3346,7 +3346,7 @@ class Component extends DCLogic {
     const s = this.state;
     const on = !!s.pinOn && s.screen === "fanzone";
     return { pollTop: on ? (s.pinExpanded ? 48 + 289 : 48 + 64) : 48, pinOn: on, pinClosed: on && !s.pinExpanded, pinExpanded: on && !!s.pinExpanded,
-      pinOpen: () => this.setState({ pinExpanded: true }), pinClose: () => this.setState({ pinExpanded: false }) };
+      pinOpen: () => this.setState({ pinExpanded: true, pollCollapsed: true }), pinClose: () => this.setState({ pinExpanded: false }) };
   }
   // Long press a fan's message -> focus + Report; Report -> drawer (FanZone DS 12356:11041 / 12356:11859)
   msgPressStart = (m, ring, av) => {

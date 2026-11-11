@@ -9,7 +9,8 @@
 The image in Figma is a bitmap; here the banner is built in HTML/CSS (stadium-light gradients, DAZN logo
 SVG, title text) so it stays vector. Icons (pin, link, collapse) are SVGs from Figma in assets/pinned/.
 
-With a poll running, the poll sits under the pinned image (starting a poll closes an open pinned image).
+With a poll running, the poll sits under the pinned image (starting a poll closes an open pinned image;
+opening the pinned image collapses the poll).
 
 Run after the other scripts:  python3 tools/fanzone-pinned.py FanZone.dc.html
 """
@@ -84,7 +85,7 @@ LOGIC = '''  // Pinned image (from the shell)
     const s = this.state;
     const on = !!s.pinOn && s.screen === "fanzone";
     return { pinOn: on, pinClosed: on && !s.pinExpanded, pinExpanded: on && !!s.pinExpanded,
-      pinOpen: () => this.setState({ pinExpanded: true }), pinClose: () => this.setState({ pinExpanded: false }) };
+      pinOpen: () => this.setState({ pinExpanded: true, pollCollapsed: true }), pinClose: () => this.setState({ pinExpanded: false }) };
   }
   openFanZoneOver = (e) => {'''
 rep('  openFanZoneOver = (e) => {', LOGIC)
