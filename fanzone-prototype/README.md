@@ -54,6 +54,7 @@ Tapping your own avatar opens My Card.
 - `tools/fanzone-team.py`: "Choose your team" (Bayern / Dortmund) after the FanZone loading, until you pick a team or go neutral; the bar's Change team button reopens it.
 - `tools/fanzone-leaderboard.py`: the leaderboard from the trophy in the FanZone header: empty state before any quiz, loading then results after one (medals and pictograms are SVGs from Figma in `assets/leaderboard/`).
 - `tools/fanzone-quiz.py`: the FanZone quiz, started from the shell (Start quiz): 10s toast, full-panel countdown from 5, three Bayern/Dortmund questions, result, then the leaderboard.
+- `tools/fanzone-pinned.py`: the pinned image (closed / open), started from the shell (Pin image); the banner is HTML/CSS so it stays vector.
 - `sources/`: the two source prototypes the build starts from (`Personal Fan Card.dc.html`, `Comments & Replies.dc.html`).
 - `build.sh`: rebuilds `FanZone.dc.html` (runs the merge, then the other scripts in the order above).
 

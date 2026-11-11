@@ -114,6 +114,7 @@
       <button type="button" class="restart-mini js-restart" aria-label="Restart prototype" title="Restart prototype"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="display:block;"><path d="M13.5 8a5.5 5.5 0 1 1-1.61-3.89M13.5 2.5v3h-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button type="button" class="poll-mini" id="pollMini" aria-pressed="false" disabled>Start poll</button>
       <button type="button" class="poll-mini" id="quizMini" aria-pressed="false" disabled>Quiz</button>
+      <button type="button" class="poll-mini" id="pinMini" aria-pressed="false" disabled>Pin</button>
       <button type="button" id="openSettings" aria-controls="rail" aria-expanded="false">Settings &amp; tips</button>
     </div>
   </header>
@@ -145,6 +146,10 @@
       <button type="button" class="live-btn" id="quizBtn" aria-pressed="false" disabled>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2-2.4 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.9" r="1.2" fill="currentColor"/></svg>
         <span id="quizBtnText">Start quiz</span>
+      </button>
+      <button type="button" class="live-btn" id="pinBtn" aria-pressed="false" disabled>
+        <svg width="18" height="18" viewBox="6 6 12 12" fill="currentColor" aria-hidden="true"><path d="M14.93 6.27C14.70 6.04 14.36 5.94 14.04 6.02C13.72 6.10 13.46 6.33 13.36 6.65L12.84 8.37L10.75 10.45C8.48 9.94 7.96 10.45 7.27 11.15C6.90 11.52 6.90 12.17 7.27 12.54L8.67 13.95L6.28 16.34C5.91 16.71 5.90 17.35 6.27 17.72C6.64 18.09 7.29 18.09 7.66 17.72L10.05 15.32L11.45 16.72C11.82 17.09 12.47 17.09 12.84 16.72C13.53 16.02 14.05 15.50 13.53 13.24L15.62 11.15L17.34 10.63C17.66 10.53 17.89 10.27 17.97 9.95C18.05 9.63 17.95 9.29 17.72 9.06L14.93 6.27Z"/></svg>
+        <span id="pinBtnText">Pin image</span>
       </button>
     </div>
 
@@ -323,6 +328,18 @@
     try { frame.contentWindow.postMessage({ fz: "quiz", on: !quizOn }, "*"); } catch (e) {}
   }
   quizBtn.addEventListener("click", toggleQuiz);
+  var pinOn = false, pinBtn = document.getElementById("pinBtn"), pinMini = document.getElementById("pinMini");
+  function paintPin() {
+    [pinBtn, pinMini].forEach(function (b) { b.disabled = !inFanZone; b.setAttribute("aria-pressed", String(pinOn)); });
+    document.getElementById("pinBtnText").textContent = pinOn ? "Unpin image" : "Pin image";
+    pinMini.textContent = pinOn ? "Unpin" : "Pin";
+  }
+  function togglePin() {
+    if (!inFanZone) return;
+    try { frame.contentWindow.postMessage({ fz: "pin", on: !pinOn }, "*"); } catch (e) {}
+  }
+  pinBtn.addEventListener("click", togglePin);
+  pinMini.addEventListener("click", togglePin);
   quizMini.addEventListener("click", toggleQuiz);
   var pollBtn = document.getElementById("pollBtn"), pollMini = document.getElementById("pollMini");
   function paintPoll() {
@@ -344,8 +361,10 @@
     inFanZone = d.screen === "fanzone";
     pollOn = !!d.poll;
     quizOn = !!d.quiz;
+    pinOn = !!d.pin;
     paintPoll();
     paintQuiz();
+    paintPin();
   });
 
   function setOpen(open) {
