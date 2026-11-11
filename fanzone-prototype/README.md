@@ -48,6 +48,7 @@ Tapping your own avatar opens My Card.
 - `tools/fanzone-bar.py`: the message bar's two states per FanZone DS "Chat Input Field" (node 13299:57986), with a swipe between them.
 - `tools/fanzone-giphy.py`: GIFs and stickers in FanZone, per the Figma "Giphy - Stickers - Dev": drawer from the sticker icon, GIF / Sticker tabs, search with loading and results, sending to the chat (run last). GIFs are still frames; GIF and sticker images are in `assets/gif/` and `assets/stickers/`.
 
+- `tools/vector-assets.py`: swaps bitmap logos for vectors exported from Figma (`assets/vec/`), rebuilt with the same framing as the PNGs they replace (run last).
 - `sources/`: the two source prototypes the build starts from (`Personal Fan Card.dc.html`, `Comments & Replies.dc.html`).
 - `build.sh`: rebuilds `FanZone.dc.html` (runs the merge, then the other scripts in the order above).
 
