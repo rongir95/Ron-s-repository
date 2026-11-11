@@ -111,7 +111,8 @@ rep('<div class="fz-scroll" ref="{{ feedRef }}" onScroll="{{ onFeedScroll }}" st
 # ---------------------------------------------------------------- my avatar by the Message field
 rep('<button onClick="{{ openCard }}" title="Open your Fan Card" style="scroll-snap-align:start;border:0;padding:2px;{{ selfCardCursor }}flex-shrink:0;width:40px;height:40px;border-radius:50%;background:{{ ringBg }};">\n              <span style="position:relative;display:block;width:100%;height:100%;border-radius:50%;overflow:hidden;background:#080E12;padding:3px;box-sizing:border-box;">',
     '<button onClick="{{ openCard }}" title="Open your Fan Card" style="position:relative;scroll-snap-align:start;border:0;padding:5px;{{ selfCardCursor }}flex-shrink:0;width:40px;height:40px;box-sizing:border-box;border-radius:50%;background:transparent;">\n'
-    '              <span aria-hidden="true" style="position:absolute;inset:0;border-radius:50%;background:{{ ringBg }};-webkit-mask:radial-gradient(circle closest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));mask:radial-gradient(circle closest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));"></span>\n'
+    # ring drawn as a border (a hard-stop mask has no antialiasing and looked blurry / jagged)
+    '              <span aria-hidden="true" style="position:absolute;inset:0;border-radius:50%;box-sizing:border-box;border:2px solid transparent;background:linear-gradient(#0C161C,#0C161C) padding-box,{{ ringBg }} border-box;"></span>\n'
     '              <span style="position:relative;display:block;width:30px;height:30px;border-radius:50%;overflow:hidden;background:#0C161C;box-sizing:border-box;">')
 
 open(PATH, 'w', encoding='utf-8').write(src)

@@ -29,7 +29,9 @@
   .shell { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 340px; }
   .stage { position: relative; min-width: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(110% 90% at 50% 0%, #161b20 0%, var(--stage) 55%, var(--ground) 100%); padding-block: 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; }
   .device { position: relative; flex: none; border-radius: calc(46px * var(--s, 1)); box-shadow: 0 0 0 calc(11px * var(--s, 1)) var(--bezel), 0 0 0 calc(13px * var(--s, 1)) #2c2c31, 0 40px 90px rgba(0, 0, 0, 0.55); overflow: hidden; background: #000; }
-  .device iframe { position: absolute; left: 0; top: 0; width: 375px; height: 812px; border: 0; transform-origin: 0 0; transform: scale(var(--s, 1)); background: #000; display: block; }
+  .device iframe { position: absolute; left: 0; top: 0; width: 375px; height: 812px; border: 0; zoom: var(--s, 1); background: #000; display: block; }
+  /* zoom lays the phone out at its real size (sharp text, avatars and icons, no edge seams); transform is only a fallback */
+  @supports not (zoom: 2) { .device iframe { zoom: normal; transform-origin: 0 0; transform: scale(var(--s, 1)); } }
 
   .rail { background: var(--rail); border-left: 1px solid var(--line); overflow-y: auto; padding-block: 28px 32px; padding-left: 24px; padding-right: max(24px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 26px; }
   .brand { display: flex; flex-direction: column; gap: 4px; }
