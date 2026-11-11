@@ -51,6 +51,7 @@ Tapping your own avatar opens My Card.
 - `tools/vector-assets.py`: swaps bitmap logos for vectors exported from Figma (`assets/vec/`), rebuilt with the same framing as the PNGs they replace (run last).
 - `tools/ios-keyboard.py`: the updated iOS keyboard (Figma "[Dev] Public Profile", node 8003:175519) in the status editor and the Comments composer, built in HTML/CSS with SVG symbols.
 - `tools/fixture-reactions.py`: the match page heart: tap to like, long press for the reaction picker (FanZone DS "Reaction btn"); the reaction you pick replaces the heart.
+- `tools/fanzone-team.py`: "Choose your team" (Bayern / Dortmund) after the FanZone loading, until you pick a team or go neutral; the bar's Change team button reopens it.
 - `sources/`: the two source prototypes the build starts from (`Personal Fan Card.dc.html`, `Comments & Replies.dc.html`).
 - `build.sh`: rebuilds `FanZone.dc.html` (runs the merge, then the other scripts in the order above).
 

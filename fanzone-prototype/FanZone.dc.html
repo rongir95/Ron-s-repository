@@ -187,6 +187,7 @@
   @keyframes fzRxPop { 0% { transform: scale(.4); } 100% { transform: scale(1); } }
   .fz-rx { transition: transform .15s ease; }
   .fz-rx:hover { transform: translateY(-6px) scale(1.18); }
+  @keyframes fzFadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes fzPushIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
   @keyframes fzPushOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
 </style>
@@ -421,6 +422,29 @@
             <span style="width:30px;height:30px;border-radius:50%;border:2.5px solid rgba(249,250,250,.18);border-top-color:#F9FAFA;animation:fzSpin .8s linear infinite;"></span>
           </div>
         </sc-if>
+        <!-- Choose your team (FanZone DS 12521:41534) -->
+        <sc-if value="{{ fzChoose }}" hint-placeholder-val="{{ false }}">
+          <div role="dialog" aria-label="Choose your team" style="position:absolute;left:0;right:0;top:48px;bottom:0;z-index:6;overflow:hidden;background:radial-gradient(91% 71% at 50% 46%,#191970 0%,#0C161C 100%);animation:fzFadeIn .3s ease;">
+            <img src="assets/icons/fanzone-logo.svg" alt="FanZone" width="71" height="56" style="position:absolute;left:151px;top:24px;display:block;">
+            <button onClick="{{ fzGoNeutral }}" aria-label="Close" title="Close" style="position:absolute;right:12px;top:12px;width:32px;height:32px;border:0;padding:0;border-radius:9999px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="display:block;"><path d="M5 5L15 15M15 5L5 15" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round"></path></svg></button>
+            <div style="position:absolute;left:0;right:0;top:{{ fzChooseTop }}px;display:flex;flex-direction:column;align-items:center;">
+              <div style="font-family:'DAZN Oscine',sans-serif;font-weight:700;font-size:18px;line-height:25px;color:#F9FAFA;">Choose your team</div>
+              <div style="margin-top:16px;display:flex;align-items:flex-start;gap:20px;">
+                <sc-for list="{{ fzTeams }}" as="t" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:flex-start;gap:20px;">
+                    <sc-if value="{{ t.second }}" hint-placeholder-val="{{ false }}"><span style="width:15px;margin-top:38px;font-family:'DAZN Oscine',sans-serif;font-weight:800;font-size:12px;line-height:24px;color:#FFFFFF;text-align:center;">VS</span></sc-if>
+                    <button onClick="{{ t.pick }}" aria-label="{{ t.name }}" style="position:relative;width:100px;border:0;padding:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:15px;">
+                      <span style="{{ t.tileStyle }}"><img src="{{ t.crest }}" alt="" width="64" height="64" style="display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25));"></span>
+                      <sc-if value="{{ t.picked }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:38px;top:88px;width:24px;height:24px;border-radius:50%;background:#F9FAFA;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.35);animation:fzRxPop .25s cubic-bezier(.22,1.6,.36,1);"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 7.3l3 3 6-6.6" stroke="#080E12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></sc-if>
+                      <span style="font-family:'DAZN Oscine',sans-serif;font-weight:700;font-size:16px;line-height:1;color:#FFFFFF;white-space:nowrap;">{{ t.name }}</span>
+                    </button>
+                  </div>
+                </sc-for>
+              </div>
+              <button onClick="{{ fzGoNeutral }}" style="margin-top:42px;width:127px;height:40px;border:0;border-radius:7.3px;background:rgba(255,255,255,.2);font-family:'DAZN Oscine',sans-serif;font-weight:700;font-size:14px;color:#F9FAFA;cursor:pointer;">Go neutral</button>
+            </div>
+          </div>
+        </sc-if>
         <!-- chat feed -->
         <div class="fz-scroll" ref="{{ feedRef }}" onScroll="{{ onFeedScroll }}" style="flex:1;overflow-y:auto;min-height:0;transition:opacity .25s ease;{{ fzPollWrapStyle }}">
           <div style="min-height:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;padding:0 12px 12px;">
@@ -497,7 +521,7 @@
               <sc-for list="{{ reactions }}" as="r" hint-placeholder-count="5">
                 <img src="{{ r }}" alt="" draggable="false" style="flex-shrink:0;width:40px;height:40px;margin:-2px;object-fit:contain;cursor:pointer;">
               </sc-for>
-              <button aria-label="Change team" style="flex-shrink:0;width:32px;height:32px;border:0;padding:0;border-radius:8px;background:#3D4549;display:flex;align-items:center;justify-content:center;cursor:pointer;"><img src="assets/icons/change-team.svg" alt="" width="20" height="20" style="display:block;"></button>
+              <button onClick="{{ openTeamChooser }}" aria-label="Change team" style="flex-shrink:0;width:32px;height:32px;border:0;padding:0;border-radius:8px;background:#3D4549;display:flex;align-items:center;justify-content:center;cursor:pointer;"><img src="assets/icons/change-team.svg" alt="" width="20" height="20" style="display:block;"></button>
             </div>
           </div>
           </div>
@@ -2358,6 +2382,8 @@ const CHAT_POOL = [
 
 // GIFs & stickers (Figma "Giphy - Stickers - Dev")
 const GZ = {"gifDefault": [[["assets/gif/g01.jpg", 166], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 166], ["assets/gif/g02.jpg", 124], ["assets/gif/g05.jpg", 166], ["assets/gif/g08.jpg", 125], ["assets/gif/g04.jpg", 166], ["assets/gif/g01.jpg", 124]], [["assets/gif/g02.jpg", 165], ["assets/gif/g04.jpg", 124], ["assets/gif/g08.jpg", 163], ["assets/gif/g05.jpg", 121], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 124], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g01.jpg", 166], ["assets/gif/g05.jpg", 124]]], "gifResult": [[["assets/gif/g05.jpg", 124], ["assets/gif/g06.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g03.jpg", 166], ["assets/gif/g09.jpg", 166], ["assets/gif/g02.jpg", 124], ["assets/gif/g05.jpg", 166], ["assets/gif/g08.jpg", 125], ["assets/gif/g04.jpg", 166], ["assets/gif/g01.jpg", 124]], [["assets/gif/g02.jpg", 165], ["assets/gif/g08.jpg", 163], ["assets/gif/g09.jpg", 166], ["assets/gif/g04.jpg", 121], ["assets/gif/g01.jpg", 166], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 124], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g01.jpg", 166], ["assets/gif/g05.jpg", 124]]], "stickerDefault": ["assets/stickers/s01.png", "assets/stickers/s02.png", "assets/stickers/s03.png", "assets/stickers/s04.png", "assets/stickers/s05.png", "assets/stickers/s06.png", "assets/stickers/s07.png", "assets/stickers/s08.png", "assets/stickers/s09.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png", "assets/stickers/s18.png", "assets/stickers/s09.png", "assets/stickers/s04.png", "assets/stickers/s11.png", "assets/stickers/s02.png", "assets/stickers/s16.png", "assets/stickers/s07.png", "assets/stickers/s13.png", "assets/stickers/s01.png", "assets/stickers/s15.png", "assets/stickers/s06.png", "assets/stickers/s10.png", "assets/stickers/s03.png", "assets/stickers/s17.png", "assets/stickers/s12.png", "assets/stickers/s05.png", "assets/stickers/s14.png", "assets/stickers/s08.png"], "stickerResult": ["assets/stickers/s10.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s15.png", "assets/stickers/s03.png", "assets/stickers/s12.png", "assets/stickers/s16.png", "assets/stickers/s17.png", "assets/stickers/s18.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png", "assets/stickers/s08.png", "assets/stickers/s14.png", "assets/stickers/s05.png", "assets/stickers/s12.png", "assets/stickers/s17.png", "assets/stickers/s03.png", "assets/stickers/s10.png", "assets/stickers/s06.png", "assets/stickers/s15.png", "assets/stickers/s01.png", "assets/stickers/s13.png", "assets/stickers/s07.png", "assets/stickers/s16.png", "assets/stickers/s02.png", "assets/stickers/s11.png", "assets/stickers/s04.png", "assets/stickers/s09.png", "assets/stickers/s18.png"]};
+// Choose your team tile (FanZone DS)
+const TILE_STYLE = 'position:relative;width:100px;height:100px;border-radius:22px;overflow:hidden;box-sizing:border-box;border:2px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;background:radial-gradient(130% 55% at 15% -8%,rgba(255,255,255,.22) 0 50%,transparent 51%),radial-gradient(140% 60% at 90% 112%,rgba(0,0,0,.16) 0 50%,transparent 51%),{bg};';
 // FanZone chat: which team each fan supports (drives their avatar ring and Fan Card favorite)
 const FZ_FAN_TEAM = {"Ayaka": "bayern", "Hina": "bayern", "Sora": "bayern", "Mei": "bayern", "Aoi": "bayern", "Riku": "bayern", "Nao": "bayern", "Kenji": "bayern", "Rina": "bayern", "Daiki": "bayern", "Sho": "bayern", "Ai": "bvb", "Misaki": "bvb", "Kaito": "bvb", "Ren": "bvb", "Yuki": "bvb", "Haruto": "bvb", "Emi": "bvb", "Taiga": "bvb", "Sana": "bvb", "Yui": "bvb", "Miku": "bvb", "Ryo": "bvb", "Akari": "bvb"};
 // ---------- teams ----------
@@ -2868,11 +2894,33 @@ class Component extends DCLogic {
       fixRxItems: R.map(([id, name], i) => ({ id, name, x: 5 + i * 44, src: "assets/reactions/" + id + ".png", pick: () => this.setState({ fixRx: id, fixRxOpen: false }) })),
     };
   }
+  // Choose your team (FanZone DS 12521:41534)
+  pickFzTeam = (id) => {
+    clearTimeout(this._fzTeamT);
+    this.setState(st => ({ fzTeam: id, fzTeamPicked: true, favoriteId: st.favoriteId || id }));
+    this._fzTeamT = setTimeout(() => this.setState({ fzChoose: false }), 650);
+  };
+  fzGoNeutral = () => { clearTimeout(this._fzTeamT); this.setState({ fzTeam: "neutral", fzTeamPicked: true, fzChoose: false }); };
+  openTeamChooser = (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.setState({ fzChoose: true }); };
+  fzTeamVals() {
+    const s = this.state;
+    const T = [
+      { id: "bayern", name: "Bayern München", crest: "assets/vec/tiles/img-logo-bayern.svg", bg: "#DC052D" },
+      { id: "bvb", name: "Dortmund", crest: "assets/poll/logo-bvb.png", bg: "#FDE100" },
+    ];
+    return {
+      fzChoose: !!s.fzChoose && s.screen === "fanzone" && !s.fzLoading,
+      fzChooseTop: 135,
+      fzGoNeutral: this.fzGoNeutral, openTeamChooser: this.openTeamChooser,
+      fzTeams: T.map((t, i) => ({ ...t, second: i > 0, picked: s.fzTeam === t.id, pick: () => this.pickFzTeam(t.id),
+        tileStyle: TILE_STYLE.replace("{bg}", t.bg) })),
+    };
+  }
   openFanZoneOver = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     clearTimeout(this._fzLoadT);
     this.setState({ screen: "fanzone", fanzoneFrom: "fixture", fzOver: true, fzLoading: true, fzCollapsed: false, fzEntrySeen: true, fzOpenN: (this.state.fzOpenN || 0) + 1 }, this.startFanZoneFtue);
-    this._fzLoadT = setTimeout(() => this.setState({ fzLoading: false }), 1300);
+    this._fzLoadT = setTimeout(() => this.setState(st => ({ fzLoading: false, fzChoose: !st.fzTeamPicked })), 1300);
   };
   backFromFixture = (e) => { if (e && e.stopPropagation) e.stopPropagation(); clearTimeout(this._fixHideT); clearTimeout(this._fzAutoT); this.pollEnd(true); this.setState({ screen: "home", commentsOpen: false, fixCtrls: false, fixPlaying: true, fixProgress: 0 }); };
   openComments = () => this.setState({ commentsOpen: true, commentsClosing: false, commentsView: "list", commentsBack: false });
@@ -4294,6 +4342,7 @@ class Component extends DCLogic {
     return {
       ...this.crVals(),
       ...this.gzVals(),
+      ...this.fzTeamVals(),
       ...this.fixRxVals(),
       ...this.pollVals(),
       // fanzone
