@@ -59,6 +59,9 @@ Tapping your own avatar opens My Card.
 - `tools/home-video.py`: the Home hero plays the match video (muted, looping) instead of a still.
 - `tools/fanzone-report.py`: long press a fan's message to focus it with a Report menu; Report opens the reasons drawer and a thank-you toast.
 - `tools/fanzone-light.py`: FanZone Light (shell switch, live): no text field, a quick-message button and a Quick message tab with predefined messages; GIFs and stickers still allowed; the chat shows predefined messages only.
+- `tools/fixture-reaction-list.py`: tap the reactions summary on the match page to see who reacted (loader, then the list).
+- `tools/avatar-drawer.py`: the Choose your avatar drawer per Figma.
+- `tools/ui-fixes.py`: small fixes (pushed Fan Card hidden under drawers, text-only common interests, Fan Card scroll).
 - `sources/`: the two source prototypes the build starts from (`Personal Fan Card.dc.html`, `Comments & Replies.dc.html`).
 - `build.sh`: rebuilds `FanZone.dc.html` (runs the merge, then the other scripts in the order above).
 
