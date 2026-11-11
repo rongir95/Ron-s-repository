@@ -47,7 +47,30 @@ Tapping your own avatar opens My Card.
 - `tools/fanzone-bar.py`: the message bar's two states per FanZone DS "Chat Input Field" (node 13299:57986), with a swipe between them.
 - `tools/fanzone-giphy.py`: GIFs and stickers in FanZone, per the Figma "Giphy - Stickers - Dev": drawer from the sticker icon, GIF / Sticker tabs, search with loading and results, sending to the chat (run last). GIFs are still frames; GIF and sticker images are in `assets/gif/` and `assets/stickers/`.
 
-To rebuild `FanZone.dc.html`, run the nine scripts in the order above on the two source pages.
+- `sources/`: the two source prototypes the build starts from (`Personal Fan Card.dc.html`, `Comments & Replies.dc.html`).
+- `build.sh`: rebuilds `FanZone.dc.html` (runs the merge, then the eight scripts in the order above).
+
+## Working on it
+
+`FanZone.dc.html` is generated. Don't edit it by hand: the next build overwrites it. To change the app,
+edit the script in `tools/` that owns that part (or add a new script and call it from `build.sh`), then:
+
+```bash
+./build.sh
+```
+
+Each script finds the exact text it replaces and stops with an error if that text is missing, so a
+change in an earlier step that breaks a later one shows up at build time. `index.html` (the shell) is
+hand-written and can be edited directly. Requires Python 3 only.
+
+Figma sources used so far:
+
+- FanZone screens: file `EyEm3J8Y3qrWV40vOPOkjV` (FanZone screen node 496:103459; profile initials node 955:153494)
+- FanZone DS: file `NIgPxOlNU4U3sWMRdoE4Qh` (`.UserIndicator` node 13299:56861; Chat Input Field node 13299:57986)
+- Giphy / Stickers: file `vyXEcIzwOA5N0iLEQ4fL03` (node 2004:28)
+
+Open items: about 137 logos, crests, interest icons and some UI bars (Home header, bottom nav, Profile
+header) are still PNG and should be replaced with vectors from Figma; GIFs in the GIF drawer are still frames.
 
 ## Run locally
 

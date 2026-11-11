@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family:'DAZN Oscine'; src:url('uploads/DAZN_Oscine_Lt.ttf') format('truetype'); font-weight:300; font-style:normal; font-display:swap; }
+  @font-face { font-family:'DAZN Oscine'; src:url('uploads/DAZN_Oscine_Rg.ttf') format('truetype'); font-weight:400 500; font-style:normal; font-display:swap; }
+  @font-face { font-family:'DAZN Oscine'; src:url('uploads/DAZN_Oscine_Bd.ttf') format('truetype'); font-weight:600 700; font-style:normal; font-display:swap; }
+  @font-face { font-family:'DAZN Oscine'; src:url('uploads/DAZN_Oscine_XBd.ttf') format('truetype'); font-weight:800 900; font-style:normal; font-display:swap; }
+  @font-face { font-family:'DAZN Oscine'; src:url('uploads/DAZN_Oscine_It.ttf') format('truetype'); font-weight:400; font-style:italic; font-display:swap; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; }
+  ::-webkit-scrollbar { display: none; }
+  @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes kbdUp { from { transform: translateY(110%); } to { transform: translateY(0); } }
+  @keyframes popIn { from { transform: scale(0.7) translateY(8px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+  @keyframes toastIn { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes floatUp { 0% { transform: translateY(0) scale(0.6); opacity: 0; } 20% { opacity: 1; transform: translateY(-10px) scale(1.2); } 100% { transform: translateY(-120px) scale(1); opacity: 0; } }
+  @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</helmet>
+<div style="min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;background:#0a0a0b;font-family:'DAZN Oscine','Hanken Grotesk',system-ui,sans-serif;padding:24px 0;">
+  <div ref="{{ setPhoneRef }}" style="position:relative;width:375px;height:812px;background:#080e12;border-radius:44px;overflow:hidden;box-shadow:0 0 0 11px #1a1a1d,0 0 0 13px #2c2c30,0 30px 80px rgba(0,0,0,0.6);">
+
+    <!-- ===== STATUS BAR ===== -->
+    <div style="position:absolute;top:0;left:0;width:375px;height:50px;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 34px;color:#fff;background:#080e12;">
+      <span style="font-size:15px;font-weight:700;letter-spacing:0.2px;">9:41</span>
+      <div onClick="{{ onToggleOnline }}" style="display:flex;align-items:center;gap:7px;cursor:pointer;">
+        <sc-if value="{{ online }}" hint-placeholder-val="{{ true }}">
+          <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="7" width="3" height="5" rx="1" fill="#fff"/><rect x="5" y="4.5" width="3" height="7.5" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="10" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><path d="M8.5 11.2 1 4.2C5.2 0.3 11.8 0.3 16 4.2L8.5 11.2Z" fill="#fff"/></svg>
+        </sc-if>
+        <sc-if value="{{ offline }}" hint-placeholder-val="{{ false }}">
+          <span style="font-size:11px;font-weight:700;color:#ff6b6b;border:1px solid #ff6b6b;border-radius:5px;padding:1px 5px;">No Internet</span>
+        </sc-if>
+        <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="#fff" stroke-opacity="0.5"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#fff"/><rect x="23" y="4" width="2" height="4" rx="1" fill="#fff" fill-opacity="0.6"/></svg>
+      </div>
+    </div>
+
+    <!-- ===== VIDEO PLAYER ===== -->
+    <div style="position:absolute;top:50px;left:0;width:375px;height:200px;background:#000;overflow:hidden;z-index:10;">
+      <img src="assets/match-still.png" alt="match" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+      <!-- top controls -->
+      <div style="position:absolute;top:8px;left:0;width:100%;display:flex;align-items:center;justify-content:space-between;padding:0 14px;">
+        <sc-if value="{{ isComments }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ closeComments }}" style="cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 18 18" stroke="#fff" stroke-width="2"><path d="M2 2 16 16M16 2 2 16"/></svg>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isFixture }}" hint-placeholder-val="{{ true }}"><span style="width:30px;"></span></sc-if>
+      </div>
+      <!-- center controls removed -->
+      <!-- progress -->
+      <div style="position:absolute;bottom:0;left:0;width:100%;">
+        <div style="height:3px;width:100%;background:rgba(255,255,255,0.25);"><div style="height:3px;width:62%;background:#f5054f;"></div></div>
+      </div>
+    </div>
+
+    <!-- ===== FIXTURE PAGE (kept mounted behind the drawer so content shows through on close) ===== -->
+    <sc-if value="{{ showFixtureLayer }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:250px;left:0;width:375px;height:562px;background:#080e12;overflow-y:auto;z-index:12;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(36,45,51,0.5);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#2c3338,#11161a);display:flex;align-items:center;justify-content:center;font-size:13px;">🏆</div>
+          <span style="color:#B3B9BB;font-size:14px;font-weight:700;">FIFA World Cup 2026™</span>
+        </div>
+        <div style="background:#f9fafa;color:#0c161c;font-size:13px;font-weight:700;border-radius:18px;padding:7px 18px;cursor:pointer;">Follow</div>
+      </div>
+      <div style="padding:6px 16px 6px;">
+        <div style="color:#f9fafa;font-size:26px;font-weight:700;letter-spacing:-0.3px;">Germany vs. Spain</div>
+        <div style="color:#9aa1a5;font-size:14px;font-weight:500;margin-top:4px;">Follow Germany vs Spain live on DAZN.</div>
+      </div>
+      <div style="display:flex;gap:8px;padding:14px 16px 6px;overflow-x:auto;">
+        <div style="display:flex;align-items:center;gap:11px;background:#242D33;border-radius:21px;padding:10px 16px;flex-shrink:0;">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="#f9fafa"><path d="M12.012 19.8955C11.772 19.8955 11.52 19.7995 11.328 19.6195L4.59598 12.8875C3.62398 11.9155 3.08398 10.6195 3.08398 9.25152C3.08398 7.88352 3.62398 6.58752 4.59598 5.61552C5.56798 4.64352 6.86398 4.10352 8.23198 4.10352C9.59998 4.10352 10.896 4.64352 11.868 5.61552L12 5.74752L12.132 5.61552C13.104 4.64352 14.4 4.10352 15.768 4.10352C17.136 4.10352 18.432 4.64352 19.404 5.61552C20.376 6.58752 20.916 7.88352 20.916 9.25152C20.916 10.6195 20.376 11.9155 19.404 12.8875L12.672 19.6195C12.48 19.8115 12.24 19.8955 11.988 19.8955H12.012ZM8.24398 6.02352C7.37998 6.02352 6.57598 6.35951 5.96398 6.97152C5.35198 7.58352 5.01598 8.38752 5.01598 9.25152C5.01598 10.1155 5.35198 10.9195 5.96398 11.5315L12.012 17.5795L18.06 11.5315C18.66 10.9315 19.008 10.1035 19.008 9.25152C19.008 8.39952 18.672 7.58352 18.06 6.97152C16.836 5.74751 14.712 5.74751 13.5 6.97152L12.696 7.77552C12.516 7.95552 12.276 8.05152 12.012 8.05152C11.76 8.05152 11.508 7.95552 11.328 7.77552L10.524 6.97152C9.91198 6.35951 9.10798 6.02352 8.24398 6.02352Z"/></svg>
+          <div style="width:1px;height:18px;background:rgba(255,255,255,0.18);"></div>
+          <div style="display:flex;align-items:center;"><div style="display:flex;align-items:center;"><img src="assets/reactions/like.png" style="width:21px;height:21px;object-fit:contain;margin-right:-6px;" /><img src="assets/reactions/happy.png" style="width:21px;height:21px;object-fit:contain;margin-right:-6px;" /><img src="assets/reactions/cheer.png" style="width:21px;height:21px;object-fit:contain;" /></div><span style="color:#f9fafa;font-size:14px;font-weight:700;margin-left:5px;">2.1K</span></div>
+        </div>
+        <div onClick="{{ openComments }}" style="display:flex;align-items:center;gap:9px;background:#242D33;border-radius:21px;padding:10px 18px;flex-shrink:0;cursor:pointer;">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#f9fafa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 18.5512C11.6987 18.7951 12.4592 18.9337 13.2577 18.9337C13.9823 18.9337 14.6742 18.8172 15.3181 18.6145L19.3534 19.6957L18.4619 16.3674C18.9488 15.6679 19.2468 14.8618 19.3214 14"/><path d="M10.8577 4C7.06996 4 4 6.72936 4 10.0957C4 11.2554 4.37108 12.3359 5.00351 13.2587L4 17.0037L8.47275 15.8052C9.21642 16.0505 10.018 16.1915 10.8577 16.1915C14.6454 16.1915 17.7154 13.4621 17.7154 10.0957C17.7154 6.72936 14.6454 4 10.8577 4Z"/></svg><span style="color:#f9fafa;font-size:14px;font-weight:700;">3.4K</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;background:#242D33;border-radius:21px;padding:10px 18px;flex-shrink:0;">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="#f9fafa"><path d="M1.97001 20.3939C1.95001 10.6539 10.17 8.12395 12.94 7.54395V4.72395C12.94 4.27395 13.2 3.87395 13.61 3.69395C14.02 3.52395 14.5 3.60395 14.82 3.91395L21.5526 10.5558C22.0225 11.0195 22.0297 11.7756 21.5687 12.2481L14.87 19.1139C14.56 19.4339 14.08 19.5439 13.66 19.3639C13.24 19.1939 12.96 18.7839 12.96 18.3339V15.2439C9.72001 15.6639 3.96001 17.0839 3.97001 20.3739H1.97001V20.3939ZM14.95 13.0839V16.1939L19.66 11.3939L14.94 6.83395V9.30395L14.05 9.39395C13.71 9.43395 7.21001 10.1839 4.83001 15.8139C8.25001 13.6139 13.55 13.1939 13.88 13.1739L14.95 13.0939V13.0839Z"/></svg><span style="color:#f9fafa;font-size:14px;font-weight:700;">Share</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;background:#242D33;border-radius:21px;padding:10px 14px;flex-shrink:0;">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="#f9fafa"><path d="M12.0101 21.0297C11.5501 21.0297 11.1001 20.9097 10.7101 20.6797C10.3101 20.4497 9.98011 20.1197 9.76011 19.7297C9.48011 19.2497 9.65011 18.6397 10.1301 18.3597C10.6101 18.0897 11.2201 18.2497 11.5001 18.7297C11.5501 18.8197 11.6301 18.8997 11.7201 18.9497C11.9001 19.0597 12.1401 19.0597 12.3301 18.9497C12.4201 18.8997 12.5001 18.8197 12.5501 18.7297C12.8301 18.2497 13.4401 18.0897 13.9201 18.3597C14.4001 18.6397 14.5601 19.2497 14.2901 19.7297C14.0601 20.1297 13.7301 20.4497 13.3401 20.6797C12.9401 20.9097 12.4901 21.0297 12.0401 21.0297H12.0101Z"/><path d="M18.4301 17.0097H5.58011C5.23011 17.0097 4.89011 16.9097 4.60011 16.7197C4.30011 16.5297 4.07011 16.2497 3.93011 15.9297C3.79011 15.6097 3.74011 15.2597 3.80011 14.9097C3.86011 14.5697 4.01011 14.2497 4.25011 13.9897C4.25011 13.9897 4.26011 13.9697 4.27011 13.9697C5.26011 12.9497 6.19011 11.9897 6.19011 8.77973C6.19011 7.22973 6.80011 5.75973 7.89011 4.66973C8.98011 3.57973 10.4501 2.96973 12.0001 2.96973C13.5501 2.96973 15.0201 3.57973 16.1101 4.66973C17.2001 5.75973 17.8101 7.22973 17.8101 8.77973C17.8101 11.9897 18.7401 12.9497 19.7301 13.9697C19.9901 14.2497 20.1401 14.5697 20.2001 14.9197C20.2601 15.2697 20.2101 15.6197 20.0701 15.9397C19.9301 16.2597 19.7001 16.5297 19.4101 16.7197C19.1101 16.9097 18.7701 17.0097 18.4301 17.0097ZM17.9701 15.0097C16.9501 13.9297 15.8201 12.4197 15.8201 8.77973C15.8201 7.75973 15.4201 6.79972 14.7001 6.07972C13.2601 4.63972 10.7401 4.63972 9.30011 6.07972C8.58011 6.79972 8.18011 7.75973 8.18011 8.77973C8.18011 12.3997 7.06011 13.9097 6.03011 15.0097H17.9701Z"/></svg>
+        </div>
+      </div>
+      <div style="display:flex;gap:22px;padding:12px 16px 0;border-bottom:1px solid rgba(36,45,51,0.5);">
+        <div style="color:#f9fafa;font-size:14px;font-weight:700;padding-bottom:10px;border-bottom:2px solid #f5d400;">Related</div>
+        <div style="color:#798084;font-size:14px;font-weight:600;padding-bottom:10px;">Stats</div>
+        <div style="color:#798084;font-size:14px;font-weight:600;padding-bottom:10px;">Lineups</div>
+        <div style="color:#798084;font-size:14px;font-weight:600;padding-bottom:10px;white-space:nowrap;">Live updates</div>
+      </div>
+      <div style="padding:20px 16px 8px;color:#f9fafa;font-size:18px;font-weight:700;">Live and Coming Up</div>
+      <div style="display:flex;gap:12px;padding:4px 16px 24px;overflow-x:auto;">
+        <div style="flex-shrink:0;width:280px;">
+          <div style="height:148px;border-radius:12px;background:linear-gradient(100deg,#1b7a44 0% 50%,#e8b800 50% 100%);position:relative;display:flex;align-items:center;justify-content:center;gap:30px;overflow:hidden;">
+            <div style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.45);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:4px 8px;">14 SEP</div>
+            <span style="font-size:40px;">🇲🇽</span>
+            <div style="color:#fff;font-size:26px;font-weight:800;text-shadow:0 1px 4px rgba(0,0,0,0.3);">🏆</div>
+            <span style="font-size:40px;">🇧🇷</span>
+          </div>
+          <div style="color:#f9fafa;font-size:15px;font-weight:700;margin-top:10px;">Mexico vs Brazil</div>
+          <div style="color:#798084;font-size:13px;font-weight:500;margin-top:2px;">FIFA World Cup 2026 | Group A</div>
+        </div>
+        <div style="flex-shrink:0;width:280px;">
+          <div style="height:148px;border-radius:12px;background:linear-gradient(100deg,#c2410c 0% 50%,#7a1d1d 50% 100%);position:relative;display:flex;align-items:center;justify-content:center;gap:30px;overflow:hidden;">
+            <div style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.45);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:4px 8px;">14 SEP</div>
+            <span style="font-size:40px;">🇳🇱</span>
+            <div style="color:#fff;font-size:26px;font-weight:800;">🏆</div>
+            <span style="font-size:40px;">🇫🇷</span>
+          </div>
+          <div style="color:#f9fafa;font-size:15px;font-weight:700;margin-top:10px;">Netherlands vs France</div>
+          <div style="color:#798084;font-size:13px;font-weight:500;margin-top:2px;">FIFA World Cup 2026 | Group B</div>
+        </div>
+      </div>
+      <div style="padding:8px 16px 8px;color:#f9fafa;font-size:18px;font-weight:700;">Recommended for You</div>
+      <div style="display:flex;gap:12px;padding:4px 16px 24px;overflow-x:auto;">
+        <div style="flex-shrink:0;width:280px;">
+          <div style="height:148px;border-radius:12px;background:linear-gradient(100deg,#1e3a8a 0% 50%,#7a1d1d 50% 100%);position:relative;display:flex;align-items:center;justify-content:center;gap:30px;overflow:hidden;">
+            <div style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.45);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:4px 8px;">16 SEP</div>
+            <span style="font-size:40px;">🇦🇷</span>
+            <div style="color:#fff;font-size:26px;font-weight:800;text-shadow:0 1px 4px rgba(0,0,0,0.3);">🏆</div>
+            <span style="font-size:40px;">🇵🇹</span>
+          </div>
+          <div style="color:#f9fafa;font-size:15px;font-weight:700;margin-top:10px;">Argentina vs Portugal</div>
+          <div style="color:#798084;font-size:13px;font-weight:500;margin-top:2px;">FIFA World Cup 2026 | Round of 16</div>
+        </div>
+        <div style="flex-shrink:0;width:280px;">
+          <div style="height:148px;border-radius:12px;background:linear-gradient(100deg,#3a3f44 0% 50%,#0e7490 50% 100%);position:relative;display:flex;align-items:center;justify-content:center;gap:30px;overflow:hidden;">
+            <div style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.45);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:4px 8px;">17 SEP</div>
+            <span style="font-size:40px;">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+            <div style="color:#fff;font-size:26px;font-weight:800;">🏆</div>
+            <span style="font-size:40px;">🇮🇹</span>
+          </div>
+          <div style="color:#f9fafa;font-size:15px;font-weight:700;margin-top:10px;">England vs Italy</div>
+          <div style="color:#798084;font-size:13px;font-weight:500;margin-top:2px;">FIFA World Cup 2026 | Quarter-final</div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== STREAM TAP-CATCHER (closes drawer entirely, even from focus mode) ===== -->
+    <sc-if value="{{ isComments }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeComments }}" style="position:absolute;top:50px;left:0;width:375px;height:200px;z-index:70;cursor:pointer;"></div>
+    </sc-if>
+
+    <!-- ===== COMMENTS SHEET ===== -->
+    <sc-if value="{{ isComments }}" hint-placeholder-val="{{ false }}">
+    <div ref="{{ setSheetRef }}" style="position:absolute;top:262px;left:0;width:375px;height:550px;z-index:20;background:#0c161c;border-radius:14px 14px 0 0;box-shadow:0 -1px 0 rgba(255,255,255,0.2);display:flex;flex-direction:column;transition:transform 0.34s cubic-bezier(0.2,0.8,0.2,1);transform:{{ sheetTransform }};">
+      <!-- header -->
+      <div style="flex-shrink:0;position:relative;padding-top:8px;">
+        <div style="width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.3);margin:0 auto;"></div>
+        <div onClick="{{ closeComments }}" style="position:absolute;top:16px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(120,128,132,0.45);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <svg width="13" height="13" viewBox="0 0 13 13" stroke="#fff" stroke-width="1.8"><path d="M1.5 1.5 11.5 11.5M11.5 1.5 1.5 11.5"/></svg>
+        </div>
+        <div style="text-align:center;color:#f9fafa;font-size:18px;font-weight:700;padding:16px 0 14px;">Comments</div>
+        <div style="height:1px;background:rgba(36,45,51,0.6);"></div>
+      </div>
+
+      <!-- feed -->
+      <div id="comments-feed" ref="{{ setFeedRef }}" style="{{ feedStyle }}">
+        <sc-for list="{{ comments }}" as="c" hint-placeholder-count="4">
+          <div data-comment-id="{{ c.id }}" style="{{ c.rowStyle }}">
+            <div style="display:flex;gap:11px;">
+              <div style="{{ c.avatarStyle }}"><sc-if value="{{ c.showInitial }}" hint-placeholder-val="{{ true }}"><div style="{{ c.avatarInner }}">{{ c.initial }}</div></sc-if></div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:7px;">
+                  <span style="color:#B3B9BB;font-size:13px;font-weight:700;">{{ c.author }}</span>
+                  <span style="color:#798084;font-size:12px;font-weight:500;">· {{ c.time }}</span>
+                </div>
+                <div style="position:relative;margin-top:3px;">
+                  <div ref="{{ c.measureRef }}" onPointerDown="{{ c.onRowDown }}" onPointerUp="{{ c.onRowUp }}" onClick="{{ c.onToggleClamp }}" style="{{ c.clampTextStyle }}">{{ c.text }}</div>
+                  <sc-if value="{{ c.showMore }}" hint-placeholder-val="{{ false }}">
+                    <div onClick="{{ c.onToggleClamp }}" style="{{ c.moreStyle }}">…&nbsp;<span style="font-weight:700;">more</span></div>
+                  </sc-if>
+                  <sc-if value="{{ c.showLess }}" hint-placeholder-val="{{ false }}">
+                    <div onClick="{{ c.onToggleClamp }}" style="{{ c.showLessStyle }}">Show less</div>
+                  </sc-if>
+                </div>
+                <!-- action row -->
+                <div style="display:flex;align-items:center;gap:14px;margin-top:9px;">
+                  <div onPointerDown="{{ c.onHeartDown }}" onPointerUp="{{ c.onHeartUp }}" style="cursor:pointer;display:flex;align-items:center;">
+                    <sc-if value="{{ c.hasMyReaction }}" hint-placeholder-val="{{ false }}">
+                      <div style="{{ c.myReactionStyle }}"></div>
+                    </sc-if>
+                    <sc-if value="{{ c.noReaction }}" hint-placeholder-val="{{ true }}">
+                      <svg width="20" height="20" viewBox="0 0 18 18" fill="none" stroke="#B3B9BB" stroke-width="1.5" stroke-linecap="round"><path d="M11.749 3.75C12.6197 3.75013 13.432 4.08653 14.0469 4.7002C14.6618 5.31413 15 6.12677 15 6.99902C14.9999 7.87107 14.6617 8.68297 14.0469 9.29688H14.0459L9.13965 14.1943C9.1045 14.2294 9.06004 14.25 9 14.25C8.95263 14.25 8.89872 14.231 8.84961 14.1846L3.9541 9.29688H3.95312C3.33832 8.68297 3.00008 7.87107 3 6.99902L3.00391 6.83594C3.04336 6.02574 3.37661 5.27577 3.95312 4.7002C4.52967 4.12479 5.27982 3.79312 6.08887 3.75391L6.25098 3.75C7.09184 3.75 7.87757 4.06448 8.48438 4.63867L9 5.12598L9.51562 4.63867C10.0467 4.13615 10.7144 3.83258 11.4365 3.76465L11.749 3.75Z"/></svg>
+                    </sc-if>
+                  </div>
+                  <sc-if value="{{ c.hasReactions }}" hint-placeholder-val="{{ true }}">
+                    <div style="width:1px;height:16px;background:rgba(255,255,255,0.14);"></div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <div style="display:flex;align-items:center;"><sc-for list="{{ c.reactionIcons }}" as="ic" hint-placeholder-count="0"><div style="{{ ic }}"></div></sc-for></div>
+                      <span style="color:#cfd2d4;font-size:13px;font-weight:700;margin-left:4px;">{{ c.reactionCount }}</span>
+                    </div>
+                  </sc-if>
+                  <div onClick="{{ c.onReply }}" style="cursor:pointer;color:#cfd2d4;font-size:13px;font-weight:700;">Reply</div>
+                </div>
+                <!-- view replies toggle -->
+                <sc-if value="{{ c.showRepliesToggle }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ c.onToggleReplies }}" style="display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer;">
+                    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="#798084" stroke-width="1.5"><path d="M2 0v6a4 4 0 0 0 4 4h9"/></svg>
+                    <span style="color:#cfd2d4;font-size:13px;font-weight:400;">{{ c.repliesToggleLabel }}</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ c.loadingReplies }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:12px;">
+                    <sc-for list="{{ skeletonRows }}" as="sk" hint-placeholder-count="1">
+                      <div style="display:flex;gap:10px;padding:8px 0;align-items:flex-start;">
+                        <div style="width:32px;height:32px;border-radius:50%;flex-shrink:0;background:linear-gradient(90deg,#222b30 25%,#323d44 50%,#222b30 75%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;"></div>
+                        <div style="flex:1;display:flex;flex-direction:column;gap:7px;padding-top:3px;">
+                          <div style="height:9px;width:36%;border-radius:5px;background:linear-gradient(90deg,#222b30 25%,#323d44 50%,#222b30 75%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;"></div>
+                          <div style="height:9px;width:90%;border-radius:5px;background:linear-gradient(90deg,#222b30 25%,#323d44 50%,#222b30 75%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;"></div>
+                          <div style="height:9px;width:62%;border-radius:5px;background:linear-gradient(90deg,#222b30 25%,#323d44 50%,#222b30 75%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;"></div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+            <!-- replies -->
+            <sc-if value="{{ c.repliesExpanded }}" hint-placeholder-val="{{ false }}">
+              <div style="padding-left:49px;margin-top:6px;">
+                <sc-for list="{{ c.shownReplies }}" as="r" hint-placeholder-count="2">
+                  <div data-reply-id="{{ r.id }}" style="{{ r.rowStyle }}">
+                    <div style="{{ r.avatarStyle }}"><sc-if value="{{ r.showInitial }}" hint-placeholder-val="{{ true }}"><div style="{{ r.avatarInner }}">{{ r.initial }}</div></sc-if></div>
+                    <div style="flex:1;min-width:0;">
+                      <div style="display:flex;align-items:center;gap:6px;">
+                        <span style="color:#B3B9BB;font-size:12.5px;font-weight:700;">{{ r.author }}</span>
+                        <span style="color:#798084;font-size:11.5px;font-weight:500;">· {{ r.time }}</span>
+                      </div>
+                      <div style="position:relative;margin-top:2px;">
+                        <div ref="{{ r.measureRef }}" onPointerDown="{{ r.onRowDown }}" onPointerUp="{{ r.onRowUp }}" onClick="{{ r.onToggleClamp }}" style="{{ r.clampTextStyle }}"><span style="color:#8b9296;font-weight:400;">{{ r.mention }}</span><span style="color:#F9FAFA;">{{ r.body }}</span></div>
+                        <sc-if value="{{ r.showMore }}" hint-placeholder-val="{{ false }}">
+                          <div onClick="{{ r.onToggleClamp }}" style="{{ r.moreStyle }}">…&nbsp;<span style="font-weight:700;">more</span></div>
+                        </sc-if>
+                        <sc-if value="{{ r.showLess }}" hint-placeholder-val="{{ false }}">
+                          <div onClick="{{ r.onToggleClamp }}" style="{{ r.showLessStyle }}">Show less</div>
+                        </sc-if>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:13px;margin-top:7px;">
+                        <div onPointerDown="{{ r.onHeartDown }}" onPointerUp="{{ r.onHeartUp }}" style="cursor:pointer;display:flex;align-items:center;">
+                          <sc-if value="{{ r.hasMyReaction }}" hint-placeholder-val="{{ false }}">
+                            <div style="{{ r.myReactionStyle }}"></div>
+                          </sc-if>
+                          <sc-if value="{{ r.noReaction }}" hint-placeholder-val="{{ true }}">
+                            <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="#B3B9BB" stroke-width="1.5" stroke-linecap="round"><path d="M11.749 3.75C12.6197 3.75013 13.432 4.08653 14.0469 4.7002C14.6618 5.31413 15 6.12677 15 6.99902C14.9999 7.87107 14.6617 8.68297 14.0469 9.29688H14.0459L9.13965 14.1943C9.1045 14.2294 9.06004 14.25 9 14.25C8.95263 14.25 8.89872 14.231 8.84961 14.1846L3.9541 9.29688H3.95312C3.33832 8.68297 3.00008 7.87107 3 6.99902L3.00391 6.83594C3.04336 6.02574 3.37661 5.27577 3.95312 4.7002C4.52967 4.12479 5.27982 3.79312 6.08887 3.75391L6.25098 3.75C7.09184 3.75 7.87757 4.06448 8.48438 4.63867L9 5.12598L9.51562 4.63867C10.0467 4.13615 10.7144 3.83258 11.4365 3.76465L11.749 3.75Z"/></svg>
+                          </sc-if>
+                        </div>
+                        <sc-if value="{{ r.hasReactions }}" hint-placeholder-val="{{ false }}">
+                          <div style="width:1px;height:14px;background:rgba(255,255,255,0.14);"></div>
+                          <div style="display:flex;align-items:center;gap:5px;">
+                            <div style="display:flex;align-items:center;"><sc-for list="{{ r.reactionIcons }}" as="ic" hint-placeholder-count="0"><div style="{{ ic }}"></div></sc-for></div>
+                            <span style="color:#cfd2d4;font-size:12px;font-weight:700;margin-left:4px;">{{ r.reactionCount }}</span>
+                          </div>
+                        </sc-if>
+                        <div onClick="{{ r.onReply }}" style="cursor:pointer;color:#cfd2d4;font-size:12.5px;font-weight:700;">Reply</div>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ c.hasMoreReplies }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ c.onLoadMore }}" style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;">
+                    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="#798084" stroke-width="1.5"><path d="M2 0v6a4 4 0 0 0 4 4h9"/></svg>
+                    <span style="color:#cfd2d4;font-size:13px;font-weight:400;">{{ c.moreRepliesLabel }}</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ c.loadingMore }}" hint-placeholder-val="{{ false }}">
+                  <sc-for list="{{ skeletonRows }}" as="sk" hint-placeholder-count="1">
+                    <div style="display:flex;gap:10px;padding:8px 0;align-items:flex-start;">
+                      <div style="width:32px;height:32px;border-radius:50%;flex-shrink:0;background:linear-gradient(90deg,#222b30 25%,#323d44 50%,#222b30 75%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;"></div>
+                      <div style="flex:1;display:flex;flex-direction:column;gap:7px;padding-top:3px;">
+                        <div style="height:9px;width:36%;border-radius:5px;background:linear-gradient(90deg,#222b30 25%,#323d44 50%,#222b30 75%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;"></div>
+                        <div style="height:9px;width:90%;border-radius:5px;background:linear-gradient(90deg,#222b30 25%,#323d44 50%,#222b30 75%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;"></div>
+                        <div style="height:9px;width:62%;border-radius:5px;background:linear-gradient(90deg,#222b30 25%,#323d44 50%,#222b30 75%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;"></div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </sc-if>
+                <sc-if value="{{ c.showHide }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ c.onHideReplies }}" style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;">
+                    <svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="#798084" stroke-width="1.5"><path d="M0 7h14"/></svg>
+                    <span style="color:#cfd2d4;font-size:13px;font-weight:400;">Hide replies</span>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <div style="height:8px;"></div>
+      </div>
+
+      <!-- bottom composer bar (idle) -->
+      <sc-if value="{{ barVisible }}" hint-placeholder-val="{{ true }}">
+        <div style="flex-shrink:0;padding:10px 16px;border-top:1px solid rgba(36,45,51,0.6);">
+          <div onClick="{{ onBarClick }}" style="display:flex;align-items:center;justify-content:space-between;background:#242D33;border-radius:24px;padding:13px 18px;cursor:text;">
+            <span style="{{ barTextStyle }}">{{ barText }}</span>
+          </div>
+        </div>
+        <div style="flex-shrink:0;display:flex;justify-content:center;padding:6px 0 10px;"><div style="width:134px;height:5px;border-radius:3px;background:#fff;"></div></div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- ===== REACTION PICKER ===== -->
+    <sc-if value="{{ pickerOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closePicker }}" style="position:absolute;inset:0;z-index:55;"></div>
+      <div style="{{ pickerStyle }}">
+        <sc-for list="{{ pickerItems }}" as="p" hint-placeholder-count="0">
+          <div onClick="{{ p.onClick }}" style="{{ p.iconStyle }}" style-hover="transform:scale(1.3) translateY(-4px)"></div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ===== FLOATERS ===== -->
+    <sc-for list="{{ floaters }}" as="f" hint-placeholder-count="0">
+      <div style="{{ f.style }}"></div>
+    </sc-for>
+
+    <!-- ===== ACTION PILL (delete/report) ===== -->
+    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeMenu }}" style="position:absolute;inset:0;z-index:65;"></div>
+      <div style="{{ menuPillStyle }}">
+        <sc-if value="{{ menuLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:11px 24px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,0.16);border-top-color:#f9fafa;animation:spin 0.7s linear infinite;"></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ menuShowDelete }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ doDelete }}" style="display:flex;align-items:center;gap:8px;padding:10px 18px;cursor:pointer;">
+            <svg width="16" height="17" viewBox="0 0 18 20" fill="none" stroke="#FF8D8D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h14M7 5V2h4v3M3.5 5l1 13h9l1-13M7.5 9v6M10.5 9v6"/></svg>
+            <span style="color:#FF8D8D;font-size:15px;font-weight:700;">{{ deleteLabel }}</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ menuShowReport }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ doReport }}" style="display:flex;align-items:center;gap:8px;padding:10px 18px;cursor:pointer;">
+            <svg width="15" height="17" viewBox="0 0 16 20" fill="none" stroke="#F9FAFA" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1v18M3 2h10l-2 4 2 4H3"/></svg>
+            <span style="color:#F9FAFA;font-size:15px;font-weight:700;">Report</span>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+    </sc-if>
+
+    <!-- ===== TOAST ===== -->
+    <sc-if value="{{ toastOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ toastStyle }}">
+        <span style="{{ toastTextStyle }}">{{ toastText }}</span>
+        <sc-if value="{{ toastHasRetry }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ onRetry }}" style="flex-shrink:0;color:#5b9bff;font-size:13.5px;font-weight:700;cursor:pointer;">Retry</div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ===== COMPOSER + KEYBOARD ===== -->
+    <sc-if value="{{ composerOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ blurComposer }}" style="position:absolute;inset:0;z-index:44;"></div>
+      <div style="position:absolute;left:0;right:0;bottom:0;z-index:45;display:flex;flex-direction:column;">
+      <div style="padding:10px 14px 10px;background:#0c161c;">
+        <div style="display:flex;align-items:flex-end;gap:10px;">
+          <div style="{{ composerBoxStyle }}">
+            <sc-if value="{{ hasReplyTo }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;justify-content:space-between;height:26px;padding:0 16px;background:#1B2326;">
+                <span style="color:#B3B9BB;font-size:13.5px;">Replying to <span style="color:#B3B9BB;font-weight:700;">{{ replyingToName }}</span></span>
+                <div onClick="{{ removeReplyTo }}" style="cursor:pointer;color:#f9fafa;display:flex;"><svg width="12" height="12" viewBox="0 0 14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 2 12 12M12 2 2 12"/></svg></div>
+              </div>
+            </sc-if>
+            <div style="position:relative;padding:12px 16px;">
+              <sc-if value="{{ showMention }}" hint-placeholder-val="{{ false }}">
+                <span ref="{{ setMentionRef }}" style="position:absolute;left:16px;top:12px;color:#B3B9BB;font-size:15px;line-height:22px;white-space:nowrap;pointer-events:none;">{{ mentionToken }}</span>
+              </sc-if>
+              <textarea ref="{{ setInputRef }}" value="{{ composerText }}" onInput="{{ onComposerInput }}" onKeyDown="{{ onComposerKeyDown }}" onScroll="{{ onComposerScroll }}" placeholder="{{ composerPlaceholder }}" rows="1" style="width:100%;box-sizing:border-box;border:none;outline:none;background:transparent;color:#F9FAFA;font-size:15px;line-height:22px;font-family:'DAZN Oscine','Hanken Grotesk',sans-serif;resize:none;display:block;padding:0;margin:0;max-height:66px;overflow-y:hidden;"></textarea>
+            </div>
+          </div>
+          <sc-if value="{{ sendEnabled }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onSend }}" style="flex-shrink:0;width:42px;height:42px;border-radius:50%;background:#f9fafa;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg width="20" height="20" viewBox="335 69 18 18"><path d="M337.004 71.9394C336.683 70.6769 338.031 69.6447 339.166 70.2831L350.59 76.7089C351.597 77.2753 351.597 78.7255 350.59 79.2919L339.166 85.7177C338.031 86.3562 336.683 85.3239 337.004 84.0615L337.891 80.5673L341.227 78.6415C341.721 78.3564 341.721 77.6435 341.227 77.3583L337.891 75.4316L337.004 71.9394Z" fill="#1B2326"/></svg>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      <!-- iOS keyboard (decorative) -->
+      <div style="background:#1a1c1e;padding-bottom:8px;">
+        <div style="display:flex;justify-content:space-around;align-items:center;height:42px;border-bottom:0.5px solid rgba(255,255,255,0.08);">
+          <span style="color:#f9fafa;font-size:15px;">I</span>
+          <span style="color:#f9fafa;font-size:15px;border-left:0.5px solid rgba(255,255,255,0.15);border-right:0.5px solid rgba(255,255,255,0.15);padding:0 60px;">The</span>
+          <span style="color:#f9fafa;font-size:15px;">I'm</span>
+        </div>
+        <div style="padding:8px 3px 0;">
+          <div style="display:flex;justify-content:center;gap:6px;margin-bottom:11px;">
+            <span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 0 rgba(0,0,0,0.4);">q</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">w</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">e</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">r</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">t</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">y</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">u</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">i</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">o</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">p</span>
+          </div>
+          <div style="display:flex;justify-content:center;gap:6px;margin-bottom:11px;">
+            <span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">a</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">s</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">d</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">f</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">g</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">h</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">j</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">k</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">l</span>
+          </div>
+          <div style="display:flex;justify-content:center;gap:6px;margin-bottom:11px;">
+            <span style="width:42px;height:42px;background:#54585c;border-radius:5px;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 20 20" fill="#fff"><path d="M10 2 3 9h4v7h6V9h4z"/></svg></span>
+            <span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">z</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">x</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">c</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">v</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">b</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">n</span><span style="width:30px;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">m</span>
+            <span style="width:42px;height:42px;background:#54585c;border-radius:5px;display:flex;align-items:center;justify-content:center;"><svg width="20" height="16" viewBox="0 0 22 18" fill="none" stroke="#fff" stroke-width="1.6"><path d="M7 2h12v14H7L1 9z"/><path d="M11 6l5 6M16 6l-5 6"/></svg></span>
+          </div>
+          <div style="display:flex;justify-content:center;gap:6px;align-items:center;">
+            <span style="width:42px;height:42px;background:#54585c;border-radius:5px;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;">123</span>
+            <span style="width:42px;height:42px;background:#54585c;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:18px;">😀</span>
+            <span style="flex:1;height:42px;background:#3a3d40;border-radius:5px;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;">space</span>
+            <span onClick="{{ onSend }}" style="width:80px;height:42px;background:#54585c;border-radius:5px;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;">return</span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:center;padding-top:8px;"><div style="width:134px;height:5px;border-radius:3px;background:#fff;"></div></div>
+      </div>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const EMOJI = { like:'❤️', happy:'😃', cheer:'👏', wow:'😮', sad:'😢', angry:'😡' };
+    this.EMOJI = EMOJI;
+    this.REACT = { like:'assets/reactions/like.png', happy:'assets/reactions/happy.png', cheer:'assets/reactions/cheer.png', wow:'assets/reactions/wow.png', angry:'assets/reactions/angry.png', sad:'assets/reactions/sad.png' };
+    this.PROFANITY = ['fuck','fucking','shit','damn','bastard','asshole','bitch','crap'];
+    this.ME = 'ron1783';
+    this.ringGrads = [
+      'linear-gradient(135deg,#8923A0,#F1A322,#FFFA00)',
+      'linear-gradient(135deg,#1e6fd9,#3a9bc9,#7be0ff)',
+      'linear-gradient(135deg,#0f9b6c,#3ad29f,#d6ffe9)',
+      'linear-gradient(135deg,#d94b7a,#ff7eb3,#ffd6e7)',
+      'linear-gradient(135deg,#c2410c,#f59e0b,#ffe6a0)',
+      'linear-gradient(135deg,#9747ff,#c08bff,#ece0ff)',
+    ];
+    this.avatars = [
+      ['#1e6fd9','#0a3a7a'],['#e0a020','#9a6800'],['#c2410c','#7a1d1d'],
+      ['#0f9b6c','#075c40'],['#9747ff','#5a1fb0'],['#d94b7a','#8a1f47'],
+      ['#3a9bc9','#1a5a7a'],['#6b7280','#374151']
+    ];
+    const ai = (n)=>this.avatars[n % this.avatars.length];
+
+    const replyTexts = [
+      'totally agree, refs ruin games 😤','he\u2019s already booked two players lol',
+      'what a match so far 🔥','no way that wasn\u2019t offside','best game of the tournament honestly',
+      'the keeper is unreal today','I can\u2019t watch, too stressful 😭','this is going to penalties for sure',
+      'GOAT performance from the captain','that tackle should\u2019ve been a red','crowd is electric tonight',
+      'commentators won\u2019t stop talking lol','my heart can\u2019t take this','what a save oh my days',
+      'we don\u2019t deserve football this good','the build-up play is insane',
+      'VAR is going to ruin this one too','left back has been their best player honestly',
+      'how is that not a penalty?!','subs changed the whole game','pure class from the number 10',
+      'I called this scoreline at half time 😎','the press is relentless tonight','offside by a toenail again 🙄',
+      'this midfield battle is everything','keeper just won them the match','what a counter attack omg',
+      'they need to slow it down and keep possession','that first touch was filthy 🔥','genuinely the best atmosphere all season'
+    ];
+    const replyAuthors = ['Mia_K','Jonas','LeoTV','Aria99','Tomek','Priya','Marco','Sven','Noor','Kenji','Bert1e88','Diego','Hannah','Yuki','Omar','Lena','RubenS','Felix','AliyaH','Marek_','Tomoko','Gabri','Nuria','Paolo'];
+
+    const makeReplies = (parentAuthor, count, startId) => {
+      const out = [];
+      for (let i=0;i<count;i++){
+        const author = replyAuthors[i % replyAuthors.length];
+        // mix of mentions: the original commenter, another replier in this thread, or none
+        let mention = '';
+        const r = i % 4;
+        if(i===0){ mention = '@'+parentAuthor+' '; }
+        else if(r===0){ mention = '@'+parentAuthor+' '; }
+        else if(r===1){ mention = '@'+replyAuthors[(i-1) % replyAuthors.length]+' '; }
+        else if(r===2){ mention = '@'+replyAuthors[(i+3) % replyAuthors.length]+' '; }
+        // r===3 → no mention
+        out.push({
+          id: startId + i,
+          author,
+          ai: (i*3+1),
+          img: (i % 4 === 3) ? null : ('avatar'+((i % 9) + 1)),
+          time: (function(){ const fromEnd = count - 1 - i; return fromEnd===0 ? '30s' : (fromEnd<4 ? fromEnd+'m' : fromEnd+'h'); })(),
+          mention,
+          body: replyTexts[i % replyTexts.length],
+          base: { like: 4 + ((i*37)%60), angry: i%5===0 ? 12 : 0 },
+          my: null, mine: false
+        });
+      }
+      return out;
+    };
+
+    const firstReplies = makeReplies('Scarlet82', 47, 9100).concat([
+      { id: 9002, author:'TommoW', ai:6, time:'40s', img:'avatar3', mention:'@Scarlet82 ', body:'Completely agree with you, but I would go even further. The officiating this whole tournament has been wildly inconsistent, and tonight of all nights we really need the referee to just let the game breathe. If he starts blowing for every little contact it is going to ruin the rhythm of what has otherwise been an unbelievable spectacle, and both sets of players deserve better than that.', base:{ like:34 }, my:null, mine:false },
+      { id: 9001, author:'Daniel293', ai:4, time:'2s', mention:'@Scarlet82 ', body:'Cool game, unbelievable final 🔥🔥', base:{ like:12 }, my:null, mine:false },
+    ]);
+
+    this.state = {
+      view: 'fixture',
+      comments: [
+        { id:1, author:'Scarlet82', ai:0, time:'4d', img:'avatar1',
+          text:'Hope the referee doesn\u2019t become the main character tonight',
+          base:{ like:3800, happy:1800 }, my:null, mine:false,
+          replies: firstReplies, totalReplies: 48,
+          repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:2, author:'Adam173', ai:6, time:'4d', img:'avatar4',
+          text:'I\u2019ve been nervous about this game since yesterday 😅',
+          base:{ like:1200, happy:600 }, my:null, mine:false,
+          replies: makeReplies('Adam173', 6, 9300), totalReplies:6, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:3, author:'Demian990', ai:2, time:'4d', img:'avatar5',
+          text:'Honestly this is exactly the kind of match that reminds me why I fell in love with football in the first place. The tempo has been relentless from the opening whistle, both midfields are refusing to give an inch, and every time one side wins the ball back it feels like a genuine chance is about to happen. I have rewatched three different passages of play already and I am still finding new little details, the movement off the ball is on another level tonight and whoever loses this really does not deserve to.',
+          base:{ like:1500, cheer:600 }, my:null, mine:false,
+          replies:[], totalReplies:0, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:4, author:'Bert1e88', ai:5, time:'4d', img:'avatar2',
+          text:'The atmosphere is so electric but at the same time so tense, and the football is so good that I keep coming back to this thread every single minute of the match.',
+          base:{ like:1400, wow:700 }, my:null, mine:false,
+          replies: makeReplies('Bert1e88', 20, 9600), totalReplies:20,
+          repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:5, author:'GoalMachine', ai:3, time:'3d', img:'avatar3',
+          text:'That through ball was absolute poetry, rewind it ten times 🎯',
+          base:{ like:980, cheer:420, wow:150 }, my:null, mine:false,
+          replies: makeReplies('GoalMachine', 12, 9700), totalReplies:12, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:6, author:'TacticsNerd', ai:1, time:'3d', img:'avatar6',
+          text:'They switched to a back three at half and it completely changed the shape of the game. Whoever made that call deserves a raise.',
+          base:{ like:760, happy:90 }, my:null, mine:false,
+          replies: makeReplies('TacticsNerd', 4, 9760), totalReplies:4, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:7, author:'Klara_W', ai:5, time:'2d', img:'avatar7',
+          text:'I genuinely cannot remember the last time I was this tense watching a game at home. My hands are shaking, I have paused it twice just to calm down, and every time the crowd noise swells through my TV I feel it in my chest. Whatever the scoreline ends up being, the two teams have given us an absolute spectacle tonight and I am so grateful I did not miss a single second of it. Football like this is why I renewed my subscription.',
+          base:{ like:540, cheer:60 }, my:null, mine:false,
+          replies:[], totalReplies:0, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:8, author:'PennyL', ai:7, time:'2d',
+          text:'okay that dive was embarrassing, just play football 🙄',
+          base:{ like:430, angry:210, happy:120 }, my:null, mine:false,
+          replies: makeReplies('PennyL', 9, 9780), totalReplies:9, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:9, author:'Sven', ai:2, time:'2d', img:'avatar8',
+          text:'the keeper single-handedly keeping them in this',
+          base:{ like:610, wow:300 }, my:null, mine:false,
+          replies:[], totalReplies:0, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:10, author:'MatchdayMike', ai:0, time:'1d', img:'avatar9',
+          text:'I have watched a lot of football in my life and this second half is up there with the best 45 minutes I have ever seen, genuinely no notes.',
+          base:{ like:1900, cheer:880, happy:240 }, my:null, mine:false,
+          replies: makeReplies('MatchdayMike', 31, 9820), totalReplies:31, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:11, author:'Noor', ai:4, time:'1d',
+          text:'penalty all day long, how did VAR miss that 😡',
+          base:{ like:720, angry:540 }, my:null, mine:false,
+          replies: makeReplies('Noor', 7, 9880), totalReplies:7, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:12, author:'Priya', ai:5, time:'1d', img:'avatar1',
+          text:'their number 10 is operating on a different level tonight ✨',
+          base:{ like:840, cheer:120 }, my:null, mine:false,
+          replies:[], totalReplies:0, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:13, author:'CouchCoach', ai:6, time:'22h', img:'avatar4',
+          text:'bring the striker off he\u2019s done nothing all game, I said this 20 minutes ago',
+          base:{ like:310, happy:160, angry:40 }, my:null, mine:false,
+          replies: makeReplies('CouchCoach', 5, 9900), totalReplies:5, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:14, author:'Diego', ai:3, time:'20h', img:'avatar2',
+          text:'this is why I pay for DAZN, what a night 🍿',
+          base:{ like:1100, cheer:330 }, my:null, mine:false,
+          replies:[], totalReplies:0, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:15, author:'HannahB', ai:1, time:'18h', img:'avatar5',
+          text:'my heart genuinely cannot take penalties please end it in normal time 😭',
+          base:{ like:670, sad:240, happy:90 }, my:null, mine:false,
+          replies: makeReplies('HannahB', 14, 9930), totalReplies:14, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:16, author:'Yuki', ai:2, time:'14h', img:'avatar3',
+          text:'the fullback overlap is unstoppable, no one can deal with it',
+          base:{ like:420, wow:80 }, my:null, mine:false,
+          replies:[], totalReplies:0, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:17, author:'OldSchoolFooty', ai:7, time:'10h',
+          text:'back in my day they\u2019d have let half these challenges go, soft game now 😤',
+          base:{ like:230, angry:180, happy:300 }, my:null, mine:false,
+          replies: makeReplies('OldSchoolFooty', 8, 9960), totalReplies:8, repliesExpanded:false, loaded:0, textExpanded:false },
+        { id:18, author:'Lena', ai:4, time:'6h', img:'avatar6',
+          text:'whatever happens this has been an absolute classic, well played both 👏',
+          base:{ like:1500, cheer:600, happy:200 }, my:null, mine:false,
+          replies:[], totalReplies:0, repliesExpanded:false, loaded:0, textExpanded:false },
+      ],
+      composerOpen:false, replyTo:null, mentionOn:false, composerText:'',
+      pickerOpen:false, pickerTarget:null, pickerPos:{top:0,left:0},
+      sheetIn:false,
+      menuOpen:false, menuTarget:null, menuPos:{top:300,right:16}, menuLoading:false,
+      loadingReplies:null, loadingMore:null,
+      toast:null,
+      floaters:[],
+      online:true,
+      nextId: 5000,
+    };
+    this.floaterId = 0;
+    this.holdTimer = null;
+    this.heldOpened = false;
+  }
+
+  setPhoneRef = (el)=>{ this.phoneEl = el; };
+  setSheetRef = (el)=>{
+    this.sheetEl = el;
+    if(!el) return;
+    // Entrance animation via WAAPI. Resting state is translateY(0) (visible).
+    // A setTimeout safety net CANCELS the animation and forces the visible position,
+    // so the sheet can never get stuck off-screen even if frames never fire
+    // (throttled/background tab) — a frozen animation otherwise pins the first keyframe.
+    let anim = null;
+    const settle = ()=>{ try { if(anim) anim.cancel(); } catch(e){} try { el.style.transform = 'translateY(0)'; } catch(e){} };
+    try {
+      anim = el.animate(
+        [{ transform:'translateY(100%)' }, { transform:'translateY(0)' }],
+        { duration:340, easing:'cubic-bezier(0.2,0.8,0.2,1)' }
+      );
+      anim.onfinish = settle;
+      setTimeout(settle, 480);
+    } catch(e){ settle(); }
+  };
+  setFeedRef = (el)=>{ this.feedEl = el; };
+  setInputRef = (el)=>{ this.inputEl = el; if(el){ this.autosize(el); } if(el && this._focusNext){ this._focusNext=false; setTimeout(()=>{ try{el.focus(); const v=el.value; el.setSelectionRange(v.length,v.length); this.autosize(el);}catch(e){} },30); } };
+  setMentionRef = (el)=>{ this.mentionEl = el; if(el && this.inputEl){ setTimeout(()=>this.autosize(this.inputEl), 0); } };
+  autosize(el){ if(!el) return;
+    // first-line indent so the mention sits inline but wrapped lines go full-width
+    let indent = 0;
+    if(this.mentionEl && this.state.mentionOn && this.state.replyTo){ indent = Math.ceil(this.mentionEl.getBoundingClientRect().width) + 6; }
+    el.style.textIndent = indent + 'px';
+    el.style.height='auto'; const max=66; el.style.height=Math.min(el.scrollHeight, max)+'px';
+    el.style.overflowY = el.scrollHeight>max ? 'auto' : 'hidden';
+    if(el.scrollHeight>max){ el.scrollTop = el.scrollHeight; }
+    if(this.mentionEl){ this.mentionEl.style.visibility = el.scrollTop>1 ? 'hidden' : 'visible'; }
+  }
+  onComposerScroll = (e)=>{ if(this.mentionEl){ this.mentionEl.style.visibility = e.target.scrollTop>1 ? 'hidden' : 'visible'; } };
+
+  fmt(n){ if(n>=1000){ let s=(n/1000).toFixed(1); if(s.endsWith('.0')) s=s.slice(0,-2); return s+'K'; } return ''+n; }
+
+  agg(item){
+    const counts = Object.assign({}, item.base);
+    let baseTotal = 0; for(const k in item.base){ baseTotal += item.base[k]||0; }
+    if(item.my){ counts[item.my] = (counts[item.my]||0) + 1; }
+    let total = 0; const entries = [];
+    for(const k in counts){ if(counts[k]>0){ total += counts[k]; entries.push([k,counts[k]]); } }
+    entries.sort((a,b)=>b[1]-a[1]);
+    const emojis = entries.slice(0,2).map(e=>this.EMOJI[e[0]]).join('');
+    const icons = entries.slice(0,2).map(e=>this.REACT[e[0]]);
+    return { total, emojis, icons, has: baseTotal>0 };
+  }
+
+  avFull(n, small, img){ const d = small?32:38; if(img){ return { width:d, height:d, flexShrink:0, backgroundImage:'url(assets/avatars/'+img+'.png)', backgroundSize:'contain', backgroundRepeat:'no-repeat', backgroundPosition:'center' }; } const grad = this.ringGrads[n % this.ringGrads.length]; const ring = d*0.063; return { width:d, height:d, flexShrink:0, borderRadius:'50%', background:grad, display:'flex', alignItems:'center', justifyContent:'center', boxSizing:'border-box', padding:ring+'px' }; }
+  avInner(n, small){ const d = small?32:38; const gap = d*0.063; return { width:'100%', height:'100%', borderRadius:'50%', background:'#383d42', border:gap+'px solid #0c161c', boxSizing:'border-box', color:'#F9FAFA', display:'flex', alignItems:'center', justifyContent:'center', fontSize: small?12:14, fontWeight:700 }; }
+
+  // ----- find helpers -----
+  findComment(id){ return this.state.comments.find(c=>c.id===id); }
+  findAny(cid, rid){
+    const c = this.findComment(cid);
+    if(!c) return {};
+    if(rid==null) return { c, item:c };
+    const r = c.replies.find(x=>x.id===rid);
+    return { c, item:r };
+  }
+
+  // ----- view nav -----
+  openComments = ()=>{
+    this.setState({ view:'comments', sheetIn:false });
+    setTimeout(()=> this.setState({ sheetIn:true }), 24);
+  };
+  closeComments = ()=>{
+    if(this._closing) return;
+    const finish = ()=>{
+      this._closing = false;
+      clearTimeout(this._loadTimer); clearTimeout(this._loadMoreTimer);
+      this.setState(s=>({
+        view:'fixture', composerOpen:false, replyTo:null, mentionOn:false, composerText:'', sheetIn:false,
+        pickerOpen:false, pickerTarget:null, menuOpen:false, menuTarget:null, menuLoading:false,
+        loadingReplies:null, loadingMore:null, toast:null,
+        comments: s.comments.map(c=> (c.repliesExpanded || c.loaded) ? { ...c, repliesExpanded:false, loaded:0 } : c)
+      }));
+      if(this.feedEl) this.feedEl.scrollTop = 0;
+    };
+    const el = this.sheetEl;
+    if(!el){ finish(); return; }
+    this._closing = true;
+    // drop the keyboard immediately, then slide the sheet down and unmount on finish
+    if(this.state.composerOpen) this.setState({ composerOpen:false });
+    try {
+      const a = el.animate(
+        [{ transform:'translateY(0)' }, { transform:'translateY(100%)' }],
+        { duration:300, easing:'cubic-bezier(0.4,0,1,1)', fill:'forwards' }
+      );
+      a.onfinish = finish;
+      setTimeout(finish, 360); // safety net if frames are throttled
+    } catch(e){ finish(); }
+  };
+
+  // ----- reactions -----
+  onHeartDown = (cid, rid)=>{
+    this.heldOpened = false;
+    this.holdTimer = setTimeout(()=>{ this.heldOpened = true; this.openPickerAt(cid, rid); }, 320);
+  };
+  onHeartUp = (cid, rid, ev)=>{
+    clearTimeout(this.holdTimer);
+    if(this.heldOpened){ this.heldOpened=false; return; }
+    this.toggleLike(cid, rid);
+  };
+  toggleLike(cid, rid){
+    this.setState(s=>{
+      const comments = s.comments.map(c=>{
+        if(c.id!==cid) return c;
+        if(rid==null){ return { ...c, my: c.my==='like'?null:'like' }; }
+        return { ...c, replies: c.replies.map(r=> r.id===rid ? { ...r, my: r.my==='like'?null:'like' } : r), myReplies: (c.myReplies||[]).map(r=> r.id===rid ? { ...r, my: r.my==='like'?null:'like' } : r) };
+      });
+      return { comments };
+    });
+  }
+  openPickerAt(cid, rid){
+    let pos = { top:300, left:40 };
+    try {
+      const btn = (typeof event!=='undefined' && event && event.currentTarget) ? event.currentTarget : null;
+    } catch(e){}
+    // position via stored last pointer rect
+    if(this._lastBtn && this.phoneEl){
+      const b = this._lastBtn.getBoundingClientRect();
+      const p = this.phoneEl.getBoundingClientRect();
+      let top = b.top - p.top - 58;
+      let left = b.left - p.left - 10;
+      if(left < 8) left = 8;
+      if(left > 130) left = 130;
+      if(top < 60) top = b.bottom - p.top + 8;
+      pos = { top, left };
+    }
+    this.setState({ pickerOpen:true, pickerTarget:{cid,rid}, pickerPos:pos });
+  }
+  openCluster = (cid, rid)=>{ this.openPickerAt(cid, rid); };
+  closePicker = ()=> this.setState({ pickerOpen:false, pickerTarget:null });
+  pickReaction = (type)=>{
+    const t = this.state.pickerTarget; if(!t) return;
+    this.setState(s=>{
+      const comments = s.comments.map(c=>{
+        if(c.id!==t.cid) return c;
+        if(t.rid==null){ return { ...c, my: type }; }
+        return { ...c, replies: c.replies.map(r=> r.id===t.rid ? { ...r, my: type } : r), myReplies: (c.myReplies||[]).map(r=> r.id===t.rid ? { ...r, my: type } : r) };
+      });
+      return { comments, pickerOpen:false };
+    });
+  };
+
+  // ----- replies expand -----
+  measureText(key){
+    return (el)=>{
+      if(!el) return;
+      if(this._ovf && this._ovf[key]!==undefined) return;
+      requestAnimationFrame(()=>{
+        if(!el.isConnected) return;
+        const over = el.scrollHeight > el.clientHeight + 1;
+        this._ovf = this._ovf || {};
+        if(this._ovf[key]===undefined){ this._ovf[key] = over; if(over) this.forceUpdate(); }
+      });
+    };
+  }
+  toggleClamp = (cid, rid)=>{
+    this.setState(s=>({ comments: s.comments.map(c=>{
+      if(c.id!==cid) return c;
+      if(rid==null) return { ...c, textExpanded: !c.textExpanded };
+      return { ...c,
+        replies: c.replies.map(r=> r.id===rid ? { ...r, textExpanded: !r.textExpanded } : r),
+        myReplies: (c.myReplies||[]).map(r=> r.id===rid ? { ...r, textExpanded: !r.textExpanded } : r)
+      };
+    }) }));
+  };
+  toggleReplies = (cid)=>{
+    const cc = this.state.comments.find(x=>x.id===cid);
+    if(cc && cc.repliesExpanded){
+      this.setState(s=>({ comments: s.comments.map(c=> c.id===cid ? { ...c, repliesExpanded:false, loaded:0 } : c) }));
+      return;
+    }
+    this.setState({ loadingReplies: cid });
+    clearTimeout(this._loadTimer);
+    this._loadTimer = setTimeout(()=>{
+      this.setState(s=>({ loadingReplies:null, comments: s.comments.map(c=> c.id===cid ? { ...c, repliesExpanded:true, loaded: Math.min(8, c.replies.length) } : c) }));
+    }, 850);
+  };
+  hideReplies = (cid)=>{
+    this.setState(s=>({ comments: s.comments.map(c=> c.id===cid ? { ...c, repliesExpanded:false, loaded:0 } : c) }));
+  };
+  loadMore = (cid)=>{
+    this.setState({ loadingMore: cid });
+    clearTimeout(this._loadMoreTimer);
+    this._loadMoreTimer = setTimeout(()=>{
+      this.setState(s=>({ loadingMore:null, comments: s.comments.map(c=> c.id===cid ? { ...c, loaded: Math.min(c.loaded+8, c.replies.length) } : c) }));
+    }, 850);
+  };
+
+  // ----- composer -----
+  openTopComposer = ()=>{ this._focusNext=true; this.setState({ composerOpen:true, replyTo:null, mentionOn:false, composerText:'', toast:null }); };
+  openReply = (cid, rid, author)=>{
+    this._focusNext = true;
+    this.setState({ composerOpen:true, replyTo:{ cid, rid, author }, mentionOn:true, composerText:' ', toast:null });
+    const sel = (rid!=null) ? '[data-reply-id="'+rid+'"]' : '[data-comment-id="'+cid+'"]';
+    this.scrollToEl(sel, 'top');
+  };
+  removeReplyTo = ()=>{ this.mentionEl=null; this.setState({ replyTo:null, mentionOn:false, composerText:'' }); if(this.inputEl){ setTimeout(()=>{ try{ this.inputEl.style.textIndent='0px'; this.inputEl.focus(); this.autosize(this.inputEl); }catch(e){} }, 0); } };
+  onComposerKeyDown = (e)=>{
+    if(e.key==='Backspace' && this.state.mentionOn && (e.target.value||'')===''){
+      e.preventDefault();
+      this.mentionEl=null;
+      const el=e.target;
+      this.setState({ mentionOn:false });
+      setTimeout(()=>{ try{ el.style.textIndent='0px'; this.autosize(el); }catch(err){} }, 0);
+    }
+  };
+  onComposerInput = (e)=>{ const el=e.target; this.autosize(el); this.setState({ composerText: el.value }); };
+  blurComposer = ()=>{ this.setState({ composerOpen:false }); };
+  onBarClick = ()=>{
+    const s = this.state;
+    const hasDraft = (s.composerText||'').trim().length>0 || !!s.replyTo;
+    if(hasDraft){ this._focusNext=true; this.setState({ composerOpen:true, toast:null }); }
+    else { this.openTopComposer(); }
+  };
+
+  onSend = ()=>{
+    const text = (this.state.composerText||'').trim();
+    if(!text) return;
+    const lower = text.toLowerCase();
+    if(this.PROFANITY.some(w=> new RegExp('\\b'+w+'\\b').test(lower))){
+      this.showToast('Content violates community guidelines.', { error:true });
+      return;
+    }
+    if(!this.state.online){
+      this.showToast('Your reply wasn\u2019t posted. Please try again.', { retry:true });
+      return;
+    }
+    this.postNow(text);
+  };
+  postNow(text){
+    const rt = this.state.replyTo;
+    let bottomScrollId = null;
+    if(rt){ const pc = this.state.comments.find(c=>c.id===rt.cid); if(pc && pc.repliesExpanded) bottomScrollId = this.state.nextId; }
+    this.setState(s=>{
+      if(rt){
+        const comments = s.comments.map(c=>{
+          if(c.id!==rt.cid) return c;
+          const newReply = { id:s.nextId, author:this.ME, ai:7, time:'now', mention: s.mentionOn ? '@'+rt.author+' ' : '', body:text, base:{}, my:null, mine:true };
+          const myReplies = (c.myReplies||[]).concat([newReply]);
+          const loaded = c.repliesExpanded ? c.loaded : 0;
+          return { ...c, myReplies, repliesExpanded:true, loaded };
+        });
+        return { comments, composerOpen:false, replyTo:null, mentionOn:false, composerText:'', nextId:s.nextId+1 };
+      } else {
+        const newC = { id:s.nextId, author:this.ME, ai:7, time:'now', text, base:{}, my:null, mine:true, replies:[], totalReplies:0, repliesExpanded:false, loaded:0, textExpanded:false };
+        return { comments:[newC].concat(s.comments), composerOpen:false, composerText:'', nextId:s.nextId+1 };
+      }
+    });
+    if(bottomScrollId != null){ this.scrollToEl('[data-reply-id="'+bottomScrollId+'"]', 'bottom'); }
+  }
+  scrollToEl(selector, where, tries){
+    tries = tries || 0;
+    setTimeout(()=>{
+      const feed = this.feedEl || document.getElementById('comments-feed');
+      if(!feed){ if(tries<12) this.scrollToEl(selector, where, tries+1); return; }
+      const el = feed.querySelector(selector);
+      if(!el){ if(tries<12) this.scrollToEl(selector, where, tries+1); return; }
+      const fr = feed.getBoundingClientRect();
+      let top;
+      if(where==='bottom'){ top = feed.scrollTop + (el.getBoundingClientRect().bottom - fr.top) - feed.clientHeight + 20; }
+      else { top = feed.scrollTop + (el.getBoundingClientRect().top - fr.top) - 8; }
+      feed.scrollTo({ top: Math.max(0, top), behavior:'smooth' });
+    }, 70);
+  }
+  retryPost = ()=>{
+    if(!this.state.online){ this.showToast('Your reply wasn\u2019t posted. Please try again.', { retry:true }); return; }
+    this.setState({ toast:null });
+    const text=(this.state.composerText||'').trim();
+    if(text) this.postNow(text);
+  };
+
+  // ----- menu / delete -----
+  onMenuDown = (cid,rid,mine,e)=>{ this.menuHeld=false; this._lastMenuBtn = (e&&e.currentTarget)?e.currentTarget:null; clearTimeout(this.menuTimer); this.menuTimer=setTimeout(()=>{ this.menuHeld=true; this.openMenu(cid,rid,mine); }, 380); };
+  onMenuUp = ()=>{ clearTimeout(this.menuTimer); };
+  openMenu = (cid, rid, mine)=>{
+    let pos = { top:300, right:16 };
+    if(this._lastMenuBtn && this.phoneEl){
+      const b = this._lastMenuBtn.getBoundingClientRect();
+      const p = this.phoneEl.getBoundingClientRect();
+      let top = b.top - p.top - 6;
+      if(top < 60) top = 60;
+      if(top > 700) top = 700;
+      pos = { top, right:16 };
+    }
+    this.setState({ menuOpen:true, menuTarget:{ cid, rid, mine }, menuPos:pos });
+  };
+  closeMenu = ()=>{ if(this.state.menuLoading) return; this.setState({ menuOpen:false, menuTarget:null }); };
+  doDelete = ()=>{
+    const t = this.state.menuTarget; if(!t || this.state.menuLoading) return;
+    const isReply = t.rid!=null;
+    this.setState({ menuLoading:true });
+    setTimeout(()=>{
+      this.setState(s=>{
+        let comments;
+        if(isReply){ comments = s.comments.map(c=> c.id===t.cid ? { ...c, replies: c.replies.filter(r=>r.id!==t.rid), myReplies: (c.myReplies||[]).filter(r=>r.id!==t.rid), loaded: Math.max(0, Math.min(c.loaded, c.replies.filter(r=>r.id!==t.rid).length)) } : c); }
+        else { comments = s.comments.filter(c=>c.id!==t.cid); }
+        return { comments, menuOpen:false, menuTarget:null, menuLoading:false };
+      });
+      this.showToast(isReply ? 'Your reply has been deleted' : 'Your comment has been deleted', {});
+    }, 1100);
+  };
+  doReport = ()=>{
+    if(this.state.menuLoading) return;
+    this.setState({ menuLoading:true });
+    setTimeout(()=>{
+      this.setState({ menuOpen:false, menuTarget:null, menuLoading:false });
+      this.showToast('Thanks \u2014 we\u2019ll review this comment.', {});
+    }, 1100);
+  };
+
+  // ----- toast / online -----
+  showToast(text, opts){
+    if(this._toastTimer) clearTimeout(this._toastTimer);
+    this.setState({ toast:{ text, error:!!opts.error, retry:!!opts.retry } });
+    if(!opts.retry){ this._toastTimer = setTimeout(()=> this.setState({ toast:null }), 2600); }
+  }
+  toggleOnline = ()=> this.setState(s=>({ online:!s.online }));
+
+  // capture pointer target for picker positioning
+  capture = (fn)=> (e)=>{ this._lastBtn = e && e.currentTarget ? e.currentTarget : null; return fn(e); };
+
+  renderVals(){
+    const s = this.state;
+    const self = this;
+
+    const buildItem = (item, cid, isReply) => {
+      const a = this.agg(item);
+      const mt = s.menuTarget;
+      const selected = !!(mt && mt.cid===cid && ((mt.rid==null && !isReply) || (mt.rid!=null && isReply && mt.rid===item.id)));
+      const clampKey = (isReply?'r':'c')+item.id;
+      const expanded = !!item.textExpanded;
+      const canClamp = !!(this._ovf && this._ovf[clampKey]===true);
+      const fs = isReply ? '13.5px' : '14px';
+      const clampedTextStyle = { fontSize:fs, color:'#F9FAFA', lineHeight:1.4, whiteSpace:'pre-wrap', display:'-webkit-box', WebkitLineClamp:4, WebkitBoxOrient:'vertical', overflow:'hidden', cursor:'pointer' };
+      const plainTextStyle = { fontSize:fs, color:'#F9FAFA', lineHeight:1.4, whiteSpace:'pre-wrap', cursor: canClamp?'pointer':'default' };
+      return {
+        measureRef: this.measureText(clampKey),
+        canClamp, textExpanded: expanded,
+        showMore: canClamp && !expanded,
+        showLess: canClamp && expanded,
+        clampTextStyle: expanded ? plainTextStyle : clampedTextStyle,
+        moreStyle: { position:'absolute', right:'0', bottom:'0', paddingLeft:'8px', background:'#0c161c', color:'#8b9296', fontSize:fs, lineHeight:1.4, cursor:'pointer' },
+        showLessStyle: { color:'#8b9296', fontWeight:700, fontSize:'13px', marginTop:'5px', cursor:'pointer' },
+        onToggleClamp: ()=> this.toggleClamp(cid, isReply?item.id:null),
+        id:item.id, author:item.author, time:item.time, initial: (item.mine||item.img) ? '' : item.author.charAt(0).toUpperCase(),
+        avatarStyle: this.avFull(item.ai, isReply, item.mine ? 'me' : item.img),
+        showInitial: !(item.mine||item.img),
+        avatarInner: this.avInner(item.ai, isReply),
+        selected,
+        rowStyle: isReply
+          ? { display:'flex', gap:'10px', paddingTop:'8px', paddingBottom:'8px', paddingLeft:'65px', paddingRight:'16px', marginLeft:'-65px', marginRight:'-16px', background: selected?'rgba(255,255,255,0.04)':'transparent' }
+          : { padding:'14px 16px 6px', background: selected?'rgba(255,255,255,0.04)':'transparent' },
+        mention: item.mention||'', body: item.body||'', text:item.text||'',
+        liked: item.my==='like', notLiked: item.my!=='like',
+        hasMyReaction: !!item.my, noReaction: !item.my,
+        myReactionStyle: item.my ? { width:(isReply?'18px':'20px'), height:(isReply?'18px':'20px'), backgroundImage:'url('+this.REACT[item.my]+')', backgroundSize:'contain', backgroundRepeat:'no-repeat', backgroundPosition:'center' } : null,
+        hasReactions: a.has, reactionEmojis: a.emojis, reactionIcons: a.icons.map(src=>({ width:(isReply?17:19)+'px', height:(isReply?17:19)+'px', backgroundImage:'url('+src+')', backgroundSize:'contain', backgroundRepeat:'no-repeat', backgroundPosition:'center', marginRight:'-4px', flexShrink:0 })), reactionCount: this.fmt(a.total),
+        onHeartDown: this.capture((e)=> this.onHeartDown(cid, isReply?item.id:null)),
+        onHeartUp: (e)=> this.onHeartUp(cid, isReply?item.id:null, e),
+        onCluster: this.capture((e)=> this.openCluster(cid, isReply?item.id:null)),
+        onReply: ()=> this.openReply(cid, isReply?item.id:null, item.author),
+        onMenu: ()=> this.openMenu(cid, isReply?item.id:null, !!item.mine),
+        onRowDown: (e)=> this.onMenuDown(cid, isReply?item.id:null, !!item.mine, e),
+        onRowUp: ()=> this.onMenuUp(),
+      };
+    };
+
+    const comments = s.comments.map(c=>{
+      const vm = buildItem(c, c.id, false);
+      // replies
+      vm.repliesExpanded = c.repliesExpanded;
+      const myReplies = c.myReplies || [];
+      const totalCount = c.replies.length + myReplies.length;
+      vm.showRepliesToggle = totalCount > 0 && !c.repliesExpanded && this.state.loadingReplies !== c.id;
+      vm.loadingReplies = this.state.loadingReplies === c.id;
+      vm.repliesToggleLabel = 'View '+totalCount+(totalCount===1?' reply':' replies');
+      vm.onToggleReplies = ()=> this.toggleReplies(c.id);
+      vm.shownReplies = c.repliesExpanded ? c.replies.slice(0, c.loaded).concat(myReplies).map(r=> buildItem(r, c.id, true)) : [];
+      const remaining = c.replies.length - c.loaded;
+      vm.loadingMore = this.state.loadingMore === c.id;
+      vm.hasMoreReplies = c.repliesExpanded && remaining > 0 && this.state.loadingMore !== c.id;
+      vm.moreRepliesLabel = 'View '+remaining+(remaining===1?' more reply':' more replies');
+      vm.onLoadMore = ()=> this.loadMore(c.id);
+      vm.showHide = c.repliesExpanded && remaining <= 0;
+      vm.onHideReplies = ()=> this.hideReplies(c.id);
+      return vm;
+    });
+
+    const toast = s.toast;
+    return {
+      isFixture: s.view==='fixture',
+      isComments: s.view==='comments',
+      showFixtureLayer: true,
+      sheetTransform: s.sheetIn ? 'translateY(0)' : 'translateY(100%)',
+      feedStyle: { flex:1, overflowY:'auto', overflowX:'hidden', padding:'4px 0 8px' },
+      online: s.online, offline: !s.online, onToggleOnline: this.toggleOnline,
+      openComments: this.openComments, closeComments: this.closeComments,
+      comments,
+      // composer
+      composerOpen: s.composerOpen,
+      barVisible: !s.composerOpen,
+      hasReplyTo: !!s.replyTo,
+      replyingToName: s.replyTo ? s.replyTo.author : '',
+      composerBoxStyle: { flex:1, border: s.replyTo ? '1px solid #6D7377' : '1px solid transparent', borderRadius: s.replyTo ? '14px' : '24px', background:'#242D33', overflow:'hidden' },
+      showMention: !!(s.replyTo && s.mentionOn),
+      mentionToken: s.replyTo ? '@'+s.replyTo.author : '',
+      composerPlaceholder: (s.replyTo && s.mentionOn) ? '' : (s.replyTo ? 'Add a reply' : 'Add a comment'),
+      composerText: s.composerText,
+      barText: (function(){ const t=(s.composerText||'').trim(); if(t.length>0){ return (s.replyTo?'@'+s.replyTo.author+' ':'')+t; } if(s.replyTo){ return 'Replying to '+s.replyTo.author+'…'; } return 'Add a comment'; })(),
+      barTextStyle: { color: ((s.composerText||'').trim().length>0) ? '#F9FAFA' : '#798084', fontSize:'14px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' },
+      onBarClick: this.onBarClick,
+      onComposerInput: this.onComposerInput,
+      onComposerKeyDown: this.onComposerKeyDown,
+      onComposerScroll: this.onComposerScroll,
+      setMentionRef: this.setMentionRef,
+      removeReplyTo: this.removeReplyTo,
+      openTopComposer: this.openTopComposer,
+      blurComposer: this.blurComposer,
+      setInputRef: this.setInputRef,
+      onSend: this.onSend,
+      sendEnabled: (s.composerText||'').trim().length>0,
+      sendDisabled: (s.composerText||'').trim().length===0,
+      // picker
+      pickerOpen: s.pickerOpen,
+      pickerStyle: { position:'absolute', zIndex:56, display:'flex', gap:'6px', background:'#2b3338', borderRadius:'30px', padding:'8px 12px', boxShadow:'0 8px 30px rgba(0,0,0,0.5)', animation:'popIn 0.18s ease-out', top:s.pickerPos.top+'px', left:s.pickerPos.left+'px' },
+      pickerItems: ['like','happy','cheer','wow','angry','sad'].map(t=>({ emoji:this.EMOJI[t], src:this.REACT[t], iconStyle:{ width:'36px', height:'36px', backgroundImage:'url('+this.REACT[t]+')', backgroundSize:'contain', backgroundRepeat:'no-repeat', backgroundPosition:'center', cursor:'pointer', transition:'transform 0.12s' }, onClick: ()=> this.pickReaction(t) })),
+      closePicker: this.closePicker,
+      floaters: s.floaters.map(f=>({ id:f.id, emoji:f.emoji, src:f.src, style:{ position:'absolute', zIndex:60, width:'34px', height:'34px', backgroundImage:'url('+f.src+')', backgroundSize:'contain', backgroundRepeat:'no-repeat', backgroundPosition:'center', pointerEvents:'none', animation:'floatUp 1s ease-out forwards', left:f.style.left, top:f.style.top } })),
+      // menu
+      menuOpen: s.menuOpen,
+      menuPillStyle: { position:'absolute', zIndex:66, top:(s.menuPos?s.menuPos.top:300)+'px', right:(s.menuPos?s.menuPos.right:16)+'px', background:'#232A30', borderRadius:'12px', boxShadow:'0 10px 30px rgba(0,0,0,0.5)', animation:'popIn 0.15s ease-out' },
+      menuLoading: !!s.menuLoading,
+      menuShowDelete: (s.menuTarget ? s.menuTarget.mine : false) && !s.menuLoading,
+      menuShowReport: (s.menuTarget ? !s.menuTarget.mine : false) && !s.menuLoading,
+      deleteLabel: 'Delete',
+      doDelete: this.doDelete, doReport: this.doReport, closeMenu: this.closeMenu,
+      // toast
+      toastOpen: !!toast,
+      toastText: toast ? toast.text : '',
+      toastHasRetry: toast ? toast.retry : false,
+      onRetry: this.retryPost,
+      toastStyle: { position:'absolute', left:'12px', right:'12px', bottom:'96px', zIndex:70, background: (toast&&toast.error)?'#2a1416':'#242D33', borderRadius:'8px', padding:'19px 24px', display:'flex', alignItems:'center', justifyContent:(toast&&toast.retry)?'space-between':'center', gap:'12px', boxShadow:'0 10px 30px rgba(0,0,0,0.45)', animation:'toastIn 0.25s ease-out' },
+      toastTextStyle: { fontSize:'16px', fontWeight:500, lineHeight:1.35, textAlign:'center', color:(toast&&toast.error)?'#ff8585':'#f9fafa' },
+      setPhoneRef: this.setPhoneRef,
+      setSheetRef: this.setSheetRef,
+      setFeedRef: this.setFeedRef,
+      skeletonRows: [0],
+    };
+  }
+}
+</script>
+</body>
+</html>
