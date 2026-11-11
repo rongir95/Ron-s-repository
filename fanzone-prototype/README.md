@@ -52,6 +52,7 @@ Tapping your own avatar opens My Card.
 - `tools/ios-keyboard.py`: the updated iOS keyboard (Figma "[Dev] Public Profile", node 8003:175519) in the status editor and the Comments composer, built in HTML/CSS with SVG symbols. The keys really type (into whichever field is in use; shift, delete, space, return), and in FanZone focusing the Message field brings up the typing state (FanZone DS 12302:56387): dark keyboard, panel above it, yellow send button.
 - `tools/fixture-reactions.py`: the match page heart: tap to like, long press for the reaction picker (FanZone DS "Reaction btn"); the reaction you pick replaces the heart.
 - `tools/fanzone-team.py`: "Choose your team" (Bayern / Dortmund) after the FanZone loading, until you pick a team or go neutral; the bar's Change team button reopens it.
+- `tools/fanzone-leaderboard.py`: the leaderboard from the trophy in the FanZone header: empty state before any quiz, loading then results after one (medals and pictograms are SVGs from Figma in `assets/leaderboard/`).
 - `sources/`: the two source prototypes the build starts from (`Personal Fan Card.dc.html`, `Comments & Replies.dc.html`).
 - `build.sh`: rebuilds `FanZone.dc.html` (runs the merge, then the other scripts in the order above).
 

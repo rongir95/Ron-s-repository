@@ -345,9 +345,9 @@
             <span style="font-size:17px;font-weight:700;letter-spacing:-.01em;color:#F9FAFA;">FanZone</span>
           </button>
           <span style="flex:1;"></span>
-          <svg width="17" height="18" viewBox="0 0 19 20" fill="none" style="flex-shrink:0;">
+          <button onClick="{{ toggleLeaderboard }}" aria-label="Leaderboard" aria-pressed="{{ lbPressed }}" title="Leaderboard" style="flex-shrink:0;width:32px;height:32px;margin:-7px -7px;border:0;padding:0;border-radius:999px;background:{{ lbBtnBg }};cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s ease;"><svg width="17" height="18" viewBox="0 0 19 20" fill="none" style="display:block;{{ lbIconStyle }}">
             <path d="M12.093 1.017C13.243 1.017 14.177 1.95 14.177 3.1V3.512H14.593C15.743 3.513 16.676 4.445 16.676 5.595V6.762C16.676 7.537 16.486 8.318 16.105 8.927C15.726 9.533 15.12 10.012 14.364 10.012H14.148C13.826 12.629 11.771 14.707 9.166 15.066C9.171 15.102 9.175 15.14 9.175 15.177V16.013H10.904C11.363 16.014 11.737 16.386 11.737 16.846C11.737 17.306 11.363 17.679 10.904 17.679H5.789C5.329 17.679 4.956 17.306 4.956 16.846C4.956 16.386 5.329 16.013 5.789 16.013H7.509V15.177C7.509 15.138 7.512 15.098 7.517 15.06C4.933 14.684 2.902 12.614 2.581 10.012H2.333C1.577 10.012 0.971 9.533 0.592 8.927C0.211 8.318 0.02 7.537 0.02 6.762V5.595C0.02 4.445 0.954 3.512 2.104 3.512H2.517V3.1C2.517 1.95 3.449 1.017 4.6 1.017H12.093ZM4.6 2.683C4.37 2.683 4.183 2.87 4.183 3.1V8.084L4.202 9.281V9.293C4.202 11.592 6.066 13.455 8.365 13.455C10.659 13.455 12.52 11.598 12.527 9.305L12.51 8.11V3.1C12.51 2.87 12.323 2.683 12.093 2.683H4.6ZM2.104 5.012C1.782 5.012 1.521 5.273 1.521 5.595V6.762C1.521 7.313 1.66 7.804 1.865 8.132C2.072 8.464 2.262 8.512 2.333 8.512H2.523L2.517 8.111V5.012H2.104ZM13.677 8.087L13.683 8.512H14.364C14.436 8.512 14.626 8.463 14.832 8.132C15.037 7.804 15.176 7.313 15.176 6.762V5.595C15.176 5.273 14.915 5.013 14.593 5.012H14.177V8.087H13.677Z" fill="#F9FAFA"></path>
-          </svg>
+          </svg></button>
           <span style="width:1px;height:17px;background:rgba(249,250,250,.6);flex-shrink:0;"></span>
           <button onClick="{{ goHome }}" title="Close FanZone" style="flex-shrink:0;border:0;padding:6px;margin:-6px;background:transparent;cursor:pointer;display:flex;"><svg width="12" height="13" viewBox="0 0 13 14" fill="none" style="flex-shrink:0;">
             <path d="M10.41 0.459C10.722 0.147 11.228 0.147 11.541 0.459C11.853 0.772 11.853 1.278 11.541 1.59L7.131 6L11.541 10.41C11.853 10.722 11.853 11.228 11.541 11.54C11.228 11.853 10.722 11.853 10.41 11.54L6 7.13L1.59 11.54C1.278 11.853 0.772 11.853 0.46 11.54C0.147 11.228 0.147 10.722 0.46 10.41L4.869 6L0.46 1.59C0.147 1.278 0.147 0.772 0.46 0.459C0.772 0.147 1.278 0.147 1.59 0.459L6 4.869L10.41 0.459Z" fill="#F9FAFA"></path>
@@ -365,7 +365,7 @@
             <img src="assets/icons/sponsor-cocacola.svg" alt="FanZone, presented by Coca-Cola" width="74" height="24" style="display:block;flex-shrink:0;">
           </button>
           <div style="position:absolute;right:16px;top:0;bottom:0;display:flex;align-items:center;">
-            <img src="assets/icons/fz-leaderboard.svg" alt="" width="32" height="32" style="display:block;">
+            <button onClick="{{ toggleLeaderboard }}" aria-label="Leaderboard" aria-pressed="{{ lbPressed }}" title="Leaderboard" style="width:32px;height:32px;border:0;padding:0;border-radius:999px;background:{{ lbBtnBg }};cursor:pointer;display:block;transition:background .2s ease;"><img src="assets/icons/fz-leaderboard.svg" alt="" width="32" height="32" style="display:block;{{ lbIconStyle }}"></button>
             <span aria-hidden="true" style="width:1px;height:17px;margin:0 15px 0 10px;background:rgba(249,250,250,.6);"></span>
             <button onClick="{{ goHome }}" aria-label="Close FanZone" title="Close FanZone" style="width:20px;height:20px;border:0;padding:0;background:transparent;cursor:pointer;display:block;"><img src="assets/icons/fz-close.svg" alt="" width="20" height="20" style="display:block;"></button>
           </div>
@@ -451,6 +451,72 @@
               </div>
               <button onClick="{{ fzGoNeutral }}" style="margin-top:42px;width:127px;height:40px;border:0;border-radius:7.3px;background:rgba(255,255,255,.2);font-family:'DAZN Oscine',sans-serif;font-weight:700;font-size:14px;color:#F9FAFA;cursor:pointer;">Go neutral</button>
             </div>
+          </div>
+        </sc-if>
+        <!-- Leaderboard (FanZone DS 12304:62639 empty / loading, 12930:55217 loaded) -->
+        <sc-if value="{{ lbOpen }}" hint-placeholder-val="{{ false }}">
+          <div role="region" aria-label="Leaderboard" class="fz-scroll" style="position:absolute;left:0;right:0;top:48px;bottom:0;z-index:7;overflow-y:auto;overflow-x:hidden;background:#080E12;animation:fzFadeIn .2s ease;font-family:'DAZN Oscine',sans-serif;">
+            <div style="position:relative;height:48px;background:#0C161C;">
+              <span style="position:absolute;left:16px;top:11px;font-weight:800;font-size:20px;line-height:26px;color:#F9FAFA;">Leaderboard</span>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="position:absolute;right:16px;top:12px;display:block;"><circle cx="12" cy="12" r="9" stroke="#B3B9BB" stroke-width="2"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2-2.4 3.6" stroke="#B3B9BB" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.9" r="1.2" fill="#B3B9BB"/></svg>
+            </div>
+            <!-- top 3 -->
+            <div style="position:relative;height:146px;background:linear-gradient(180deg,#0C161C 0%,#1C2529 100%);">
+              <sc-if value="{{ lbSkeleton }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;left:16px;top:0;width:114px;display:flex;flex-direction:column;align-items:center;"><img src="assets/leaderboard/empty-2nd.svg" alt="" width="60" height="60" style="display:block;margin-top:10px;"><span style="display:block;border-radius:4px;background:#1B2326;width:72px;height:8px;margin-top:18px;background:#2A3439;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:36px;height:8px;margin-top:8px;background:#2A3439;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:72px;height:8px;margin-top:8px;background:#2A3439;"></span></div><div style="position:absolute;left:130px;top:0;width:114px;display:flex;flex-direction:column;align-items:center;"><img src="assets/leaderboard/empty-1st.svg" alt="" width="60" height="76" style="display:block;margin-top:0px;"><span style="display:block;border-radius:4px;background:#1B2326;width:72px;height:8px;margin-top:6px;background:#2A3439;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:36px;height:8px;margin-top:8px;background:#2A3439;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:72px;height:8px;margin-top:8px;background:#2A3439;"></span></div><div style="position:absolute;left:245px;top:0;width:114px;display:flex;flex-direction:column;align-items:center;"><img src="assets/leaderboard/empty-3rd.svg" alt="" width="60" height="60" style="display:block;margin-top:10px;"><span style="display:block;border-radius:4px;background:#1B2326;width:72px;height:8px;margin-top:18px;background:#2A3439;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:36px;height:8px;margin-top:8px;background:#2A3439;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:72px;height:8px;margin-top:8px;background:#2A3439;"></span></div></sc-if>
+              <sc-if value="{{ lbLoaded }}" hint-placeholder-val="{{ false }}">
+                <sc-for list="{{ lbTop }}" as="w" hint-placeholder-count="3">
+                  <div style="position:absolute;left:{{ w.x }}px;top:0;width:114px;display:flex;flex-direction:column;align-items:center;animation:fzRxPop .35s cubic-bezier(.22,1.4,.36,1);">
+                    <img src="{{ w.medal }}" alt="{{ w.place }}" width="76" height="76" style="display:block;">
+                    <span style="margin-top:6px;font-weight:700;font-size:14px;line-height:20px;color:#F9FAFA;max-width:106px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ w.name }}</span>
+                    <span style="font-size:14px;line-height:14px;color:#F9FAFA;"><b style="color:#5ADC8C;font-weight:700;">{{ w.good }}</b>/10</span>
+                    <span style="margin-top:2px;font-size:14px;line-height:14px;color:#9EA2A4;">{{ w.time }}</span>
+                  </div>
+                </sc-for>
+              </sc-if>
+            </div>
+            <sc-if value="{{ lbSkeleton }}" hint-placeholder-val="{{ true }}">
+              <div style="position:relative;"><div style="display:flex;align-items:center;height:40px;margin-top:4px;padding:0 12px;opacity:1;"><span style="display:block;border-radius:4px;background:#1B2326;width:12px;height:8px;"></span><span style="display:block;width:24px;height:24px;border-radius:50%;background:#1B2326;margin-left:47px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:62px;height:8px;margin-left:8px;"></span><span style="flex:1;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:42px;height:8px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:60px;height:8px;margin-left:12px;"></span></div><div style="display:flex;align-items:center;height:40px;margin-top:4px;padding:0 12px;opacity:0.85;"><span style="display:block;border-radius:4px;background:#1B2326;width:12px;height:8px;"></span><span style="display:block;width:24px;height:24px;border-radius:50%;background:#1B2326;margin-left:47px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:62px;height:8px;margin-left:8px;"></span><span style="flex:1;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:42px;height:8px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:60px;height:8px;margin-left:12px;"></span></div><div style="display:flex;align-items:center;height:40px;margin-top:4px;padding:0 12px;opacity:0.7;"><span style="display:block;border-radius:4px;background:#1B2326;width:12px;height:8px;"></span><span style="display:block;width:24px;height:24px;border-radius:50%;background:#1B2326;margin-left:47px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:62px;height:8px;margin-left:8px;"></span><span style="flex:1;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:42px;height:8px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:60px;height:8px;margin-left:12px;"></span></div><div style="display:flex;align-items:center;height:40px;margin-top:4px;padding:0 12px;opacity:0.55;"><span style="display:block;border-radius:4px;background:#1B2326;width:12px;height:8px;"></span><span style="display:block;width:24px;height:24px;border-radius:50%;background:#1B2326;margin-left:47px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:62px;height:8px;margin-left:8px;"></span><span style="flex:1;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:42px;height:8px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:60px;height:8px;margin-left:12px;"></span></div><div style="display:flex;align-items:center;height:40px;margin-top:4px;padding:0 12px;opacity:0.4;"><span style="display:block;border-radius:4px;background:#1B2326;width:12px;height:8px;"></span><span style="display:block;width:24px;height:24px;border-radius:50%;background:#1B2326;margin-left:47px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:62px;height:8px;margin-left:8px;"></span><span style="flex:1;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:42px;height:8px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:60px;height:8px;margin-left:12px;"></span></div><div style="display:flex;align-items:center;height:40px;margin-top:4px;padding:0 12px;opacity:0.25;"><span style="display:block;border-radius:4px;background:#1B2326;width:12px;height:8px;"></span><span style="display:block;width:24px;height:24px;border-radius:50%;background:#1B2326;margin-left:47px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:62px;height:8px;margin-left:8px;"></span><span style="flex:1;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:42px;height:8px;"></span><span style="display:block;border-radius:4px;background:#1B2326;width:60px;height:8px;margin-left:12px;"></span></div>
+                <div style="position:absolute;left:0;right:0;bottom:0;height:170px;background:linear-gradient(180deg,rgba(8,14,18,0) 0%,#080E12 42%);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:30px;box-sizing:border-box;">
+                  <sc-if value="{{ lbEmpty }}" hint-placeholder-val="{{ true }}">
+                    <img src="assets/leaderboard/tip-bulb.svg" alt="" width="40" height="40" style="display:block;">
+                    <span style="margin-top:4px;font-size:16px;line-height:24px;color:#F9FAFA;text-align:center;padding:0 12px;">Check back after the first quiz to see your ranking</span>
+                  </sc-if>
+                  <sc-if value="{{ lbLoading }}" hint-placeholder-val="{{ false }}">
+                    <span style="width:26px;height:26px;border-radius:50%;border:2.5px solid rgba(249,250,250,.18);border-top-color:#F9FAFA;animation:fzSpin .8s linear infinite;"></span>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ lbLoaded }}" hint-placeholder-val="{{ false }}">
+              <div style="padding-bottom:56px;">
+                <sc-for list="{{ lbRows }}" as="r" hint-placeholder-count="7">
+                  <div style="display:flex;align-items:center;height:40px;margin-top:4px;padding:0 12px;">
+                    <span style="width:47px;font-size:16px;color:#F9FAFA;">{{ r.rank }}</span>
+                    <span style="margin-left:12px;width:24px;height:24px;border-radius:50%;flex-shrink:0;box-sizing:border-box;border:1.5px solid transparent;padding:1.5px;background:linear-gradient(#080E12,#080E12) padding-box,{{ r.ring }} border-box;">
+                      <span style="display:block;width:18px;height:18px;border-radius:50%;overflow:hidden;"><img src="{{ r.avatar }}" alt="" style="display:block;width:18px;height:18px;object-fit:cover;transform:scale(1.207);"></span>
+                    </span>
+                    <span style="margin-left:8px;flex:1;min-width:0;font-weight:700;font-size:16px;color:#F9FAFA;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.name }}</span>
+                    <span style="width:42px;font-size:16px;color:#F9FAFA;"><b style="color:#5ADC8C;font-weight:700;">{{ r.good }}</b>/10</span>
+                    <span style="width:61px;margin-left:12px;font-size:16px;color:#9EA2A4;text-align:right;">{{ r.time }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <!-- you -->
+              <div style="position:sticky;bottom:0;display:flex;align-items:center;height:48px;padding:0 12px;background:#F9FAFA;color:#080E12;">
+                <span style="width:47px;font-size:16px;">{{ lbMeRank }}</span>
+                <span style="margin-left:12px;width:24px;height:24px;border-radius:50%;flex-shrink:0;box-sizing:border-box;border:1.5px solid transparent;padding:1.5px;background:linear-gradient(#F9FAFA,#F9FAFA) padding-box,{{ ringBg }} border-box;">
+                  <span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;overflow:hidden;background:#080E12;color:#F9FAFA;font-weight:700;font-size:11px;">
+                    <sc-if value="{{ hasAvatarImg }}" hint-placeholder-val="{{ true }}"><img src="{{ avatarImg }}" alt="" style="display:block;width:18px;height:18px;object-fit:cover;{{ avatarImgScale }}"></sc-if>
+                    <sc-if value="{{ barShowInitial }}" hint-placeholder-val="{{ false }}">{{ cardInitial }}</sc-if>
+                  </span>
+                </span>
+                <span style="margin-left:8px;font-size:16px;max-width:99px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ cardName }}</span>
+                <span style="margin-left:8px;padding:1px 2px;border-radius:2px;background:#080E12;color:#F9FAFA;font-weight:800;font-size:12px;line-height:10px;">YOU</span>
+                <span style="flex:1;"></span>
+                <span style="width:42px;font-size:16px;"><b style="font-weight:700;">{{ lbMeGood }}</b>/10</span>
+                <span style="width:61px;margin-left:12px;font-size:16px;text-align:right;">{{ lbMeTime }}</span>
+              </div>
+            </sc-if>
           </div>
         </sc-if>
         <!-- chat feed -->
@@ -2395,6 +2461,9 @@ const CHAT_POOL = [
 const GZ = {"gifDefault": [[["assets/gif/g01.jpg", 166], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 166], ["assets/gif/g02.jpg", 124], ["assets/gif/g05.jpg", 166], ["assets/gif/g08.jpg", 125], ["assets/gif/g04.jpg", 166], ["assets/gif/g01.jpg", 124]], [["assets/gif/g02.jpg", 165], ["assets/gif/g04.jpg", 124], ["assets/gif/g08.jpg", 163], ["assets/gif/g05.jpg", 121], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 124], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g01.jpg", 166], ["assets/gif/g05.jpg", 124]]], "gifResult": [[["assets/gif/g05.jpg", 124], ["assets/gif/g06.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g03.jpg", 166], ["assets/gif/g09.jpg", 166], ["assets/gif/g02.jpg", 124], ["assets/gif/g05.jpg", 166], ["assets/gif/g08.jpg", 125], ["assets/gif/g04.jpg", 166], ["assets/gif/g01.jpg", 124]], [["assets/gif/g02.jpg", 165], ["assets/gif/g08.jpg", 163], ["assets/gif/g09.jpg", 166], ["assets/gif/g04.jpg", 121], ["assets/gif/g01.jpg", 166], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 124], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g01.jpg", 166], ["assets/gif/g05.jpg", 124]]], "stickerDefault": ["assets/stickers/s01.png", "assets/stickers/s02.png", "assets/stickers/s03.png", "assets/stickers/s04.png", "assets/stickers/s05.png", "assets/stickers/s06.png", "assets/stickers/s07.png", "assets/stickers/s08.png", "assets/stickers/s09.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png", "assets/stickers/s18.png", "assets/stickers/s09.png", "assets/stickers/s04.png", "assets/stickers/s11.png", "assets/stickers/s02.png", "assets/stickers/s16.png", "assets/stickers/s07.png", "assets/stickers/s13.png", "assets/stickers/s01.png", "assets/stickers/s15.png", "assets/stickers/s06.png", "assets/stickers/s10.png", "assets/stickers/s03.png", "assets/stickers/s17.png", "assets/stickers/s12.png", "assets/stickers/s05.png", "assets/stickers/s14.png", "assets/stickers/s08.png"], "stickerResult": ["assets/stickers/s10.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s15.png", "assets/stickers/s03.png", "assets/stickers/s12.png", "assets/stickers/s16.png", "assets/stickers/s17.png", "assets/stickers/s18.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png", "assets/stickers/s08.png", "assets/stickers/s14.png", "assets/stickers/s05.png", "assets/stickers/s12.png", "assets/stickers/s17.png", "assets/stickers/s03.png", "assets/stickers/s10.png", "assets/stickers/s06.png", "assets/stickers/s15.png", "assets/stickers/s01.png", "assets/stickers/s13.png", "assets/stickers/s07.png", "assets/stickers/s16.png", "assets/stickers/s02.png", "assets/stickers/s11.png", "assets/stickers/s04.png", "assets/stickers/s09.png", "assets/stickers/s18.png"]};
 // Choose your team tile (FanZone DS)
 const TILE_STYLE = 'position:relative;width:100px;height:100px;border-radius:22px;overflow:hidden;box-sizing:border-box;border:2px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;background:radial-gradient(130% 55% at 15% -8%,rgba(255,255,255,.22) 0 50%,transparent 51%),radial-gradient(140% 60% at 90% 112%,rgba(0,0,0,.16) 0 50%,transparent 51%),{bg};';
+// Leaderboard (FanZone DS)
+const LB_TOP = [["Ronen", "assets/leaderboard/medal-2nd.svg", "2nd place", 16, "10", "01:34:35"], ["Guybenita", "assets/leaderboard/medal-1st.svg", "1st place", 130, "10", "01:34:35"], ["Whitepanda", "assets/leaderboard/medal-3rd.svg", "3rd place", 245, "10", "01:34:35"]];
+const LB_ROWS = [["4", "Mariposa", "uploads/11.png", "#DC052D", "10", "01:34:35"], ["5", "Bravewale", "uploads/12.png", "#FDE100", "9", "01:35:03"], ["6", "Briana", "uploads/13.png", "#DC052D", "9", "01:36:53"], ["7", "Carla", "uploads/14.png", "#FDE100", "8", "01:36:13"], ["8", "Michaelb", "uploads/17.png", "#DC052D", "8", "01:36:11"], ["9", "Americanx", "uploads/18.png", "#FDE100", "8", "01:43:11"], ["10", "Rojumi", "uploads/19.png", "#DC052D", "7", "02:12:46"]];
 // FanZone chat: which team each fan supports (drives their avatar ring and Fan Card favorite)
 const FZ_FAN_TEAM = {"Ayaka": "bayern", "Hina": "bayern", "Sora": "bayern", "Mei": "bayern", "Aoi": "bayern", "Riku": "bayern", "Nao": "bayern", "Kenji": "bayern", "Rina": "bayern", "Daiki": "bayern", "Sho": "bayern", "Ai": "bvb", "Misaki": "bvb", "Kaito": "bvb", "Ren": "bvb", "Yuki": "bvb", "Haruto": "bvb", "Emi": "bvb", "Taiga": "bvb", "Sana": "bvb", "Yui": "bvb", "Miku": "bvb", "Ryo": "bvb", "Akari": "bvb"};
 // ---------- teams ----------
@@ -2987,6 +3056,33 @@ class Component extends DCLogic {
         tileStyle: TILE_STYLE.replace("{bg}", t.bg) })),
     };
   }
+  // Leaderboard (trophy in the FanZone header)
+  openLeaderboard = (afterQuiz) => {
+    clearTimeout(this._lbT);
+    const loading = !!(afterQuiz || this.state.quizDone);
+    this.setState({ lbOpen: true, lbLoading: loading, fzTyping: false });
+    if (loading) this._lbT = setTimeout(() => this.setState({ lbLoading: false }), 1200);
+  };
+  toggleLeaderboard = (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (this.state.lbOpen) { clearTimeout(this._lbT); this.setState({ lbOpen: false, lbLoading: false }); }
+    else this.openLeaderboard(false);
+  };
+  lbVals() {
+    const s = this.state;
+    const open = !!s.lbOpen && s.screen === "fanzone";
+    const loaded = !!s.quizDone && !s.lbLoading;
+    return {
+      lbOpen: open, toggleLeaderboard: this.toggleLeaderboard,
+      lbPressed: open ? "true" : "false", lbBtnBg: open ? "#F9FAFA" : "transparent", lbIconStyle: open ? "filter:brightness(0);" : "",
+      lbSkeleton: !loaded, lbLoaded: loaded, lbEmpty: !s.quizDone, lbLoading: !!s.quizDone && !!s.lbLoading,
+      lbTop: LB_TOP.map(([name, medal, place, x, good, time]) => ({ id: place, name, medal, place, x, good, time })),
+      lbRows: LB_ROWS.map(([rank, name, avatar, ring, good, time]) => ({ id: rank, rank, name, avatar, ring, good, time })),
+      lbMeRank: s.quizScore != null ? String(s.quizRank || "4,568") : "4,568",
+      lbMeGood: s.quizScore != null ? String(s.quizScore).padStart(2, "0") : "01",
+      lbMeTime: "05:19:11",
+    };
+  }
   openFanZoneOver = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     clearTimeout(this._fzLoadT);
@@ -3099,7 +3195,7 @@ class Component extends DCLogic {
     clearTimeout(this._commentsT);
     this._commentsT = setTimeout(() => this.setState({ commentsOpen: false, commentsClosing: false, commentsView: "list", commentsBack: false, opSub: null, opSubClosing: false }), 280);
   };
-  goHome = () => { this.pollEnd(true); clearTimeout(this._gzT); if (this.state.gzOpen) this.setState({ gzOpen: false, gzExpanded: false, gzQuery: "" }); clearTimeout(this._ftueTimer); this.setState({ screen: this.state.fanzoneFrom === "fixture" ? "fixture" : "home", showFtue: false }); };
+  goHome = () => { this.pollEnd(true); clearTimeout(this._lbT); if (this.state.lbOpen) this.setState({ lbOpen: false, lbLoading: false }); clearTimeout(this._gzT); if (this.state.gzOpen) this.setState({ gzOpen: false, gzExpanded: false, gzQuery: "" }); clearTimeout(this._ftueTimer); this.setState({ screen: this.state.fanzoneFrom === "fixture" ? "fixture" : "home", showFtue: false }); };
 
   // ---- navigation ----
   animateClose = (cb) => {
@@ -4413,6 +4509,7 @@ class Component extends DCLogic {
     return {
       ...this.crVals(),
       ...this.gzVals(),
+      ...this.lbVals(),
       ...this.fzTeamVals(),
       ...this.fixRxVals(),
       ...this.pollVals(),
