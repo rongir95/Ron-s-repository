@@ -29,7 +29,10 @@ def rep(old, new, count=1):
     src = src.replace(old, new)
 
 FONT = "font-family:'DAZN Oscine',sans-serif;"
-TRIM = "display:inline-block;font-weight:800;transform:scaleX(.8);transform-origin:center;"
+# Figma: numbers in DAZN Trim Condensed Display Bold, titles in DAZN Trim Bold (uploads/DAZNTrim*.ttf).
+# DAZN Trim (not condensed) isn't in the project yet: titles fall back to DAZN Oscine Bold until it is.
+NUM = "font-family:'DAZN Trim Condensed Display',sans-serif;font-weight:700;"
+TITLE = "font-family:'DAZN Trim','DAZN Oscine',sans-serif;font-weight:700;"
 YEL = '#F7FF1A'
 CLOSE = ('<button onClick="{{ closeQuiz }}" aria-label="Close quiz" title="Close" style="position:absolute;right:12px;top:8px;z-index:3;width:31px;height:32px;border:0;padding:0;border-radius:32px;'
          'background:rgba(61,69,73,.6);display:flex;align-items:center;justify-content:center;cursor:pointer;">'
@@ -67,11 +70,11 @@ TOAST = '''        <!-- Quiz coming up toast (FanZone DS 12930:53666) -->
                 <circle cx="24" cy="24" r="18" fill="none" stroke="#3D4549" stroke-width="4"/>
                 <circle cx="24" cy="24" r="18" fill="none" stroke="''' + YEL + '''" stroke-width="4" stroke-linecap="round" stroke-dasharray="113.1" style="animation:qzSweepS 1s linear infinite;"/>
               </svg>
-              <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:''' + YEL + ''';">{{ qzNum }}</span>
+              <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;''' + NUM + '''font-size:28px;line-height:1;padding-top:2px;color:''' + YEL + ''';">{{ qzNum }}</span>
             </span>
             <span style="display:flex;flex-direction:column;gap:6px;min-width:0;">
-              <span style="font-weight:700;font-size:16px;line-height:1;color:''' + YEL + ''';">New quiz coming up</span>
-              <span style="font-weight:700;font-size:14px;line-height:1;color:#F9FAFA;">Your chance to win!</span>
+              <span style="''' + TITLE + '''font-size:16px;line-height:1;color:''' + YEL + ''';">New quiz coming up</span>
+              <span style="''' + TITLE + '''font-size:14px;line-height:1;color:#F9FAFA;">Your chance to win!</span>
             </span>
           </div>
         </sc-if>
@@ -95,11 +98,11 @@ FULL = '''        <!-- Quiz: countdown (12930:51084), questions (12930:52000), r
                   <circle cx="120" cy="120" r="92" fill="none" stroke="#3D4549" stroke-width="16"/>
                   <circle cx="120" cy="120" r="92" fill="none" stroke="''' + YEL + '''" stroke-width="16" stroke-linecap="round" stroke-dasharray="578.1" style="animation:qzSweepL 1s linear infinite;"/>
                 </svg>
-                <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:128px;line-height:1;color:''' + YEL + ''';"><span style="''' + TRIM + '''animation:qzTick 1s ease-out infinite;">{{ qzNum }}</span></span>
+                <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;line-height:1;color:''' + YEL + ''';"><span style="display:inline-block;''' + NUM + '''padding-top:10px;animation:qzTick 1s ease-out infinite;">{{ qzNum }}</span></span>
               </div>
               <div style="position:absolute;left:16px;right:16px;top:373px;text-align:center;">
-                <div style="font-weight:700;font-size:24px;line-height:28px;color:''' + YEL + ''';">New quiz is starting</div>
-                <div style="margin-top:4px;font-weight:700;font-size:18px;line-height:24px;color:#F9FAFA;">Your chance to win!</div>
+                <div style="''' + TITLE + '''font-size:24px;line-height:28px;color:''' + YEL + ''';">New quiz is starting</div>
+                <div style="margin-top:4px;''' + TITLE + '''font-size:18px;line-height:24px;color:#F9FAFA;">Your chance to win!</div>
               </div>
             </sc-if>
             <sc-if value="{{ qzAsk }}" hint-placeholder-val="{{ false }}">
@@ -126,10 +129,10 @@ FULL = '''        <!-- Quiz: countdown (12930:51084), questions (12930:52000), r
               ''' + CLOSE + '''
               <div style="position:absolute;left:0;right:0;top:24px;display:flex;flex-direction:column;align-items:center;">
                 <img src="assets/quiz/trophy.svg" alt="" width="84" height="84" style="display:block;animation:fzRxPop .5s cubic-bezier(.22,1.6,.36,1);">
-                <div style="margin-top:12px;font-size:24px;line-height:28px;color:#F9FAFA;"><span style="''' + TRIM + '''">{{ qzTitle }}</span></div>
-                <div style="margin-top:32px;font-size:20px;line-height:24px;color:#CED0D2;"><span style="''' + TRIM + '''">You got</span></div>
-                <div style="margin-top:4px;font-size:118px;line-height:1;"><span style="''' + TRIM + '''"><span style="color:#5ADC8C;">{{ qzGood }}</span><span style="color:#F9FAFA;">/3</span></span></div>
-                <div style="margin-top:6px;font-size:20px;line-height:24px;color:#F9FAFA;"><span style="''' + TRIM + '''">IN {{ qzTime }}</span></div>
+                <div style="margin-top:12px;font-size:24px;line-height:28px;color:#F9FAFA;"><span style="''' + TITLE + '''">{{ qzTitle }}</span></div>
+                <div style="margin-top:32px;font-size:20px;line-height:24px;color:#CED0D2;"><span style="''' + TITLE + '''">You got</span></div>
+                <div style="margin-top:4px;font-size:130px;line-height:.85;"><span style="''' + NUM + '''"><span style="color:#5ADC8C;">{{ qzGood }}</span><span style="color:#F9FAFA;">/3</span></span></div>
+                <div style="margin-top:6px;font-size:20px;line-height:24px;color:#F9FAFA;"><span style="''' + TITLE + '''">IN {{ qzTime }}</span></div>
               </div>
               <div style="position:absolute;left:0;right:0;bottom:46px;display:flex;flex-direction:column;align-items:center;gap:8px;">
                 <span style="display:flex;align-items:center;gap:8px;font-size:16px;color:#F9FAFA;"><img src="assets/quiz/trophy.svg" alt="" width="24" height="24" style="display:block;">Moving to leaderboard</span>
@@ -141,11 +144,15 @@ FULL = '''        <!-- Quiz: countdown (12930:51084), questions (12930:52000), r
 '''
 rep('        <!-- chat feed -->\n', TOAST + FULL + '        <!-- chat feed -->\n')
 
+rep('  * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }',
+    '  @font-face { font-family: "DAZN Trim Condensed Display"; src: url("uploads/DAZNTrimCondensedDisplay-Bold.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: swap; }\n'
+    '  @font-face { font-family: "DAZN Trim Condensed Text"; src: url("uploads/DAZNTrimCondensedText-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }\n'
+    '  * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }')
 rep('  @keyframes fzPushIn {',
     '  @keyframes qzToastIn { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }\n'
     '  @keyframes qzSweepS { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 113.1; } }\n'
     '  @keyframes qzSweepL { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 578.1; } }\n'
-    '  @keyframes qzTick { 0% { opacity: .2; transform: scaleX(.8) scale(1.25); } 25% { opacity: 1; transform: scaleX(.8) scale(1); } 100% { transform: scaleX(.8) scale(1); } }\n'
+    '  @keyframes qzTick { 0% { opacity: .2; transform: scale(1.25); } 25% { opacity: 1; transform: scale(1); } 100% { transform: scale(1); } }\n'
     '  @keyframes qzConf { from { translate: 0 0; } to { translate: 4px 10px; rotate: 35deg; } }\n'
     '  @keyframes qzLoad { from { width: 4px; } to { width: 100%; } }\n'
     '  @keyframes fzPushIn {')
