@@ -457,7 +457,7 @@
         </sc-if>
         <!-- Choose your team (FanZone DS 12521:41534) -->
         <sc-if value="{{ fzChoose }}" hint-placeholder-val="{{ false }}">
-          <div role="dialog" aria-label="Choose your team" style="position:absolute;left:0;right:0;top:48px;bottom:0;z-index:6;overflow:hidden;background:radial-gradient(91% 71% at 50% 46%,#191970 0%,#0C161C 100%);animation:fzFadeIn .3s ease;">
+          <div role="dialog" aria-label="Choose your team" style="position:absolute;left:0;right:0;top:48px;bottom:0;z-index:6;overflow:hidden;background:radial-gradient(263px 253px at 50.1% 45.2%,#191970 0%,#0C161C 100%);animation:fzFadeIn .3s ease;">
             <img src="assets/icons/fanzone-logo.svg" alt="FanZone" width="71" height="56" style="position:absolute;left:151px;top:24px;display:block;">
             <button onClick="{{ fzGoNeutral }}" aria-label="Close" title="Close" style="position:absolute;right:12px;top:12px;width:32px;height:32px;border:0;padding:0;border-radius:9999px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="display:block;"><path d="M5 5L15 15M15 5L5 15" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round"></path></svg></button>
             <div style="position:absolute;left:0;right:0;top:{{ fzChooseTop }}px;display:flex;flex-direction:column;align-items:center;">
@@ -474,7 +474,7 @@
                   </div>
                 </sc-for>
               </div>
-              <button onClick="{{ fzGoNeutral }}" style="margin-top:42px;width:127px;height:40px;border:0;border-radius:7.3px;background:rgba(255,255,255,.2);font-family:'DAZN Oscine',sans-serif;font-weight:700;font-size:14px;color:#F9FAFA;cursor:pointer;">Go neutral</button>
+              <button onClick="{{ fzGoNeutral }}" style="margin-top:58px;width:127px;height:40px;border:0;border-radius:7.3px;background:rgba(255,255,255,.2);font-family:'DAZN Oscine',sans-serif;font-weight:700;font-size:14px;color:#F9FAFA;cursor:pointer;">Go neutral</button>
             </div>
           </div>
         </sc-if>
@@ -2657,7 +2657,7 @@ const CHAT_POOL = [
 // GIFs & stickers (Figma "Giphy - Stickers - Dev")
 const GZ = {"gifDefault": [[["assets/gif/g01.jpg", 166], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 166], ["assets/gif/g02.jpg", 124], ["assets/gif/g05.jpg", 166], ["assets/gif/g08.jpg", 125], ["assets/gif/g04.jpg", 166], ["assets/gif/g01.jpg", 124]], [["assets/gif/g02.jpg", 165], ["assets/gif/g04.jpg", 124], ["assets/gif/g08.jpg", 163], ["assets/gif/g05.jpg", 121], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 124], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g01.jpg", 166], ["assets/gif/g05.jpg", 124]]], "gifResult": [[["assets/gif/g05.jpg", 124], ["assets/gif/g06.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g03.jpg", 166], ["assets/gif/g09.jpg", 166], ["assets/gif/g02.jpg", 124], ["assets/gif/g05.jpg", 166], ["assets/gif/g08.jpg", 125], ["assets/gif/g04.jpg", 166], ["assets/gif/g01.jpg", 124]], [["assets/gif/g02.jpg", 165], ["assets/gif/g08.jpg", 163], ["assets/gif/g09.jpg", 166], ["assets/gif/g04.jpg", 121], ["assets/gif/g01.jpg", 166], ["assets/gif/g06.jpg", 166], ["assets/gif/g09.jpg", 124], ["assets/gif/g03.jpg", 166], ["assets/gif/g07.jpg", 125], ["assets/gif/g01.jpg", 166], ["assets/gif/g05.jpg", 124]]], "stickerDefault": ["assets/stickers/s01.png", "assets/stickers/s02.png", "assets/stickers/s03.png", "assets/stickers/s04.png", "assets/stickers/s05.png", "assets/stickers/s06.png", "assets/stickers/s07.png", "assets/stickers/s08.png", "assets/stickers/s09.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png", "assets/stickers/s18.png", "assets/stickers/s09.png", "assets/stickers/s04.png", "assets/stickers/s11.png", "assets/stickers/s02.png", "assets/stickers/s16.png", "assets/stickers/s07.png", "assets/stickers/s13.png", "assets/stickers/s01.png", "assets/stickers/s15.png", "assets/stickers/s06.png", "assets/stickers/s10.png", "assets/stickers/s03.png", "assets/stickers/s17.png", "assets/stickers/s12.png", "assets/stickers/s05.png", "assets/stickers/s14.png", "assets/stickers/s08.png"], "stickerResult": ["assets/stickers/s10.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s15.png", "assets/stickers/s03.png", "assets/stickers/s12.png", "assets/stickers/s16.png", "assets/stickers/s17.png", "assets/stickers/s18.png", "assets/stickers/s10.png", "assets/stickers/s11.png", "assets/stickers/s12.png", "assets/stickers/s15.png", "assets/stickers/s13.png", "assets/stickers/s14.png", "assets/stickers/s16.png", "assets/stickers/s08.png", "assets/stickers/s17.png", "assets/stickers/s08.png", "assets/stickers/s14.png", "assets/stickers/s05.png", "assets/stickers/s12.png", "assets/stickers/s17.png", "assets/stickers/s03.png", "assets/stickers/s10.png", "assets/stickers/s06.png", "assets/stickers/s15.png", "assets/stickers/s01.png", "assets/stickers/s13.png", "assets/stickers/s07.png", "assets/stickers/s16.png", "assets/stickers/s02.png", "assets/stickers/s11.png", "assets/stickers/s04.png", "assets/stickers/s09.png", "assets/stickers/s18.png"]};
 // Choose your team tile (FanZone DS)
-const TILE_STYLE = 'position:relative;width:100px;height:100px;border-radius:22px;overflow:hidden;box-sizing:border-box;border:2px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;background:radial-gradient(130% 55% at 15% -8%,rgba(255,255,255,.22) 0 50%,transparent 51%),radial-gradient(140% 60% at 90% 112%,rgba(0,0,0,.16) 0 50%,transparent 51%),{bg};';
+const TILE_STYLE = 'position:relative;width:100px;height:100px;border-radius:22px;overflow:hidden;box-sizing:border-box;border:2px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;background:radial-gradient(130% 55% at 15% -8%,rgba(0,0,0,.04) 0 50%,transparent 51%),radial-gradient(140% 60% at 90% 112%,rgba(0,0,0,.1) 0 50%,transparent 51%),{bg};';
 // Leaderboard (FanZone DS)
 const LB_TOP = [["Ronen", "assets/leaderboard/medal-2nd.svg", "2nd place", 16, "10", "01:34:35"], ["Guybenita", "assets/leaderboard/medal-1st.svg", "1st place", 130, "10", "01:34:35"], ["Whitepanda", "assets/leaderboard/medal-3rd.svg", "3rd place", 245, "10", "01:34:35"]];
 const LB_ROWS = [["4", "Mariposa", "uploads/11.png", "#DC052D", "10", "01:34:35"], ["5", "Bravewale", "uploads/12.png", "#FDE100", "9", "01:35:03"], ["6", "Briana", "uploads/13.png", "#DC052D", "9", "01:36:53"], ["7", "Carla", "uploads/14.png", "#FDE100", "8", "01:36:13"], ["8", "Michaelb", "uploads/17.png", "#DC052D", "8", "01:36:11"], ["9", "Americanx", "uploads/18.png", "#FDE100", "8", "01:43:11"], ["10", "Rojumi", "uploads/19.png", "#DC052D", "7", "02:12:46"]];
@@ -3254,12 +3254,12 @@ class Component extends DCLogic {
   fzTeamVals() {
     const s = this.state;
     const T = [
-      { id: "bayern", name: "Bayern München", crest: "assets/vec/tiles/img-logo-bayern.svg", bg: "#DC052D" },
-      { id: "bvb", name: "Dortmund", crest: "assets/poll/logo-bvb.png", bg: "#FDE100" },
+      { id: "bayern", name: "Bayern München", crest: "assets/vec/tiles/img-logo-bayern.svg", bg: "#F40101" },
+      { id: "bvb", name: "Dortmund", crest: "assets/poll/logo-bvb.png", bg: "#F4CE00" },
     ];
     return {
       fzChoose: !!s.fzChoose && s.screen === "fanzone" && !s.fzLoading,
-      fzChooseTop: 135,
+      fzChooseTop: 159,
       fzGoNeutral: this.fzGoNeutral, openTeamChooser: this.openTeamChooser,
       fzTeams: T.map((t, i) => ({ ...t, second: i > 0, picked: s.fzTeam === t.id, pick: () => this.pickFzTeam(t.id),
         tileStyle: TILE_STYLE.replace("{bg}", t.bg) })),
