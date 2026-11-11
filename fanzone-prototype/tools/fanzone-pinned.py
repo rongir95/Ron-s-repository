@@ -77,7 +77,7 @@ PANEL = '''        <!-- Pinned image (FanZone DS 12304:59996 closed, 12304:60712
         </sc-if>
 '''
 rep('        <!-- chat feed -->\n', PANEL + '        <!-- chat feed -->\n')
-rep('  @keyframes fzPushIn {', '  @keyframes pinIn { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }\n  @keyframes fzPushIn {')
+rep('  @keyframes fzPushIn {', '  @keyframes pinIn { from { opacity: 0; } to { opacity: 1; } }\n  @keyframes fzPushIn {')
 
 LOGIC = '''  // Pinned image (from the shell)
   pinVals() {
@@ -97,9 +97,10 @@ rep('quiz: !!s.qzPhase }, "*");', 'quiz: !!s.qzPhase, pin: !!s.pinOn }, "*");')
 # if you open the pinned image again, the poll moves down under it.
 rep('<div style="position:absolute;left:0;right:0;top:48px;z-index:2;height:{{ pollClipH }}px;',
     '<div style="position:absolute;left:0;right:0;top:{{ pollTop }}px;z-index:2;height:{{ pollClipH }}px;')
+rep('height:{{ pollClipH }}px;overflow:hidden;pointer-events:none;transition:opacity .25s ease;', 'height:{{ pollClipH }}px;overflow:hidden;pointer-events:none;transition:opacity .25s ease,top .3s cubic-bezier(.22,1,.36,1);')
 rep('      if (d.on) this.pollStart(); else this.pollEnd();',
     '      if (d.on) { if (this.state.pinExpanded) this.setState({ pinExpanded: false }); this.pollStart(); } else this.pollEnd();')
-rep("    return { pinOn: on,", "    return { pollTop: on ? (s.pinExpanded ? 48 + 290 : 48 + 65) : 48, pinOn: on,")
+rep("    return { pinOn: on,", "    return { pollTop: on ? (s.pinExpanded ? 48 + 289 : 48 + 64) : 48, pinOn: on,")
 
 open(PATH, 'w', encoding='utf-8').write(src)
 print('ok')
