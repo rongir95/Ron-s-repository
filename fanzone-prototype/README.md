@@ -56,6 +56,7 @@ Tapping your own avatar opens My Card.
 - `tools/fanzone-quiz.py`: the FanZone quiz, started from the shell (Start quiz): 10s toast, full-panel countdown from 5, three Bayern/Dortmund questions, result, then the leaderboard.
 - `tools/fanzone-pinned.py`: the pinned image (closed / open), started from the shell (Pin image); the banner is HTML/CSS so it stays vector.
 - `tools/fanzone-entry-card.py`: the FanZone card on the match page per FanZone DS "fan-zone" (vector FanZone mark).
+- `tools/home-video.py`: the Home hero plays the match video (muted, looping) instead of a still.
 - `sources/`: the two source prototypes the build starts from (`Personal Fan Card.dc.html`, `Comments & Replies.dc.html`).
 - `build.sh`: rebuilds `FanZone.dc.html` (runs the merge, then the other scripts in the order above).
 

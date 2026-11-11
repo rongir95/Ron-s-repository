@@ -716,7 +716,7 @@
         <div class="fz-scroll" onScroll="{{ onHomeScroll }}" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;">
           <!-- mobile-hero-native (375x564) -->
           <div style="position:relative;width:375px;height:564px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;">
-            <img src="assets/home/hero.jpg" alt="" style="position:absolute;inset:0;width:375px;height:564px;object-fit:cover;display:block;">
+            <video src="assets/video/fixture-bayern-bvb.mp4" poster="assets/home/hero.jpg" ref="{{ heroVidRef }}" autoPlay="{{ true }}" muted="{{ true }}" loop="{{ true }}" playsInline="{{ true }}" preload="auto" aria-hidden="true" style="position:absolute;inset:0;width:375px;height:564px;object-fit:cover;display:block;background:#080E12;"></video>
             <div style="position:relative;width:100%;box-sizing:border-box;padding:0 16px;display:flex;flex-direction:column;align-items:center;gap:8px;">
               <div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;">
                 <div onClick="{{ goFixture }}" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;">
@@ -3343,6 +3343,13 @@ class Component extends DCLogic {
     this._opBackT = setTimeout(() => this.setState({ commentsView: "list", opClosing: false, opSub: null, opSubClosing: false }), 300);
   };
   // ---- fixture player controls ----
+  // muted must be set on the element itself for autoplay to be allowed
+  heroVidRef = (el) => {
+    if (!el || el._hero) return;
+    el._hero = true; el.muted = true; el.defaultMuted = true; el.setAttribute("muted", "");
+    const go = () => { const p = el.play(); if (p && p.catch) p.catch(() => {}); };
+    if (el.readyState >= 2) go(); else el.addEventListener("canplay", go, { once: true });
+  };
   fixVidRef = (el) => {
     this._fixVid = el;
     if (!el) return;
@@ -4729,6 +4736,7 @@ class Component extends DCLogic {
       fzCollapseRot: s.fzCollapsed ? 180 : 0,
       fzPollWrapStyle: s.fzCollapsed ? "opacity:0;visibility:hidden;" : "",
       fixVidRef: this.fixVidRef,
+      heroVidRef: this.heroVidRef,
       onFixTime: this.onFixTime,
       showFixCtrls: this.showFixCtrls,
       hideFixCtrlsSoon: this.hideFixCtrlsSoon,
