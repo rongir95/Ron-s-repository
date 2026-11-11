@@ -193,6 +193,12 @@
   .fz-rx { transition: transform .15s ease; }
   .fz-rx:hover { transform: translateY(-6px) scale(1.18); }
   @keyframes fzFadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes qzToastIn { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
+  @keyframes qzSweepS { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 113.1; } }
+  @keyframes qzSweepL { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 578.1; } }
+  @keyframes qzTick { 0% { opacity: .2; transform: scaleX(.8) scale(1.25); } 25% { opacity: 1; transform: scaleX(.8) scale(1); } 100% { transform: scaleX(.8) scale(1); } }
+  @keyframes qzConf { from { translate: 0 0; } to { translate: 4px 10px; rotate: 35deg; } }
+  @keyframes qzLoad { from { width: 4px; } to { width: 100%; } }
   @keyframes fzPushIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
   @keyframes fzPushOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
 </style>
@@ -515,6 +521,80 @@
                 <span style="flex:1;"></span>
                 <span style="width:42px;font-size:16px;"><b style="font-weight:700;">{{ lbMeGood }}</b>/10</span>
                 <span style="width:61px;margin-left:12px;font-size:16px;text-align:right;">{{ lbMeTime }}</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <!-- Quiz coming up toast (FanZone DS 12930:53666) -->
+        <sc-if value="{{ qzToast }}" hint-placeholder-val="{{ false }}">
+          <div role="status" aria-live="polite" style="position:absolute;left:8px;right:8px;top:56px;z-index:6;height:72px;box-sizing:border-box;padding:12px 16px;border-radius:24px;border:2px solid rgba(249,250,250,.1);
+            background:linear-gradient(100deg,rgba(247,255,26,.44) 0%,rgba(247,255,26,.15) 100%),rgba(36,45,51,.6);-webkit-backdrop-filter:blur(40px);backdrop-filter:blur(40px);
+            display:flex;align-items:center;gap:4px;animation:qzToastIn .4s cubic-bezier(.22,1,.36,1);font-family:'DAZN Oscine',sans-serif;">
+            <span style="position:relative;width:48px;height:48px;flex-shrink:0;">
+              <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true" style="position:absolute;inset:0;display:block;transform:rotate(-90deg);">
+                <circle cx="24" cy="24" r="20" fill="#0C161C"/>
+                <circle cx="24" cy="24" r="18" fill="none" stroke="#3D4549" stroke-width="4"/>
+                <circle cx="24" cy="24" r="18" fill="none" stroke="#F7FF1A" stroke-width="4" stroke-linecap="round" stroke-dasharray="113.1" style="animation:qzSweepS 1s linear infinite;"/>
+              </svg>
+              <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:#F7FF1A;">{{ qzNum }}</span>
+            </span>
+            <span style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+              <span style="font-weight:700;font-size:16px;line-height:1;color:#F7FF1A;">New quiz coming up</span>
+              <span style="font-weight:700;font-size:14px;line-height:1;color:#F9FAFA;">Your chance to win!</span>
+            </span>
+          </div>
+        </sc-if>
+        <!-- Quiz: countdown (12930:51084), questions (12930:52000), results (12930:52826) -->
+        <sc-if value="{{ qzFull }}" hint-placeholder-val="{{ false }}">
+          <div role="dialog" aria-label="Quiz" style="position:absolute;left:0;right:0;top:48px;bottom:0;z-index:8;overflow:hidden;background:linear-gradient(180deg,#141C20 0%,#0B1317 48%,#080E12 77%);animation:fzFadeIn .25s ease;font-family:'DAZN Oscine',sans-serif;">
+            <sc-if value="{{ qzCount }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ closeQuiz }}" aria-label="Close quiz" title="Close" style="position:absolute;right:12px;top:8px;z-index:3;width:31px;height:32px;border:0;padding:0;border-radius:32px;background:rgba(61,69,73,.6);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1.5 1.5l11 11M12.5 1.5l-11 11" stroke="#F9FAFA" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+              <div aria-hidden="true" style="position:absolute;left:0;top:8px;width:375px;height:375px;pointer-events:none;"><span style="position:absolute;left:39px;top:198px;transform:rotate(259deg);animation:qzConf 2.3s ease-in-out 0.4s infinite alternate;"><span style="display:block;width:6px;height:9px;border-radius:1.5px;background:#8E2DE2;"></span></span><span style="position:absolute;left:210px;top:342px;transform:rotate(295deg);animation:qzConf 2.3s ease-in-out 1.2s infinite alternate;"><span style="display:block;width:5px;height:9px;border-radius:1.5px;background:#2ECC71;"></span></span><span style="position:absolute;left:207px;top:57px;transform:rotate(276deg);animation:qzConf 2.6s ease-in-out 0.2s infinite alternate;"><span style="display:block;width:8px;height:9px;border-radius:1.5px;background:#4FC3F7;"></span></span><span style="position:absolute;left:50px;top:210px;transform:rotate(49deg);animation:qzConf 2.3s ease-in-out 1.1s infinite alternate;"><span style="display:block;width:4px;height:4px;border-radius:50%;background:#FFFA00;"></span></span><span style="position:absolute;left:284px;top:173px;transform:rotate(127deg);animation:qzConf 3.2s ease-in-out 1.6s infinite alternate;"><span style="display:block;width:4px;height:4px;border-radius:50%;background:#8E2DE2;"></span></span><span style="position:absolute;left:42px;top:115px;transform:rotate(229deg);animation:qzConf 3.6s ease-in-out 0.6s infinite alternate;"><span style="display:block;width:4px;height:4px;border-radius:50%;background:#4FC3F7;"></span></span><span style="position:absolute;left:338px;top:158px;transform:rotate(285deg);animation:qzConf 3.4s ease-in-out 1.1s infinite alternate;"><span style="display:block;width:6px;height:11px;border-radius:1.5px;background:#2ECC71;"></span></span><span style="position:absolute;left:172px;top:304px;transform:rotate(31deg);animation:qzConf 2.6s ease-in-out 1.5s infinite alternate;"><span style="display:block;width:8px;height:13px;border-radius:1.5px;background:#4FC3F7;"></span></span><span style="position:absolute;left:246px;top:18px;transform:rotate(86deg);animation:qzConf 2.9s ease-in-out 1.2s infinite alternate;"><span style="display:block;width:4px;height:4px;border-radius:50%;background:#4FC3F7;"></span></span><span style="position:absolute;left:281px;top:55px;transform:rotate(200deg);animation:qzConf 2.9s ease-in-out 1.8s infinite alternate;"><svg width="22" height="16" viewBox="0 0 22 16" fill="none" style="display:block;"><path d="M2 12c3-8 6 4 9-4s6 2 9-5" stroke="#FFFA00" stroke-width="3" stroke-linecap="round"/></svg></span><span style="position:absolute;left:62px;top:161px;transform:rotate(212deg);animation:qzConf 3.2s ease-in-out 2.0s infinite alternate;"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#FF7A00;"></span></span><span style="position:absolute;left:346px;top:63px;transform:rotate(118deg);animation:qzConf 2.2s ease-in-out 1.3s infinite alternate;"><span style="display:block;width:8px;height:9px;border-radius:1.5px;background:#FFFA00;"></span></span><span style="position:absolute;left:105px;top:11px;transform:rotate(312deg);animation:qzConf 3.5s ease-in-out 1.1s infinite alternate;"><span style="display:block;width:7px;height:7px;border-radius:50%;background:#4FC3F7;"></span></span><span style="position:absolute;left:312px;top:343px;transform:rotate(233deg);animation:qzConf 3.3s ease-in-out 1.8s infinite alternate;"><span style="display:block;width:8px;height:13px;border-radius:1.5px;background:#2ECC71;"></span></span><span style="position:absolute;left:234px;top:32px;transform:rotate(225deg);animation:qzConf 2.7s ease-in-out 0.3s infinite alternate;"><span style="display:block;width:5px;height:9px;border-radius:1.5px;background:#E8175D;"></span></span><span style="position:absolute;left:14px;top:63px;transform:rotate(314deg);animation:qzConf 3.4s ease-in-out 0.1s infinite alternate;"><span style="display:block;width:7px;height:7px;border-radius:50%;background:#E8175D;"></span></span><span style="position:absolute;left:145px;top:232px;transform:rotate(242deg);animation:qzConf 3.4s ease-in-out 0.2s infinite alternate;"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#FF7A00;"></span></span><span style="position:absolute;left:344px;top:137px;transform:rotate(270deg);animation:qzConf 3.1s ease-in-out 0.6s infinite alternate;"><span style="display:block;width:5px;height:13px;border-radius:1.5px;background:#2ECC71;"></span></span><span style="position:absolute;left:307px;top:191px;transform:rotate(114deg);animation:qzConf 3.3s ease-in-out 1.1s infinite alternate;"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#FFFA00;"></span></span><span style="position:absolute;left:185px;top:266px;transform:rotate(241deg);animation:qzConf 3.2s ease-in-out 0.5s infinite alternate;"><span style="display:block;width:5px;height:5px;border-radius:50%;background:#F9FAFA;"></span></span></div>
+              <div style="position:absolute;left:68px;top:71px;width:240px;height:240px;">
+                <svg width="240" height="240" viewBox="0 0 240 240" aria-hidden="true" style="position:absolute;inset:0;display:block;transform:rotate(-90deg);">
+                  <circle cx="120" cy="120" r="100" fill="#0C161C"/>
+                  <circle cx="120" cy="120" r="92" fill="none" stroke="#3D4549" stroke-width="16"/>
+                  <circle cx="120" cy="120" r="92" fill="none" stroke="#F7FF1A" stroke-width="16" stroke-linecap="round" stroke-dasharray="578.1" style="animation:qzSweepL 1s linear infinite;"/>
+                </svg>
+                <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:128px;line-height:1;color:#F7FF1A;"><span style="display:inline-block;font-weight:800;transform:scaleX(.8);transform-origin:center;animation:qzTick 1s ease-out infinite;">{{ qzNum }}</span></span>
+              </div>
+              <div style="position:absolute;left:16px;right:16px;top:373px;text-align:center;">
+                <div style="font-weight:700;font-size:24px;line-height:28px;color:#F7FF1A;">New quiz is starting</div>
+                <div style="margin-top:4px;font-weight:700;font-size:18px;line-height:24px;color:#F9FAFA;">Your chance to win!</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ qzAsk }}" hint-placeholder-val="{{ false }}">
+              <div style="position:relative;height:40px;background:#1B2326;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:16px;color:#F9FAFA;">
+                <span>Answer 3 questions</span><span style="color:#F7FF1A;font-variant-numeric:tabular-nums;">{{ qzClock }}</span>
+                <button onClick="{{ closeQuiz }}" aria-label="Close quiz" style="position:absolute;right:12px;top:8px;width:24px;height:24px;border:0;padding:0;background:transparent;cursor:pointer;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display:block;"><path d="M6 6l12 12M18 6L6 18" stroke="#F9FAFA" stroke-width="2" stroke-linecap="round"/></svg></button>
+              </div>
+              <div style="padding:16px 16px 0;">
+                <div style="text-align:center;font-weight:700;font-size:16px;line-height:22px;color:#F9FAFA;">{{ qzQuestion }}</div>
+                <div style="margin-top:12px;height:4px;border-radius:2px;background:#3D4549;overflow:hidden;"><span style="display:block;height:100%;width:{{ qzBar }}%;background:#F7FF1A;transition:width .4s ease;"></span></div>
+                <div style="margin-top:8px;display:flex;flex-direction:column;gap:10px;">
+                  <sc-for list="{{ qzAnswers }}" as="a" hint-placeholder-count="4">
+                    <button onClick="{{ a.pick }}" style="height:70px;border-radius:8px;cursor:pointer;box-sizing:border-box;font-family:'DAZN Oscine',sans-serif;font-weight:700;font-size:18px;letter-spacing:.02em;text-transform:uppercase;transition:all .2s ease;{{ a.style }}">{{ a.text }}</button>
+                  </sc-for>
+                </div>
+                <div style="margin-top:14px;display:flex;justify-content:center;">
+                  <span style="display:flex;gap:6px;padding:3px 8px;border-radius:6px;background:#3D4549;font-weight:700;font-size:14px;">
+                    <sc-for list="{{ qzPager }}" as="p" hint-placeholder-count="3"><span style="color:{{ p.color }};">{{ p.n }}</span></sc-for>
+                  </span>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ qzResult }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ closeQuiz }}" aria-label="Close quiz" title="Close" style="position:absolute;right:12px;top:8px;z-index:3;width:31px;height:32px;border:0;padding:0;border-radius:32px;background:rgba(61,69,73,.6);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1.5 1.5l11 11M12.5 1.5l-11 11" stroke="#F9FAFA" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+              <div style="position:absolute;left:0;right:0;top:24px;display:flex;flex-direction:column;align-items:center;">
+                <img src="assets/quiz/trophy.svg" alt="" width="84" height="84" style="display:block;animation:fzRxPop .5s cubic-bezier(.22,1.6,.36,1);">
+                <div style="margin-top:12px;font-size:24px;line-height:28px;color:#F9FAFA;"><span style="display:inline-block;font-weight:800;transform:scaleX(.8);transform-origin:center;">{{ qzTitle }}</span></div>
+                <div style="margin-top:32px;font-size:20px;line-height:24px;color:#CED0D2;"><span style="display:inline-block;font-weight:800;transform:scaleX(.8);transform-origin:center;">You got</span></div>
+                <div style="margin-top:4px;font-size:118px;line-height:1;"><span style="display:inline-block;font-weight:800;transform:scaleX(.8);transform-origin:center;"><span style="color:#5ADC8C;">{{ qzGood }}</span><span style="color:#F9FAFA;">/3</span></span></div>
+                <div style="margin-top:6px;font-size:20px;line-height:24px;color:#F9FAFA;"><span style="display:inline-block;font-weight:800;transform:scaleX(.8);transform-origin:center;">IN {{ qzTime }}</span></div>
+              </div>
+              <div style="position:absolute;left:0;right:0;bottom:46px;display:flex;flex-direction:column;align-items:center;gap:8px;">
+                <span style="display:flex;align-items:center;gap:8px;font-size:16px;color:#F9FAFA;"><img src="assets/quiz/trophy.svg" alt="" width="24" height="24" style="display:block;">Moving to leaderboard</span>
+                <span style="width:240px;height:12px;box-sizing:border-box;padding:2px;border-radius:6px;background:#576065;"><span style="display:block;height:8px;border-radius:4px;background:#F7FF1A;animation:qzLoad 3s linear forwards;"></span></span>
               </div>
             </sc-if>
           </div>
@@ -2464,6 +2544,8 @@ const TILE_STYLE = 'position:relative;width:100px;height:100px;border-radius:22p
 // Leaderboard (FanZone DS)
 const LB_TOP = [["Ronen", "assets/leaderboard/medal-2nd.svg", "2nd place", 16, "10", "01:34:35"], ["Guybenita", "assets/leaderboard/medal-1st.svg", "1st place", 130, "10", "01:34:35"], ["Whitepanda", "assets/leaderboard/medal-3rd.svg", "3rd place", 245, "10", "01:34:35"]];
 const LB_ROWS = [["4", "Mariposa", "uploads/11.png", "#DC052D", "10", "01:34:35"], ["5", "Bravewale", "uploads/12.png", "#FDE100", "9", "01:35:03"], ["6", "Briana", "uploads/13.png", "#DC052D", "9", "01:36:53"], ["7", "Carla", "uploads/14.png", "#FDE100", "8", "01:36:13"], ["8", "Michaelb", "uploads/17.png", "#DC052D", "8", "01:36:11"], ["9", "Americanx", "uploads/18.png", "#FDE100", "8", "01:43:11"], ["10", "Rojumi", "uploads/19.png", "#DC052D", "7", "02:12:46"]];
+// Quiz questions
+const QZ = [{"q": "What is the Bayern v Dortmund fixture called?", "a": ["Der Klassiker", "Revierderby", "El Clásico", "Nordderby"], "c": 0}, {"q": "Which stadium is Bayern München's home?", "a": ["Signal Iduna Park", "Allianz Arena", "Olympiastadion", "Volksparkstadion"], "c": 1}, {"q": "What is Dortmund's famous south stand called?", "a": ["The Kop", "Südkurve", "Die Gelbe Wand", "Curva Sud"], "c": 2}];
 // FanZone chat: which team each fan supports (drives their avatar ring and Fan Card favorite)
 const FZ_FAN_TEAM = {"Ayaka": "bayern", "Hina": "bayern", "Sora": "bayern", "Mei": "bayern", "Aoi": "bayern", "Riku": "bayern", "Nao": "bayern", "Kenji": "bayern", "Rina": "bayern", "Daiki": "bayern", "Sho": "bayern", "Ai": "bvb", "Misaki": "bvb", "Kaito": "bvb", "Ren": "bvb", "Yuki": "bvb", "Haruto": "bvb", "Emi": "bvb", "Taiga": "bvb", "Sana": "bvb", "Yui": "bvb", "Miku": "bvb", "Ryo": "bvb", "Akari": "bvb"};
 // ---------- teams ----------
@@ -2766,6 +2848,7 @@ class Component extends DCLogic {
     this._onShellMsg = (e) => {
       const d = e && e.data;
       if (d && d.fz === "sponsor") { this.setState({ fzSponsorLive: !!d.on }); return; }
+      if (d && d.fz === "quiz") { if (d.on) this.startQuiz(); else this.closeQuiz(); return; }
       if (!d || d.fz !== "poll") return;
       if (d.on) this.pollStart(); else this.pollEnd();
     };
@@ -3083,6 +3166,64 @@ class Component extends DCLogic {
       lbMeTime: "05:19:11",
     };
   }
+  // Quiz (started from the shell): toast 10..6, countdown 5..1, three questions, result, leaderboard
+  startQuiz = () => {
+    if (this.state.screen !== "fanzone") return;
+    this.clearQuiz();
+    this.setState({ qzPhase: "toast", qzLeft: 10, lbOpen: false, fzTyping: false });
+    this._qzTick = setInterval(() => {
+      const left = (this.state.qzLeft || 0) - 1;
+      if (left <= 0) {
+        clearInterval(this._qzTick);
+        this.setState({ qzPhase: "ask", qzQ: 0, qzPick: null, qzGoodN: 0, qzClockS: 60, qzT0: Date.now() });
+        this._qzClock = setInterval(() => this.setState(s => ({ qzClockS: Math.max(0, (s.qzClockS || 0) - 1) })), 1000);
+        return;
+      }
+      this.setState({ qzLeft: left, qzPhase: left <= 5 ? "count" : "toast" });
+    }, 1000);
+  };
+  clearQuiz = () => { clearInterval(this._qzTick); clearInterval(this._qzClock); clearTimeout(this._qzNext); clearTimeout(this._qzEnd); };
+  closeQuiz = () => { this.clearQuiz(); this.setState({ qzPhase: null }); };
+  pickQuiz = (i) => {
+    const s = this.state;
+    if (s.qzPick != null || s.qzPhase !== "ask") return;
+    const good = (s.qzGoodN || 0) + (i === QZ[s.qzQ].c ? 1 : 0);
+    this.setState({ qzPick: i, qzGoodN: good });
+    this._qzNext = setTimeout(() => {
+      if (s.qzQ < QZ.length - 1) { this.setState({ qzQ: s.qzQ + 1, qzPick: null }); return; }
+      clearInterval(this._qzClock);
+      this.setState({ qzPhase: "result", qzMs: Date.now() - (this.state.qzT0 || Date.now()) });
+      this._qzEnd = setTimeout(() => {
+        this.setState({ qzPhase: null, quizDone: true, quizScore: good, quizRank: good === 3 ? "11" : (good === 2 ? "86" : "1,204") });
+        this.openLeaderboard(true);
+      }, 3200);
+    }, 650);
+  };
+  qzVals() {
+    const s = this.state;
+    const on = s.screen === "fanzone" ? s.qzPhase : null;
+    const q = QZ[s.qzQ || 0];
+    const two = (n) => String(Math.max(0, n)).padStart(2, "0");
+    const ms = s.qzMs || 0, sec = Math.floor(ms / 1000);
+    const good = s.qzGoodN || 0;
+    return {
+      qzToast: on === "toast", qzFull: on === "count" || on === "ask" || on === "result",
+      qzCount: on === "count", qzAsk: on === "ask", qzResult: on === "result",
+      qzNum: two(s.qzLeft || 0), closeQuiz: this.closeQuiz,
+      qzClock: "00:" + two(s.qzClockS != null ? s.qzClockS : 60),
+      qzQuestion: q.q, qzBar: Math.round(((s.qzQ || 0) + 1) / QZ.length * 100),
+      qzAnswers: q.a.map((t, i) => {
+        const picked = s.qzPick === i, other = s.qzPick != null && !picked;
+        return { id: (s.qzQ || 0) + "-" + i, text: t, pick: () => this.pickQuiz(i),
+          style: picked ? "border:2px solid #F7FF1A;background:rgba(255,255,255,.12);color:#F9FAFA;"
+               : (other ? "border:2px solid transparent;background:rgba(255,255,255,.06);color:#6D7377;"
+                        : "border:2px solid transparent;background:rgba(255,255,255,.1);color:#F9FAFA;") };
+      }),
+      qzPager: QZ.map((x, i) => ({ id: "p" + i, n: String(i + 1), color: i === (s.qzQ || 0) ? "#F9FAFA" : "#9EA2A4" })),
+      qzTitle: good === 3 ? "A PERFECT GAME" : (good === 2 ? "GREAT GAME" : (good === 1 ? "GOOD TRY" : "BETTER LUCK NEXT TIME")),
+      qzGood: String(good), qzTime: two(Math.floor(sec / 3600)) + ":" + two(Math.floor(sec / 60) % 60) + ":" + two(sec % 60),
+    };
+  }
   openFanZoneOver = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     clearTimeout(this._fzLoadT);
@@ -3195,7 +3336,7 @@ class Component extends DCLogic {
     clearTimeout(this._commentsT);
     this._commentsT = setTimeout(() => this.setState({ commentsOpen: false, commentsClosing: false, commentsView: "list", commentsBack: false, opSub: null, opSubClosing: false }), 280);
   };
-  goHome = () => { this.pollEnd(true); clearTimeout(this._lbT); if (this.state.lbOpen) this.setState({ lbOpen: false, lbLoading: false }); clearTimeout(this._gzT); if (this.state.gzOpen) this.setState({ gzOpen: false, gzExpanded: false, gzQuery: "" }); clearTimeout(this._ftueTimer); this.setState({ screen: this.state.fanzoneFrom === "fixture" ? "fixture" : "home", showFtue: false }); };
+  goHome = () => { this.pollEnd(true); if (this.state.qzPhase) this.closeQuiz(); clearTimeout(this._lbT); if (this.state.lbOpen) this.setState({ lbOpen: false, lbLoading: false }); clearTimeout(this._gzT); if (this.state.gzOpen) this.setState({ gzOpen: false, gzExpanded: false, gzQuery: "" }); clearTimeout(this._ftueTimer); this.setState({ screen: this.state.fanzoneFrom === "fixture" ? "fixture" : "home", showFtue: false }); };
 
   // ---- navigation ----
   animateClose = (cb) => {
@@ -4350,10 +4491,10 @@ class Component extends DCLogic {
       { id: "b04", name: "Bayer 04 Leverkusen", logo: "assets/poll/logo-b04.png", ring: "rgba(255,255,255,0.12)" }
     ];
     // post the screen + poll state to the prototype shell so it can enable its Poll button
-    const report = (s.screen === "fanzone" ? "fanzone" : "other") + "|" + (on && !s.pollClosing ? "on" : "off");
+    const report = (s.screen === "fanzone" ? "fanzone" : "other") + "|" + (on && !s.pollClosing ? "on" : "off") + "|" + (s.qzPhase ? "quiz" : "-");
     if (report !== this._pollReport) {
       this._pollReport = report;
-      setTimeout(() => { try { if (window.parent && window.parent !== window) window.parent.postMessage({ fz: "state", screen: s.screen, poll: on && !s.pollClosing }, "*"); } catch (e) {} }, 0);
+      setTimeout(() => { try { if (window.parent && window.parent !== window) window.parent.postMessage({ fz: "state", screen: s.screen, poll: on && !s.pollClosing, quiz: !!s.qzPhase }, "*"); } catch (e) {} }, 0);
     }
     return {
       pollMounted: on,
@@ -4509,6 +4650,7 @@ class Component extends DCLogic {
     return {
       ...this.crVals(),
       ...this.gzVals(),
+      ...this.qzVals(),
       ...this.lbVals(),
       ...this.fzTeamVals(),
       ...this.fixRxVals(),
