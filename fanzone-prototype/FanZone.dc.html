@@ -2517,7 +2517,7 @@ const OTHER_PROFILES = [
     watched: [{ logo: "assets/others/mw-bvb.png", name: "Borussia Dortmund", sport: "Football" }, { logo: "assets/profile/mw-bundesliga.png", name: "Bundesliga", sport: "Football" }, { logo: "assets/others/mw-ufc.png", name: "UFC", sport: "UFC" }] },
   { name: "Mariana", avatar: "assets/others/av-mariana.png", second: "barcelona", status: "Vamos Argentina! Nervous every single match \uD83D\uDE05", team: "argentina", following: ["barcelona", "mancity"], more: 4,
     interests: ["in_football", "in_laliga", "in_tennis", "in_nba"], watched: ["barcelona", "fifaplus", "laliga"] },
-  { name: "Sandra45", avatar: "", initial: "S", second: "laliga", status: "Here for the chaos, staying for the goals", team: "atletico", following: ["realmadrid", "betis"], more: 2,
+  { name: "Sandra45", avatar: "", initial: "S", second: "laliga", status: "Aúpa Atleti ❤️🤍 Partido a partido", team: "atletico", following: ["realmadrid", "betis"], more: 2,
     interests: ["in_laliga", "in_football", "in_tennis", "in_golf"], watched: ["realmadrid", "laliga", "tennis"] },
   { name: "MisterFotball12", avatar: "assets/others/av-mister.png", second: "laliga", status: "Win or lose, always proud of the team", team: "athletic", following: ["betis", "osasuna"], more: 5,
     interests: ["in_laliga", "in_football", "in_boxing", "in_mma"], watched: ["laliga", "ufc", "jakepaul"] },
@@ -2564,6 +2564,15 @@ function otherProfileView(i) {
   };
 }
 
+// Fan Card status by favorite team
+const TEAM_STATUS = {"bayern": ["Mia san mia ❤️", "Allianz Arena is my second home", "Red and white till I die 🔴⚪", "Another Meisterschale, please 🏆", "Südkurve every home game", "Musiala is a generational talent, fight me", "Klassiker day = best day of the year"], "bvb": ["Echte Liebe 🖤💛", "Gelbe Wand forever", "Black and yellow, through everything 🐝", "Südtribüne is the best stand in the world", "Heja BVB!", "Westfalenstadion gives me goosebumps every time", "This is the year we beat Bayern"], "atletico": ["Aúpa Atleti ❤️🤍", "Partido a partido", "Metropolitano or nowhere"], "athletic": ["Aupa Athletic! 🦁", "San Mamés is my cathedral"]};
+const TEAM_STATUS_GENERIC = ["{team} till the end", "Proud {team} fan, every single match", "My week depends on how {team} plays"];
+function fanStatusFor(teamId, h) {
+  const list = TEAM_STATUS[teamId];
+  if (list) return list[h % list.length];
+  const t = TEAMS[teamId];
+  return t ? TEAM_STATUS_GENERIC[h % TEAM_STATUS_GENERIC.length].replace("{team}", t.name) : STATUS_POOL[h % STATUS_POOL.length];
+}
 const STATUS_POOL = [
   "Firenze in my heart, Viola in my soul \uD83D\uDC9C",
   "Here for the chaos, staying for the goals",
@@ -3051,7 +3060,7 @@ class Component extends DCLogic {
       const t = ids[(h + i * 7 + 3) % ids.length];
       if (t !== favoriteId && following.indexOf(t) < 0) following.push(t);
     }
-    return { name, avatarImg: avatar, favoriteId, following, interests: this.synthInterests(h), mostWatched: this.synthWatched(h), status: STATUS_POOL[h % STATUS_POOL.length] };
+    return { name, avatarImg: avatar, favoriteId, following, interests: this.synthInterests(h), mostWatched: this.synthWatched(h), status: fanStatusFor(favoriteId, h) };
   }
 
   synthWatched(h) {
