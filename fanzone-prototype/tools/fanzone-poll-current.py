@@ -3,8 +3,8 @@
 The prototype shell picks which one Start poll runs: postMessage({ fz: "poll", on: true, kind: "current" | "v2" }).
 
 Current poll per FanZone DS (file NIgPxOlNU4U3sWMRdoE4Qh):
-  12930:48147  arrives collapsed: header (NEW POLL label, segmented timer, chevron) and the question
-  12930:48834  open: three answers, each with an outlined check
+  12930:48147  collapsed (tap the header or the question): header (NEW POLL label, segmented timer, chevron) and the question
+  12930:48834  open (how it arrives): three answers, each with an outlined check
   12930:49542  voted: your answer gets a yellow check and a lighter row; every answer shows its % and bar
   12930:50235  finished: POLL FINISHED label, your answer row turns yellow
 
@@ -143,7 +143,7 @@ rep('      pollMounted: on,', '      pollMounted: on && s.pollKind !== "current"
 rep('      if (d.on) { if (this.state.pinExpanded) this.setState({ pinExpanded: false }); this.pollStart(); } else this.pollEnd();',
     '      if (d.on) { this._pollKind = d.kind === "current" ? "current" : "v2"; if (this.state.pinExpanded) this.setState({ pinExpanded: false }); this.pollStart(); } else this.pollEnd();')
 rep('    this.setState({ pollOn: true, pollClosing: false, pollCollapsed: false, pollVote: null,',
-    '    clearTimeout(this._cpFinT);\n    this.setState({ pollOn: true, pollClosing: false, pollCollapsed: this._pollKind === "current", pollKind: this._pollKind || "v2", cpFinished: false, pollVote: null,')
+    '    clearTimeout(this._cpFinT);\n    this.setState({ pollOn: true, pollClosing: false, pollCollapsed: false, pollKind: this._pollKind || "v2", cpFinished: false, pollVote: null,')
 # Current poll: 30s, then the finished state for 6s
 rep('''      const t = (this.state.pollTime ?? 100) - 100 / 90;
       if (t <= 0) this.pollEnd(); else this.setState({ pollTime: t });''',

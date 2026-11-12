@@ -4979,7 +4979,7 @@ class Component extends DCLogic {
     this.pollClear();
     clearTimeout(this._pollOutT);
     clearTimeout(this._cpFinT);
-    this.setState({ pollOn: true, pollClosing: false, pollCollapsed: this._pollKind === "current", pollKind: this._pollKind || "v2", cpFinished: false, pollVote: null, pollCounts: { fcb: 610, bvb: 420, b04: 317 }, pollPcts: [46, 31, 23], pollTime: 100 });
+    this.setState({ pollOn: true, pollClosing: false, pollCollapsed: false, pollKind: this._pollKind || "v2", cpFinished: false, pollVote: null, pollCounts: { fcb: 610, bvb: 420, b04: 317 }, pollPcts: [46, 31, 23], pollTime: 100 });
     this._pollW = { fcb: 0.45, bvb: 0.33, b04: 0.22 };
     this._pollVotesT = setInterval(() => this.pollBumpVotes(), 1100);
     this._pollPctT = setInterval(() => this.pollShiftPcts(), 2000);
