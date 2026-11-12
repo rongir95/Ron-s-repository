@@ -537,7 +537,7 @@
                   <div style="display:flex;align-items:center;height:40px;margin-top:4px;padding:0 12px;">
                     <span style="width:47px;font-size:16px;color:#F9FAFA;">{{ r.rank }}</span>
                     <span onClick="{{ r.open }}" role="button" aria-label="Open {{ r.name }}'s card" style="cursor:pointer;margin-left:12px;width:24px;height:24px;border-radius:50%;flex-shrink:0;box-sizing:border-box;border:1.5px solid transparent;padding:1.5px;background:linear-gradient(#080E12,#080E12) padding-box,{{ r.ring }} border-box;">
-                      <span style="display:block;width:18px;height:18px;border-radius:50%;overflow:hidden;"><img src="{{ r.avatar }}" alt="" style="display:block;width:18px;height:18px;object-fit:cover;transform:scale(1.207);"></span>
+                      <span style="display:block;width:18px;height:18px;border-radius:50%;overflow:hidden;"><img src="{{ r.avatar }}" alt="" style="display:block;width:18px;height:18px;object-fit:cover;transform:scale(1.25);clip-path:circle(40%);"></span>
                     </span>
                     <span style="margin-left:8px;flex:1;min-width:0;display:flex;"><span onClick="{{ r.open }}" style="cursor:pointer;font-weight:700;font-size:16px;color:#F9FAFA;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.name }}</span></span>
                     <span style="width:42px;font-size:16px;color:#F9FAFA;"><b style="color:#5ADC8C;font-weight:700;">{{ r.good }}</b>/10</span>
@@ -3592,12 +3592,12 @@ class Component extends DCLogic {
     const on = !!s.rxList && s.screen === "fixture";
     const R = (ids) => ids.map(id => ({ id, src: "assets/reactions/" + id + ".png" }));
     const rows = RX_FANS.map(([name, avatar, ring, rx]) => ({ id: name, name, avatar, ring, hasImg: !!avatar, noImg: !avatar,
-      initial: name.charAt(0), scale: /(^|\/)uploads\//.test(avatar) ? "transform:scale(1.207);" : "", rx: R(rx) }));
+      initial: name.charAt(0), scale: /(^|\/)uploads\//.test(avatar) ? "transform:scale(1.25);clip-path:circle(40%);" : "", rx: R(rx) }));
     if (s.fixRx) {
       const av = s.avatar && AV_MAP[s.avatar] && AV_MAP[s.avatar].src ? AV_MAP[s.avatar].src : "";
       const fav = s.favoriteId ? teamById(s.favoriteId) : null;
       rows.unshift({ id: "me", name: (s.nickname || "Charlie") + " (you)", avatar: av, ring: fav ? fav.card : "linear-gradient(210deg,#8923A0 0%,#F1A322 38%,#FFFA00 100%)",
-        hasImg: !!av, noImg: !av, initial: String(s.nickname || "C").charAt(0).toUpperCase(), scale: /(^|\/)uploads\//.test(av) ? "transform:scale(1.207);" : "", rx: R([s.fixRx]) });
+        hasImg: !!av, noImg: !av, initial: String(s.nickname || "C").charAt(0).toUpperCase(), scale: /(^|\/)uploads\//.test(av) ? "transform:scale(1.25);clip-path:circle(40%);" : "", rx: R([s.fixRx]) });
     }
     return { rxListOn: on, openRxList: this.openRxList, closeRxList: this.closeRxList,
       rxListLoading: on && !!s.rxListLoading, rxListReady: on && !s.rxListLoading, rxListRows: rows };
@@ -5131,7 +5131,7 @@ class Component extends DCLogic {
       isInitial: !!a.initial, notInitial: !a.initial,
       initialLetter: vInitial,
       selected: s.dAvatar === a.id,
-      scaleStyle: /(^|\/)uploads\//.test(a.src || "") ? "transform:scale(1.207);" : "",
+      scaleStyle: /(^|\/)uploads\//.test(a.src || "") ? "transform:scale(1.25);clip-path:circle(40%);" : "",
       pressed: s.dAvatar === a.id ? "true" : "false",
       onTap: () => this.pickAvatar(a.id),
     }));
@@ -5226,7 +5226,7 @@ class Component extends DCLogic {
         const p = this.synthProfile(m.name, m.avatar);
         const t = teamById(p.favoriteId);
         // my messages: the same ring as my avatar next to the Message field (my favorite team, or the default gradient)
-        const fzAv = { hasImg: !!m.avatar, noImg: !m.avatar, initial: String(m.name || "?").charAt(0).toUpperCase(), imgScale: /(^|\/)uploads\//.test(m.avatar || "") ? "transform:scale(1.207);" : "" };
+        const fzAv = { hasImg: !!m.avatar, noImg: !m.avatar, initial: String(m.name || "?").charAt(0).toUpperCase(), imgScale: /(^|\/)uploads\//.test(m.avatar || "") ? "transform:scale(1.25);clip-path:circle(40%);" : "" };
         if (m.mine) { const myFav = s.favoriteId ? teamById(s.favoriteId) : null; return { ...m, ...fzAv, ring: myFav ? myFav.card : "linear-gradient(210deg,#8923A0 0%,#F1A322 38%,#FFFA00 100%)", onOpen: this.openCard, onPress: null }; }
         return { ...m, ...fzAv, text: this.lightText(m), ring: t ? t.card : "#F2C400", onOpen: () => this.openUserCard(m), onPress: (e) => this.msgPressStart(m, t ? t.card : "#F2C400", fzAv) };
       }),
@@ -5519,7 +5519,7 @@ class Component extends DCLogic {
       cardInitial: vInitial,
       hasAvatarImg, noAvatarImg: !hasAvatarImg,
       avatarImg: vAvatarImg || "",
-      avatarImgScale: /(^|\/)uploads\//.test(vAvatarImg || "") ? "transform:scale(1.207);" : "",
+      avatarImgScale: /(^|\/)uploads\//.test(vAvatarImg || "") ? "transform:scale(1.25);clip-path:circle(40%);" : "",
       showPencil: isMe,
       showAvatarPlus: isMe && !hasAvatarImg,
       showAvatarPencil: isMe && hasAvatarImg,

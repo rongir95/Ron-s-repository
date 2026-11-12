@@ -70,7 +70,7 @@ src = src[:start] + block + src[end:]
 
 # every picture fills the same circle (uploads/* carry a transparent margin)
 rep('      scaleStyle: "",\n      innerSizeStyle: s.dAvatar === a.id ? "width:84%;height:84%;" : "width:84%;height:84%;",',
-    '      scaleStyle: /(^|\\/)uploads\\//.test(a.src || "") ? "transform:scale(1.207);" : "",\n      pressed: s.dAvatar === a.id ? "true" : "false",')
+    '      scaleStyle: /(^|\\/)uploads\\//.test(a.src || "") ? "transform:scale(1.25);clip-path:circle(40%);" : "",\n      pressed: s.dAvatar === a.id ? "true" : "false",')
 
 open(PATH, 'w', encoding='utf-8').write(src)
 print('ok')

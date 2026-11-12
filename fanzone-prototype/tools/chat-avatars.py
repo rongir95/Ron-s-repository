@@ -35,7 +35,7 @@ rep('                  <img src="{{ m.avatar }}" alt="" style="display:block;wid
 # ---------------------------------------------------------------- data
 rep("        if (m.mine) { const myFav = s.favoriteId ? teamById(s.favoriteId) : null; return { ...m, ring: myFav ? myFav.card : \"linear-gradient(210deg,#8923A0 0%,#F1A322 38%,#FFFA00 100%)\", imgScale: \"\", onOpen: this.openCard }; }\n"
     "        return { ...m, ring: t ? t.card : \"#F2C400\", imgScale: \"transform:scale(1.05);\", onOpen: () => this.openUserCard(m) };",
-    "        const fzAv = { hasImg: !!m.avatar, noImg: !m.avatar, initial: String(m.name || \"?\").charAt(0).toUpperCase(), imgScale: /(^|\\/)uploads\\//.test(m.avatar || \"\") ? \"transform:scale(1.207);\" : \"\" };\n"
+    "        const fzAv = { hasImg: !!m.avatar, noImg: !m.avatar, initial: String(m.name || \"?\").charAt(0).toUpperCase(), imgScale: /(^|\\/)uploads\\//.test(m.avatar || \"\") ? \"transform:scale(1.25);clip-path:circle(40%);\" : \"\" };\n"
     "        if (m.mine) { const myFav = s.favoriteId ? teamById(s.favoriteId) : null; return { ...m, ...fzAv, ring: myFav ? myFav.card : \"linear-gradient(210deg,#8923A0 0%,#F1A322 38%,#FFFA00 100%)\", onOpen: this.openCard }; }\n"
     "        return { ...m, ...fzAv, ring: t ? t.card : \"#F2C400\", onOpen: () => this.openUserCard(m) };")
 # my messages: my chosen avatar, else my initial
@@ -45,7 +45,7 @@ rep('const av = s.avatar && AV_MAP[s.avatar] && AV_MAP[s.avatar].src ? AV_MAP[s.
 # avatar sits at the same size inside its ring whichever file it comes from (was: a fixed 1.16 zoom in the card,
 # none by the Message field)
 rep('      avatarImgScale: "transform:scale(1.16);",',
-    '      avatarImgScale: /(^|\\/)uploads\\//.test(vAvatarImg || "") ? "transform:scale(1.207);" : "",')
+    '      avatarImgScale: /(^|\\/)uploads\\//.test(vAvatarImg || "") ? "transform:scale(1.25);clip-path:circle(40%);" : "",')
 rep('<img src="{{ avatarImg }}" alt="your avatar" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">',
     '<img src="{{ avatarImg }}" alt="your avatar" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;{{ avatarImgScale }}">')
 

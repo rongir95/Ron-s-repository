@@ -102,7 +102,7 @@ PANEL = '''        <!-- Leaderboard (FanZone DS 12304:62639 empty / loading, 129
                   <div style="display:flex;align-items:center;height:40px;margin-top:4px;padding:0 12px;">
                     <span style="width:47px;font-size:16px;color:#F9FAFA;">{{ r.rank }}</span>
                     <span onClick="{{ r.open }}" role="button" aria-label="Open {{ r.name }}'s card" style="cursor:pointer;margin-left:12px;width:24px;height:24px;border-radius:50%;flex-shrink:0;box-sizing:border-box;border:1.5px solid transparent;padding:1.5px;background:linear-gradient(#080E12,#080E12) padding-box,{{ r.ring }} border-box;">
-                      <span style="display:block;width:18px;height:18px;border-radius:50%;overflow:hidden;"><img src="{{ r.avatar }}" alt="" style="display:block;width:18px;height:18px;object-fit:cover;transform:scale(1.207);"></span>
+                      <span style="display:block;width:18px;height:18px;border-radius:50%;overflow:hidden;"><img src="{{ r.avatar }}" alt="" style="display:block;width:18px;height:18px;object-fit:cover;transform:scale(1.25);clip-path:circle(40%);"></span>
                     </span>
                     <span style="margin-left:8px;flex:1;min-width:0;display:flex;"><span onClick="{{ r.open }}" style="cursor:pointer;font-weight:700;font-size:16px;color:#F9FAFA;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.name }}</span></span>
                     <span style="width:42px;font-size:16px;color:#F9FAFA;"><b style="color:#5ADC8C;font-weight:700;">{{ r.good }}</b>/10</span>

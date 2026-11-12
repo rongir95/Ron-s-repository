@@ -92,12 +92,12 @@ LOGIC = '''  // Who reacted (match page)
     const on = !!s.rxList && s.screen === "fixture";
     const R = (ids) => ids.map(id => ({ id, src: "assets/reactions/" + id + ".png" }));
     const rows = RX_FANS.map(([name, avatar, ring, rx]) => ({ id: name, name, avatar, ring, hasImg: !!avatar, noImg: !avatar,
-      initial: name.charAt(0), scale: /(^|\\/)uploads\\//.test(avatar) ? "transform:scale(1.207);" : "", rx: R(rx) }));
+      initial: name.charAt(0), scale: /(^|\\/)uploads\\//.test(avatar) ? "transform:scale(1.25);clip-path:circle(40%);" : "", rx: R(rx) }));
     if (s.fixRx) {
       const av = s.avatar && AV_MAP[s.avatar] && AV_MAP[s.avatar].src ? AV_MAP[s.avatar].src : "";
       const fav = s.favoriteId ? teamById(s.favoriteId) : null;
       rows.unshift({ id: "me", name: (s.nickname || "Charlie") + " (you)", avatar: av, ring: fav ? fav.card : "linear-gradient(210deg,#8923A0 0%,#F1A322 38%,#FFFA00 100%)",
-        hasImg: !!av, noImg: !av, initial: String(s.nickname || "C").charAt(0).toUpperCase(), scale: /(^|\\/)uploads\\//.test(av) ? "transform:scale(1.207);" : "", rx: R([s.fixRx]) });
+        hasImg: !!av, noImg: !av, initial: String(s.nickname || "C").charAt(0).toUpperCase(), scale: /(^|\\/)uploads\\//.test(av) ? "transform:scale(1.25);clip-path:circle(40%);" : "", rx: R([s.fixRx]) });
     }
     return { rxListOn: on, openRxList: this.openRxList, closeRxList: this.closeRxList,
       rxListLoading: on && !!s.rxListLoading, rxListReady: on && !s.rxListLoading, rxListRows: rows };
