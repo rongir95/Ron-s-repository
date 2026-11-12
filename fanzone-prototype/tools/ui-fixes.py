@@ -14,6 +14,10 @@
   - Fan Card reveal: after the loading skeleton the whole card appears at once (one short fade), instead of
     the avatar, name, team and rows coming in one after another.
 
+  - Comments: every author's avatar and name opens their card (comments and replies), not just the four with a
+    ready-made profile. Authors without one get a generated profile: Bayern or Dortmund fan, a status that fits
+    the team, their picture or initial.
+
 Run after the other scripts:  python3 tools/ui-fixes.py FanZone.dc.html
 """
 import sys
@@ -53,6 +57,28 @@ if not m:
     raise SystemExit('card reveal animations not found')
 src = src[:m.start()] + ('  @keyframes fzCardIn { from { opacity: 0; } to { opacity: 1; } }\n'
     '  .fz-r-avatar, .fz-r-glow, .fz-r-name, .fz-r-bubble, .fz-r-team, .fz-r-int, .fz-r-chips, .fz-r-mwt, .fz-r-row, .fz-r-wash { animation: fzCardIn .25s ease both; }\n') + src[m.end():]
+
+rep("        avatarStyle: Object.assign(this.crAvFull(item.ai, isReply, item.mine ? 'assets/comments/avin.png' : item.img), (!isReply && (item.profileIdx!=null || item.mine)) ? { cursor:'pointer' } : {}),",
+    "        avatarStyle: Object.assign(this.crAvFull(item.ai, isReply, item.mine ? 'assets/comments/avin.png' : item.img), { cursor:'pointer' }),")
+rep("        authorStyle: { color:'#B3B9BB', fontSize:'13px', fontWeight:700, cursor: (!isReply && (item.profileIdx!=null || item.mine)) ? 'pointer' : 'default' },",
+    "        authorStyle: { color:'#B3B9BB', fontSize:'13px', fontWeight:700, cursor:'pointer' },")
+rep("        onProfile: (e)=>{ if(isReply) return; if(item.profileIdx!=null) this.openOtherProfile(item.profileIdx, e); else if(item.mine) this.openCardFromComments(e); },",
+    "        onProfile: (e)=>{ if(item.mine) { this.openCardFromComments(e); return; } this.openOtherProfile(item.profileIdx!=null ? item.profileIdx : this.crProfileFor(item), e); },")
+rep('  openOtherProfile = (i, e) => {', '''  // a Fan Card profile for any comment author (made once per name)
+  crProfileFor = (item) => {
+    const name = item.author || item.name || "Fan";
+    let i = OTHER_PROFILES.findIndex(p => p.name === name);
+    if (i >= 0) return i;
+    let h = 0; for (let k = 0; k < name.length; k++) h = (h * 31 + name.charCodeAt(k)) >>> 0;
+    const team = h % 2 ? "bayern" : "bvb";
+    const img = item.img ? (item.img.indexOf("/") >= 0 ? item.img : "assets/avatars/" + item.img + ".png") : "";
+    const F = ["barcelona", "realmadrid", "mancity", "chelsea", "juventus", "inter"];
+    OTHER_PROFILES.push({ name, avatar: img, initial: img ? "" : name.charAt(0).toUpperCase(), second: "bundesliga", status: fanStatusFor(team, h), team,
+      following: [F[h % F.length], F[(h >> 3) % F.length] === F[h % F.length] ? F[(h + 1) % F.length] : F[(h >> 3) % F.length]], more: 1 + (h % 5),
+      interests: ["in_bundesliga", "in_football", "in_tennis", "in_nba"], watched: ["laliga", "ufc", "tennis"] });
+    return OTHER_PROFILES.length - 1;
+  };
+  openOtherProfile = (i, e) => {''')
 
 open(PATH, 'w', encoding='utf-8').write(src)
 print('ok')
