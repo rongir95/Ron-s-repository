@@ -63,6 +63,8 @@
   .live { display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
   .live .label { display: flex; align-items: center; gap: 7px; }
   .live .label::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--live); }
+  .poll-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .poll-pair .live-btn { padding: 11px 8px; white-space: nowrap; }
   .live-btn { border: 1px solid transparent; border-radius: 10px; padding: 11px 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--primary); color: var(--on-primary); }
   .live-btn:hover:not(:disabled) { background: #ffffff; }
   .live-btn:disabled { background: transparent; border-color: var(--line-strong); color: var(--muted); cursor: not-allowed; }
@@ -146,6 +148,7 @@
 
     <div class="live">
       <span class="label">Live moments</span>
+      <div class="poll-pair">
       <button type="button" class="live-btn" id="pollBtn" data-kind="current" aria-pressed="false" disabled>
         <svg width="18" height="18" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><rect x="25" y="16.7" width="39.3" height="16.7" rx="4"></rect><rect x="25" y="41.7" width="50" height="16.7" rx="4"></rect><rect x="25" y="66.7" width="21.4" height="16.7" rx="4"></rect></svg>
         <span id="pollBtnText">Current poll</span>
@@ -154,6 +157,7 @@
         <svg width="18" height="18" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><rect x="25" y="16.7" width="39.3" height="16.7" rx="4"></rect><rect x="25" y="41.7" width="50" height="16.7" rx="4"></rect><rect x="25" y="66.7" width="21.4" height="16.7" rx="4"></rect></svg>
         <span id="pollV2BtnText">Poll V2</span>
       </button>
+      </div>
       <button type="button" class="live-btn" id="quizBtn" aria-pressed="false" disabled>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2-2.4 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.9" r="1.2" fill="currentColor"/></svg>
         <span id="quizBtnText">Start quiz</span>
@@ -391,7 +395,7 @@
       var mine = pollOn && pollKind === x[1];
       x[0].disabled = !inFanZone || (pollOn && !mine);
       x[0].setAttribute("aria-pressed", String(mine));
-      x[0].querySelector("span").textContent = mine ? "End " + (x[1] === "v2" ? "Poll V2" : "current poll") : x[2];
+      x[0].querySelector("span").textContent = mine ? "End poll" : x[2];
     });
     pollMini.disabled = !inFanZone;
     pollMini.setAttribute("aria-pressed", String(pollOn));
