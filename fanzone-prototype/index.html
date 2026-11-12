@@ -63,6 +63,10 @@
   .live { display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
   .live .label { display: flex; align-items: center; gap: 7px; }
   .live .label::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--live); }
+  .poll-kind { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border: 1px solid var(--line-strong); border-radius: 10px; }
+  .poll-kind button { border: 0; border-radius: 7px; padding: 7px 8px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; background: transparent; color: var(--muted); }
+  .poll-kind button[aria-checked="true"] { background: var(--raise); color: var(--text); }
+  .poll-kind button:disabled { cursor: not-allowed; opacity: .55; }
   .live-btn { border: 1px solid transparent; border-radius: 10px; padding: 11px 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--primary); color: var(--on-primary); }
   .live-btn:hover:not(:disabled) { background: #ffffff; }
   .live-btn:disabled { background: transparent; border-color: var(--line-strong); color: var(--muted); cursor: not-allowed; }
@@ -146,6 +150,10 @@
 
     <div class="live">
       <span class="label">Live moments</span>
+      <div class="poll-kind" role="radiogroup" aria-label="Poll type">
+        <button type="button" role="radio" data-kind="current" aria-checked="true">Current poll</button>
+        <button type="button" role="radio" data-kind="v2" aria-checked="false">Poll V2</button>
+      </div>
       <button type="button" class="live-btn" id="pollBtn" aria-pressed="false" disabled>
         <svg width="18" height="18" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><rect x="25" y="16.7" width="39.3" height="16.7" rx="4"></rect><rect x="25" y="41.7" width="50" height="16.7" rx="4"></rect><rect x="25" y="66.7" width="21.4" height="16.7" rx="4"></rect></svg>
         <span id="pollBtnText">Start poll</span>
@@ -245,7 +253,7 @@
         <li><span class="n">2</span><div><b>Open FanZone.</b> <span>Tap Watch now. The match page opens and FanZone opens over it by itself. Close it with X; the FanZone card on the match page opens it again.</span></div></li>
         <li><span class="n">3</span><div><b>Chat in FanZone.</b> <span>Tap the Message field, type, and press Enter or the send button. Your message appears in the chat with your name and avatar.</span></div></li>
         <li><span class="n">4</span><div><b>Collapse FanZone.</b> <span>Tap the arrow next to the FanZone title to slide the panel down and see the match page; tap it again to bring it back.</span></div></li>
-        <li><span class="n">5</span><div><b>Vote in a live poll.</b> <span>In FanZone, press Start poll. It slides down under the FanZone header. Pick a team to see the results; the arrow collapses the poll.</span></div></li>
+        <li><span class="n">5</span><div><b>Vote in a live poll.</b> <span>In FanZone, choose Current poll or Poll V2, then press Start poll. Current poll arrives collapsed: tap it to open, vote for a player, and watch the timer run out to the finished state. Poll V2 slides down with the teams; the arrow collapses it.</span></div></li>
         <li><span class="n">6</span><div><b>Join the comments.</b> <span>On the match page, tap Comments. View replies, reply, post a comment, and long-press the heart for more reactions.</span></div></li>
         <li><span class="n">7</span><div><b>Meet other fans.</b> <span>In Comments, tap Futcrunch, Mariana, Sandra45 or MisterFotball12 to open their Fan Card. Tap your own avatar to open yours.</span></div></li>
         <li><span class="n">8</span><div><b>Manage your comments.</b> <span>Long-press your comment to delete it, or someone else's to report it.</span></div></li>
@@ -385,11 +393,19 @@
     [pollBtn, pollMini].forEach(function (b) { b.disabled = !inFanZone; b.setAttribute("aria-pressed", String(pollOn)); });
     document.getElementById("pollBtnText").textContent = label;
     pollMini.textContent = label;
+    if (typeof paintKind === "function" && kindBtns) paintKind();
   }
   function togglePoll() {
     if (!inFanZone) return;
-    try { frame.contentWindow.postMessage({ fz: "poll", on: !pollOn }, "*"); } catch (e) {}
+    try { frame.contentWindow.postMessage({ fz: "poll", on: !pollOn, kind: pollKind }, "*"); } catch (e) {}
   }
+  // which poll Start poll runs: Current poll or Poll V2 (locked while a poll runs)
+  var pollKind = "current";
+  try { var savedKind = localStorage.getItem("fzPollKind"); if (savedKind === "v2" || savedKind === "current") pollKind = savedKind; } catch (e) {}
+  var kindBtns = Array.prototype.slice.call(document.querySelectorAll(".poll-kind button"));
+  function paintKind() { kindBtns.forEach(function (b) { b.setAttribute("aria-checked", String(b.dataset.kind === pollKind)); b.disabled = pollOn; }); }
+  kindBtns.forEach(function (b) { b.addEventListener("click", function () { if (pollOn) return; pollKind = b.dataset.kind; try { localStorage.setItem("fzPollKind", pollKind); } catch (e) {} paintKind(); }); });
+  paintKind();
   pollBtn.addEventListener("click", togglePoll);
   pollMini.addEventListener("click", togglePoll);
   window.addEventListener("message", function (e) {
