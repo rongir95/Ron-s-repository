@@ -145,7 +145,7 @@ ROWS = [("4", "Mariposa", "uploads/11.png", "#DC052D", "10", "01:34:35"),
 LOGIC = '''  // Leaderboard (trophy in the FanZone header)
   openLeaderboard = (afterQuiz) => {
     clearTimeout(this._lbT);
-    const loading = !!(afterQuiz || this.state.quizDone);
+    const loading = true; // the trophy always loads the full board (skeleton first)
     this.setState({ lbOpen: true, lbLoading: loading, fzTyping: false });
     if (loading) this._lbT = setTimeout(() => this.setState({ lbLoading: false }), 1200);
   };
@@ -157,11 +157,11 @@ LOGIC = '''  // Leaderboard (trophy in the FanZone header)
   lbVals() {
     const s = this.state;
     const open = !!s.lbOpen && s.screen === "fanzone";
-    const loaded = !!s.quizDone && !s.lbLoading;
+    const loaded = !s.lbLoading;
     return {
       lbOpen: open, toggleLeaderboard: this.toggleLeaderboard,
       lbPressed: open ? "true" : "false", lbBtnBg: open ? "#F9FAFA" : "transparent", lbIconStyle: open ? "filter:brightness(0);" : "",
-      lbSkeleton: !loaded, lbLoaded: loaded, lbEmpty: !s.quizDone, lbLoading: !!s.quizDone && !!s.lbLoading,
+      lbSkeleton: !loaded, lbLoaded: loaded, lbEmpty: false, lbLoading: !!s.lbLoading,
       lbTop: LB_TOP.map(([name, medal, place, x, good, time]) => ({ id: place, name, medal, place, x, good, time, open: () => this.openUserCard({ name, avatar: "" }) })),
       lbRows: LB_ROWS.map(([rank, name, avatar, ring, good, time]) => ({ id: rank, rank, name, avatar, ring, good, time, open: () => this.openUserCard({ name, avatar }) })),
       lbMeRank: s.quizScore != null ? String(s.quizRank || "4,568") : "4,568",

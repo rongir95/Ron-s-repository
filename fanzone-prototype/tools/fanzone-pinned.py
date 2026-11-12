@@ -46,11 +46,10 @@ def banner(scale_style=''):
             'text-shadow:0 3px 0 rgba(0,0,0,.35);">Welcome to<br>FanZone!</div></div>')
 
 HOST = ('<div style="display:flex;align-items:center;gap:6px;height:24px;">'
-        '<span style="width:24px;height:24px;border-radius:50%;flex-shrink:0;box-sizing:border-box;border:1.5px solid transparent;padding:1.5px;'
-        'background:linear-gradient(#242D33,#242D33) padding-box,#F7FF1A border-box;">'
-        '<span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#080E12;color:#F9FAFA;font-weight:700;font-size:11px;">R</span></span>'
-        '<span style="font-weight:700;font-size:14px;color:#F9FAFA;">Reut</span>'
-        '<span style="padding:2px 6px;border-radius:999px;background:rgba(255,250,0,.2);color:#FFFA00;font-weight:700;font-size:12px;line-height:13px;">Host</span>'
+        # host avatar per FanZone DS 12930:56751: DAZN logo on yellow, gradient ring (vector)
+        '<img src="assets/pinned/host-avatar.svg" alt="" width="24" height="24" style="display:block;flex-shrink:0;">'
+        '<span style="font-weight:700;font-size:14px;line-height:20px;color:#F9FAFA;">Reut</span>'
+        '<span style="padding:2px 6px;border-radius:999px;background:rgba(255,250,0,.2);color:#FFFA00;font-weight:800;font-size:12px;line-height:13px;text-transform:uppercase;">Host</span>'
         '<span style="flex:1;"></span><img src="assets/pinned/pin.svg" alt="Pinned" width="24" height="24" style="display:block;"></div>')
 
 PANEL = '''        <!-- Pinned image (FanZone DS 12304:59996 closed, 12304:60712 open) -->
