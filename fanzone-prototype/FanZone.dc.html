@@ -216,6 +216,8 @@
   @keyframes gaBeat { 0%, 22%, 84%, 100% { transform: none; } 30%, 44%, 58%, 72% { transform: scale(.86, .9); } 37%, 51%, 65%, 79% { transform: scale(1.1); } }
   @keyframes gaLaunch { 0%, 22%, 84%, 100% { transform: none; } 32% { transform: translateY(8px) scale(1.05, .92); } 42%, 70% { transform: translateY(-14px) rotate(3deg); } 56% { transform: translateY(-18px) rotate(-3deg); } }
   @keyframes gaSpark { 0% { transform: rotate(var(--a)) translateY(0) scale(.4); opacity: 0; } 15% { opacity: 1; } 100% { transform: rotate(var(--a)) translateY(-150px) scale(1); opacity: 0; } }
+  @keyframes fzFlyUp { 0% { transform: translateY(0) scale(.6); opacity: 0; } 8% { transform: translateY(-46px) scale(1.15); opacity: 1; } 16% { transform: translateY(-58px) scale(1); opacity: 1; } 55% { opacity: .9; } 100% { transform: translateY(calc(-1 * var(--rise))) scale(.35); opacity: 0; } }
+  @keyframes fzFlySway { 0%, 16% { transform: none; } 40% { transform: translateX(var(--sway)) rotate(6deg); } 65% { transform: translateX(calc(-1 * var(--sway))) rotate(-6deg); } 100% { transform: translateX(calc(var(--sway) / 2)); } }
   @keyframes fzPushIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
   @keyframes fzPushOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
 </style>
@@ -791,7 +793,13 @@
           <div style="flex-shrink:0;display:flex;align-items:flex-start;padding:4px 8px 0;height:76px;box-sizing:border-box;background:#0C161C;--g1:{{ fbG1 }};--g2:{{ fbG2 }};--g3:{{ fbG3 }};animation:fbRowIn .35s cubic-bezier(.22,1,.36,1);"><button class="fb-gift" onClick="{{ fbGift5 }}" aria-label="Send 5 coins" style="width:64px;flex-shrink:0;border:0;padding:4px 0 0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;"><img src="assets/gifts/{{ fbGiftColor }}-finger.png" alt="" width="56" height="48" draggable="false" style="display:block;"><span style="display:flex;align-items:center;gap:4px;font-family:'DAZN Oscine',sans-serif;font-size:12px;color:#F9FAFA;">5<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="display:block;"><circle cx="6" cy="6" r="5" fill="#F1A322"/><circle cx="6" cy="6" r="4.3" fill="#FFD23A"/><path d="M6.6 2.9 3.9 6.4h2.2l-.7 2.7 2.7-3.5H5.9z" fill="#F1A322"/></svg></span></button><button class="fb-gift" onClick="{{ fbGift10 }}" aria-label="Send 10 coins" style="width:64px;flex-shrink:0;border:0;padding:4px 0 0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;"><img src="assets/gifts/{{ fbGiftColor }}-flag.png" alt="" width="56" height="48" draggable="false" style="display:block;"><span style="display:flex;align-items:center;gap:4px;font-family:'DAZN Oscine',sans-serif;font-size:12px;color:#F9FAFA;">10<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="display:block;"><circle cx="6" cy="6" r="5" fill="#F1A322"/><circle cx="6" cy="6" r="4.3" fill="#FFD23A"/><path d="M6.6 2.9 3.9 6.4h2.2l-.7 2.7 2.7-3.5H5.9z" fill="#F1A322"/></svg></span></button><button class="fb-gift" onClick="{{ fbGift50 }}" aria-label="Send 50 coins" style="width:64px;flex-shrink:0;border:0;padding:4px 0 0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;"><img src="assets/gifts/{{ fbGiftColor }}-horn.png" alt="" width="56" height="48" draggable="false" style="display:block;"><span style="display:flex;align-items:center;gap:4px;font-family:'DAZN Oscine',sans-serif;font-size:12px;color:#F9FAFA;">50<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="display:block;"><circle cx="6" cy="6" r="5" fill="#F1A322"/><circle cx="6" cy="6" r="4.3" fill="#FFD23A"/><path d="M6.6 2.9 3.9 6.4h2.2l-.7 2.7 2.7-3.5H5.9z" fill="#F1A322"/></svg></span></button><button class="fb-gift" onClick="{{ fbGift100 }}" aria-label="Send 100 coins" style="width:64px;flex-shrink:0;border:0;padding:4px 0 0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;"><img src="assets/gifts/{{ fbGiftColor }}-drum.png" alt="" width="56" height="48" draggable="false" style="display:block;"><span style="display:flex;align-items:center;gap:4px;font-family:'DAZN Oscine',sans-serif;font-size:12px;color:#F9FAFA;">100<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="display:block;"><circle cx="6" cy="6" r="5" fill="#F1A322"/><circle cx="6" cy="6" r="4.3" fill="#FFD23A"/><path d="M6.6 2.9 3.9 6.4h2.2l-.7 2.7 2.7-3.5H5.9z" fill="#F1A322"/></svg></span></button><button class="fb-gift" onClick="{{ fbGift500 }}" aria-label="Send 500 coins" style="width:64px;flex-shrink:0;border:0;padding:4px 0 0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;"><img src="assets/gifts/{{ fbGiftColor }}-fireworks.png" alt="" width="56" height="48" draggable="false" style="display:block;"><span style="display:flex;align-items:center;gap:4px;font-family:'DAZN Oscine',sans-serif;font-size:12px;color:#F9FAFA;">500<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="display:block;"><circle cx="6" cy="6" r="5" fill="#F1A322"/><circle cx="6" cy="6" r="4.3" fill="#FFD23A"/><path d="M6.6 2.9 3.9 6.4h2.2l-.7 2.7 2.7-3.5H5.9z" fill="#F1A322"/></svg></span></button></div>
         </sc-if>
         <!-- message bar -->
-        <div style="position:relative;display:flex;align-items:center;gap:12px;padding:8px 0;height:72px;box-sizing:border-box;background:#0C161C;">
+        <div data-fz-msgbar="1" style="position:relative;display:flex;align-items:center;gap:12px;padding:8px 0;height:72px;box-sizing:border-box;background:#0C161C;">
+          <!-- reactions you send float up the chat -->
+          <sc-for list="{{ flyList }}" as="f" hint-placeholder-count="0">
+            <span aria-hidden="true" style="position:absolute;left:{{ f.x }}px;top:{{ f.y }}px;width:40px;height:40px;z-index:9;pointer-events:none;--rise:{{ f.rise }}px;--sway:{{ f.sway }}px;animation:fzFlyUp 1.8s cubic-bezier(.33,.0,.4,1) both;">
+              <img src="{{ f.src }}" alt="" width="40" height="40" draggable="false" style="display:block;width:40px;height:40px;object-fit:contain;animation:fzFlySway 1.8s ease-in-out both;">
+            </span>
+          </sc-for>
           <!-- FTUE coach-mark -->
           <sc-if value="{{ showFtue }}" hint-placeholder-val="{{ false }}">
             <div style="position:absolute;left:10px;right:10px;bottom:76px;background:linear-gradient(105deg,#F1F2F2 0%,#F1F2F2 52%,#F5EBDD 78%,#F7E4CE 100%);color:#1B2326;border-radius:18px;padding:14px 18px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fzPop .28s cubic-bezier(.22,1,.36,1);z-index:5;">
@@ -842,7 +850,7 @@
             <!-- reactions -->
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;height:48px;padding-right:12px;{{ fzRxDisplay }}">
               <sc-for list="{{ reactions }}" as="r" hint-placeholder-count="5">
-                <img src="{{ r }}" alt="" draggable="false" style="flex-shrink:0;width:40px;height:40px;margin:-2px;object-fit:contain;cursor:pointer;">
+                <img src="{{ r }}" alt="" role="button" aria-label="Send reaction" onClick="{{ flyReaction }}" draggable="false" style="flex-shrink:0;width:40px;height:40px;margin:-2px;object-fit:contain;cursor:pointer;">
               </sc-for>
               <button onClick="{{ openTeamChooser }}" aria-label="Change team" style="flex-shrink:0;width:32px;height:32px;border:0;padding:0;border-radius:8px;background:#3D4549;display:flex;align-items:center;justify-content:center;cursor:pointer;"><img src="assets/icons/change-team.svg" alt="" width="20" height="20" style="display:block;"></button>
             </div>
@@ -3623,6 +3631,23 @@ class Component extends DCLogic {
         move: "animation:" + move + " 2.4s ease-in-out both;" }],
     };
   }
+  // Reactions by the message field float up the chat
+  flyReaction = (e) => {
+    const img = e && e.currentTarget;
+    const bar = img && img.closest("[data-fz-msgbar]");
+    if (!bar) return;
+    const ir = img.getBoundingClientRect(), br = bar.getBoundingClientRect();
+    const col = bar.parentElement ? bar.parentElement.getBoundingClientRect() : br;
+    const zoom = br.width ? bar.offsetWidth / br.width : 1;
+    const x = (ir.left - br.left) * zoom, y = (ir.top - br.top) * zoom;
+    // up to just under the FanZone header (48px)
+    const rise = Math.max(160, (ir.top - col.top) * zoom - 48 - 20);
+    const n = (this._flyN = (this._flyN || 0) + 1);
+    const sway = (n % 2 ? 1 : -1) * (8 + (n * 7) % 10);
+    this.setState(st => ({ flyList: [...(st.flyList || []), { id: n, src: img.getAttribute("src"), x: Math.round(x), y: Math.round(y), rise: Math.round(rise), sway }] }));
+    clearTimeout(this._flyT);
+    this._flyT = setTimeout(() => this.setState({ flyList: [] }), 1900);
+  };
   openFanZoneOver = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     clearTimeout(this._fzLoadT);
@@ -5070,6 +5095,7 @@ class Component extends DCLogic {
     return {
       ...this.crVals(),
       ...this.gzVals(),
+      flyList: this.state.screen === "fanzone" ? (this.state.flyList || []) : [], flyReaction: this.flyReaction,
       ...this.gaVals(),
       ...this.fbVals(),
       ...this.rxListVals(),
