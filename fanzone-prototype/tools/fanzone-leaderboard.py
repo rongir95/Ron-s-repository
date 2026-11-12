@@ -8,7 +8,8 @@
   The trophy turns into a white circle while the leaderboard is open; tap it again for the chat.
 
 Every graphic is vector: medals and pictograms were exported as SVG from Figma (assets/leaderboard/).
-openLeaderboard(true) is what the quiz calls when it ends.
+openLeaderboard(true) is what the quiz calls when it ends. Every avatar and name opens that fan's card
+(the medal and name for the top 3, yours opens your own).
 
 Run after the other scripts:  python3 tools/fanzone-leaderboard.py FanZone.dc.html
 """
@@ -74,8 +75,8 @@ PANEL = '''        <!-- Leaderboard (FanZone DS 12304:62639 empty / loading, 129
               <sc-if value="{{ lbLoaded }}" hint-placeholder-val="{{ false }}">
                 <sc-for list="{{ lbTop }}" as="w" hint-placeholder-count="3">
                   <div style="position:absolute;left:{{ w.x }}px;top:0;width:114px;display:flex;flex-direction:column;align-items:center;animation:fzRxPop .35s cubic-bezier(.22,1.4,.36,1);">
-                    <img src="{{ w.medal }}" alt="{{ w.place }}" width="76" height="76" style="display:block;">
-                    <span style="margin-top:6px;font-weight:700;font-size:14px;line-height:20px;color:#F9FAFA;max-width:106px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ w.name }}</span>
+                    <img onClick="{{ w.open }}" src="{{ w.medal }}" alt="{{ w.place }}" width="76" height="76" style="display:block;cursor:pointer;">
+                    <span onClick="{{ w.open }}" style="cursor:pointer;margin-top:6px;font-weight:700;font-size:14px;line-height:20px;color:#F9FAFA;max-width:106px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ w.name }}</span>
                     <span style="font-size:14px;line-height:14px;color:#F9FAFA;"><b style="color:#5ADC8C;font-weight:700;">{{ w.good }}</b>/10</span>
                     <span style="margin-top:2px;font-size:14px;line-height:14px;color:#9EA2A4;">{{ w.time }}</span>
                   </div>
@@ -100,10 +101,10 @@ PANEL = '''        <!-- Leaderboard (FanZone DS 12304:62639 empty / loading, 129
                 <sc-for list="{{ lbRows }}" as="r" hint-placeholder-count="7">
                   <div style="display:flex;align-items:center;height:40px;margin-top:4px;padding:0 12px;">
                     <span style="width:47px;font-size:16px;color:#F9FAFA;">{{ r.rank }}</span>
-                    <span style="margin-left:12px;width:24px;height:24px;border-radius:50%;flex-shrink:0;box-sizing:border-box;border:1.5px solid transparent;padding:1.5px;background:linear-gradient(#080E12,#080E12) padding-box,{{ r.ring }} border-box;">
+                    <span onClick="{{ r.open }}" role="button" aria-label="Open {{ r.name }}'s card" style="cursor:pointer;margin-left:12px;width:24px;height:24px;border-radius:50%;flex-shrink:0;box-sizing:border-box;border:1.5px solid transparent;padding:1.5px;background:linear-gradient(#080E12,#080E12) padding-box,{{ r.ring }} border-box;">
                       <span style="display:block;width:18px;height:18px;border-radius:50%;overflow:hidden;"><img src="{{ r.avatar }}" alt="" style="display:block;width:18px;height:18px;object-fit:cover;transform:scale(1.207);"></span>
                     </span>
-                    <span style="margin-left:8px;flex:1;min-width:0;font-weight:700;font-size:16px;color:#F9FAFA;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.name }}</span>
+                    <span style="margin-left:8px;flex:1;min-width:0;display:flex;"><span onClick="{{ r.open }}" style="cursor:pointer;font-weight:700;font-size:16px;color:#F9FAFA;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.name }}</span></span>
                     <span style="width:42px;font-size:16px;color:#F9FAFA;"><b style="color:#5ADC8C;font-weight:700;">{{ r.good }}</b>/10</span>
                     <span style="width:61px;margin-left:12px;font-size:16px;color:#9EA2A4;text-align:right;">{{ r.time }}</span>
                   </div>
@@ -112,13 +113,13 @@ PANEL = '''        <!-- Leaderboard (FanZone DS 12304:62639 empty / loading, 129
               <!-- you -->
               <div style="position:sticky;bottom:0;display:flex;align-items:center;height:48px;padding:0 12px;background:#F9FAFA;color:#080E12;">
                 <span style="width:47px;font-size:16px;">{{ lbMeRank }}</span>
-                <span style="margin-left:12px;width:24px;height:24px;border-radius:50%;flex-shrink:0;box-sizing:border-box;border:1.5px solid transparent;padding:1.5px;background:linear-gradient(#F9FAFA,#F9FAFA) padding-box,{{ ringBg }} border-box;">
+                <span onClick="{{ openCard }}" role="button" aria-label="Open your Fan Card" style="cursor:pointer;margin-left:12px;width:24px;height:24px;border-radius:50%;flex-shrink:0;box-sizing:border-box;border:1.5px solid transparent;padding:1.5px;background:linear-gradient(#F9FAFA,#F9FAFA) padding-box,{{ ringBg }} border-box;">
                   <span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;overflow:hidden;background:#080E12;color:#F9FAFA;font-weight:700;font-size:11px;">
                     <sc-if value="{{ hasAvatarImg }}" hint-placeholder-val="{{ true }}"><img src="{{ avatarImg }}" alt="" style="display:block;width:18px;height:18px;object-fit:cover;{{ avatarImgScale }}"></sc-if>
                     <sc-if value="{{ barShowInitial }}" hint-placeholder-val="{{ false }}">{{ cardInitial }}</sc-if>
                   </span>
                 </span>
-                <span style="margin-left:8px;font-size:16px;max-width:99px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ cardName }}</span>
+                <span onClick="{{ openCard }}" style="cursor:pointer;margin-left:8px;font-size:16px;max-width:99px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ cardName }}</span>
                 <span style="margin-left:8px;padding:1px 2px;border-radius:2px;background:#080E12;color:#F9FAFA;font-weight:800;font-size:12px;line-height:10px;">YOU</span>
                 <span style="flex:1;"></span>
                 <span style="width:42px;font-size:16px;"><b style="font-weight:700;">{{ lbMeGood }}</b>/10</span>
@@ -161,8 +162,8 @@ LOGIC = '''  // Leaderboard (trophy in the FanZone header)
       lbOpen: open, toggleLeaderboard: this.toggleLeaderboard,
       lbPressed: open ? "true" : "false", lbBtnBg: open ? "#F9FAFA" : "transparent", lbIconStyle: open ? "filter:brightness(0);" : "",
       lbSkeleton: !loaded, lbLoaded: loaded, lbEmpty: !s.quizDone, lbLoading: !!s.quizDone && !!s.lbLoading,
-      lbTop: LB_TOP.map(([name, medal, place, x, good, time]) => ({ id: place, name, medal, place, x, good, time })),
-      lbRows: LB_ROWS.map(([rank, name, avatar, ring, good, time]) => ({ id: rank, rank, name, avatar, ring, good, time })),
+      lbTop: LB_TOP.map(([name, medal, place, x, good, time]) => ({ id: place, name, medal, place, x, good, time, open: () => this.openUserCard({ name, avatar: "" }) })),
+      lbRows: LB_ROWS.map(([rank, name, avatar, ring, good, time]) => ({ id: rank, rank, name, avatar, ring, good, time, open: () => this.openUserCard({ name, avatar }) })),
       lbMeRank: s.quizScore != null ? String(s.quizRank || "4,568") : "4,568",
       lbMeGood: s.quizScore != null ? String(s.quizScore).padStart(2, "0") : "01",
       lbMeTime: "05:19:11",
