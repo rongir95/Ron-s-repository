@@ -13,8 +13,7 @@ section 4935:35973 "Fan Battle Animation FLOW"). Bayern (home, left) v Dortmund 
   finish  "And the Winner is:" scrolls by, then the winner's strip with its crest and a medal.
 
 Decided with the product owner: no Beck's header and no coin balance in the header.
-Text on the strip is a dot-matrix font: Figma uses AB-megadot9 (not in the project), DotGothic16 (Latin
-subset, uploads/DotGothic16-latin.ttf) stands in. Gifts: the FanZone DS "Gift pictograms" (NIgPxOlNU4U3sWMRdoE4Qh 4482:41428), Light red for Bayern and
+Text on the strip is the dot-matrix font from Figma, AB-megadot9 (Latin subset, uploads/AB-megadot9-latin.otf). Gifts: the FanZone DS "Gift pictograms" (NIgPxOlNU4U3sWMRdoE4Qh 4482:41428), Light red for Bayern and
 Yellow primary for Dortmund, exported at 4x (assets/gifts/; they are bitmaps in the DS).
 Strip per Figma 6372:237056: 40px, 32px crests in the team colour with a 1px white border, points in
 DAZN Oscine ExtraBold 12 (white, thin dark outline) 56px from each side, a white 00:18 pill in the middle.
@@ -33,7 +32,7 @@ def rep(old, new, count=1):
         raise SystemExit(f'expected {count} occurrence(s), found {n}: {old[:100]!r}')
     src = src.replace(old, new)
 
-DOT = "font-family:'DotGothic16','DAZN Oscine',monospace;"
+DOT = "font-family:'AB-megadot9','DAZN Oscine',monospace;"
 FONT = "font-family:'DAZN Oscine',sans-serif;"
 
 # ---------------------------------------------------------------- gift pictograms (SVG, team colours via CSS vars)
@@ -74,7 +73,10 @@ STRIP = '''        <!-- Fan Battle strip (Figma 4935:35973) -->
             </sc-if>
             <!-- moderator text / winner text -->
             <sc-if value="{{ fbMarquee }}" hint-placeholder-val="{{ false }}">
-              <span style="position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;white-space:nowrap;font-size:17px;color:#F9FAFA;animation:fbMarquee {{ fbMarqueeS }}s linear both;">{{ fbMarqueeText }}</span>
+              <!-- the text runs between the crests and disappears under them (Fan Battle 13467:76612) -->
+              <div style="position:absolute;left:44px;right:44px;top:0;bottom:0;overflow:hidden;">
+                <span style="position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;white-space:nowrap;font-size:17px;color:#F9FAFA;animation:fbMarquee {{ fbMarqueeS }}s linear both;">{{ fbMarqueeText }}</span>
+              </div>
             </sc-if>
             <!-- ready / set / go -->
             <sc-if value="{{ fbCall }}" hint-placeholder-val="{{ false }}">
@@ -102,12 +104,12 @@ ROW = ('        <!-- Fan Battle gifts (only while the battle runs) -->\n'
 rep('        <!-- message bar -->\n', ROW + '        <!-- message bar -->\n')
 
 rep('  * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }',
-    '  @font-face { font-family: "DotGothic16"; src: url("uploads/DotGothic16-latin.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }\n'
+    '  @font-face { font-family: "AB-megadot9"; src: url("uploads/AB-megadot9-latin.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }\n'
     '  * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }')
 rep('  @keyframes fzPushIn {',
     '  @keyframes fbIn { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }\n'
     '  @keyframes fbOut { from { transform: none; opacity: 1; } to { transform: translateY(-100%); opacity: 0; } }\n'
-    '  @keyframes fbMarquee { from { transform: translateX(375px); } to { transform: translateX(-100%); } }\n'
+    '  @keyframes fbMarquee { from { transform: translateX(287px); } to { transform: translateX(-100%); } }\n'
     '  @keyframes fbCallPop { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }\n'
     '  @keyframes fbBuildL { 0% { transform: scaleX(0); opacity: 0; } 13% { opacity: 1; } 100% { transform: scaleX(1); opacity: 1; } }\n'
     '  @keyframes fbBeat { 0%, 100% { transform: scale(1); } 35% { transform: scale(.7); } 65% { transform: scale(1.12); } }\n'
@@ -180,7 +182,7 @@ LOGIC = '''  // Fan Battle (from the shell)
       fbScores: ph === "battle", fbHomeScore: fmt(sc.home), fbAwayScore: fmt(sc.away),
       fbClock: "00:" + String(s.fbClockS != null ? s.fbClockS : 20).padStart(2, "0"),
       fbMarquee: ph === "text" || ph === "finish", fbMarqueeS: ph === "text" ? 5.4 : 4,
-      fbMarqueeText: ph === "text" ? "Fan Battle! Send gifts to cheer your team!" : "And the Winner is:",
+      fbMarqueeText: ph === "text" ? "Fans Battle! Send Gifts to Cheer Your Team!" : "And the Winner is:",
       fbCall: !!call, fbCallText: call ? call[0] : "", fbCallColor: call ? call[1] : "#F9FAFA",
       fbWin: ph === "winner", fbWinColor: winHome ? "#DC052D" : "#FDE100", fbWinText: winHome ? "#FFFFFF" : "#080E12", fbWinName: winHome ? "Bayern München" : "Dortmund",
       fbBeatHome: beat("home"), fbBeatAway: beat("away"), fbFlashHome: flash("home"), fbFlashAway: flash("away"),

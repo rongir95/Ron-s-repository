@@ -79,11 +79,11 @@ LOGIC = '''  // Fan Battle: play the gift you sent over the chat
   }
   gaVals() {
     const s = this.state, a = s.screen === "fanzone" && s.fbPhase === "battle" ? s.gaAnim : null;
-    if (!a) return { gaOn: false, gaList: [], gaTop: 88 };
+    if (!a) return { gaOn: false, gaList: [], gaTop: 40 };
     const gif = GIFT_ANIM_GIFS.includes(a.color + "-" + a.kind);
     const move = { finger: "gaPump", flag: "gaWave", horn: "gaShake", drum: "gaBeat", fireworks: "gaLaunch" }[a.kind];
     return {
-      gaOn: true, gaTop: 88,
+      gaOn: true, gaTop: 40,
       // a new list item per tap, so the animation starts again from the top
       gaList: [{ key: a.n, gif, css: !gif,
         src: gif ? "assets/gifts/anim/" + a.color + "-" + a.kind + ".gif?n=" + a.n : "assets/gifts/" + a.color + "-" + a.kind + ".png",

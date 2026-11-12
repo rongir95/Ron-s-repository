@@ -107,7 +107,7 @@
   @font-face { font-family: "DAZN Oscine"; src: url("uploads/DAZN_Oscine_BdIt.ttf") format("truetype"); font-weight: 600 800; font-style: italic; font-display: swap; }
   @font-face { font-family: "DAZN Trim Condensed Display"; src: url("uploads/DAZNTrimCondensedDisplay-Bold.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: swap; }
   @font-face { font-family: "DAZN Trim Condensed Text"; src: url("uploads/DAZNTrimCondensedText-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
-  @font-face { font-family: "DotGothic16"; src: url("uploads/DotGothic16-latin.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: "AB-megadot9"; src: url("uploads/AB-megadot9-latin.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
   * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body { background: #0a0a0c; font-family: "DAZN Oscine", system-ui, sans-serif; color: #F9FAFA; }
@@ -199,7 +199,7 @@
   .gz-chip:hover { background: #2E383E !important; }
   @keyframes fbIn { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }
   @keyframes fbOut { from { transform: none; opacity: 1; } to { transform: translateY(-100%); opacity: 0; } }
-  @keyframes fbMarquee { from { transform: translateX(375px); } to { transform: translateX(-100%); } }
+  @keyframes fbMarquee { from { transform: translateX(287px); } to { transform: translateX(-100%); } }
   @keyframes fbCallPop { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
   @keyframes fbBuildL { 0% { transform: scaleX(0); opacity: 0; } 13% { opacity: 1; } 100% { transform: scaleX(1); opacity: 1; } }
   @keyframes fbBeat { 0%, 100% { transform: scale(1); } 35% { transform: scale(.7); } 65% { transform: scale(1.12); } }
@@ -706,7 +706,7 @@
         </sc-if>
         <!-- Fan Battle strip (Figma 4935:35973) -->
         <sc-if value="{{ fbOn }}" hint-placeholder-val="{{ false }}">
-          <div class="fb-strip" style="position:absolute;left:0;right:0;top:48px;z-index:7;height:40px;overflow:hidden;background:#080E12;{{ fbStripAnim }}font-family:'DotGothic16','DAZN Oscine',monospace;">
+          <div class="fb-strip" style="position:absolute;left:0;right:0;top:48px;z-index:7;height:40px;overflow:hidden;background:#080E12;{{ fbStripAnim }}font-family:'AB-megadot9','DAZN Oscine',monospace;">
             <!-- bars -->
             <sc-if value="{{ fbBars }}" hint-placeholder-val="{{ false }}">
               <div style="position:absolute;left:0;top:0;bottom:0;width:{{ fbHomePct }}%;background:{{ fbHomeColor }};transform-origin:left center;transition:width .45s cubic-bezier(.22,1,.36,1);{{ fbBuildL }}">
@@ -725,7 +725,10 @@
             </sc-if>
             <!-- moderator text / winner text -->
             <sc-if value="{{ fbMarquee }}" hint-placeholder-val="{{ false }}">
-              <span style="position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;white-space:nowrap;font-size:17px;color:#F9FAFA;animation:fbMarquee {{ fbMarqueeS }}s linear both;">{{ fbMarqueeText }}</span>
+              <!-- the text runs between the crests and disappears under them (Fan Battle 13467:76612) -->
+              <div style="position:absolute;left:44px;right:44px;top:0;bottom:0;overflow:hidden;">
+                <span style="position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;white-space:nowrap;font-size:17px;color:#F9FAFA;animation:fbMarquee {{ fbMarqueeS }}s linear both;">{{ fbMarqueeText }}</span>
+              </div>
             </sc-if>
             <!-- ready / set / go -->
             <sc-if value="{{ fbCall }}" hint-placeholder-val="{{ false }}">
@@ -3602,7 +3605,7 @@ class Component extends DCLogic {
       fbScores: ph === "battle", fbHomeScore: fmt(sc.home), fbAwayScore: fmt(sc.away),
       fbClock: "00:" + String(s.fbClockS != null ? s.fbClockS : 20).padStart(2, "0"),
       fbMarquee: ph === "text" || ph === "finish", fbMarqueeS: ph === "text" ? 5.4 : 4,
-      fbMarqueeText: ph === "text" ? "Fan Battle! Send gifts to cheer your team!" : "And the Winner is:",
+      fbMarqueeText: ph === "text" ? "Fans Battle! Send Gifts to Cheer Your Team!" : "And the Winner is:",
       fbCall: !!call, fbCallText: call ? call[0] : "", fbCallColor: call ? call[1] : "#F9FAFA",
       fbWin: ph === "winner", fbWinColor: winHome ? "#DC052D" : "#FDE100", fbWinText: winHome ? "#FFFFFF" : "#080E12", fbWinName: winHome ? "Bayern München" : "Dortmund",
       fbBeatHome: beat("home"), fbBeatAway: beat("away"), fbFlashHome: flash("home"), fbFlashAway: flash("away"),
@@ -3622,11 +3625,11 @@ class Component extends DCLogic {
   }
   gaVals() {
     const s = this.state, a = s.screen === "fanzone" && s.fbPhase === "battle" ? s.gaAnim : null;
-    if (!a) return { gaOn: false, gaList: [], gaTop: 88 };
+    if (!a) return { gaOn: false, gaList: [], gaTop: 40 };
     const gif = GIFT_ANIM_GIFS.includes(a.color + "-" + a.kind);
     const move = { finger: "gaPump", flag: "gaWave", horn: "gaShake", drum: "gaBeat", fireworks: "gaLaunch" }[a.kind];
     return {
-      gaOn: true, gaTop: 88,
+      gaOn: true, gaTop: 40,
       // a new list item per tap, so the animation starts again from the top
       gaList: [{ key: a.n, gif, css: !gif,
         src: gif ? "assets/gifts/anim/" + a.color + "-" + a.kind + ".gif?n=" + a.n : "assets/gifts/" + a.color + "-" + a.kind + ".png",
