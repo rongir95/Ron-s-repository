@@ -41,7 +41,7 @@ rep('      if (d && d.fz === "sponsor") { this.setState({ fzSponsorLive: !!d.on 
 QUICK_BTN = ('            <sc-if value="{{ fzLight }}" hint-placeholder-val="{{ false }}">\n'
              '              <button onClick="{{ openQuick }}" aria-label="Quick messages" style="position:relative;flex-shrink:0;width:56px;height:56px;box-sizing:border-box;border:1px solid rgba(255,255,255,.1);border-radius:24px;background:#242D33;display:flex;align-items:center;justify-content:center;cursor:pointer;">'
              '<img src="assets/icons/quick-message.svg" alt="" width="24" height="24" style="display:block;">'
-             '<span style="position:absolute;left:31px;top:-4px;padding:2px 5px;border-radius:9999px;background:#FFFA00;' + FONT + 'font-weight:700;font-size:12px;line-height:13px;color:#080E12;">New</span></button>\n'
+             '<span style="position:absolute;left:31px;top:-4px;padding:4px 5px;border-radius:9999px;background:#FFFA00;' + FONT + 'font-weight:700;font-size:12px;line-height:9px;color:#080E12;text-transform:uppercase;">New</span></button>\n'
              '            </sc-if>\n')
 rep('            <!-- entry point: your avatar (B + avatar in gradient ring) -->\n', QUICK_BTN + '            <!-- entry point: your avatar (B + avatar in gradient ring) -->\n')
 # your avatar and the Message field exist only in regular FanZone
