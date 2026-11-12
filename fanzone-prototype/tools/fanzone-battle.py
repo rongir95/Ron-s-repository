@@ -14,8 +14,10 @@ section 4935:35973 "Fan Battle Animation FLOW"). Bayern (home, left) v Dortmund 
 
 Decided with the product owner: no Beck's header and no coin balance in the header.
 Text on the strip is a dot-matrix font: Figma uses AB-megadot9 (not in the project), DotGothic16 (Latin
-subset, uploads/DotGothic16-latin.ttf) stands in. Gifts are bitmaps in Figma; here they are drawn as SVG
-in the colours of the team you back. Everything is vector.
+subset, uploads/DotGothic16-latin.ttf) stands in. Gifts: the FanZone DS "Gift pictograms" (NIgPxOlNU4U3sWMRdoE4Qh 4482:41428), Light red for Bayern and
+Yellow primary for Dortmund, exported at 4x (assets/gifts/; they are bitmaps in the DS).
+Strip per Figma 6372:237056: 40px, 32px crests in the team colour with a 1px white border, points in
+DAZN Oscine ExtraBold 12 (white, thin dark outline) 56px from each side, a white 00:18 pill in the middle.
 
 Run after the other scripts:  python3 tools/fanzone-battle.py FanZone.dc.html
 """
@@ -44,10 +46,10 @@ G = {
 }
 COIN = ('<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="display:block;"><circle cx="6" cy="6" r="5" fill="#F1A322"/>'
         '<circle cx="6" cy="6" r="4.3" fill="#FFD23A"/><path d="M6.6 2.9 3.9 6.4h2.2l-.7 2.7 2.7-3.5H5.9z" fill="#F1A322"/></svg>')
-GIFTS = [('finger', 5), ('flag', 10), ('horn', 50), ('drum', 100), ('popper', 500)]
+GIFTS = [('finger', 5), ('flag', 10), ('horn', 50), ('drum', 100), ('fireworks', 500)]
 GIFT_ROW = ''.join(
     f'<button class="fb-gift" onClick="{{{{ fbGift{v} }}}}" aria-label="Send {v} coins" style="width:64px;flex-shrink:0;border:0;padding:4px 0 0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;">'
-    f'<svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true" style="display:block;">{G[k]}</svg>'
+    f'<img src="assets/gifts/{{{{ fbGiftColor }}}}-{k}.png" alt="" width="56" height="48" draggable="false" style="display:block;">'
     f'<span style="display:flex;align-items:center;gap:4px;{FONT}font-size:12px;color:#F9FAFA;">{v}{COIN}</span></button>'
     for k, v in GIFTS)
 
@@ -66,9 +68,9 @@ STRIP = '''        <!-- Fan Battle strip (Figma 4935:35973) -->
               </div>
             </sc-if>
             <sc-if value="{{ fbScores }}" hint-placeholder-val="{{ false }}">
-              <span style="position:absolute;left:40px;top:0;bottom:0;display:flex;align-items:center;''' + FONT + '''font-weight:700;font-size:12px;color:#F9FAFA;animation:fzFadeIn .5s ease both;">{{ fbHomeScore }}</span>
-              <span style="position:absolute;right:40px;top:0;bottom:0;display:flex;align-items:center;''' + FONT + '''font-weight:700;font-size:12px;color:{{ fbAwayText }};animation:fzFadeIn .5s ease both;">{{ fbAwayScore }}</span>
-              <span style="position:absolute;top:10px;left:{{ fbHomePct }}%;transform:translateX(-50%);padding:2px 6px;border-radius:6px;background:#080E12;border:1px solid rgba(249,250,250,.25);''' + FONT + '''font-weight:700;font-size:12px;line-height:14px;color:#F9FAFA;transition:left .45s cubic-bezier(.22,1,.36,1);font-variant-numeric:tabular-nums;animation:fzFadeIn .5s ease both;">{{ fbClock }}</span>
+              <span style="position:absolute;left:56px;top:13px;font-family:'DAZN Oscine',sans-serif;font-weight:800;font-size:12px;line-height:13px;color:#F9FAFA;-webkit-text-stroke:1px rgba(36,32,37,.5);paint-order:stroke fill;animation:fzFadeIn .5s ease both;">{{ fbHomeScore }}</span>
+              <span style="position:absolute;right:56px;top:13px;font-family:'DAZN Oscine',sans-serif;font-weight:800;font-size:12px;line-height:13px;color:#F9FAFA;-webkit-text-stroke:1px rgba(36,32,37,.5);paint-order:stroke fill;animation:fzFadeIn .5s ease both;">{{ fbAwayScore }}</span>
+              <span style="position:absolute;top:12px;left:50%;transform:translateX(-50%);height:16px;box-sizing:border-box;padding:2px 4px;border-radius:8px;background:#F9FAFA;border:1px solid rgba(36,32,37,.2);display:flex;align-items:center;''' + FONT + '''font-weight:700;font-size:12px;line-height:12px;color:#0C161C;font-variant-numeric:tabular-nums;animation:fzFadeIn .5s ease both;">{{ fbClock }}</span>
             </sc-if>
             <!-- moderator text / winner text -->
             <sc-if value="{{ fbMarquee }}" hint-placeholder-val="{{ false }}">
@@ -86,8 +88,8 @@ STRIP = '''        <!-- Fan Battle strip (Figma 4935:35973) -->
               </div>
             </sc-if>
             <!-- crests -->
-            <span style="position:absolute;left:6px;top:7px;width:26px;height:26px;border-radius:50%;background:#F9FAFA;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(0,0,0,.25);{{ fbBeatHome }}"><img src="assets/vec/tiles/img-logo-bayern.svg" alt="Bayern München" width="24" height="24" style="display:block;"></span>
-            <span style="position:absolute;right:6px;top:7px;width:26px;height:26px;border-radius:50%;background:#FDE100;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(0,0,0,.25);{{ fbBeatAway }}"><img src="assets/poll/logo-bvb.png" alt="Borussia Dortmund" width="24" height="24" style="display:block;"></span>
+            <span style="position:absolute;left:8px;top:4px;width:32px;height:32px;box-sizing:border-box;border-radius:32px;border:1px solid #FFFFFF;background:#DC052D;display:flex;align-items:center;justify-content:center;{{ fbBeatHome }}"><img src="assets/vec/tiles/img-logo-bayern.svg" alt="Bayern München" width="24" height="24" style="display:block;"></span>
+            <span style="position:absolute;right:8px;top:4px;width:32px;height:32px;box-sizing:border-box;border-radius:32px;border:1px solid #FFFFFF;background:#FDE100;display:flex;align-items:center;justify-content:center;{{ fbBeatAway }}"><img src="assets/poll/logo-bvb.png" alt="Borussia Dortmund" width="24" height="24" style="display:block;"></span>
           </div>
         </sc-if>
 '''
@@ -182,7 +184,7 @@ LOGIC = '''  // Fan Battle (from the shell)
       fbCall: !!call, fbCallText: call ? call[0] : "", fbCallColor: call ? call[1] : "#F9FAFA",
       fbWin: ph === "winner", fbWinColor: winHome ? "#DC052D" : "#FDE100", fbWinText: winHome ? "#FFFFFF" : "#080E12", fbWinName: winHome ? "Bayern München" : "Dortmund",
       fbBeatHome: beat("home"), fbBeatAway: beat("away"), fbFlashHome: flash("home"), fbFlashAway: flash("away"),
-      fbGifts: ph === "battle",
+      fbGifts: ph === "battle", fbGiftColor: team === "away" ? "yellow" : "red",
       fbG1: team === "away" ? "#FDE100" : (team === "home" ? "#DC052D" : "#6D7377"), fbG2: team === "away" ? "#080E12" : "#FFFFFF", fbG3: "#080E12",
       fbGift5: () => this.sendGift(5), fbGift10: () => this.sendGift(10), fbGift50: () => this.sendGift(50), fbGift100: () => this.sendGift(100), fbGift500: () => this.sendGift(500),
     };
