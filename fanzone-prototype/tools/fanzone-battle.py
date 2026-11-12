@@ -103,7 +103,7 @@ STRIP = '''        <!-- Fan Battle strip (Figma 4935:35973) -->
 '''
 WIN = '''        <!-- Fan Battle winner: the winning team's crest over the chat with the medal from Figma (Fan Battle 6090:64167) -->
         <sc-if value="{{ fbWin }}" hint-placeholder-val="{{ false }}">
-          <div aria-label="{{ fbWinName }} wins the Fan Battle" role="img" style="position:absolute;left:49px;top:78px;width:278px;height:278px;z-index:6;pointer-events:none;">
+          <div aria-label="{{ fbWinName }} wins the Fan Battle" role="img" style="position:absolute;left:49px;top:118px;width:278px;height:278px;z-index:6;pointer-events:none;">
             <img src="{{ fbWinCrest }}" alt="" width="200" height="200" style="position:absolute;left:39px;top:26px;width:200px;height:200px;display:block;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5));animation:fbWinCrest .7s cubic-bezier(.22,1.4,.36,1) both;">
             <img src="assets/battle/medal-figma.png" alt="" width="278" height="278" style="position:absolute;inset:0;width:278px;height:278px;display:block;transform-origin:68% 75%;animation:fbWinMedal .8s .35s cubic-bezier(.22,1.5,.36,1) both;">
           </div>
