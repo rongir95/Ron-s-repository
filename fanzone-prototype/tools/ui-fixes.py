@@ -56,7 +56,8 @@ m = _re.search(r'  \.fz-r-avatar \{ animation:.*?\n  \.fz-r-wash \{ animation:[^
 if not m:
     raise SystemExit('card reveal animations not found')
 src = src[:m.start()] + ('  @keyframes fzCardIn { from { opacity: 0; } to { opacity: 1; } }\n'
-    '  .fz-r-avatar, .fz-r-glow, .fz-r-name, .fz-r-bubble, .fz-r-team, .fz-r-int, .fz-r-chips, .fz-r-mwt, .fz-r-row, .fz-r-wash { animation: fzCardIn .25s ease both; }\n') + src[m.end():]
+    '  @keyframes fzCardOut { from { opacity: 1; } to { opacity: 0; } }\n'
+    '  .fz-r-wash { animation: fzCardIn .22s ease both; }\n') + src[m.end():]
 
 rep("        avatarStyle: Object.assign(this.crAvFull(item.ai, isReply, item.mine ? 'assets/comments/avin.png' : item.img), (!isReply && (item.profileIdx!=null || item.mine)) ? { cursor:'pointer' } : {}),",
     "        avatarStyle: Object.assign(this.crAvFull(item.ai, isReply, item.mine ? 'assets/comments/avin.png' : item.img), { cursor:'pointer' }),")
@@ -79,6 +80,32 @@ rep('  openOtherProfile = (i, e) => {', '''  // a Fan Card profile for any comme
     return OTHER_PROFILES.length - 1;
   };
   openOtherProfile = (i, e) => {''')
+
+# The card content is mounted while the skeleton shows (so its images are loaded by the time it is
+# ready); when loading ends the skeleton fades out and the whole card is there at once.
+rep('''          <div style="height:24px;"></div>
+        </div>
+        </sc-if>
+        </sc-if>
+        <!-- Skeleton (Figma 496:102531), shown while the card loads -->
+        <sc-if value="{{ cardLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:0;right:0;top:60px;height:720px;z-index:5;background:#080E12;pointer-events:none;">''',
+'''          <div style="height:24px;"></div>
+        </div>
+        </sc-if>
+        </sc-if>
+        <!-- Skeleton (Figma 496:102531), shown while the card loads -->
+        <sc-if value="{{ cardSk }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:0;right:0;top:60px;height:720px;z-index:5;background:#080E12;pointer-events:none;{{ cardSkStyle }}">''')
+n = src.count('<sc-if value="{{ cardReady }}" hint-placeholder-val="{{ true }}">')
+if n != 2: raise SystemExit('cardReady blocks: %d' % n)
+i = src.index('<sc-if value="{{ cardReady }}" hint-placeholder-val="{{ true }}">')
+j = src.index('<sc-if value="{{ cardReady }}" hint-placeholder-val="{{ true }}">', i + 10)
+src = src[:j] + '<sc-if value="{{ cardMounted }}" hint-placeholder-val="{{ true }}">' + src[j + len('<sc-if value="{{ cardReady }}" hint-placeholder-val="{{ true }}">'):]
+rep('this._cardLoadT = setTimeout(() => this.setState({ cardLoading: false }), 1200);',
+    'this._cardLoadT = setTimeout(() => { this.setState({ cardLoading: false, cardSkOut: true }); this._cardLoadT = setTimeout(() => this.setState({ cardSkOut: false }), 240); }, 1200);', 2)
+rep('cardLoading: !!s.cardLoading, cardReady: !s.cardLoading,',
+    'cardLoading: !!s.cardLoading, cardReady: !s.cardLoading, cardMounted: true, cardSk: !!s.cardLoading || !!s.cardSkOut, cardSkStyle: !s.cardLoading && s.cardSkOut ? "animation:fzCardOut .22s ease both;" : "",')
 
 open(PATH, 'w', encoding='utf-8').write(src)
 print('ok')

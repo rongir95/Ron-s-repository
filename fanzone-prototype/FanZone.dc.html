@@ -139,7 +139,8 @@
   @keyframes fzRiseIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
   @keyframes fzSlideInX { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
   @keyframes fzCardIn { from { opacity: 0; } to { opacity: 1; } }
-  .fz-r-avatar, .fz-r-glow, .fz-r-name, .fz-r-bubble, .fz-r-team, .fz-r-int, .fz-r-chips, .fz-r-mwt, .fz-r-row, .fz-r-wash { animation: fzCardIn .25s ease both; }
+  @keyframes fzCardOut { from { opacity: 1; } to { opacity: 0; } }
+  .fz-r-wash { animation: fzCardIn .22s ease both; }
   @media (prefers-reduced-motion: reduce) { .fz-sk, .fz-sk2, .fz-ring, [class*="fz-r-"] { animation: fzWashIn .2s ease both !important; -webkit-mask: none; mask: none; } }
   /* Comments & Replies */
   @keyframes crPopIn { from { transform: scale(0.7) translateY(8px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
@@ -1655,7 +1656,7 @@
             <span style="position:absolute;left:16px;top:16px;width:32px;height:32px;border-radius:9999px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;"><img src="assets/icons/more-h.svg" alt="" width="16" height="16" style="display:block;"></span>
           </sc-if>
         </div>
-        <sc-if value="{{ cardReady }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ cardMounted }}" hint-placeholder-val="{{ true }}">
         <!-- ===== Self card from comments · Profile & Settings (Figma 670:140671, same content as the profile page 492:86482) ===== -->
         <sc-if value="{{ myVarP }}" hint-placeholder-val="{{ false }}">
         <div style="position:relative;display:flex;flex-direction:column;flex-shrink:0;">
@@ -2110,8 +2111,8 @@
         </sc-if>
         </sc-if>
         <!-- Skeleton (Figma 496:102531), shown while the card loads -->
-        <sc-if value="{{ cardLoading }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute;left:0;right:0;top:60px;height:720px;z-index:5;background:#080E12;pointer-events:none;">
+        <sc-if value="{{ cardSk }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:0;right:0;top:60px;height:720px;z-index:5;background:#080E12;pointer-events:none;{{ cardSkStyle }}">
             <span style="position:absolute;left:24px;top:12px;width:80px;height:80px;border-radius:50%;background:#1D2428;" class="fz-sk"></span>
             <span style="position:absolute;left:120px;top:42px;width:116px;height:20px;border-radius:4px;background:#1D2428;" class="fz-sk"></span>
             <span style="position:absolute;left:33px;top:111px;width:14px;height:10px;border-radius:2px;background:#1D2428;" class="fz-sk"></span>
@@ -3794,10 +3795,10 @@ class Component extends DCLogic {
     if (this.state.cardFromComments) { this.closeSheet(); this.closeComments(); }
     else this.closeSheet();
   };
-  openCard = (e) => { if (e && e.stopPropagation) e.stopPropagation(); if (this.P.selfCard === false) return; this.dismissFtue(); clearTimeout(this._homeTipTimer); this.setState({ sheet: "card", cardUser: null, closing: false, cardExpanded: false, showHomeTip: false, cardSeen: true, cardLoading: true, cardFromComments: false, cardBackClosing: false }); clearTimeout(this._cardLoadT); this._cardLoadT = setTimeout(() => this.setState({ cardLoading: false }), 1200); };
+  openCard = (e) => { if (e && e.stopPropagation) e.stopPropagation(); if (this.P.selfCard === false) return; this.dismissFtue(); clearTimeout(this._homeTipTimer); this.setState({ sheet: "card", cardUser: null, closing: false, cardExpanded: false, showHomeTip: false, cardSeen: true, cardLoading: true, cardFromComments: false, cardBackClosing: false }); clearTimeout(this._cardLoadT); this._cardLoadT = setTimeout(() => { this.setState({ cardLoading: false, cardSkOut: true }); this._cardLoadT = setTimeout(() => this.setState({ cardSkOut: false }), 240); }, 1200); };
   openUserCard = (msg) => {
     this.setState({ sheet: "card", cardUser: this.synthProfile(msg.name, msg.avatar), closing: false, cardExpanded: false, cardLoading: true });
-    clearTimeout(this._cardLoadT); this._cardLoadT = setTimeout(() => this.setState({ cardLoading: false }), 1200);
+    clearTimeout(this._cardLoadT); this._cardLoadT = setTimeout(() => { this.setState({ cardLoading: false, cardSkOut: true }); this._cardLoadT = setTimeout(() => this.setState({ cardSkOut: false }), 240); }, 1200);
   };
   closeSheet = () => this.animateClose(() => this.setState({ sheet: null, editFavOpen: false, cardUser: null, drawerExpanded: false, favOrigin: null, cardFromComments: false, cardBackClosing: false }));
   // drill-down navigation inside the profile card: next drawers push in from the right; back slides them out
@@ -5354,7 +5355,7 @@ class Component extends DCLogic {
       // Profile & Settings drawer (Figma 670:140673 "Background color team"): #A50044 at 60% fading out by 64.442% of 350px
       ...((isMe && s.cardFromComments) ? { cardWash: "linear-gradient(180deg,rgba(165,0,68,.6) 0%,rgba(165,0,68,0) 64.442%,rgba(165,0,68,0) 100%)" } : {}),
       avatarCutStyle: (isMe && (hasAvatarImg || this.P.selfCard !== false)) ? "-webkit-mask:radial-gradient(circle 20px at 80px 80px,transparent 99%,#000 100%);mask:radial-gradient(circle 20px at 80px 80px,transparent 99%,#000 100%);" : "",
-      cardLoading: !!s.cardLoading, cardReady: !s.cardLoading,
+      cardLoading: !!s.cardLoading, cardReady: !s.cardLoading, cardMounted: true, cardSk: !!s.cardLoading || !!s.cardSkOut, cardSkStyle: !s.cardLoading && s.cardSkOut ? "animation:fzCardOut .22s ease both;" : "",
       followLoading: !!s.followLoading,
       showFavToast: !!s.favToast && s.sheet === "card",
       favToastText: s.favToast ? (s.favToast.name + " set as your favorite") : "",
