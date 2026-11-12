@@ -11,7 +11,7 @@ section 4935:35973 "Fan Battle Animation FLOW"). Bayern (home, left) v Dortmund 
           Your gifts go to your Choose-your-team pick (neutral: the team chooser opens first); your crest
           does a heartbeat and your bar flashes.
   finish  "And the Winner is:" stays still in the strip; then the winner's crest shows big over the chat
-          with a medal dropping in and confetti (Figma 6090:64167).
+          with the Figma medal (a frame of its GIF, assets/battle/medal-figma.png) dropping in (Figma 6090:64167).
 
 Decided with the product owner: no Beck's header and no coin balance in the header.
 Text on the strip is the dot-matrix font from Figma, AB-megadot9 (Latin subset, uploads/AB-megadot9-latin.otf). Gifts: the FanZone DS "Gift pictograms" (NIgPxOlNU4U3sWMRdoE4Qh 4482:41428), Light red for Bayern and
@@ -101,13 +101,11 @@ STRIP = '''        <!-- Fan Battle strip (Figma 4935:35973) -->
           </div>
         </sc-if>
 '''
-WIN = '''        <!-- Fan Battle winner: the winning crest over the chat with a medal (Fan Battle 6090:64167) -->
+WIN = '''        <!-- Fan Battle winner: the winning team's crest over the chat with the medal from Figma (Fan Battle 6090:64167) -->
         <sc-if value="{{ fbWin }}" hint-placeholder-val="{{ false }}">
           <div aria-label="{{ fbWinName }} wins the Fan Battle" role="img" style="position:absolute;left:49px;top:78px;width:278px;height:278px;z-index:6;pointer-events:none;">
-            <span style="position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.7) 48%,rgba(0,0,0,0) 100%);animation:fzFadeIn .4s ease both;"></span>
-            <img src="{{ fbWinCrest }}" alt="" width="200" height="200" style="position:absolute;left:39px;top:30px;width:200px;height:200px;display:block;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5));animation:fbWinCrest .7s cubic-bezier(.22,1.4,.36,1) both;">
-            <span style="position:absolute;left:200px;top:120px;width:8px;height:4px;border-radius:2px;background:#F7FF1A;transform:rotate(20deg);animation:fbConfetti 1.6s 0.5s ease-out both;--dx:30px;--dy:-60px;"></span><span style="position:absolute;left:214px;top:110px;width:4px;height:10px;border-radius:2px;background:#E31B23;transform:rotate(-30deg);animation:fbConfetti 1.6s 0.55s ease-out both;--dx:50px;--dy:-30px;"></span><span style="position:absolute;left:190px;top:130px;width:6px;height:6px;border-radius:2px;background:#1DBF00;transform:rotate(45deg);animation:fbConfetti 1.6s 0.6s ease-out both;--dx:-10px;--dy:-70px;"></span><span style="position:absolute;left:222px;top:128px;width:9px;height:4px;border-radius:2px;background:#3DA9FF;transform:rotate(60deg);animation:fbConfetti 1.6s 0.5s ease-out both;--dx:60px;--dy:-10px;"></span><span style="position:absolute;left:206px;top:140px;width:4px;height:9px;border-radius:2px;background:#FF9C1A;transform:rotate(-60deg);animation:fbConfetti 1.6s 0.65s ease-out both;--dx:20px;--dy:-80px;"></span><span style="position:absolute;left:230px;top:118px;width:6px;height:6px;border-radius:2px;background:#F9FAFA;transform:rotate(10deg);animation:fbConfetti 1.6s 0.6s ease-out both;--dx:70px;--dy:-50px;"></span><span style="position:absolute;left:196px;top:116px;width:7px;height:4px;border-radius:2px;background:#E92B74;transform:rotate(-15deg);animation:fbConfetti 1.6s 0.7s ease-out both;--dx:-30px;--dy:-50px;"></span><span style="position:absolute;left:226px;top:140px;width:4px;height:8px;border-radius:2px;background:#F7FF1A;transform:rotate(75deg);animation:fbConfetti 1.6s 0.7s ease-out both;--dx:40px;--dy:-90px;"></span>
-            <img src="assets/battle/medal.svg" alt="" width="110" height="110" style="position:absolute;left:150px;top:150px;display:block;filter:drop-shadow(0 6px 12px rgba(0,0,0,.45));animation:fbWinMedal .8s .35s cubic-bezier(.22,1.5,.36,1) both;">
+            <img src="{{ fbWinCrest }}" alt="" width="200" height="200" style="position:absolute;left:39px;top:26px;width:200px;height:200px;display:block;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5));animation:fbWinCrest .7s cubic-bezier(.22,1.4,.36,1) both;">
+            <img src="assets/battle/medal-figma.png" alt="" width="278" height="278" style="position:absolute;inset:0;width:278px;height:278px;display:block;transform-origin:68% 75%;animation:fbWinMedal .8s .35s cubic-bezier(.22,1.5,.36,1) both;">
           </div>
         </sc-if>
 '''
@@ -131,8 +129,7 @@ rep('  @keyframes fzPushIn {',
     '  @keyframes fbBeat { 0%, 100% { transform: scale(1); } 35% { transform: scale(.7); } 65% { transform: scale(1.12); } }\n'
     '  @keyframes fbFlash { from { background-position: -160px 0; } to { background-position: 420px 0; } }\n'
     '  @keyframes fbWinCrest { 0% { transform: scale(.3); opacity: 0; } 100% { transform: none; opacity: 1; } }\n'
-    '  @keyframes fbWinMedal { 0% { transform: translateY(-40px) scale(.2) rotate(-40deg); opacity: 0; } 100% { transform: none; opacity: 1; } }\n'
-    '  @keyframes fbConfetti { 0% { transform: translate(0,0) scale(.3); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(var(--dx),var(--dy)) rotate(200deg); opacity: 0; } }\n'
+    '  @keyframes fbWinMedal { 0% { transform: translateY(-30px) scale(.4); opacity: 0; } 100% { transform: none; opacity: 1; } }\n'
     '  @keyframes fbRowIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }\n'
     '  .fb-gift:active svg { transform: scale(.9); }\n'
     '  @keyframes fzPushIn {')
@@ -201,7 +198,7 @@ LOGIC = '''  // Fan Battle (from the shell)
       fbMarquee: ph === "text", fbMarqueeS: 5.4, fbWinLine: ph === "finish" || ph === "winner",
       fbMarqueeText: "Fans Battle! Send Gifts to Cheer Your Team!",
       fbCallReady: ph === "ready", fbCallSet: ph === "set", fbCallGo: ph === "go",
-      fbWin: ph === "winner", fbWinName: winHome ? "Bayern München" : "Dortmund", fbWinCrest: winHome ? "assets/vec/tiles/img-logo-bayern.svg" : "assets/battle/logo-bvb.svg",
+      fbWin: ph === "winner", fbWinName: winHome ? "Bayern München" : "Dortmund", fbWinCrest: winHome ? "assets/vec/tiles/img-logo-bayern.svg" : "assets/poll/logo-bvb.png",
       fbBeatHome: beat("home"), fbBeatAway: beat("away"), fbFlashHome: flash("home"), fbFlashAway: flash("away"),
       fbGifts: ph === "battle", fbGiftColor: team === "away" ? "yellow" : "red",
       fbG1: team === "away" ? "#FDE100" : (team === "home" ? "#DC052D" : "#6D7377"), fbG2: team === "away" ? "#080E12" : "#FFFFFF", fbG3: "#080E12",
