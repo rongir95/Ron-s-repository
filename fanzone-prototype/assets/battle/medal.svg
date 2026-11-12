@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <!-- Winner medal: ribbon and a gold coin with a star -->
+  <defs>
+    <radialGradient id="coin" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#FFE68A"/><stop offset=".55" stop-color="#F5B921"/><stop offset="1" stop-color="#C98A06"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF1B0"/><stop offset="1" stop-color="#B57800"/>
+    </linearGradient>
+  </defs>
+  <path d="M30 4 L52 4 L72 40 L50 40 Z" fill="#C4121A"/>
+  <path d="M37 4 L45 4 L65 40 L57 40 Z" fill="#FFFFFF"/>
+  <path d="M98 4 L76 4 L56 40 L78 40 Z" fill="#E31B23"/>
+  <path d="M91 4 L83 4 L63 40 L71 40 Z" fill="#FFFFFF"/>
+  <circle cx="64" cy="72" r="44" fill="url(#rim)"/>
+  <circle cx="64" cy="72" r="37" fill="url(#coin)"/>
+  <circle cx="64" cy="72" r="37" fill="none" stroke="#C98A06" stroke-width="2" stroke-dasharray="3 3" opacity=".55"/>
+  <path d="M64 50 L70.5 63.5 L85 65.3 L74.4 75.4 L77.1 90 L64 82.9 L50.9 90 L53.6 75.4 L43 65.3 L57.5 63.5 Z" fill="#E9A200" stroke="#FFE68A" stroke-width="1.5" stroke-linejoin="round"/>
+  <ellipse cx="50" cy="55" rx="12" ry="6" fill="#FFFFFF" opacity=".35" transform="rotate(-30 50 55)"/>
+</svg>
