@@ -200,7 +200,7 @@
   @keyframes fbIn { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }
   @keyframes fbOut { from { transform: none; opacity: 1; } to { transform: translateY(-100%); opacity: 0; } }
   @keyframes fbMarquee { from { transform: translateX(287px); } to { transform: translateX(-100%); } }
-  @keyframes fbCallPop { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+  @keyframes fbCallPop { 0% { transform: scale(.4); opacity: 0; } 18% { transform: scale(1.15); opacity: 1; } 30%, 82% { transform: scale(1); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
   @keyframes fbBuildL { 0% { transform: scaleX(0); opacity: 0; } 13% { opacity: 1; } 100% { transform: scaleX(1); opacity: 1; } }
   @keyframes fbBeat { 0%, 100% { transform: scale(1); } 35% { transform: scale(.7); } 65% { transform: scale(1.12); } }
   @keyframes fbFlash { from { background-position: -160px 0; } to { background-position: 420px 0; } }
@@ -731,8 +731,14 @@
               </div>
             </sc-if>
             <!-- ready / set / go -->
-            <sc-if value="{{ fbCall }}" hint-placeholder-val="{{ false }}">
-              <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;letter-spacing:.06em;color:{{ fbCallColor }};animation:fbCallPop 1s ease-in-out both;">{{ fbCallText }}</span>
+            <sc-if value="{{ fbCallReady }}" hint-placeholder-val="{{ false }}">
+              <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;color:#FF7466;animation:fbCallPop 1s ease-out both;">READY</span>
+            </sc-if>
+            <sc-if value="{{ fbCallSet }}" hint-placeholder-val="{{ false }}">
+              <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;color:#F7FF1A;animation:fbCallPop 1s ease-out both;">SET</span>
+            </sc-if>
+            <sc-if value="{{ fbCallGo }}" hint-placeholder-val="{{ false }}">
+              <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;color:#1DBF00;animation:fbCallPop 1s ease-out both;">GO!!</span>
             </sc-if>
             <!-- winner -->
             <sc-if value="{{ fbWin }}" hint-placeholder-val="{{ false }}">
@@ -3643,7 +3649,6 @@ class Component extends DCLogic {
     const team = s.fzTeam === "bayern" ? "home" : (s.fzTeam === "bvb" ? "away" : null);
     const beat = (side) => (s.fbPulse === side ? "animation:fbBeat .55s ease both;" : "");
     const flash = (side) => (s.fbFlash === side ? "background:linear-gradient(100deg,rgba(255,255,255,0) 0,rgba(255,255,255,.55) 50%,rgba(255,255,255,0) 100%) no-repeat;background-size:160px 100%;animation:fbFlash .6s ease-out both;" : "");
-    const call = { ready: ["READY", "#FF7466"], set: ["SET", "#FFD23A"], go: ["GO!!", "#3DDC84"] }[ph] || null;
     const bars = ph === "build" || ph === "battle" || ph === "finish";
     return {
       fbOn: !!ph, fbStripAnim: ph === "out" ? "animation:fbOut .45s ease both;" : (ph === "entry" ? "animation:fbIn .5s cubic-bezier(.22,1,.36,1) both;" : ""),
@@ -3654,7 +3659,7 @@ class Component extends DCLogic {
       fbClock: "00:" + String(s.fbClockS != null ? s.fbClockS : 20).padStart(2, "0"),
       fbMarquee: ph === "text" || ph === "finish", fbMarqueeS: ph === "text" ? 5.4 : 4,
       fbMarqueeText: ph === "text" ? "Fans Battle! Send Gifts to Cheer Your Team!" : "And the Winner is:",
-      fbCall: !!call, fbCallText: call ? call[0] : "", fbCallColor: call ? call[1] : "#F9FAFA",
+      fbCallReady: ph === "ready", fbCallSet: ph === "set", fbCallGo: ph === "go",
       fbWin: ph === "winner", fbWinColor: winHome ? "#DC052D" : "#FDE100", fbWinText: winHome ? "#FFFFFF" : "#080E12", fbWinName: winHome ? "Bayern München" : "Dortmund",
       fbBeatHome: beat("home"), fbBeatAway: beat("away"), fbFlashHome: flash("home"), fbFlashAway: flash("away"),
       fbGifts: ph === "battle", fbGiftColor: team === "away" ? "yellow" : "red",
