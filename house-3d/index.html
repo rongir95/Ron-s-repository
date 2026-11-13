@@ -1825,7 +1825,7 @@ function desk(p, base, r, chairAt, faceTo) {
     tower(80, 55, 120, 115, 'E');                        // corner unit of the display cabinet
     for (let k = 0; k < 5; k++) pot(100, 78, 122 + k * 1.8, 10, 1.6, cer); pot(100, 98, 162, 5, 20, terra); pot(100, 75, 200, 4, 9, cer); pot(100, 88, 200, 4, 9, terra);
     // long display cabinet on the nook's north wall with a desk niche in the middle
-    B(g, 122, 57, 266, 95, 0, 10, Pl, b);
+    B(g, 122, 57, 186, 95, 0, 10, Pl, b); B(g, 246, 57, 266, 95, 0, 10, Pl, b);   // plinth only under the closed units; open floor under the desk
     B(g, 120, 55, 186, 97, 10, 120, Wt, b); B(g, 246, 55, 268, 97, 10, 120, Wt, b);
     B(g, 186, 55, 246, 58, 10, 120, Wt, b);                                   // back of the desk niche
     B(g, 186, 55, 246, 97, 72, 76, O, b);                                     // oak desktop
@@ -1962,8 +1962,9 @@ function desk(p, base, r, chairAt, faceTo) {
     for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.05, 0), M.leaf)); m.position.set(wx(28 + (rnd() - .5) * 10), b + 2.18 + rnd() * .1, wz(385 + (rnd() - .5) * 12)); p.add(m); }
     // south wall: oak tall units to the ceiling, oven tower with built-in microwave and oven, lit open niche, fridge set into the oak wall
     B(p, 76, 640.4, 137, 699, 10, 88, M.kWhite, b); B(p, 76, 637, 137, 699, 88, 92, M.qWhite, b); // tucks 1 cm into the oak tower, front set 4 mm back: no crack and no shared face
-    B(p, 16, 664, 136, 699, 150, C, M.oakLight, b); B(p, 78, 663.5, 134, 664, 150, 155, M.oakLight, b); // oak wall units reach the west wall
-    B(p, 78, 664, 134, 668, 100, 150, M.oakLight, b); B(p, 78, 664.5, 134, 665, 148, 149, M.led, b);
+    B(p, 16, 664, 136, 699, 160, C, M.oakLight, b); const lipA = B(p, 78, 663.5, 134, 664, 160, 165, M.oakLight, b); // oak wall units reach the west wall
+    const nicheA = [lipA, B(p, 78, 664, 134, 668, 100, 160, M.oakLight, b), B(p, 78, 664.5, 134, 665, 158, 159, M.led, b)]; nicheA.forEach(o => o.userData.styleA = true);
+    { const t = B(p, 16, 697.6, 136, 699, 92, 160, M.backsplash, b); t.userData.styleB = true; t.visible = false; } // oak-and-sage: green tiles between the worktop and the wall units, as in the study
     for (const [x, z] of [[90, 115], [112, 115]]) CY(p, x, 680, 4, 102, 110, M.white, b, 14);
     // tall units: oak to the ceiling; in the oak-and-sage style the part below 160 cm is white and only the top is oak
     const tall = (X0, Y0, X1, Y1) => { B(p, X0, Y0, X1, Y1, 0, C, M.oakLight, b).userData.styleA = true;
