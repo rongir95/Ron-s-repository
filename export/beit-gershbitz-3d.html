@@ -1310,7 +1310,7 @@ const OPS0 = {
   2: [W(201, 100, 100, 200), W(446, 60, 125, 205)],                     // safe-room window between shutter pockets; guest WC (frosted, beside the mirror)
   4: [{ type: 'front', at: 75, w: 90, sill: 0, head: 222 }],           // front door at the lower end of the angled wall
   6: [W(189, 140, 105, 215)],                                           // kitchen window over the sink
-  8: [{ type: 'hole', at: 135.5, w: 160, sill: 60, head: 220 }],          // dining window: opening cut to the renovated size, filled back for 'before' below                                             // window where the storage door used to be
+  8: [{ type: 'hole', at: 135.5, w: 75, sill: 20, head: 210 }],          // dining window: opening cut to the renovated size, filled back for 'before' below                                             // window where the storage door used to be
 };
 const OPS1 = {
   0: [W(153, 135)],                      // parents' room
@@ -1322,7 +1322,7 @@ const OPS1 = {
 const ROOMS = [
   { id: 'living', f: 0, name: 'סלון', dims: [510, 397], rect: [270, 25, 780, 422], old: [260, 47.5, 779.5, 425], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט עץ חם, קיר טלוויזיה בטיח בגוון גריז׳ עם מדף אגוז צף ומזנון אגוז תלוי, ספה פינתית בבד בוקלה בהיר עם כריות זית וטרקוטה, שטיח ג׳וטה, שולחן קפה מאגוז ומנורת פאות ברונזה.', note: 'דלת הזזה לחצר עם וילונות וואל, ומימינה על אותו קיר קיר הטלוויזיה עם פאנל חרדל ומזנון לבן צף. ספת עור פינתית בבז׳ לאורך הקיר המשותף, שולחן קפה לבן ומנורה תלויה.' },
   { id: 'kitchen', f: 0, name: 'מטבח', dims: [250, 360], rect: [25, 325, 275, 685], old: [16.5, 301, 290, 692.5], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, ארונות אלון עד התקרה בקיר המקרר עם מגדל תנורים ונישה מוארת, ארונות תחתונים לבנים עם משטח לבן, מדפי אלון צפים במקום הקולט, אי לבן עם בר אלון ומנורות כיפה לבנות. בלי הגבס בתקרה.', note: 'חזיתות שמנת מבריקות ומשטח קוורץ אפור בהיר. כיור מתחת לחלון, מדיח וכיריים עם קולט נירוסטה. מקרר שחור ומגדל תנורים בקיר הדרומי, בר בפורניר אגוז עם כיסאות בר, וחלק בורדו שיוצא מקיר הכיריים וסוגר את המטבח מצפון.', spots: true },
-  { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [80, 55, 270, 300], old: [75.5, 47.5, 260, 301], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, בלי הגבס בתקרה, וחלון מוגדל לרוחב 160 ס״מ במקום שבו הייתה דלת המחסן.', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
+  { id: 'storage', f: 0, name: 'פינת אוכל', dims: [160, 245], rect: [80, 55, 270, 300], old: [75.5, 47.5, 260, 301], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, בלי הגבס בתקרה, והחלון הקיים (75 ס״מ רוחב) מוארך כלפי מטה עד 20 ס״מ מהרצפה.', spots: true, note: 'פינת אוכל עם שולחן מלבני לשישה, בשטח המחסן לשעבר. קירות המחסן נהרסו, ובמקום דלת המחסן הותקן חלון.' },
   { id: 'foyer', f: 0, name: 'מבואת כניסה', dims: [150, 395], rect: [285, 432, 435, 827], old: [302, 431, 435, 824], mat: 'tile', afterMat: 'herring', afterNote: 'אחרי השיפוץ: פרקט פישבון, והנמכת הגבס בתקרה הוסרה (בלי פתח המיזוג), כך שהתקרה גבוהה יותר.', spots: true, eye: [373, 625], look: [0, 1], note: 'הכניסה המקורה, מתחת לחדר השינה בקומה העליונה. מכאן עולות המדרגות.' },
   { id: 'wc', f: 0, name: 'שירותי אורחים', dims: [155, 115], rect: [280, 837, 435, 952], old: [294.5, 836, 435, 947.5], mat: 'slate', afterMat: 'terrazzo', afterNote: 'אחרי השיפוץ: אריחי סטאק ירוקים בגובה 1.2 מ׳ וצבע לבן מעליהם, ריצוף טרצו, אסלה תלויה עם מיכל סמוי, נישת עץ מוארת מעל האסלה, כיור תלוי קטן ומראה מעוגלת עם תאורה אחורית.', eye: [400, 850], look: [-1, .75], note: 'אריחי קיר לבנים עם טקסטורת נקודות וקיר מבטא בבורדו מאחורי האסלה. כיור תלוי קטן, מראה וחלון חלבי.' },
   { id: 'mamad', f: 0, name: 'ממ״ד · חדר אחסון', dims: [315, 305], rect: [465, 647, 780, 952], old: [465, 640, 779.5, 947.5], mat: 'tile', afterNote: 'אחרי השיפוץ: הארוניות הירוקות הנמוכות נשארות, וכל השאר מסודר בארונות לבנים גבוהים לאורך הקיר המערבי, בכוורת פתוחה עם קופסאות בד ליד החלון ובארונות סגורים ליד הדלת.', note: 'מרחב מוגן דירתי מבטון מזוין שמשמש כחדר אחסון, עם מדפים לאורך הקירות. הכניסה מהמעבר שמתחת למדרגות.' },
@@ -1373,16 +1373,16 @@ const groundSlab = slab(F[0].shell, slab0, -0.002, 0.45, M.tile, M.concrete); gr
 buildOutline(F[0].shell, OUT0, OPS0, { t: 25, tEdge: { 1: 22, 2: 40, 5: 32, 10: 30 }, base: 0, h: L1 * 100, outMat: M.stone, inMat: M.interior });
 const I = (a, b, ops = [], t = 12, extra = {}) => wall(F[0].shell, a, b, Object.assign({ t, base: 0, h: (L1 - .3) * 100, ops, inMat: M.interior }, extra));
 // the former storage room's inner walls were demolished; its space now opens onto the living area
-{ // dining window (where the storage door was): 75 cm today, enlarged to 160 cm in the renovation
+{ // dining window (where the storage door was): 75 cm wide; the renovation keeps the width and lowers the sill from 102 to 20 cm
   const before = new THREE.Group(), after = new THREE.Group(); after.visible = false; F[0].shell.add(before, after);
   renoSets.push({ room: 'dining-window', before, after });
   const o = { t: 25, base: 0, h: L1 * 100, outSide: -1 }, a = [67.5, 312.5];
   const fill = (Y0, Y1, z0, z1) => { onWall(B(before, 55, Y0, 67.5, Y1, z0, z1, M.stone), 0, z0, z1); onWall(B(before, 67.5, Y0, 80, Y1, z0, z1, M.interior), 0, z0, z1); };
-  fill(97, 139.5, 60, 220); fill(214.5, 257, 60, 220); fill(139.5, 214.5, 60, 102); fill(139.5, 214.5, 210, 220);
+  fill(139.5, 214.5, 20, 102); // today's sill; the renovation only lowers the window to 20 cm above the floor, same width
   opening(before, a, 0, -1, Math.PI / 2, W(135.5, 75, 102, 210), o);
-  opening(after, a, 0, -1, Math.PI / 2, W(135.5, 160, 60, 220), o);
+  opening(after, a, 0, -1, Math.PI / 2, W(135.5, 75, 20, 210), o);
   B(before, 80, 137, 87, 217, 208, 215, M.shade, 0); B(before, 80.5, 140, 82, 214, 178, 208, M.shade, 0);
-  B(after, 80, 93, 87, 261, 222, 229, M.shade, 0); B(after, 80.5, 96, 82, 258, 200, 222, M.shade, 0);
+  B(after, 80, 137, 87, 217, 208, 215, M.shade, 0); B(after, 80.5, 140, 82, 214, 190, 208, M.shade, 0);
   // split AC unit above the enlarged window
   { const ac = B(after, 80, 133, 100, 221, 236, 264, M.white, 0); onWall(ac, 0, 236, 264);
     onWall(B(after, 100, 137, 100.6, 217, 238, 243, M.alu, 0), 0, 238, 243); }
@@ -3775,7 +3775,7 @@ document.body.appendChild(compass);
   });
   function fromHash() { const m = /^#room-([a-z0-9]+)(?:-(before|after))?$/.exec(location.hash); if (!m || !ROOMS.find(r => r.id === m[1])) return; setReno(m[2] === 'after'); focusRoom(m[1]); }
   addEventListener('hashchange', fromHash); setTimeout(fromHash, 300);
-  const TOUR = [['living', 'הסלון: פרקט פישבון, קיר טלוויזיה בטיח גריז׳ וספת בוקלה'], ['kitchen', 'המטבח: ארונות אלון עד התקרה, מדפים צפים ואי לבן'], ['storage', 'פינת האוכל: חלון מוגדל ומזגן'],
+  const TOUR = [['living', 'הסלון: פרקט פישבון, קיר טלוויזיה בטיח גריז׳ וספת בוקלה'], ['kitchen', 'המטבח: ארונות אלון עד התקרה, מדפים צפים ואי לבן'], ['storage', 'פינת האוכל: החלון מוארך כלפי מטה, ומעליו מזגן'],
     ['foyer', 'המבואה: בלי הנמכת הגבס, פרקט פישבון'], ['wc', 'שירותי אורחים: אריחי סטאק ירוקים ואסלה תלויה'], ['mamad', 'הממ״ד: ארונות אחסון'], ['bed1', 'חדר ההורים: קיר טאופ ומיטה מרופדת'],
     ['ensuite', 'מקלחת ההורים: טורקיז וטרצו'], ['bath', 'חדר רחצה אחים: מקלחון במקום האמבטיה']];
   let tourI = -1, tourT = null;
