@@ -1804,8 +1804,8 @@ function desk(p, base, r, chairAt, faceTo) {
   // nook window, display cabinet with a desk niche along the nook's north wall, grey cone pendants. Measured-plan coordinates.
   const kitchenInsp = parent => {
     const g = new THREE.Group(); g.userData.noRemap = true; g.userData.styleB = true; g.visible = false; parent.add(g);
-    const Wt = std({ color: 0xf4f2ed, roughness: .3 }), Q = std({ color: 0xf7f5f0, roughness: .22, envMapIntensity: .6 }), O = std({ color: 0xe2c49c, roughness: .55 }), Pl = std({ color: 0x1c1c1c, roughness: .6 });
-    const terra = std({ color: 0xe59a7c, roughness: .5 }), sage = std({ color: 0x8fae7a, roughness: .5 }), cer = std({ color: 0xf6f4ef, roughness: .3 });
+    const Wt = std({ color: 0xeeeae2, roughness: .3 }), Q = std({ color: 0xeeece7, roughness: .22, envMapIntensity: .6 }), O = std({ color: 0xd8b98f, roughness: .55 }), Pl = std({ color: 0x141414, roughness: .6 });
+    const terra = std({ color: 0xc07a55, roughness: .5 }), sage = std({ color: 0x7c8b64, roughness: .5 }), cer = std({ color: 0xf2f0eb, roughness: .3 });
     Object.assign(inspMats, { O, Wt, Q });
     const gap = std({ color: 0xc9c4ba, roughness: .8 }), glassV = new THREE.MeshStandardMaterial({ color: 0xe8f1f2, roughness: .05, transparent: true, opacity: .14, depthWrite: false, envMapIntensity: 1.2 });
     const seamX = (X, Y0, Y1, z) => B(g, X - .3, Y0, X + .3, Y1, z - .2, z + .2, gap, b), seamXv = (X, Y, z0, z1) => B(g, X - .3, Y - .2, X + .3, Y + .2, z0, z1, gap, b);   // on faces looking east / west
@@ -1866,7 +1866,7 @@ function desk(p, base, r, chairAt, faceTo) {
     for (const x of [179, 261]) B(g, x, 213, x + 5, 218, 0, 86, O, b);
     for (const y of [244, 294, 344]) { seat(172, y, 66, 'W'); seat(273, y, 66, 'E'); } // tucked about halfway under the counter
     // three grey cone pendants over the island and the dining counter
-    const cone = std({ color: 0x8e8d8a, roughness: .45, metalness: .5 });
+    const cone = std({ color: 0x1c1c1c, roughness: .75 });
     for (const y of [294, 414, 479]) { CY(g, 222, y, .4, 212, 270, M.black, b, 6);
       const c = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.03, .21, .22, 28, 1, true), cone)); c.material.side = THREE.DoubleSide; c.position.set(wx(222), b + 2.01, wz(y)); g.add(c);
       const bulb = new THREE.Mesh(new THREE.SphereGeometry(.045, 12, 8), M.fixture); bulb.position.set(wx(222), b + 1.95, wz(y)); g.add(bulb); }
@@ -2629,7 +2629,7 @@ function desk(p, base, r, chairAt, faceTo) {
     const m = new THREE.Mesh(g, mat); m.receiveShadow = true; m.position.set(wx((X0 + X1) / 2), y, wz((Y0 + Y1) / 2)); p.add(m); siteGround.push(m); return m;
   };
   // ---- garden, from the photos ----
-  const slatV = std({ color: 0xd6d0c7, roughness: .7 });
+  const slatV = std({ color: 0x9a8068, roughness: .7 });
   const slatFence = (X0, Y0, X1, Y1, h = 165) => { const along = Math.abs(X1 - X0) > Math.abs(Y1 - Y0), L = along ? X1 - X0 : Y1 - Y0, hz = [];
     for (let k = 0; k <= L; k += 180) hz.push(along ? B(p, X0 + k - 4, Y0 - 4, X0 + k + 4, Y0 + 4, -15, h, M.fenceDark) : B(p, X0 - 4, Y0 + k - 4, X0 + 4, Y0 + k + 4, -15, h, M.fenceDark));
     for (let z = 5; z < h - 5; z += 20) hz.push(along ? B(p, X0, Y0 - 1.5, X1, Y0 + 1.5, z, z + 15, M.fenceDark) : B(p, X0 - 1.5, Y0, X0 + 1.5, Y1, z, z + 15, M.fenceDark));
@@ -2700,7 +2700,7 @@ function desk(p, base, r, chairAt, faceTo) {
   tree(20, -380, 2.8, 1.0, 0x7a9a3f, 0xd6d84a);             // lemon tree
   tree(-80, -40, 2.6, .9, 0x7a9a3f, 0xd6d84a);              // lemon tree on the lawn side
   tree(560, -480, 2.4, .7, 0x6a8a3a, 0xe0b030);             // small citrus by the fence
-  const ballMat = new THREE.MeshStandardMaterial({ color: 0x9fb98c, roughness: .85 });
+  const ballMat = new THREE.MeshStandardMaterial({ color: 0x7f9c68, roughness: .85 });
   const simpleBall = (X, Y, y, r) => { const m = shadowy(new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16), ballMat)); m.position.set(wx(X), y, wz(Y)); m.userData.styleB = true; m.visible = false; p.add(m); }; // oak-and-sage: fronds become one smooth crown
   const cycas = (X, Y, s = 1) => { for (let k = 0; k < 18; k++) { const a = k / 18 * 6.28, l = new THREE.Mesh(new THREE.BoxGeometry(.06, .015, .9 * s), std({ color: 0x2f5a2a, roughness: .8 })); l.castShadow = true; l.position.set(wx(X) + Math.cos(a) * .35 * s, .25 * s, wz(Y) + Math.sin(a) * .35 * s); l.rotation.y = -a + Math.PI / 2; l.rotation.x = .5; l.userData.styleA = true; p.add(l); } blob(X, Y, .15 * s, .18 * s, 0x6a5a30); simpleBall(X, Y, .3 * s, .42 * s); };
   cycas(120, -420, 1.3); cycas(250, -470, 1.1); cycas(-150, -250, 1.2);
@@ -3242,24 +3242,24 @@ document.querySelector('#toolsP .thead').addEventListener('click', e => { const 
    It restyles the whole house on top of the renovated layout and swaps the kitchen for the study's "direction A" layout. */
 state.style = 'a';
 T.sageTile = canvasTex(512, (g, s) => {
-  g.fillStyle = '#e3e6dc'; g.fillRect(0, 0, s, s); const tw = s / 8, th = s / 2;
-  for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) { const l = 66 + (Math.random() - .5) * 6; const gr = g.createLinearGradient(i * tw, 0, i * tw + tw, 0); gr.addColorStop(0, hsl(96, 26, l + 2)); gr.addColorStop(1, hsl(96, 26, l - 2)); g.fillStyle = gr; g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3); }
+  g.fillStyle = '#d6d3c9'; g.fillRect(0, 0, s, s); const tw = s / 8, th = s / 2;
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) { const l = 47 + (Math.random() - .5) * 6; const gr = g.createLinearGradient(i * tw, 0, i * tw + tw, 0); gr.addColorStop(0, hsl(83, 17, l + 2)); gr.addColorStop(1, hsl(83, 17, l - 2)); g.fillStyle = gr; g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3); }
 }, 0.6);
 T.plankOak = canvasTex(1024, (g, s) => {
   const rows = 8, rh = s / rows;
   for (let r = 0; r < rows; r++) { let x = -Math.random() * s * .6;
-    while (x < s) { const len = s * (.45 + Math.random() * .5), l = 66 + Math.random() * 6;
-      for (const ox of [0, s]) { g.fillStyle = hsl(27, 58, l); g.fillRect(x + ox, r * rh, len, rh); g.fillStyle = 'rgba(150,95,50,.35)'; g.fillRect(x + ox + len - 1.5, r * rh, 1.5, rh); }
+    while (x < s) { const len = s * (.45 + Math.random() * .5), l = 47 + Math.random() * 6;
+      for (const ox of [0, s]) { g.fillStyle = hsl(30, 33, l); g.fillRect(x + ox, r * rh, len, rh); g.fillStyle = 'rgba(150,95,50,.35)'; g.fillRect(x + ox + len - 1.5, r * rh, 1.5, rh); }
       x += len; }
     for (let i = 0; i < 20; i++) { const y = r * rh + Math.random() * rh; g.strokeStyle = `rgba(150,100,55,${.03 + Math.random() * .06})`; g.lineWidth = .6 + Math.random() * 1.4; g.beginPath(); g.moveTo(0, y); g.lineTo(s, y + (Math.random() - .5) * 3); g.stroke(); }
     g.fillStyle = 'rgba(150,95,50,.3)'; g.fillRect(0, r * rh, s, 1.5); }
 }, 1.6);
 Object.assign(M, {
-  sOak: std({ color: 0xe2c49c, roughness: .55 }), sWhite: std({ color: 0xf4f2ed, roughness: .3 }), sQuartz: std({ color: 0xf7f5f0, roughness: .22, envMapIntensity: .6 }),
-  sSage: std({ map: T.sageTile, roughness: .15, envMapIntensity: .8 }), sTerra: std({ color: 0xe59a7c, roughness: 1 }), sSageCloth: std({ color: 0x9fb38a, roughness: 1 }),
+  sOak: std({ color: 0xd8b98f, roughness: .55 }), sWhite: std({ color: 0xeeeae2, roughness: .3 }), sQuartz: std({ color: 0xeeece7, roughness: .22, envMapIntensity: .6 }),
+  sSage: std({ map: T.sageTile, roughness: .15, envMapIntensity: .8 }), sTerra: std({ color: 0xc07a55, roughness: 1 }), sSageCloth: std({ color: 0x9aa886, roughness: 1 }),
   sParquet: std({ map: T.plankOak, roughness: .45, envMapIntensity: .5 }),
 });
-M.sOak.map = grainTex('#e2c49c', '#c7a57a', '#f0dab8'); M.sOak.color.set(0xffffff); relief(M.sOak, .3); relief(M.sSage, .6); relief(M.sParquet, .25);
+M.sOak.map = grainTex('#d8b98f', '#b8935f', '#e6cda6'); M.sOak.color.set(0xffffff); relief(M.sOak, .3); relief(M.sSage, .6); relief(M.sParquet, .25);
 if (inspMats.O) { inspMats.O.map = M.sOak.map; inspMats.O.normalMap = M.sOak.normalMap; inspMats.O.normalScale.set(.3, .3); inspMats.O.color.set(0xffffff); inspMats.O.needsUpdate = true; }
 const STYLE_MAP = new Map([['oakLight', 'sOak'], ['walnutA', 'sOak'], ['nicheWood', 'sOak'], ['wood', 'sOak'], ['walnut', 'sOak'], ['espresso', 'sOak'], ['espressoDS', 'sOak'], ['wenge', 'sOak'],
   ['veneer', 'sOak'], ['oak', 'sOak'], ['grayWood', 'sOak'], ['kWhite', 'sWhite'], ['qWhite', 'sQuartz'], ['taupe', 'sWhite'],
@@ -3274,9 +3274,10 @@ let styleList = null, styleOn = false;
 // strong reds → terracotta, the rest → pale tints). Glass, lights and the stair treads stay as they are.
 const softCacheM = new Map(), nameOf = new Map(Object.entries(M).map(([k, v]) => [v, k]));
 const WOODS = ['walnut', 'oak', 'espresso', 'espressoDS', 'wenge', 'walnutA', 'oakLight', 'grayWood', 'wood', 'veneer', 'nicheWood', 'deck', 'sOak', 'herring', 'laminate', 'lamGrey', 'lamDark', 'lamOak'];
-const FIXED = { stone: 0xf1eee8, plaster: 0xf6f4ef, interior: 0xf8f7f3, ceiling: 0xfaf9f6, fenceDark: 0xd3cdc4, roof: 0xdfa58c, brick: 0xe9cdbb, stoneStrip: 0xe7e3dc, concrete: 0xdedbd4,
-  pavers: 0xe6e2da, pavers2: 0xe6e2da, pathSlab: 0xf0ede6, gravel: 0xf3f1ec, mulch: 0xd9b9a4, asphalt: 0xc9c9c7, cap: 0x44474a, slabSide: 0xf4f2ed, sillStone: 0xf0ede6, trim: 0xf6f5f1,
-  doorDark: 0x55585c, alu: 0x55585c, railing: 0x55585c, black: 0x3d4043, skirt: 0xf4f2ed, skirtWhite: 0xf7f6f2, tile: 0xe9e7e2, slate: 0xdcdad5, hallTile: 0xe6e4df };
+const FIXED = { stone: 0xe9e4da, plaster: 0xf1eee8, interior: 0xf1eee8, ceiling: 0xf7f5f1, fenceDark: 0xc7bfb2, roof: 0xc98263, brick: 0xd9a98c, stoneStrip: 0xd9d3c8, concrete: 0xc9c5bc,
+  pavers: 0xcfc6b5, pavers2: 0xcfc6b5, pathSlab: 0xe2ddd2, gravel: 0xe6e2d9, mulch: 0xc09378, asphalt: 0x9d9d9b, cap: 0x2b2d30, slabSide: 0xe9e6df, sillStone: 0xe2ddd2, trim: 0xf2f0eb,
+  doorDark: 0x3a3c3f, alu: 0x3a3c3f, railing: 0x3a3c3f, black: 0x1e1e1e, skirt: 0xf2f0eb, skirtWhite: 0xf2f0eb, tile: 0xd9d6cf, slate: 0xc4c1ba, hallTile: 0xd4d1ca,
+  grass: 0xa9b48f, turf: 0xa9b48f, trunk: 0x8a6e55, leaf: 0x7f9c68, cabinetDark: 0x3a3c3f, shade: 0xd8d2c6, fixture: 0xfff4e2 };
 const avgCol = m => { const c = m.color ? m.color.clone() : new THREE.Color(0xcccccc); const im = m.map && m.map.image;
   if (im && im.width) { try { const cv = document.createElement('canvas'); cv.width = cv.height = 4; const g = cv.getContext('2d'); g.drawImage(im, 0, 0, 4, 4); const d = g.getImageData(0, 0, 4, 4).data; let r = 0, gg = 0, b = 0;
     for (let k = 0; k < 64; k += 4) { r += d[k]; gg += d[k + 1]; b += d[k + 2]; } c.multiply(new THREE.Color().setRGB(r / 16 / 255, gg / 16 / 255, b / 16 / 255, THREE.SRGBColorSpace)); } catch (e) {} }
@@ -3291,10 +3292,10 @@ function soft(m) {
   else { const col = new THREE.Color();
     if (name in FIXED) col.setHex(FIXED[name]);
     else { const h = {}; avgCol(m).getHSL(h, THREE.SRGBColorSpace); const deg = h.h * 360;
-      if (h.s < .12) col.setHSL(0, 0, h.l < .2 ? .27 : .66 + .3 * h.l, THREE.SRGBColorSpace);
-      else if (deg > 60 && deg < 170) col.setHSL(.265, .24, Math.min(.76, .52 + .35 * h.l), THREE.SRGBColorSpace);
-      else if ((deg < 22 || deg > 330) && h.s > .35) col.setHSL(.045, .62, .7, THREE.SRGBColorSpace);
-      else col.setHSL(h.h, Math.min(h.s, .28), .64 + .3 * h.l, THREE.SRGBColorSpace); }
+      if (h.s < .12) col.setHSL(0, 0, h.l < .22 ? .13 + h.l * .4 : .42 + .52 * h.l, THREE.SRGBColorSpace);   // neutrals keep their depth: blacks stay dark, whites stay white
+      else if (deg > 60 && deg < 170) col.setHSL(.24, .27, Math.min(.64, .4 + .35 * h.l), THREE.SRGBColorSpace);   // greens → sage
+      else if ((deg < 22 || deg > 330) && h.s > .35) col.setHSL(.04, .5, .58, THREE.SRGBColorSpace);               // strong reds → terracotta
+      else col.setHSL(h.h, Math.min(h.s, .38), .38 + .5 * h.l, THREE.SRGBColorSpace); }                            // the rest: calmer, not washed out
     r = new THREE.MeshStandardMaterial({ color: col, roughness: Math.max(.6, m.roughness), metalness: Math.min(m.metalness, .25), envMapIntensity: .35, side: m.side, flatShading: m.flatShading,
       polygonOffset: m.polygonOffset, polygonOffsetFactor: m.polygonOffsetFactor, polygonOffsetUnits: m.polygonOffsetUnits }); }
   softCacheM.set(m, r); return r;
@@ -3310,7 +3311,7 @@ function styleSwap(insp) {
   for (const [o, a, alt] of styleList.mats) o.material = insp ? alt : a;
   for (const o of styleList.a) o.visible = !insp; for (const o of styleList.b) o.visible = insp;
   applyNight();
-  if (insp && !state.night) { sun.intensity = 1.9; sun.color.set(0xfff6ea); hemi.intensity = 1.9; hemi.color.set(0xffffff); hemi.groundColor.set(0xe9e5dd); skyU.top.value.set(0xa9c3de); skyU.horizon.value.set(0xeef2f4); scene.fog.color.set(0xeef2f4); renderer.toneMappingExposure = 1.08; }
+  if (insp && !state.night) { sun.intensity = 2.6; sun.color.set(0xfff3e2); hemi.intensity = 1.15; hemi.color.set(0xf4f6fa); hemi.groundColor.set(0xb9ae9c); skyU.top.value.set(0x8fb2d6); skyU.horizon.value.set(0xe6ecef); scene.fog.color.set(0xe6ecef); renderer.toneMappingExposure = 1.0; }
 }
 /* before / after renovation: swaps the room groups and floors in place, camera stays where it is */
 function renoVisual(on) {
@@ -3660,7 +3661,7 @@ document.body.appendChild(compass);
   scene.traverse(o => { if (!o.isMesh || o.geometry.type !== 'IcosahedronGeometry' || !o.material.color) return;
     const hsl = o.material.color.getHSL({}); if (hsl.h > .17 && hsl.h < .45 && hsl.s > .15) blobs.push(o); });
   const leafG = new THREE.SphereGeometry(1, 6, 4); leafG.scale(.5, .08, 1); leafG.translate(0, 0, .6);
-  const mats = new Map(), dummy = new THREE.Object3D(), ballG = new THREE.SphereGeometry(1, 24, 16), ballM = new THREE.MeshStandardMaterial({ color: 0x9fb98c, roughness: .85 });
+  const mats = new Map(), dummy = new THREE.Object3D(), ballG = new THREE.SphereGeometry(1, 24, 16), ballM = new THREE.MeshStandardMaterial({ color: 0x7f9c68, roughness: .85 });
   for (const o of blobs) {
     const r = o.geometry.parameters.radius, sc = (o.scale.x + o.scale.y + o.scale.z) / 3, R = r * sc;
     const key = o.material.color.getHexString(); if (!mats.has(key)) { const c = o.material.color.clone(); mats.set(key, new THREE.MeshStandardMaterial({ color: c, roughness: .7, side: THREE.DoubleSide, vertexColors: false })); }
