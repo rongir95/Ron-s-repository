@@ -3266,10 +3266,11 @@ document.querySelector('#toolsP .thead').addEventListener('click', e => { const 
    shelves, furniture and stairs, pale oak plank floors, narrow sage-green wall tiles, grey cone pendants, sage and terracotta accents.
    It restyles the whole house on top of the renovated layout and swaps the kitchen for the study's "direction A" layout. */
 state.style = 'a';
-T.sageTile = canvasTex(512, (g, s) => {
-  g.fillStyle = '#d6d3c9'; g.fillRect(0, 0, s, s); const tw = s / 8, th = s / 2;
-  for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) { const l = 47 + (Math.random() - .5) * 6; const gr = g.createLinearGradient(i * tw, 0, i * tw + tw, 0); gr.addColorStop(0, hsl(83, 17, l + 2)); gr.addColorStop(1, hsl(83, 17, l - 2)); g.fillStyle = gr; g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3); }
+const sageTex = (L, S, grout) => canvasTex(512, (g, s) => {
+  g.fillStyle = grout; g.fillRect(0, 0, s, s); const tw = s / 8, th = s / 2;
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) { const l = L + (Math.random() - .5) * 6; const gr = g.createLinearGradient(i * tw, 0, i * tw + tw, 0); gr.addColorStop(0, hsl(83, S, l + 2)); gr.addColorStop(1, hsl(83, S, l - 2)); g.fillStyle = gr; g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3); }
 }, 0.6);
+T.sageTile = sageTex(47, 17, '#d6d3c9'); T.sageTileLight = sageTex(72, 22, '#ecebe4'); // the kitchen splashback is a lighter sage than the bathrooms
 T.plankOak = canvasTex(1024, (g, s) => {
   const rows = 8, rh = s / rows;
   for (let r = 0; r < rows; r++) { let x = -Math.random() * s * .6;
@@ -3281,14 +3282,14 @@ T.plankOak = canvasTex(1024, (g, s) => {
 }, 1.6);
 Object.assign(M, {
   sOak: std({ color: 0xd8b98f, roughness: .55 }), sWhite: std({ color: 0xeeeae2, roughness: .3 }), sQuartz: std({ color: 0xeeece7, roughness: .22, envMapIntensity: .6 }),
-  sSage: std({ map: T.sageTile, roughness: .15, envMapIntensity: .8 }), sTerra: std({ color: 0xc07a55, roughness: 1 }), sSageCloth: std({ color: 0x9aa886, roughness: 1 }),
+  sSage: std({ map: T.sageTile, roughness: .15, envMapIntensity: .8 }), sSageK: std({ map: T.sageTileLight, roughness: .15, envMapIntensity: .8 }), sTerra: std({ color: 0xc07a55, roughness: 1 }), sSageCloth: std({ color: 0x9aa886, roughness: 1 }),
   sParquet: std({ map: T.plankOak, roughness: .45, envMapIntensity: .5 }),
 });
-M.sOak.map = grainTex('#d8b98f', '#b8935f', '#e6cda6'); M.sOak.color.set(0xffffff); relief(M.sOak, .3); relief(M.sSage, .6); relief(M.sParquet, .25);
+M.sOak.map = grainTex('#d8b98f', '#b8935f', '#e6cda6'); M.sOak.color.set(0xffffff); relief(M.sOak, .3); relief(M.sSage, .6); relief(M.sSageK, .6); relief(M.sParquet, .25);
 if (inspMats.O) { inspMats.O.map = M.sOak.map; inspMats.O.normalMap = M.sOak.normalMap; inspMats.O.normalScale.set(.3, .3); inspMats.O.color.set(0xffffff); inspMats.O.needsUpdate = true; }
 const STYLE_MAP = new Map([['oakLight', 'sOak'], ['walnutA', 'sOak'], ['nicheWood', 'sOak'], ['wood', 'sOak'], ['walnut', 'sOak'], ['espresso', 'sOak'], ['espressoDS', 'sOak'], ['wenge', 'sOak'],
   ['veneer', 'sOak'], ['oak', 'sOak'], ['grayWood', 'sOak'], ['kWhite', 'sWhite'], ['qWhite', 'sQuartz'], ['taupe', 'sWhite'],
-  ['backsplash', 'sSage'], ['greenStack', 'sSage'], ['tealStack', 'sSage'], ['beigeStack', 'sSage'], ['taupeWall', 'interior'], ['plasterWarm', 'interior'],
+  ['backsplash', 'sSageK'], ['greenStack', 'sSage'], ['tealStack', 'sSage'], ['beigeStack', 'sSage'], ['taupeWall', 'interior'], ['plasterWarm', 'interior'],
   ['knit', 'sTerra'], ['rust', 'sTerra'], ['sageTowel', 'sSageCloth']].filter(([a, b]) => M[a] && M[b]).map(([a, b]) => [M[a], M[b]]));
 const inspFloor = r => !r.outdoor && !['wc', 'ensuite', 'bath', 'mamad', 'balcony'].includes(r.id);
 const floorMat = (r, on) => { const insp = on && state.style === 'insp'; if (insp && inspFloor(r)) return M.sParquet; const m = M[on && r.afterMat ? r.afterMat : r.mat]; return insp && !['sageTile'].includes(r.afterMat) ? soft(m) : m; };
@@ -3312,7 +3313,7 @@ function soft(m) {
   let r = softCacheM.get(m); if (r) return r;
   const name = nameOf.get(m), keep = () => (softCacheM.set(m, m), m);
   if (STYLE_MAP.has(m)) r = STYLE_MAP.get(m);
-  else if (m.transparent || m.opacity < 1 || (m.emissiveIntensity > .3 && m.emissive && m.emissive.getHex()) || ['treadWood', 'sSage', 'sParquet', 'sOak', 'sWhite', 'sQuartz', 'sTerra', 'sSageCloth', 'mirror', 'water', 'glass'].includes(name) || Object.values(inspMats).includes(m)) return keep();
+  else if (m.transparent || m.opacity < 1 || (m.emissiveIntensity > .3 && m.emissive && m.emissive.getHex()) || ['treadWood', 'sSage', 'sSageK', 'sParquet', 'sOak', 'sWhite', 'sQuartz', 'sTerra', 'sSageCloth', 'mirror', 'water', 'glass'].includes(name) || Object.values(inspMats).includes(m)) return keep();
   else if (WOODS.includes(name)) r = M.sOak;
   else { const col = new THREE.Color();
     if (name in FIXED) col.setHex(FIXED[name]);
