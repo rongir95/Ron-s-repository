@@ -2700,9 +2700,11 @@ function desk(p, base, r, chairAt, faceTo) {
   tree(20, -380, 2.8, 1.0, 0x7a9a3f, 0xd6d84a);             // lemon tree
   tree(-80, -40, 2.6, .9, 0x7a9a3f, 0xd6d84a);              // lemon tree on the lawn side
   tree(560, -480, 2.4, .7, 0x6a8a3a, 0xe0b030);             // small citrus by the fence
-  const cycas = (X, Y, s = 1) => { for (let k = 0; k < 18; k++) { const a = k / 18 * 6.28, l = new THREE.Mesh(new THREE.BoxGeometry(.06, .015, .9 * s), std({ color: 0x2f5a2a, roughness: .8 })); l.castShadow = true; l.position.set(wx(X) + Math.cos(a) * .35 * s, .25 * s, wz(Y) + Math.sin(a) * .35 * s); l.rotation.y = -a + Math.PI / 2; l.rotation.x = .5; p.add(l); } blob(X, Y, .15 * s, .18 * s, 0x6a5a30); };
+  const ballMat = new THREE.MeshStandardMaterial({ color: 0x9fb98c, roughness: .85 });
+  const simpleBall = (X, Y, y, r) => { const m = shadowy(new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16), ballMat)); m.position.set(wx(X), y, wz(Y)); m.userData.styleB = true; m.visible = false; p.add(m); }; // oak-and-sage: fronds become one smooth crown
+  const cycas = (X, Y, s = 1) => { for (let k = 0; k < 18; k++) { const a = k / 18 * 6.28, l = new THREE.Mesh(new THREE.BoxGeometry(.06, .015, .9 * s), std({ color: 0x2f5a2a, roughness: .8 })); l.castShadow = true; l.position.set(wx(X) + Math.cos(a) * .35 * s, .25 * s, wz(Y) + Math.sin(a) * .35 * s); l.rotation.y = -a + Math.PI / 2; l.rotation.x = .5; l.userData.styleA = true; p.add(l); } blob(X, Y, .15 * s, .18 * s, 0x6a5a30); simpleBall(X, Y, .3 * s, .42 * s); };
   cycas(120, -420, 1.3); cycas(250, -470, 1.1); cycas(-150, -250, 1.2);
-  const palm = (X, Y, h) => { CY(p, X, Y, 10, -15, h * 100, M.trunk, 0, 8, 14); for (let k = 0; k < 12; k++) { const a = k / 12 * 6.28, l = new THREE.Mesh(new THREE.BoxGeometry(.08, .01, 1.3), std({ color: 0x5e8a3a, roughness: .8, side: THREE.DoubleSide })); l.castShadow = true; l.position.set(wx(X) + Math.cos(a) * .5, h + .1, wz(Y) + Math.sin(a) * .5); l.rotation.y = -a + Math.PI / 2; l.rotation.x = .55; p.add(l); } };
+  const palm = (X, Y, h) => { CY(p, X, Y, 10, -15, h * 100, M.trunk, 0, 8, 14); for (let k = 0; k < 12; k++) { const a = k / 12 * 6.28, l = new THREE.Mesh(new THREE.BoxGeometry(.08, .01, 1.3), std({ color: 0x5e8a3a, roughness: .8, side: THREE.DoubleSide })); l.castShadow = true; l.position.set(wx(X) + Math.cos(a) * .5, h + .1, wz(Y) + Math.sin(a) * .5); l.rotation.y = -a + Math.PI / 2; l.rotation.x = .55; l.userData.styleA = true; p.add(l); } simpleBall(X, Y, h + .15, .6); };
   palm(350, -500, 1.6); palm(-170, 980, 2.4);
   for (let X = 400; X < 680; X += 45) blob(X, -520 + rnd() * 30, .3, .3, 0x4a6a3a);
   // dark slatted fences around the garden and the side lawn
@@ -2913,7 +2915,7 @@ function applyNight() {
   const n = state.night;
   document.documentElement.dataset.night = n ? '1' : '0';
   sun.intensity = n ? .35 : 3.2; sun.color.set(n ? 0x9fb5ff : 0xfff0da);
-  hemi.intensity = n ? .12 : .9; hemi.color.set(n ? 0x6d84b8 : 0xdfeaff);
+  hemi.intensity = n ? .12 : .9; hemi.color.set(n ? 0x6d84b8 : 0xdfeaff); hemi.groundColor.set(0x7a6a50);
   skyU.top.value.set(n ? 0x050a18 : 0x5d8fc9); skyU.horizon.value.set(n ? 0x1b2a45 : 0xdde8f0); skyU.bottom.value.set(n ? 0x0b1220 : 0xb9c4a8);
   scene.fog.color.set(n ? 0x1b2a45 : 0xdde8f0);
   scene.environment = n ? null : envTex;
@@ -3308,7 +3310,7 @@ function styleSwap(insp) {
   for (const [o, a, alt] of styleList.mats) o.material = insp ? alt : a;
   for (const o of styleList.a) o.visible = !insp; for (const o of styleList.b) o.visible = insp;
   applyNight();
-  if (insp && !state.night) { sun.intensity = 2.3; sun.color.set(0xfff6ea); hemi.intensity = 1.5; hemi.color.set(0xffffff); skyU.top.value.set(0xa9c3de); skyU.horizon.value.set(0xeef2f4); scene.fog.color.set(0xeef2f4); renderer.toneMappingExposure = 1.08; }
+  if (insp && !state.night) { sun.intensity = 1.9; sun.color.set(0xfff6ea); hemi.intensity = 1.9; hemi.color.set(0xffffff); hemi.groundColor.set(0xe9e5dd); skyU.top.value.set(0xa9c3de); skyU.horizon.value.set(0xeef2f4); scene.fog.color.set(0xeef2f4); renderer.toneMappingExposure = 1.08; }
 }
 /* before / after renovation: swaps the room groups and floors in place, camera stays where it is */
 function renoVisual(on) {
