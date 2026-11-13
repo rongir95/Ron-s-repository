@@ -1962,8 +1962,8 @@ function desk(p, base, r, chairAt, faceTo) {
     for (let k = 0; k < 6; k++) { const m = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.05, 0), M.leaf)); m.position.set(wx(28 + (rnd() - .5) * 10), b + 2.18 + rnd() * .1, wz(385 + (rnd() - .5) * 12)); p.add(m); }
     // south wall: oak tall units to the ceiling, oven tower with built-in microwave and oven, lit open niche, fridge set into the oak wall
     B(p, 76, 640.4, 137, 699, 10, 88, M.kWhite, b); B(p, 76, 637, 137, 699, 88, 92, M.qWhite, b); // tucks 1 cm into the oak tower, front set 4 mm back: no crack and no shared face
-    B(p, 16, 664, 136, 699, 135, C, M.oakLight, b); B(p, 78, 663.5, 134, 664, 135, 140, M.oakLight, b); // oak wall units reach the west wall
-    B(p, 78, 664, 134, 668, 100, 135, M.oakLight, b); B(p, 78, 664.5, 134, 665, 133, 134, M.led, b);
+    B(p, 16, 664, 136, 699, 150, C, M.oakLight, b); B(p, 78, 663.5, 134, 664, 150, 155, M.oakLight, b); // oak wall units reach the west wall
+    B(p, 78, 664, 134, 668, 100, 150, M.oakLight, b); B(p, 78, 664.5, 134, 665, 148, 149, M.led, b);
     for (const [x, z] of [[90, 115], [112, 115]]) CY(p, x, 680, 4, 102, 110, M.white, b, 14);
     // tall units: oak to the ceiling; in the oak-and-sage style the part below 160 cm is white and only the top is oak
     const tall = (X0, Y0, X1, Y1) => { B(p, X0, Y0, X1, Y1, 0, C, M.oakLight, b).userData.styleA = true;
