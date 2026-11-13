@@ -335,6 +335,9 @@ body{background:var(--stage);color:var(--ink);font-family:var(--f-ui);font-size:
   body.zshift .compass{left:calc(var(--zl) + 250px)!important}
   .card{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 }
+.renobar{width:auto!important;grid-template-columns:repeat(4,auto)!important}
+.renobar button{padding:7px 12px!important;white-space:nowrap}
+@media (max-width:760px){.renobar{max-width:none!important;width:calc(100% - 24px)!important}.renobar button{padding:7px 4px!important;font-size:12px}.renobar .ic{display:none}}
 body.tooling .lbl{pointer-events:none}
 .planner input,.planner select{background-color:var(--track)!important;border:0!important;border-radius:10px!important;padding:6px 10px!important}
 .planner select{appearance:none;-webkit-appearance:none;padding-left:28px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%23777' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px 50%;background-size:14px 14px}
@@ -420,6 +423,7 @@ body.zhide .zoom,body.zhide .compass{opacity:0;pointer-events:none}
 <div class="seg renobar panel" id="renoBar" role="group" aria-label="לפני או אחרי שיפוץ">
       <button data-reno="before" aria-pressed="true">לפני</button>
       <button data-reno="after" aria-pressed="false">אחרי</button>
+      <button data-reno="insp" aria-pressed="false">אגוז ומרווה</button>
       <button data-reno="split" aria-pressed="false">השוואה</button>
     </div>
 
@@ -3055,7 +3059,7 @@ function selectRoom(id, fly) {
   document.getElementById('cName').textContent = r.name;
   document.getElementById('cDims').textContent = `${r.dims[0]} × ${r.dims[1]} ס״מ`;
   document.getElementById('cArea').textContent = `${(r.dims[0] * r.dims[1] / 1e4).toFixed(1)} מ״ר`;
-  setCardNote(state.reno && r.afterNote ? r.afterNote : r.note);
+  setCardNote(state.reno && r.afterNote ? (state.style === 'insp' ? INSP_NOTE : r.afterNote) : r.note);
   card.hidden = false;
   if (fly) {
     const [x0, y0, x1, y1] = r.rect, base = r.f === 0 ? 0 : L1 + (state.mode === 'exploded' ? targets.f1 : 0);
@@ -3135,7 +3139,7 @@ document.querySelectorAll('.zoom button').forEach(b => { const t = b.getAttribut
   const q = s => document.querySelector(s);
   [['#tNight', 'night'], ['#tLabels', 'labels'], ['#tNeighbor', 'neighbor'], ['#tCars', 'car'], ['#tDoors', 'door'], ['#tRotate', 'rotate'], ['#tHQ', 'hq'], ['#tPins', 'pin'], ['#tElec', 'elec'], ['#tPlumb', 'plumb'], ['#tTour', 'tour'], ['#tDash', 'dash'], ['#tPlanner', 'planner'],
    ['[data-view=street]', 'street'], ['[data-view=garden]', 'garden'], ['[data-view=top]', 'top'], ['[data-view=iso]', 'iso'], ['[data-walkout=garden]', 'walk'], ['[data-walkout=front]', 'car'],
-   ['[data-tab=view]', 'eye'], ['[data-tab=set]', 'gear'], ['[data-reno=before]', 'before'], ['[data-reno=after]', 'after'], ['[data-reno=split]', 'split'],
+   ['[data-tab=view]', 'eye'], ['[data-tab=set]', 'gear'], ['[data-reno=before]', 'before'], ['[data-reno=after]', 'after'], ['[data-reno=insp]', 'garden'], ['[data-reno=split]', 'split'],
    ['[data-mode=full]', 'full'], ['[data-mode=ground]', 'ground'], ['[data-mode=first]', 'first'], ['[data-mode=exploded]', 'exploded'],
    ['[data-walls=full]', 'wallFull'], ['[data-walls=low]', 'wallLow'], ['[data-walls=none]', 'wallNone'],
    ['#cFocus', 'target'], ['#cWalk', 'walk']].forEach(([s, k]) => add(q(s), k));
@@ -3146,6 +3150,38 @@ document.querySelector('#toolsP .thead').addEventListener('click', e => { const 
   const show = t => { tabs.forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t)); panes.forEach(p => p.hidden = p.dataset.pane !== t); try { localStorage.setItem('menuTab', t); } catch (e) {} };
   tabs.forEach(b => b.addEventListener('click', () => { document.getElementById('toolsP').classList.remove('min'); show(b.dataset.tab); }));
   let t0 = 'view'; try { t0 = localStorage.getItem('menuTab') || 'view'; } catch (e) {} show(['view', 'set'].includes(t0) ? t0 : 'view'); }
+/* second renovation style, "walnut and sage" (from the kitchen study): the same renovated layout with another palette.
+   Walnut fronts, light lower units, white quartz, narrow sage-green wall tiles, brass hardware, straight oak plank parquet, sage and terracotta textiles. */
+state.style = 'a';
+T.sageTile = canvasTex(512, (g, s) => {
+  g.fillStyle = '#d6d3c9'; g.fillRect(0, 0, s, s); const tw = s / 8, th = s / 2;
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) { const l = 44 + (Math.random() - .5) * 7; const gr = g.createLinearGradient(i * tw, 0, i * tw + tw, 0); gr.addColorStop(0, hsl(83, 17, l + 3)); gr.addColorStop(1, hsl(83, 17, l - 2)); g.fillStyle = gr; g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3); }
+}, 0.6);
+T.plankOak = canvasTex(1024, (g, s) => {
+  const rows = 8, rh = s / rows;
+  for (let r = 0; r < rows; r++) { let x = -Math.random() * s * .6;
+    while (x < s) { const len = s * (.45 + Math.random() * .5), l = 50 + Math.random() * 9;
+      for (const ox of [0, s]) { g.fillStyle = hsl(29, 34, l); g.fillRect(x + ox, r * rh, len, rh); g.fillStyle = 'rgba(70,45,25,.5)'; g.fillRect(x + ox + len - 1.5, r * rh, 1.5, rh); }
+      x += len; }
+    for (let i = 0; i < 26; i++) { const y = r * rh + Math.random() * rh; g.strokeStyle = `rgba(90,60,30,${.04 + Math.random() * .08})`; g.lineWidth = .6 + Math.random() * 1.4; g.beginPath(); g.moveTo(0, y); g.lineTo(s, y + (Math.random() - .5) * 3); g.stroke(); }
+    g.fillStyle = 'rgba(70,45,25,.45)'; g.fillRect(0, r * rh, s, 1.5); }
+}, 1.6);
+Object.assign(M, {
+  sWalnut: std({ color: 0xc9a273, roughness: .55 }), sLower: std({ color: 0xeeeae2, roughness: .3 }), sQuartz: std({ color: 0xeeece7, roughness: .22, envMapIntensity: .6 }),
+  sSage: std({ map: T.sageTile, roughness: .15, envMapIntensity: .8 }), sBrass: std({ color: 0xb48a50, roughness: .3, metalness: .95, envMapIntensity: 1 }),
+  sSageWall: std({ map: T.plaster, color: 0xb9c4b3, roughness: .95 }), sTerra: std({ color: 0xc07a55, roughness: 1 }), sSageCloth: std({ color: 0x9aa886, roughness: 1 }),
+  sParquet: std({ map: T.plankOak, roughness: .45, envMapIntensity: .5 }),
+});
+const STYLE_MAP = new Map([[M.oakLight, M.sWalnut], [M.walnutA, M.sWalnut], [M.nicheWood, M.sWalnut], [M.wood, M.sWalnut], [M.kWhite, M.sLower], [M.qWhite, M.sQuartz],
+  [M.backsplash, M.sSage], [M.greenStack, M.sSage], [M.tealStack, M.sSage], [M.beigeStack, M.sSage], [M.steel, M.sBrass], [M.brushed, M.sBrass],
+  [M.taupeWall, M.sSageWall], [M.taupe, M.sLower], [M.knit, M.sTerra], [M.rust, M.sTerra], [M.sageTowel, M.sSageCloth]].filter(([a]) => a));
+const afterMat = r => M[state.style === 'insp' && r.afterMat === 'herring' ? 'sParquet' : r.afterMat];
+const INSP_NOTE = 'סגנון אגוז ומרווה: חזיתות אגוז, ארונות תחתונים בהירים, משטח קוורץ לבן, אריחים ירוקים צרים, פרזול פליז ופרקט אלון ישר.';
+function applyStyle() {
+  const insp = state.style === 'insp', sw = m => STYLE_MAP.get(m) || m;
+  renoSets.forEach(r => { if (r.after) r.after.traverse(o => { if (!o.isMesh) return; if (o.userData.matA === undefined) o.userData.matA = o.material;
+    const a = o.userData.matA; o.material = !insp ? a : Array.isArray(a) ? a.map(sw) : sw(a); }); });
+}
 /* before / after renovation: swaps the room groups and floors in place, camera stays where it is */
 function renoVisual(on) {
   if (!skirts.classified) { // which room does each skirting board face?
@@ -3154,19 +3190,21 @@ function renoVisual(on) {
       k.userData.parquet = !r || !['mamad', 'wc'].includes(r.id); }
     skirts.classified = true; }
   for (const k of skirts) { const ok = on && k.userData.parquet && (ROOMS.find(q => q.id === 'living') || {}).afterMat === 'herring'; k.material = ok ? M.skirtWhite : M.skirt; }
-  wallsReno = on; applyWalls(); groundSlab.material[0] = on ? M.herring : M.tile; // parquet everywhere on the ground floor after, incl. the passage to the safe room and the entry corner
+  wallsReno = on; applyWalls(); groundSlab.material[0] = on ? (state.style === 'insp' ? M.sParquet : M.herring) : M.tile; // parquet everywhere on the ground floor after, incl. the passage to the safe room and the entry corner
   renoSets.forEach(r => { r.before.visible = !on; if (r.after) r.after.visible = on; });
-  ROOMS.forEach(r => { if (r.mesh.material !== r.hl || state.split) r.mesh.material = M[on && r.afterMat ? r.afterMat : r.mat]; });
+  ROOMS.forEach(r => { if (r.mesh.material !== r.hl || state.split) r.mesh.material = on && r.afterMat ? afterMat(r) : M[r.mat]; });
 }
 function setReno(on, split = false) {
   state.reno = on; state.split = split;
-  ROOMS.forEach(r => { const m = M[on && r.afterMat ? r.afterMat : r.mat]; if (r.baseMat !== m) { r.baseMat = m; delete r.hl; r.mesh.material = m; } });
+  ROOMS.forEach(r => { const m = on && r.afterMat ? afterMat(r) : M[r.mat]; if (r.baseMat !== m) { r.baseMat = m; delete r.hl; r.mesh.material = m; } });
   renoVisual(on);
-  document.querySelectorAll('[data-reno]').forEach(b => b.setAttribute('aria-pressed', split ? b.dataset.reno === 'split' : b.dataset.reno === (on ? 'after' : 'before')));
+  document.querySelectorAll('[data-reno]').forEach(b => b.setAttribute('aria-pressed', split ? b.dataset.reno === 'split' : b.dataset.reno === (on ? (state.style === 'insp' ? 'insp' : 'after') : 'before')));
   document.getElementById('splitBar').hidden = !split;
   if (state.sel && !walking) selectRoom(state.sel, false);
 }
-document.querySelectorAll('[data-reno]').forEach(b => b.addEventListener('click', () => b.dataset.reno === 'split' ? setReno(true, true) : setReno(b.dataset.reno === 'after')));
+document.querySelectorAll('[data-reno]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.reno;
+  if (k === 'after' || k === 'insp') { state.style = k === 'insp' ? 'insp' : 'a'; applyStyle(); }
+  k === 'split' ? setReno(true, true) : setReno(k !== 'before'); }));
 // before / after split: the screen is divided at splitX, left half before, right half after
 let splitX = .5;
 { const bar = document.getElementById('splitBar'), knob = bar.querySelector('.knob'); let drag = false;
