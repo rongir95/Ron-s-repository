@@ -423,7 +423,7 @@ body.zhide .zoom,body.zhide .compass{opacity:0;pointer-events:none}
 <div class="seg renobar panel" id="renoBar" role="group" aria-label="לפני או אחרי שיפוץ">
       <button data-reno="before" aria-pressed="true">לפני</button>
       <button data-reno="after" aria-pressed="false">אחרי</button>
-      <button data-reno="insp" aria-pressed="false">אגוז ומרווה</button>
+      <button data-reno="insp" aria-pressed="false">אלון ומרווה</button>
       <button data-reno="split" aria-pressed="false">השוואה</button>
     </div>
 
@@ -1088,7 +1088,7 @@ const weaveTex = (base, tone) => canvasTex(256, (g, s) => {
 /* ---------------- geometry helpers ---------------- */
 const UNIT = new THREE.BoxGeometry(1, 1, 1);
 const wallPieces = [], openingGroups = [], fixtures = [];
-let wallsReno = false; // 'after' shown: before-only wall finishes (dining wallpaper) are hidden
+let wallsReno = false, wallsInsp = false; // 'after' shown: before-only wall finishes (dining wallpaper) are hidden
 const siteGround = []; // flat outdoor surfaces (lawn, paving, deck): the only site pieces the walk cursor tests
 const doorLeaves = []; // interior door leaves (hinge groups), open by default
 const skirts = []; // ground-floor skirting boards, white where the renovation lays parquet
@@ -1800,6 +1800,58 @@ function desk(p, base, r, chairAt, faceTo) {
     CY(p, 50, 667.5, 2.6, 95.4, 102, M.white, b, 16);
     B(p, 48.2, 657, 48.8, 678, 117, 125, std({ color: 0x111215, roughness: .08, envMapIntensity: 1.4 }), b);
     for (const y of [660, 664, 668, 672, 676]) B(p, 48.8, y - .7, 49, y + .7, 120.5, 121.5, M.led, b); };
+  // oak-and-sage style, layout "direction A": island continuing as a dining counter into the nook, tall open cabinet by the
+  // nook window, display cabinet with a desk niche along the nook's north wall, grey cone pendants. Measured-plan coordinates.
+  const kitchenInsp = parent => {
+    const g = new THREE.Group(); g.userData.noRemap = true; g.userData.styleB = true; g.visible = false; parent.add(g);
+    const Wt = std({ color: 0xf4f2ed, roughness: .3 }), Q = std({ color: 0xf7f5f0, roughness: .22, envMapIntensity: .6 }), O = std({ color: 0xe2c49c, roughness: .55 }), Pl = std({ color: 0x1c1c1c, roughness: .6 });
+    const terra = std({ color: 0xe59a7c, roughness: .5 }), sage = std({ color: 0x8fae7a, roughness: .5 }), cer = std({ color: 0xf6f4ef, roughness: .3 });
+    const pot = (X, Y, z, r, h, m) => CY(g, X, Y, r, z, z + h, m, b, 16);
+    // open-shelf tower: closed white base to 120, open shelves with oak boards above, to 258
+    const tower = (X0, Y0, X1, Y1, open) => { // open: 'E' or 'S' = the side the shelves face
+      B(g, X0 + 2, Y0 + 2, X1 - 2, Y1 - 2, 0, 10, Pl, b); B(g, X0, Y0, X1, Y1, 10, 120, Wt, b);
+      B(g, X0, Y0, X1, Y1, 120, 122, Wt, b); B(g, X0, Y0, X1, Y1, 256, 258, Wt, b);
+      if (open === 'E') { B(g, X0, Y0, X0 + 2, Y1, 122, 256, Wt, b); B(g, X0, Y0, X1, Y0 + 2, 122, 256, Wt, b); B(g, X0, Y1 - 2, X1, Y1, 122, 256, Wt, b); }
+      else { B(g, X0, Y0, X1, Y0 + 2, 122, 256, Wt, b); B(g, X0, Y0, X0 + 2, Y1, 122, 256, Wt, b); B(g, X1 - 2, Y0, X1, Y1, 122, 256, Wt, b); }
+      for (const z of [160, 198, 230]) B(g, X0 + 2, Y0 + 2, X1 - 2, Y1 - 2, z, z + 2, O, b);
+    };
+    tower(80, 241, 120, 300, 'E');                       // by the nook window, towards the kitchen
+    pot(100, 258, 122, 9, 3, cer); pot(100, 282, 162, 5, 22, terra); pot(100, 262, 162, 4, 9, cer); pot(100, 270, 200, 6, 12, sage); pot(100, 285, 232, 6, 14, cer);
+    tower(80, 55, 120, 115, 'E');                        // corner unit of the display cabinet
+    for (let k = 0; k < 5; k++) pot(100, 78, 122 + k * 1.8, 10, 1.6, cer); pot(100, 98, 162, 5, 20, terra); pot(100, 75, 200, 4, 9, cer); pot(100, 88, 200, 4, 9, terra);
+    // long display cabinet on the nook's north wall with a desk niche in the middle
+    B(g, 122, 57, 266, 95, 0, 10, Pl, b);
+    B(g, 120, 55, 186, 97, 10, 120, Wt, b); B(g, 246, 55, 268, 97, 10, 120, Wt, b);
+    B(g, 186, 55, 246, 58, 10, 120, Wt, b);                                   // back of the desk niche
+    B(g, 186, 55, 246, 97, 72, 76, O, b);                                     // oak desktop
+    B(g, 186, 58, 246, 97, 104, 106, Wt, b); for (const x of [206, 226]) B(g, x - 1, 58, x + 1, 97, 106, 120, Wt, b);   // pigeon holes
+    B(g, 120, 55, 268, 97, 120, 122, Wt, b); B(g, 120, 55, 268, 97, 256, 258, Wt, b); B(g, 120, 55, 268, 57, 122, 256, Wt, b); B(g, 266, 55, 268, 97, 122, 256, Wt, b);
+    for (const x of [182, 244]) B(g, x - 1, 57, x + 1, 97, 122, 256, Wt, b);
+    for (const z of [160, 198, 230]) B(g, 120, 57, 266, 95, z, z + 2, O, b);
+    for (let k = 0; k < 6; k++) pot(140, 76, 122 + k * 1.8, 11, 1.6, cer); for (let k = 0; k < 4; k++) pot(166, 76, 122 + k * 1.8, 9, 1.6, cer);
+    pot(205, 76, 122, 9, 6, terra); pot(225, 76, 122, 8, 5, cer); pot(256, 76, 122, 6, 10, cer);
+    for (const x of [135, 147, 159]) pot(x, 76, 162, 3.5, 10, cer); pot(200, 76, 162, 5, 20, terra); pot(225, 76, 162, 4, 9, sage); pot(255, 76, 162, 6, 14, cer);
+    pot(140, 76, 200, 10, 6, cer); pot(215, 76, 200, 5, 18, sage); pot(255, 76, 200, 4, 9, terra); pot(150, 76, 232, 6, 16, terra); pot(215, 76, 232, 12, 3, cer);
+    B(g, 199, 66, 233, 88, 76, 78, std({ color: 0x9a9da1, roughness: .4, metalness: .3 }), b); B(g, 199, 65, 233, 66, 78, 100, std({ color: 0x3a3d42, roughness: .4 }), b);   // laptop
+    // desk chair and stools: light oak, slatted
+    const seat = (X, Y, h, backDir) => { B(g, X - 20, Y - 20, X + 20, Y + 20, h - 4, h, O, b);
+      for (const [dx, dy] of [[-18, -18], [15, -18], [-18, 15], [15, 15]]) B(g, X + dx, Y + dy, X + dx + 3, Y + dy + 3, 0, h - 4, O, b);
+      B(g, X - 18, Y - 17, X + 18, Y + 17, h * .38, h * .38 + 2, O, b);
+      if (backDir === 'S') { B(g, X - 20, Y + 17, X + 20, Y + 20, h + 12, h + 30, O, b); for (const dx of [-20, 17]) B(g, X + dx, Y + 17, X + dx + 3, Y + 20, h, h + 12, O, b); }
+      if (backDir === 'W') { B(g, X - 20, Y - 20, X - 17, Y + 20, h + 12, h + 28, O, b); for (const dy of [-20, 17]) B(g, X - 20, Y + dy, X - 17, Y + dy + 3, h, h + 12, O, b); }
+      if (backDir === 'E') { B(g, X + 17, Y - 20, X + 20, Y + 20, h + 12, h + 28, O, b); for (const dy of [-20, 17]) B(g, X + 17, Y + dy, X + 20, Y + dy + 3, h, h + 12, O, b); } };
+    seat(216, 122, 46, 'S');
+    // island (kitchen side) continuing north at the same height as a dining counter on oak legs, six stools facing each other
+    B(g, 178, 382, 267, 511, 0, 10, Pl, b); B(g, 175, 379, 270, 514, 10, 86, Wt, b);
+    B(g, 175, 209, 270, 514, 86, 90, Q, b);
+    for (const x of [179, 261]) B(g, x, 213, x + 5, 218, 0, 86, O, b);
+    for (const y of [244, 294, 344]) { seat(152, y, 66, 'W'); seat(293, y, 66, 'E'); }
+    // three grey cone pendants over the island and the dining counter
+    const cone = std({ color: 0x8e8d8a, roughness: .45, metalness: .5 });
+    for (const y of [294, 414, 479]) { CY(g, 222, y, .4, 212, 270, M.black, b, 6);
+      const c = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.03, .21, .22, 28, 1, true), cone)); c.material.side = THREE.DoubleSide; c.position.set(wx(222), b + 2.01, wz(y)); g.add(c);
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(.045, 12, 8), M.fixture); bulb.position.set(wx(222), b + 1.95, wz(y)); g.add(bulb); }
+  };
   const kitBefore = new THREE.Group(); kitBefore.userData.reno = 'before'; p.add(kitBefore); renoSets.push({ room: 'kitchen', before: kitBefore });
   { const p = kitBefore; handleTo = kitBefore;
   // sink wall (west): cream gloss base units, light grey quartz top, white glass splashback
@@ -1901,6 +1953,7 @@ function desk(p, base, r, chairAt, faceTo) {
     fridgeFD(p, b);
     B(p, 199, 640, 289, 699, 188, C, M.oakLight, b); B(p, 289, 625, 296, 699, 0, C, M.oakLight, b);
     for (const x of [244]) B(p, x - .3, 639.4, x + .3, 640, 190, C - 2, M.espresso, b);
+    const pn0 = p.children.length;
     // white peninsula with a white quartz top, light-oak breakfast bar resting on it
     [B(p, 69, 290, 273, 352, 8, 88, M.kWhite, b), B(p, 71, 292, 271, 350, 0, 8, M.kWhite, b), B(p, 69, 286, 281, 356, 88, 92, M.qWhite, b)].forEach(m => m.userData.noRemap = true);
     BU(200, 300, 276, 488, 95, 100, M.oakLight, p); BU(200, 480, 276, 488, 0, 95, M.oakLight, p);
@@ -1912,6 +1965,8 @@ function desk(p, base, r, chairAt, faceTo) {
       for (const [y0, y1, z0, z1] of [[y - 12, y + 12, z, z + 2.5], [y - 12, y + 12, z + 21.5, z + 24], [y - 12, y - 9.5, z, z + 24], [y + 9.5, y + 12, z, z + 24]]) B(p, 233, y0, 241, y1, z0, z1, M.white, b);
       const bulb = new THREE.Mesh(new THREE.SphereGeometry(.035, 12, 8), M.fixture); bulb.position.set(wx(237), z / 100 + .12, wz(y)); p.add(bulb);
     }
+    p.children.slice(pn0).forEach(o => o.userData.styleA = true); // peninsula, bar, stools, pendants: replaced in the oak-and-sage style
+    kitchenInsp(p);
   }
   // roller blinds over the kitchen and dining windows, decorative security grille outside the sink window
   B(p, 17, 430, 24, 580, 215, 222, M.shade, b); B(p, 17.5, 433, 19, 577, 186, 215, M.shade, b);
@@ -1926,7 +1981,7 @@ function desk(p, base, r, chairAt, faceTo) {
     } }
   // ---- dining corner: espresso table and high-back chairs, wallpapered north wall with frames ----
   // dining table and chairs as one piece, measured-plan coordinates
-  const dg = new THREE.Group(); dg.userData.noRemap = true; p.add(dg);
+  const dg = new THREE.Group(); dg.userData.noRemap = true; dg.userData.styleA = true; p.add(dg);
   { const p = dg; B(p, 100, 132, 262, 222, 72, 76, M.espresso, b);
     for (const [x, y] of [[106, 138], [256, 138], [106, 216], [256, 216]]) B(p, x - 3, y - 3, x + 3, y + 3, 0, 72, M.espresso, b);
     B(p, 104, 136, 258, 138, 64, 72, M.espresso, b); B(p, 104, 216, 258, 218, 64, 72, M.espresso, b); }
@@ -1946,12 +2001,14 @@ function desk(p, base, r, chairAt, faceTo) {
     m.position.set(wx(172.75), b + .07 + 1.365, wz(48)); p.add(m); onWall(m, b, 7, 280).userData.beforeOnly = true; } // wallpaper comes off in the renovation
   { const m = new THREE.Mesh(boxUV(.01, 2.7, .3, 0, .07), M.wallpaper); m.position.set(wx(270.6), b + 1.42, wz(40)); m.userData.noRemap = true; p.add(m); onWall(m, b, 7, 277).userData.beforeOnly = true;
     const m2 = new THREE.Mesh(boxUV(.34, 2.7, .01, 2.4, .07), M.wallpaper); m2.position.set(wx(256), b + 1.42, wz(58.6)); m2.userData.noRemap = true; p.add(m2); onWall(m2, b, 7, 277).userData.beforeOnly = true; }
+  const fr0 = p.children.length;
   for (const [x, z, w, h] of [[110, 175, 16, 20], [132, 182, 18, 24], [156, 178, 14, 18], [182, 176, 34, 26], [110, 138, 16, 18], [134, 136, 18, 16], [158, 140, 18, 22], [184, 138, 16, 20], [128, 210, 20, 14]]) {
     onWall(B(p, x, 48.5, x + w, 50.5, z, z + h, M.black, b), b, z, z + h);
     onWall(B(p, x + 2.5, 50.5, x + w - 2.5, 51, z + 2.5, z + h - 2.5, M.linen, b), b, z, z + h);
   }
   onWall(B(p, 200, 48.5, 245, 51, 228, 231, M.white, b), b, 228, 231);
   for (const x of [205, 222, 239]) onWall(CY(p, x, 56, 3, 220, 228, M.white, b, 12), b, 220, 228);
+  p.children.slice(fr0).forEach(o => o.userData.styleA = true); // frames and picture spots: not in the oak-and-sage style (a display cabinet stands there)
   // foyer
   // white console with a glass top and the black framed mirror above it, on the safe-room wall
   B(p, 404, 655, 434, 790, 76, 79, M.white, b); B(p, 405, 656, 433, 789, 79, 80, M.glass, b);
@@ -2802,7 +2859,7 @@ function applyWalls() {
   const cut = eff === 'full' ? null : eff === 'low' ? 1.0 : 0.06;
   for (const m of wallPieces) {
     const u = m.userData.wall;
-    if (m.userData.focusHide || (m.userData.beforeOnly && wallsReno) || (m.userData.skirt && cut !== null)) { m.visible = false; continue; } // no skirting in the cut-away views
+    if (m.userData.focusHide || (m.userData.beforeOnly && wallsReno) || (m.userData.styleA && wallsInsp) || (m.userData.skirt && cut !== null)) { m.visible = false; continue; } // no skirting in the cut-away views
     if (cut === null) { m.visible = true; m.scale.y = u.sy || 1; m.position.y = (u.y0 + u.y1) / 2; continue; }
     const top = u.base + cut - (m.userData.seg ? 0 : 0.004); // skirting, tiles and panels stop 4 mm under the cut wall top (no shared plane)
     if (u.y0 >= top - 0.001) { m.visible = false; continue; }
@@ -3059,7 +3116,7 @@ function selectRoom(id, fly) {
   document.getElementById('cName').textContent = r.name;
   document.getElementById('cDims').textContent = `${r.dims[0]} × ${r.dims[1]} ס״מ`;
   document.getElementById('cArea').textContent = `${(r.dims[0] * r.dims[1] / 1e4).toFixed(1)} מ״ר`;
-  setCardNote(state.reno && r.afterNote ? (state.style === 'insp' ? INSP_NOTE : r.afterNote) : r.note);
+  setCardNote(state.reno && state.style === 'insp' && !r.outdoor ? INSP_NOTE : state.reno && r.afterNote ? r.afterNote : r.note);
   card.hidden = false;
   if (fly) {
     const [x0, y0, x1, y1] = r.rect, base = r.f === 0 ? 0 : L1 + (state.mode === 'exploded' ? targets.f1 : 0);
@@ -3150,37 +3207,44 @@ document.querySelector('#toolsP .thead').addEventListener('click', e => { const 
   const show = t => { tabs.forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t)); panes.forEach(p => p.hidden = p.dataset.pane !== t); try { localStorage.setItem('menuTab', t); } catch (e) {} };
   tabs.forEach(b => b.addEventListener('click', () => { document.getElementById('toolsP').classList.remove('min'); show(b.dataset.tab); }));
   let t0 = 'view'; try { t0 = localStorage.getItem('menuTab') || 'view'; } catch (e) {} show(['view', 'set'].includes(t0) ? t0 : 'view'); }
-/* second renovation style, "walnut and sage" (from the kitchen study): the same renovated layout with another palette.
-   Walnut fronts, light lower units, white quartz, narrow sage-green wall tiles, brass hardware, straight oak plank parquet, sage and terracotta textiles. */
+/* second renovation style, "oak and sage" (from the kitchen study renders): white handleless fronts, white quartz, light-oak
+   shelves, furniture and stairs, pale oak plank floors, narrow sage-green wall tiles, grey cone pendants, sage and terracotta accents.
+   It restyles the whole house on top of the renovated layout and swaps the kitchen for the study's "direction A" layout. */
 state.style = 'a';
 T.sageTile = canvasTex(512, (g, s) => {
-  g.fillStyle = '#d6d3c9'; g.fillRect(0, 0, s, s); const tw = s / 8, th = s / 2;
-  for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) { const l = 44 + (Math.random() - .5) * 7; const gr = g.createLinearGradient(i * tw, 0, i * tw + tw, 0); gr.addColorStop(0, hsl(83, 17, l + 3)); gr.addColorStop(1, hsl(83, 17, l - 2)); g.fillStyle = gr; g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3); }
+  g.fillStyle = '#e3e6dc'; g.fillRect(0, 0, s, s); const tw = s / 8, th = s / 2;
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) { const l = 66 + (Math.random() - .5) * 6; const gr = g.createLinearGradient(i * tw, 0, i * tw + tw, 0); gr.addColorStop(0, hsl(96, 26, l + 2)); gr.addColorStop(1, hsl(96, 26, l - 2)); g.fillStyle = gr; g.fillRect(i * tw + 1.5, j * th + 1.5, tw - 3, th - 3); }
 }, 0.6);
 T.plankOak = canvasTex(1024, (g, s) => {
   const rows = 8, rh = s / rows;
   for (let r = 0; r < rows; r++) { let x = -Math.random() * s * .6;
-    while (x < s) { const len = s * (.45 + Math.random() * .5), l = 50 + Math.random() * 9;
-      for (const ox of [0, s]) { g.fillStyle = hsl(29, 34, l); g.fillRect(x + ox, r * rh, len, rh); g.fillStyle = 'rgba(70,45,25,.5)'; g.fillRect(x + ox + len - 1.5, r * rh, 1.5, rh); }
+    while (x < s) { const len = s * (.45 + Math.random() * .5), l = 66 + Math.random() * 6;
+      for (const ox of [0, s]) { g.fillStyle = hsl(27, 58, l); g.fillRect(x + ox, r * rh, len, rh); g.fillStyle = 'rgba(150,95,50,.35)'; g.fillRect(x + ox + len - 1.5, r * rh, 1.5, rh); }
       x += len; }
-    for (let i = 0; i < 26; i++) { const y = r * rh + Math.random() * rh; g.strokeStyle = `rgba(90,60,30,${.04 + Math.random() * .08})`; g.lineWidth = .6 + Math.random() * 1.4; g.beginPath(); g.moveTo(0, y); g.lineTo(s, y + (Math.random() - .5) * 3); g.stroke(); }
-    g.fillStyle = 'rgba(70,45,25,.45)'; g.fillRect(0, r * rh, s, 1.5); }
+    for (let i = 0; i < 20; i++) { const y = r * rh + Math.random() * rh; g.strokeStyle = `rgba(150,100,55,${.03 + Math.random() * .06})`; g.lineWidth = .6 + Math.random() * 1.4; g.beginPath(); g.moveTo(0, y); g.lineTo(s, y + (Math.random() - .5) * 3); g.stroke(); }
+    g.fillStyle = 'rgba(150,95,50,.3)'; g.fillRect(0, r * rh, s, 1.5); }
 }, 1.6);
 Object.assign(M, {
-  sWalnut: std({ color: 0xc9a273, roughness: .55 }), sLower: std({ color: 0xeeeae2, roughness: .3 }), sQuartz: std({ color: 0xeeece7, roughness: .22, envMapIntensity: .6 }),
-  sSage: std({ map: T.sageTile, roughness: .15, envMapIntensity: .8 }), sBrass: std({ color: 0xb48a50, roughness: .3, metalness: .95, envMapIntensity: 1 }),
-  sSageWall: std({ map: T.plaster, color: 0xb9c4b3, roughness: .95 }), sTerra: std({ color: 0xc07a55, roughness: 1 }), sSageCloth: std({ color: 0x9aa886, roughness: 1 }),
+  sOak: std({ color: 0xe2c49c, roughness: .55 }), sWhite: std({ color: 0xf4f2ed, roughness: .3 }), sQuartz: std({ color: 0xf7f5f0, roughness: .22, envMapIntensity: .6 }),
+  sSage: std({ map: T.sageTile, roughness: .15, envMapIntensity: .8 }), sTerra: std({ color: 0xe59a7c, roughness: 1 }), sSageCloth: std({ color: 0x9fb38a, roughness: 1 }),
   sParquet: std({ map: T.plankOak, roughness: .45, envMapIntensity: .5 }),
 });
-const STYLE_MAP = new Map([[M.oakLight, M.sWalnut], [M.walnutA, M.sWalnut], [M.nicheWood, M.sWalnut], [M.wood, M.sWalnut], [M.kWhite, M.sLower], [M.qWhite, M.sQuartz],
-  [M.backsplash, M.sSage], [M.greenStack, M.sSage], [M.tealStack, M.sSage], [M.beigeStack, M.sSage], [M.steel, M.sBrass], [M.brushed, M.sBrass],
-  [M.taupeWall, M.sSageWall], [M.taupe, M.sLower], [M.knit, M.sTerra], [M.rust, M.sTerra], [M.sageTowel, M.sSageCloth]].filter(([a]) => a));
-const afterMat = r => M[state.style === 'insp' && r.afterMat === 'herring' ? 'sParquet' : r.afterMat];
-const INSP_NOTE = 'סגנון אגוז ומרווה: חזיתות אגוז, ארונות תחתונים בהירים, משטח קוורץ לבן, אריחים ירוקים צרים, פרזול פליז ופרקט אלון ישר.';
-function applyStyle() {
-  const insp = state.style === 'insp', sw = m => STYLE_MAP.get(m) || m;
-  renoSets.forEach(r => { if (r.after) r.after.traverse(o => { if (!o.isMesh) return; if (o.userData.matA === undefined) o.userData.matA = o.material;
-    const a = o.userData.matA; o.material = !insp ? a : Array.isArray(a) ? a.map(sw) : sw(a); }); });
+const STYLE_MAP = new Map([['oakLight', 'sOak'], ['walnutA', 'sOak'], ['nicheWood', 'sOak'], ['wood', 'sOak'], ['walnut', 'sOak'], ['espresso', 'sOak'], ['espressoDS', 'sOak'], ['wenge', 'sOak'],
+  ['veneer', 'sOak'], ['oak', 'sOak'], ['grayWood', 'sOak'], ['treadWood', 'sOak'], ['kWhite', 'sWhite'], ['qWhite', 'sQuartz'], ['taupe', 'sWhite'],
+  ['backsplash', 'sSage'], ['greenStack', 'sSage'], ['tealStack', 'sSage'], ['beigeStack', 'sSage'], ['taupeWall', 'interior'], ['plasterWarm', 'interior'],
+  ['knit', 'sTerra'], ['rust', 'sTerra'], ['sageTowel', 'sSageCloth']].filter(([a, b]) => M[a] && M[b]).map(([a, b]) => [M[a], M[b]]));
+const inspFloor = r => !r.outdoor && !['wc', 'ensuite', 'bath', 'mamad', 'balcony'].includes(r.id);
+const floorMat = (r, on) => on && state.style === 'insp' && inspFloor(r) ? M.sParquet : M[on && r.afterMat ? r.afterMat : r.mat];
+const INSP_NOTE = 'סגנון אלון ומרווה: חזיתות לבנות בלי ידיות, משטחי קוורץ לבנים, מדפים ורהיטים מאלון בהיר, פרקט אלון בהיר, אריחים ירוקים צרים וגופי תאורה אפורים.';
+let styleList = null, styleOn = false;
+function styleSwap(insp) {
+  if (!styleList) { styleList = { mats: [], a: [], b: [] }; const sw = m => STYLE_MAP.get(m) || m;
+    for (const f of F) f.furn.traverse(o => { if (o.userData.styleA) styleList.a.push(o); if (o.userData.styleB) styleList.b.push(o);
+      if (!o.isMesh) return; const a = o.material, alt = Array.isArray(a) ? a.map(sw) : sw(a);
+      if (Array.isArray(a) ? alt.some((m, i) => m !== a[i]) : alt !== a) styleList.mats.push([o, a, alt]); }); }
+  if (insp === styleOn) return; styleOn = insp;
+  for (const [o, a, alt] of styleList.mats) o.material = insp ? alt : a;
+  for (const o of styleList.a) o.visible = !insp; for (const o of styleList.b) o.visible = insp;
 }
 /* before / after renovation: swaps the room groups and floors in place, camera stays where it is */
 function renoVisual(on) {
@@ -3190,20 +3254,20 @@ function renoVisual(on) {
       k.userData.parquet = !r || !['mamad', 'wc'].includes(r.id); }
     skirts.classified = true; }
   for (const k of skirts) { const ok = on && k.userData.parquet && (ROOMS.find(q => q.id === 'living') || {}).afterMat === 'herring'; k.material = ok ? M.skirtWhite : M.skirt; }
-  wallsReno = on; applyWalls(); groundSlab.material[0] = on ? (state.style === 'insp' ? M.sParquet : M.herring) : M.tile; // parquet everywhere on the ground floor after, incl. the passage to the safe room and the entry corner
+  wallsReno = on; wallsInsp = on && state.style === 'insp'; styleSwap(wallsInsp); applyWalls(); groundSlab.material[0] = on ? (state.style === 'insp' ? M.sParquet : M.herring) : M.tile; // parquet everywhere on the ground floor after, incl. the passage to the safe room and the entry corner
   renoSets.forEach(r => { r.before.visible = !on; if (r.after) r.after.visible = on; });
-  ROOMS.forEach(r => { if (r.mesh.material !== r.hl || state.split) r.mesh.material = on && r.afterMat ? afterMat(r) : M[r.mat]; });
+  ROOMS.forEach(r => { if (r.mesh.material !== r.hl || state.split) r.mesh.material = floorMat(r, on); });
 }
 function setReno(on, split = false) {
   state.reno = on; state.split = split;
-  ROOMS.forEach(r => { const m = on && r.afterMat ? afterMat(r) : M[r.mat]; if (r.baseMat !== m) { r.baseMat = m; delete r.hl; r.mesh.material = m; } });
+  ROOMS.forEach(r => { const m = floorMat(r, on); if (r.baseMat !== m) { r.baseMat = m; delete r.hl; r.mesh.material = m; } });
   renoVisual(on);
   document.querySelectorAll('[data-reno]').forEach(b => b.setAttribute('aria-pressed', split ? b.dataset.reno === 'split' : b.dataset.reno === (on ? (state.style === 'insp' ? 'insp' : 'after') : 'before')));
   document.getElementById('splitBar').hidden = !split;
   if (state.sel && !walking) selectRoom(state.sel, false);
 }
 document.querySelectorAll('[data-reno]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.reno;
-  if (k === 'after' || k === 'insp') { state.style = k === 'insp' ? 'insp' : 'a'; applyStyle(); }
+  if (k === 'after' || k === 'insp') state.style = k === 'insp' ? 'insp' : 'a';
   k === 'split' ? setReno(true, true) : setReno(k !== 'before'); }));
 // before / after split: the screen is divided at splitX, left half before, right half after
 let splitX = .5;
