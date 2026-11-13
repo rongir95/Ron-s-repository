@@ -1461,6 +1461,31 @@ const stairMark = [F[0].furn.children.length, F[1].furn.children.length];
   B(p, 776, 434, 778, 616, 0, 9 * R - 4, M.interior); B(p, 700, 434, 776, 616, 9 * R - 16, 9 * R - 4, M.interior);
   { // coat rack on the angled wall beside the front door, coats and bags hanging on it (entrance photos)
     const g = local(F[0].furn, 200, 695, 0, 0); g.userData.noRemap = true;
+    { // after the renovation (both styles): built-in oak entrance unit on this wall, left of the door as you come in —
+      // corner shelves, a bench with drawers and a cushion, slatted back panel with hooks, cabinets to the ceiling, LED strip
+      const a = new THREE.Group(); a.userData.noRemap = true; a.userData.reno = 'after'; a.visible = false; F[0].furn.add(a); renoSets.push({ room: 'entry-unit', before: g, after: a });
+      const O = M.oakLight, gapM = std({ color: 0x8a6a45, roughness: .8 }), C = 270;
+      B(a, 185, 695, 280, 737, 0, 45, O, 0); B(a, 186, 737, 279, 737.4, 22.6, 23.4, gapM, 0); B(a, 232.1, 737, 232.9, 737.4, 2, 43, gapM, 0);     // bench with two drawer rows
+      RB(a, 188, 699, 276, 735, 45, 53, M.linen, 0, .03);                                                                                    // seat cushion
+      { const pl = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.5, .32, .12, 3, .05), M.boucle)); pl.position.set(wx(248), .72, wz(706)); pl.rotation.x = -.35; a.add(pl); }
+      B(a, 185, 695, 277, 697, 45, 215, O, 0); for (let x = 187; x < 276; x += 4) B(a, x, 697, x + 1.6, 698.2, 53, 213, O, 0);                // slatted back panel
+      B(a, 277, 695, 280, 737, 45, C, O, 0);                                                                                                 // end panel
+      B(a, 150, 695, 185, 720, 0, 62, O, 0); B(a, 150, 720, 185, 720.4, 30.6, 31.4, gapM, 0);                                                // corner cabinet
+      B(a, 150, 695, 185, 697, 62, 215, O, 0); B(a, 150, 695, 152, 720, 62, 215, O, 0);
+      for (const z of [105, 142]) B(a, 152, 697, 185, 720, z, z + 3, O, 0);
+      B(a, 150, 695, 185, 720, 215, C, O, 0); B(a, 185, 695, 277, 730, 215, C, O, 0);                                                        // cabinets to the ceiling
+      for (const x of [208, 231, 254]) B(a, x - .4, 730, x + .4, 730.4, 217, C - 2, gapM, 0); B(a, 167.1, 720, 167.9, 720.4, 217, C - 2, gapM, 0);
+      B(a, 187, 699, 276, 700.5, 213.4, 214.4, M.led, 0); for (const z of [103.6, 140.6]) B(a, 154, 698, 183, 699, z, z + .8, M.led, 0);       // LED strips
+      for (const x of [203, 223, 243, 263]) { B(a, x - 1, 698.2, x + 1, 700, 178, 190, M.black, 0); B(a, x - 1, 700, x + 1, 704, 178, 181, M.black, 0); }   // hooks
+      { const coat = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.34, .8, .1, 3, .04), M.boucle)); coat.position.set(wx(243), 1.4, wz(705)); a.add(coat);
+        const bagM = std({ color: 0x2a2623, roughness: .6 }); const bag = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.22, .18, .07, 3, .02), bagM)); bag.position.set(wx(203), 1.18, wz(704)); a.add(bag);
+        for (const dx of [-8, 8]) B(a, 203 + dx - .6, 701, 203 + dx + .6, 702, 126, 180, bagM, 0);
+        const cap = shadowy(new THREE.Mesh(new THREE.SphereGeometry(.09, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), std({ color: 0xd8c8ae, roughness: .9 }))); cap.rotation.x = Math.PI / 2; cap.position.set(wx(263), 1.72, wz(701)); a.add(cap); }
+      CY(a, 168, 708, 6, 62, 78, std({ color: 0xe6dccb, roughness: .6 }), 0, 16, 4); for (const [dx, h] of [[-3, 16], [0, 22], [3, 14]]) CY(a, 168 + dx, 708, .3, 78, 78 + h, M.trunk, 0, 5);   // vase with branches
+      for (const [dx, dz] of [[-4, 90], [1, 97], [5, 88]]) { const l = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.045, 1), M.leaf)); l.position.set(wx(168 + dx), dz / 100, wz(708)); a.add(l); }
+      B(a, 158, 700, 180, 716, 108, 120, M.jute, 0);                                                                                         // basket
+      CY(a, 165, 708, 6, 145, 156, M.white, 0, 16); { const l = shadowy(new THREE.Mesh(new THREE.IcosahedronGeometry(.1, 1), M.leaf)); l.position.set(wx(165), 1.64, wz(708)); a.add(l); }   // pot plant
+      for (let k = 0; k < 3; k++) B(a, 172, 701, 183, 716, 145 + k * 2.2, 147 + k * 2.2, M.linen, 0); }                                      // books
     lb(g, .9, .1, .025, 0, 1.72, .013, M.oak);
     for (let k = 0; k < 5; k++) { const x = -.36 + k * .18; lb(g, .02, .02, .09, x, 1.7, .07, M.black);
       if (k !== 2) { const c = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.32, .78, .12, 3, .04), std({ color: [0x2b2f36, 0x5a4636, 0x1f2a3a, 0x6b6f72, 0x3a2f2a][k], roughness: 1 }))); c.position.set(x, 1.27, .1 + k * .022); c.rotation.z = (rnd() - .5) * .1; g.add(c); } }
@@ -1595,7 +1620,7 @@ function basin(p, base, X0, Y0, X1, Y1, z0, z1) {
 // French-door fridge with a bottom freezer drawer, black stainless steel (plan box 199..289 × 627..699)
 function fridgeFD(p, b) {
   const body = std({ color: 0x3b3e44, roughness: .35, metalness: .5, envMapIntensity: 1 }), door = std({ color: 0x4a4e55, roughness: .25, metalness: .55, envMapIntensity: 1.3 });
-  const g = new THREE.Group(); g.position.set(wx(244), b, wz(627)); g.rotation.y = Math.PI; p.add(g); // local +z points into the kitchen (towards smaller Y)
+  const g = new THREE.Group(); g.position.set(wx(244), b + .025, wz(627)); g.rotation.y = Math.PI; p.add(g); lb(g, .84, .03, .58, 0, -.012, -.36, M.black); // stands 2.5 cm up on a recessed base, so its underside never meets the floor plane // local +z points into the kitchen (towards smaller Y)
   const cab = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.9, 1.84, .66, 3, .02), body)); cab.position.set(0, .92, -.36); g.add(cab);
   const dr = (w, h, x, y) => { const m = shadowy(new THREE.Mesh(new RoundedBoxGeometry(w, h, .05, 3, .015), door)); m.position.set(x, y, .0); g.add(m); return m; };
   dr(.443, 1.06, -.226, 1.33); dr(.443, 1.06, .226, 1.33);           // two upper doors
@@ -1995,7 +2020,7 @@ function desk(p, base, r, chairAt, faceTo) {
   // roller blinds over the kitchen and dining windows, decorative security grille outside the sink window
   B(p, 17, 430, 24, 580, 215, 222, M.shade, b); B(p, 17.5, 433, 19, 577, 186, 215, M.shade, b);
   for (const z of [192, 200, 208]) B(p, 19, 433, 19.4, 577, z, z + 1.2, M.alu, b);
-  { const gx = -6, gp = new THREE.Group(); gp.userData.noRemap = true; p.add(gp);
+  { const gx = -6, gp = new THREE.Group(); gp.userData.noRemap = true; p.add(gp); renoSets.push({ room: 'kitchen-grille', before: gp }); // the grille comes off in the renovation
     for (let y = 446; y <= 578; y += 12) B(gp, gx - .7, y - .7, gx + .7, y + .7, 105, 215, M.alu, b);
     for (const z of [105, 142, 214]) B(gp, gx - .7, 442, gx + .7, 582, z - .7, z + .7, M.alu, b);
     const gg = local(gp, gx, 512, b);
@@ -3896,7 +3921,7 @@ gtao.updateGtaoMaterial({ radius: .35, distanceExponent: 1.5, thickness: 1, scal
 gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 10, rings: 3, samples: 16 });
 gtao.blendIntensity = .9;
 composer.addPass(gtao); composer.addPass(new OutputPass());
-state.hq = false; window.__composer = composer; // high quality only when switched on
+state.hq = false; window.__composer = composer; window.__view = (px, py, pz, tx, ty, tz) => { camTween = null; controls.minDistance = .05; camera.position.set(wx(px), pz, wz(py)); controls.target.set(wx(tx), tz, wz(ty)); controls.update(); }; // debugging aid: place the camera by plan coordinates // high quality only when switched on
 { const el = document.getElementById('tHQ'); el.setAttribute('aria-pressed', state.hq); el.addEventListener('click', () => { state.hq = !state.hq; el.setAttribute('aria-pressed', state.hq); }); }
 const clock = new THREE.Clock(); const lastCam = new THREE.Vector3(), lastTgt = new THREE.Vector3(); let stillFrames = 0;
 renderer.setAnimationLoop(() => {
