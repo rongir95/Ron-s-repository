@@ -2629,9 +2629,13 @@ function desk(p, base, r, chairAt, faceTo) {
     const m = new THREE.Mesh(g, mat); m.receiveShadow = true; m.position.set(wx((X0 + X1) / 2), y, wz((Y0 + Y1) / 2)); p.add(m); siteGround.push(m); return m;
   };
   // ---- garden, from the photos ----
-  const slatFence = (X0, Y0, X1, Y1, h = 165) => { const along = Math.abs(X1 - X0) > Math.abs(Y1 - Y0), L = along ? X1 - X0 : Y1 - Y0;
-    for (let k = 0; k <= L; k += 180) along ? B(p, X0 + k - 4, Y0 - 4, X0 + k + 4, Y0 + 4, -15, h, M.fenceDark) : B(p, X0 - 4, Y0 + k - 4, X0 + 4, Y0 + k + 4, -15, h, M.fenceDark);
-    for (let z = 5; z < h - 5; z += 20) along ? B(p, X0, Y0 - 1.5, X1, Y0 + 1.5, z, z + 15, M.fenceDark) : B(p, X0 - 1.5, Y0, X0 + 1.5, Y1, z, z + 15, M.fenceDark); };
+  const slatV = std({ color: 0xd6d0c7, roughness: .7 });
+  const slatFence = (X0, Y0, X1, Y1, h = 165) => { const along = Math.abs(X1 - X0) > Math.abs(Y1 - Y0), L = along ? X1 - X0 : Y1 - Y0, hz = [];
+    for (let k = 0; k <= L; k += 180) hz.push(along ? B(p, X0 + k - 4, Y0 - 4, X0 + k + 4, Y0 + 4, -15, h, M.fenceDark) : B(p, X0 - 4, Y0 + k - 4, X0 + 4, Y0 + k + 4, -15, h, M.fenceDark));
+    for (let z = 5; z < h - 5; z += 20) hz.push(along ? B(p, X0, Y0 - 1.5, X1, Y0 + 1.5, z, z + 15, M.fenceDark) : B(p, X0 - 1.5, Y0, X0 + 1.5, Y1, z, z + 15, M.fenceDark));
+    hz.forEach(o => o.userData.styleA = true); // horizontal slats: every style but oak-and-sage
+    const g = new THREE.Group(); g.userData.styleB = true; g.visible = false; p.add(g); // oak-and-sage: light vertical boards, as in the study renders
+    for (let k = 0; k + 12 <= L; k += 16) g.add(along ? B(p, X0 + k, Y0 - 1.5, X0 + k + 12, Y0 + 1.5, -5, h + 10, slatV) : B(p, X0 - 1.5, Y0 + k, X0 + 1.5, Y0 + k + 12, -5, h + 10, slatV)); };
   // dark wooden deck in front of the slider, red mulch beds along the fence, white gravel edging
   flat(180, -330, 791, 12, -0.02, M.deck); B(p, 180, -332, 791, -328, -15, 0, M.fenceDark);
   flat(-215, -575, 791, -470, -0.04, M.mulch);                 // flower beds along the back fence
@@ -3294,6 +3298,7 @@ function soft(m) {
   softCacheM.set(m, r); return r;
 }
 function styleSwap(insp) {
+  if (!styleList && !insp) return;
   if (!styleList) { styleList = { mats: [], a: [], b: [] };
     scene.traverse(o => { if (o.userData.styleA) styleList.a.push(o); if (o.userData.styleB) styleList.b.push(o);
       if (!o.isMesh || o === sky || o === walkRing || o.userData.room || o.userData.skirt || o === groundSlab || !o.material) return;
@@ -3653,7 +3658,7 @@ document.body.appendChild(compass);
   scene.traverse(o => { if (!o.isMesh || o.geometry.type !== 'IcosahedronGeometry' || !o.material.color) return;
     const hsl = o.material.color.getHSL({}); if (hsl.h > .17 && hsl.h < .45 && hsl.s > .15) blobs.push(o); });
   const leafG = new THREE.SphereGeometry(1, 6, 4); leafG.scale(.5, .08, 1); leafG.translate(0, 0, .6);
-  const mats = new Map(), dummy = new THREE.Object3D();
+  const mats = new Map(), dummy = new THREE.Object3D(), ballG = new THREE.SphereGeometry(1, 24, 16), ballM = new THREE.MeshStandardMaterial({ color: 0x9fb98c, roughness: .85 });
   for (const o of blobs) {
     const r = o.geometry.parameters.radius, sc = (o.scale.x + o.scale.y + o.scale.z) / 3, R = r * sc;
     const key = o.material.color.getHexString(); if (!mats.has(key)) { const c = o.material.color.clone(); mats.set(key, new THREE.MeshStandardMaterial({ color: c, roughness: .7, side: THREE.DoubleSide, vertexColors: false })); }
@@ -3672,6 +3677,8 @@ document.body.appendChild(compass);
     // a darker inner core so the cluster does not look see-through
     const core = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshStandardMaterial({ color: o.material.color.clone().multiplyScalar(.55), roughness: 1 }));
     core.scale.set(o.scale.x * r * .55, o.scale.y * r * .55, o.scale.z * r * .55); core.position.copy(o.position); core.castShadow = true; im.parent.add(core);
+    im.userData = Object.assign({}, im.userData, { styleA: true }); core.userData.styleA = true;
+    const ball = shadowy(new THREE.Mesh(ballG, ballM)); ball.scale.set(o.scale.x * r * .95, o.scale.y * r * .95, o.scale.z * r * .95); ball.position.copy(o.position); ball.userData.styleB = true; ball.visible = false; im.parent.add(ball); // oak-and-sage: simple smooth shapes
   }
 }
 /* ---------- grass tufts on the lawn strip and the yard ---------- */
@@ -3683,7 +3690,7 @@ document.body.appendChild(compass);
     d.position.set(wx(x0 + rnd() * (x1 - x0)), -.035, wz(y0 + rnd() * (y1 - y0)));
     d.rotation.set((rnd() - .5) * .5, rnd() * 6.28, (rnd() - .5) * .5); d.scale.setScalar(.6 + rnd() * .9); d.updateMatrix(); im.setMatrixAt(k, d.matrix);
     col.setHSL(.24 + rnd() * .05, .45, .28 + rnd() * .14); im.setColorAt(k, col); }
-  im.count = k; site.add(im);
+  im.count = k; im.userData.styleA = true; site.add(im); // no grass tufts in the oak-and-sage look
 }
 { const h = document.getElementById('hint'); let t; const show = () => { h.classList.remove('fade'); clearTimeout(t); t = setTimeout(() => h.classList.add('fade'), 6000); };
   new MutationObserver(show).observe(h, { childList: true, characterData: true, subtree: true }); show(); }
