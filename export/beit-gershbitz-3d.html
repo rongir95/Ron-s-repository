@@ -1088,7 +1088,7 @@ const weaveTex = (base, tone) => canvasTex(256, (g, s) => {
 /* ---------------- geometry helpers ---------------- */
 const UNIT = new THREE.BoxGeometry(1, 1, 1);
 const wallPieces = [], openingGroups = [], fixtures = [];
-let wallsReno = false, wallsInsp = false; // 'after' shown: before-only wall finishes (dining wallpaper) are hidden
+let wallsReno = false, wallsInsp = false; const inspMats = {}; // materials of the oak-and-sage kitchen pieces, textured once the style block runs // 'after' shown: before-only wall finishes (dining wallpaper) are hidden
 const siteGround = []; // flat outdoor surfaces (lawn, paving, deck): the only site pieces the walk cursor tests
 const doorLeaves = []; // interior door leaves (hinge groups), open by default
 const skirts = []; // ground-floor skirting boards, white where the renovation lays parquet
@@ -1806,6 +1806,10 @@ function desk(p, base, r, chairAt, faceTo) {
     const g = new THREE.Group(); g.userData.noRemap = true; g.userData.styleB = true; g.visible = false; parent.add(g);
     const Wt = std({ color: 0xf4f2ed, roughness: .3 }), Q = std({ color: 0xf7f5f0, roughness: .22, envMapIntensity: .6 }), O = std({ color: 0xe2c49c, roughness: .55 }), Pl = std({ color: 0x1c1c1c, roughness: .6 });
     const terra = std({ color: 0xe59a7c, roughness: .5 }), sage = std({ color: 0x8fae7a, roughness: .5 }), cer = std({ color: 0xf6f4ef, roughness: .3 });
+    Object.assign(inspMats, { O, Wt, Q });
+    const gap = std({ color: 0xc9c4ba, roughness: .8 }), glassV = new THREE.MeshStandardMaterial({ color: 0xe8f1f2, roughness: .05, transparent: true, opacity: .14, depthWrite: false, envMapIntensity: 1.2 });
+    const seamX = (X, Y0, Y1, z) => B(g, X - .3, Y0, X + .3, Y1, z - .2, z + .2, gap, b), seamXv = (X, Y, z0, z1) => B(g, X - .3, Y - .2, X + .3, Y + .2, z0, z1, gap, b);   // on faces looking east / west
+    const seamY = (Y, X0, X1, z) => B(g, X0, Y - .3, X1, Y + .3, z - .2, z + .2, gap, b), seamYv = (Y, X, z0, z1) => B(g, X - .2, Y - .3, X + .2, Y + .3, z0, z1, gap, b);   // on faces looking north / south
     const pot = (X, Y, z, r, h, m) => CY(g, X, Y, r, z, z + h, m, b, 16);
     // open-shelf tower: closed white base to 120, open shelves with oak boards above, to 258
     const tower = (X0, Y0, X1, Y1, open) => { // open: 'E' or 'S' = the side the shelves face
@@ -1814,6 +1818,7 @@ function desk(p, base, r, chairAt, faceTo) {
       if (open === 'E') { B(g, X0, Y0, X0 + 2, Y1, 122, 256, Wt, b); B(g, X0, Y0, X1, Y0 + 2, 122, 256, Wt, b); B(g, X0, Y1 - 2, X1, Y1, 122, 256, Wt, b); }
       else { B(g, X0, Y0, X1, Y0 + 2, 122, 256, Wt, b); B(g, X0, Y0, X0 + 2, Y1, 122, 256, Wt, b); B(g, X1 - 2, Y0, X1, Y1, 122, 256, Wt, b); }
       for (const z of [160, 198, 230]) B(g, X0 + 2, Y0 + 2, X1 - 2, Y1 - 2, z, z + 2, O, b);
+      if (open === 'E') { seamX(X1, Y0 + 1, Y1 - 1, 65); seamX(X1, Y0 + 1, Y1 - 1, 117); } // drawer over door, handleless grip line under the shelf
     };
     tower(80, 241, 120, 300, 'E');                       // by the nook window, towards the kitchen
     pot(100, 258, 122, 9, 3, cer); pot(100, 282, 162, 5, 22, terra); pot(100, 262, 162, 4, 9, cer); pot(100, 270, 200, 6, 12, sage); pot(100, 285, 232, 6, 14, cer);
@@ -1832,6 +1837,11 @@ function desk(p, base, r, chairAt, faceTo) {
     pot(205, 76, 122, 9, 6, terra); pot(225, 76, 122, 8, 5, cer); pot(256, 76, 122, 6, 10, cer);
     for (const x of [135, 147, 159]) pot(x, 76, 162, 3.5, 10, cer); pot(200, 76, 162, 5, 20, terra); pot(225, 76, 162, 4, 9, sage); pot(255, 76, 162, 6, 14, cer);
     pot(140, 76, 200, 10, 6, cer); pot(215, 76, 200, 5, 18, sage); pot(255, 76, 200, 4, 9, terra); pot(150, 76, 232, 6, 16, terra); pot(215, 76, 232, 12, 3, cer);
+    // door seams and grip lines on the base units, glass doors with white stiles on the display shelves, LED strip under the top
+    for (const [x0, x1] of [[120, 186], [246, 268]]) { seamY(97, x0 + 1, x1 - 1, 65); seamY(97, x0 + 1, x1 - 1, 117); } seamYv(97, 153, 12, 117);
+    for (const [x0, x1] of [[122, 181], [183, 243], [245, 266]]) { const m = B(g, x0, 96, x1, 96.6, 123, 255, glassV, b); m.castShadow = false; m.renderOrder = 2; }
+    for (const x of [122, 182, 244, 266]) B(g, x - 1, 95.6, x + 1, 97, 122, 256, Wt, b);
+    B(g, 124, 84, 264, 87, 254.6, 255.6, M.led, b);
     B(g, 199, 66, 233, 88, 76, 78, std({ color: 0x9a9da1, roughness: .4, metalness: .3 }), b); B(g, 199, 65, 233, 66, 78, 100, std({ color: 0x3a3d42, roughness: .4 }), b);   // laptop
     // desk chair and stools: light oak, slatted
     const seat = (X, Y, h, backDir) => { B(g, X - 20, Y - 20, X + 20, Y + 20, h - 4, h, O, b);
@@ -1843,7 +1853,16 @@ function desk(p, base, r, chairAt, faceTo) {
     seat(216, 122, 46, 'S');
     // island (kitchen side) continuing north at the same height as a dining counter on oak legs, six stools facing each other
     B(g, 178, 382, 267, 511, 0, 10, Pl, b); B(g, 175, 379, 270, 514, 10, 86, Wt, b);
-    B(g, 175, 209, 270, 514, 86, 90, Q, b);
+    B(g, 173.5, 207.5, 271.5, 515.5, 86, 90, Q, b);                             // quartz top with a small overhang
+    for (const X of [175, 270]) { for (const y of [424, 469]) seamXv(X, y, 12, 84); seamX(X, 380, 513, 82); seamX(X, 380, 513, 48); }   // three drawer stacks per side, handleless
+    seamYv(514, 222.5, 12, 84); seamY(514, 176, 269, 82);
+    { // on the island: oak board, fruit bowl, a small vase with a branch
+      B(g, 190, 440, 226, 466, 90, 92, O, b); CY(g, 240, 470, 13, 90, 96, cer, b, 24, 8);
+      for (const [dx, dy, c] of [[-4, -2, 0xe0a13c], [3, 3, 0xc9523f], [2, -5, 0x9fb85a]]) { const f = new THREE.Mesh(new THREE.SphereGeometry(.04, 12, 8), std({ color: c, roughness: .5 })); f.position.set(wx(240 + dx), b + .98, wz(470 + dy)); g.add(f); }
+      CY(g, 222, 270, 5, 90, 108, sage, b, 16, 3.5); for (const [dx, h] of [[-3, 30], [2, 38], [5, 26]]) { CY(g, 222 + dx * .4, 270, .35, 108, 108 + h, std({ color: 0x6f5a3c, roughness: .9 }), b, 5).rotation.z = dx * .05;
+        const l = new THREE.Mesh(new THREE.IcosahedronGeometry(.045, 0), M.leaf); l.position.set(wx(222 + dx * 1.6), b + 1.08 + h / 100, wz(270)); g.add(l); } }
+    // by the hob on the west run: oak chopping board and two mills
+    B(g, 34, 418, 62, 452, 92, 93.6, O, b).rotation.y = .12; CY(g, 44, 462, 2.6, 92, 110, std({ color: 0xc98a5e, roughness: .5 }), b, 14); CY(g, 52, 466, 2.6, 92, 112, std({ color: 0x4f7a52, roughness: .4 }), b, 14);
     for (const x of [179, 261]) B(g, x, 213, x + 5, 218, 0, 86, O, b);
     for (const y of [244, 294, 344]) { seat(172, y, 66, 'W'); seat(273, y, 66, 'E'); } // tucked about halfway under the counter
     // three grey cone pendants over the island and the dining counter
@@ -3229,6 +3248,8 @@ Object.assign(M, {
   sSage: std({ map: T.sageTile, roughness: .15, envMapIntensity: .8 }), sTerra: std({ color: 0xe59a7c, roughness: 1 }), sSageCloth: std({ color: 0x9fb38a, roughness: 1 }),
   sParquet: std({ map: T.plankOak, roughness: .45, envMapIntensity: .5 }),
 });
+M.sOak.map = grainTex('#e2c49c', '#c7a57a', '#f0dab8'); M.sOak.color.set(0xffffff); relief(M.sOak, .3); relief(M.sSage, .6); relief(M.sParquet, .25);
+if (inspMats.O) { inspMats.O.map = M.sOak.map; inspMats.O.normalMap = M.sOak.normalMap; inspMats.O.normalScale.set(.3, .3); inspMats.O.color.set(0xffffff); inspMats.O.needsUpdate = true; }
 const STYLE_MAP = new Map([['oakLight', 'sOak'], ['walnutA', 'sOak'], ['nicheWood', 'sOak'], ['wood', 'sOak'], ['walnut', 'sOak'], ['espresso', 'sOak'], ['espressoDS', 'sOak'], ['wenge', 'sOak'],
   ['veneer', 'sOak'], ['oak', 'sOak'], ['grayWood', 'sOak'], ['treadWood', 'sOak'], ['kWhite', 'sWhite'], ['qWhite', 'sQuartz'], ['taupe', 'sWhite'],
   ['backsplash', 'sSage'], ['greenStack', 'sSage'], ['tealStack', 'sSage'], ['beigeStack', 'sSage'], ['taupeWall', 'interior'], ['plasterWarm', 'interior'],
