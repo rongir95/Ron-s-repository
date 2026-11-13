@@ -1968,7 +1968,7 @@ function desk(p, base, r, chairAt, faceTo) {
     for (const [x, z] of [[90, 115], [112, 115]]) CY(p, x, 680, 4, 102, 110, M.white, b, 14);
     // tall units: oak to the ceiling; in the oak-and-sage style the part below 160 cm is white and only the top is oak
     const tall = (X0, Y0, X1, Y1) => { B(p, X0, Y0, X1, Y1, 0, C, M.oakLight, b).userData.styleA = true;
-      const lo = B(p, X0, Y0, X1, Y1, 10, 160, M.kWhite, b), hi = B(p, X0 + .2, Y0 + .3, X1 - .2, Y1, 159, C, M.oakLight, b), pl = B(p, X0, Y0 + 3, X1, Y1, 0, 10, M.black, b); // black recessed plinth, like the other units
+      const lo = B(p, X0, Y0, X1, Y1, 10, 160, M.kWhite, b), hi = B(p, X0 + .2, Y0 + .3, X1 - .2, Y1, 159, C, M.oakLight, b), pl = B(p, X0 + .4, Y0 + 3, X1 - .4, Y1 - .4, 0, 10.2, M.black, b); // black recessed plinth, like the other units
       for (const o of [lo, hi, pl]) { o.userData.styleB = true; o.visible = false; } };
     tall(136, 640, 198, 699);
     B(p, 140, 638.5, 194, 640, 152, 186, M.black, b); B(p, 141, 638, 193, 638.5, 156, 182, M.steel, b);
