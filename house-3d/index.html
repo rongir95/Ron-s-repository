@@ -3155,7 +3155,7 @@ document.querySelectorAll('[data-walls]').forEach(b => b.addEventListener('click
 document.querySelectorAll('[data-walkout]').forEach(b => b.addEventListener('click', () => { if (walking) exitWalk(false); if (focus) exitFocus(false); enterWalk(b.dataset.walkout); }));
 document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { if (walking) exitWalk(false); const [p, t] = VIEWS[b.dataset.view](); if (b.dataset.view === 'top' && state.mode === 'full') setMode('ground'); flyTo(p, t, 1.4); }));
 const tog = (id, key, fn) => { const el = document.getElementById(id); el.addEventListener('click', () => { state[key] = !state[key]; el.setAttribute('aria-pressed', state[key]); fn(); }); };
-tog('tNight', 'night', applyNight);
+tog('tNight', 'night', () => { applyNight(); if (styleOn) { styleOn = false; styleSwap(true); } });
 tog('tLabels', 'labels', applyLabels);
 tog('tNeighbor', 'neighbor', applyNeighbor);
 // each door swings into the room, away from the hall / passage (sides[0] is the leaf's +z side)
@@ -3260,17 +3260,50 @@ const STYLE_MAP = new Map([['oakLight', 'sOak'], ['walnutA', 'sOak'], ['nicheWoo
   ['backsplash', 'sSage'], ['greenStack', 'sSage'], ['tealStack', 'sSage'], ['beigeStack', 'sSage'], ['taupeWall', 'interior'], ['plasterWarm', 'interior'],
   ['knit', 'sTerra'], ['rust', 'sTerra'], ['sageTowel', 'sSageCloth']].filter(([a, b]) => M[a] && M[b]).map(([a, b]) => [M[a], M[b]]));
 const inspFloor = r => !r.outdoor && !['wc', 'ensuite', 'bath', 'mamad', 'balcony'].includes(r.id);
-const floorMat = (r, on) => on && state.style === 'insp' && inspFloor(r) ? M.sParquet : M[on && r.afterMat ? r.afterMat : r.mat];
+const floorMat = (r, on) => { const insp = on && state.style === 'insp'; if (insp && inspFloor(r)) return M.sParquet; const m = M[on && r.afterMat ? r.afterMat : r.mat]; return insp && !['sageTile'].includes(r.afterMat) ? soft(m) : m; };
 const INSP_NOTE = 'סגנון אלון ומרווה: חזיתות לבנות בלי ידיות, משטחי קוורץ לבנים, מדפים ורהיטים מאלון בהיר, פרקט אלון בהיר, אריחים ירוקים צרים וגופי תאורה אפורים.';
 let styleList = null, styleOn = false;
+// The whole scene takes the study model's look: flat matte pastel surfaces, no photo textures, soft bright light.
+// Named materials get a fixed counterpart; everything else is softened by colour (dark neutrals → graphite, greens → sage,
+// strong reds → terracotta, the rest → pale tints). Glass, lights and the stair treads stay as they are.
+const softCacheM = new Map(), nameOf = new Map(Object.entries(M).map(([k, v]) => [v, k]));
+const WOODS = ['walnut', 'oak', 'espresso', 'espressoDS', 'wenge', 'walnutA', 'oakLight', 'grayWood', 'wood', 'veneer', 'nicheWood', 'deck', 'sOak', 'herring', 'laminate', 'lamGrey', 'lamDark', 'lamOak'];
+const FIXED = { stone: 0xf1eee8, plaster: 0xf6f4ef, interior: 0xf8f7f3, ceiling: 0xfaf9f6, fenceDark: 0xd3cdc4, roof: 0xdfa58c, brick: 0xe9cdbb, stoneStrip: 0xe7e3dc, concrete: 0xdedbd4,
+  pavers: 0xe6e2da, pavers2: 0xe6e2da, pathSlab: 0xf0ede6, gravel: 0xf3f1ec, mulch: 0xd9b9a4, asphalt: 0xc9c9c7, cap: 0x44474a, slabSide: 0xf4f2ed, sillStone: 0xf0ede6, trim: 0xf6f5f1,
+  doorDark: 0x55585c, alu: 0x55585c, railing: 0x55585c, black: 0x3d4043, skirt: 0xf4f2ed, skirtWhite: 0xf7f6f2, tile: 0xe9e7e2, slate: 0xdcdad5, hallTile: 0xe6e4df };
+const avgCol = m => { const c = m.color ? m.color.clone() : new THREE.Color(0xcccccc); const im = m.map && m.map.image;
+  if (im && im.width) { try { const cv = document.createElement('canvas'); cv.width = cv.height = 4; const g = cv.getContext('2d'); g.drawImage(im, 0, 0, 4, 4); const d = g.getImageData(0, 0, 4, 4).data; let r = 0, gg = 0, b = 0;
+    for (let k = 0; k < 64; k += 4) { r += d[k]; gg += d[k + 1]; b += d[k + 2]; } c.multiply(new THREE.Color().setRGB(r / 16 / 255, gg / 16 / 255, b / 16 / 255, THREE.SRGBColorSpace)); } catch (e) {} }
+  return c; };
+function soft(m) {
+  if (!m || !m.isMeshStandardMaterial) return m;
+  let r = softCacheM.get(m); if (r) return r;
+  const name = nameOf.get(m), keep = () => (softCacheM.set(m, m), m);
+  if (STYLE_MAP.has(m)) r = STYLE_MAP.get(m);
+  else if (m.transparent || m.opacity < 1 || (m.emissiveIntensity > .3 && m.emissive && m.emissive.getHex()) || ['treadWood', 'sSage', 'sParquet', 'sOak', 'sWhite', 'sQuartz', 'sTerra', 'sSageCloth', 'mirror', 'water', 'glass'].includes(name) || Object.values(inspMats).includes(m)) return keep();
+  else if (WOODS.includes(name)) r = M.sOak;
+  else { const col = new THREE.Color();
+    if (name in FIXED) col.setHex(FIXED[name]);
+    else { const h = {}; avgCol(m).getHSL(h, THREE.SRGBColorSpace); const deg = h.h * 360;
+      if (h.s < .12) col.setHSL(0, 0, h.l < .2 ? .27 : .66 + .3 * h.l, THREE.SRGBColorSpace);
+      else if (deg > 60 && deg < 170) col.setHSL(.265, .24, Math.min(.76, .52 + .35 * h.l), THREE.SRGBColorSpace);
+      else if ((deg < 22 || deg > 330) && h.s > .35) col.setHSL(.045, .62, .7, THREE.SRGBColorSpace);
+      else col.setHSL(h.h, Math.min(h.s, .28), .64 + .3 * h.l, THREE.SRGBColorSpace); }
+    r = new THREE.MeshStandardMaterial({ color: col, roughness: Math.max(.6, m.roughness), metalness: Math.min(m.metalness, .25), envMapIntensity: .35, side: m.side, flatShading: m.flatShading,
+      polygonOffset: m.polygonOffset, polygonOffsetFactor: m.polygonOffsetFactor, polygonOffsetUnits: m.polygonOffsetUnits }); }
+  softCacheM.set(m, r); return r;
+}
 function styleSwap(insp) {
-  if (!styleList) { styleList = { mats: [], a: [], b: [] }; const sw = m => STYLE_MAP.get(m) || m;
-    for (const f of F) f.furn.traverse(o => { if (o.userData.styleA) styleList.a.push(o); if (o.userData.styleB) styleList.b.push(o);
-      if (!o.isMesh) return; const a = o.material, alt = Array.isArray(a) ? a.map(sw) : sw(a);
+  if (!styleList) { styleList = { mats: [], a: [], b: [] };
+    scene.traverse(o => { if (o.userData.styleA) styleList.a.push(o); if (o.userData.styleB) styleList.b.push(o);
+      if (!o.isMesh || o === sky || o === walkRing || o.userData.room || o.userData.skirt || o === groundSlab || !o.material) return;
+      const a = o.material, alt = Array.isArray(a) ? a.map(soft) : soft(a);
       if (Array.isArray(a) ? alt.some((m, i) => m !== a[i]) : alt !== a) styleList.mats.push([o, a, alt]); }); }
   if (insp === styleOn) return; styleOn = insp;
   for (const [o, a, alt] of styleList.mats) o.material = insp ? alt : a;
   for (const o of styleList.a) o.visible = !insp; for (const o of styleList.b) o.visible = insp;
+  applyNight();
+  if (insp && !state.night) { sun.intensity = 2.3; sun.color.set(0xfff6ea); hemi.intensity = 1.5; hemi.color.set(0xffffff); skyU.top.value.set(0xa9c3de); skyU.horizon.value.set(0xeef2f4); scene.fog.color.set(0xeef2f4); renderer.toneMappingExposure = 1.08; }
 }
 /* before / after renovation: swaps the room groups and floors in place, camera stays where it is */
 function renoVisual(on) {
@@ -3279,7 +3312,7 @@ function renoVisual(on) {
       const r = ROOMS.find(q => q.f === 0 && !q.outdoor && X >= q.rect[0] - 12 && X <= q.rect[2] + 12 && Y >= q.rect[1] - 12 && Y <= q.rect[3] + 12);
       k.userData.parquet = !r || !['mamad', 'wc'].includes(r.id); }
     skirts.classified = true; }
-  for (const k of skirts) { const ok = on && k.userData.parquet && (ROOMS.find(q => q.id === 'living') || {}).afterMat === 'herring'; k.material = ok ? M.skirtWhite : M.skirt; }
+  for (const k of skirts) { const ok = on && k.userData.parquet && (ROOMS.find(q => q.id === 'living') || {}).afterMat === 'herring'; k.material = on && state.style === 'insp' ? soft(M.skirtWhite) : ok ? M.skirtWhite : M.skirt; }
   wallsReno = on; wallsInsp = on && state.style === 'insp'; styleSwap(wallsInsp); applyWalls(); groundSlab.material[0] = on ? (state.style === 'insp' ? M.sParquet : M.herring) : M.tile; // parquet everywhere on the ground floor after, incl. the passage to the safe room and the entry corner
   renoSets.forEach(r => { r.before.visible = !on; if (r.after) r.after.visible = on; });
   ROOMS.forEach(r => { if (r.mesh.material !== r.hl || state.split) r.mesh.material = floorMat(r, on); });
