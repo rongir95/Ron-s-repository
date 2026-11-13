@@ -1965,12 +1965,15 @@ function desk(p, base, r, chairAt, faceTo) {
     B(p, 16, 664, 136, 699, 135, C, M.oakLight, b); B(p, 78, 663.5, 134, 664, 135, 140, M.oakLight, b); // oak wall units reach the west wall
     B(p, 78, 664, 134, 668, 100, 135, M.oakLight, b); B(p, 78, 664.5, 134, 665, 133, 134, M.led, b);
     for (const [x, z] of [[90, 115], [112, 115]]) CY(p, x, 680, 4, 102, 110, M.white, b, 14);
-    B(p, 136, 640, 198, 699, 0, C, M.oakLight, b);
+    // tall units: oak to the ceiling; in the oak-and-sage style the part below 160 cm is white and only the top is oak
+    const tall = (X0, Y0, X1, Y1) => { B(p, X0, Y0, X1, Y1, 0, C, M.oakLight, b).userData.styleA = true;
+      const lo = B(p, X0, Y0, X1, Y1, 0, 160, M.kWhite, b), hi = B(p, X0, Y0, X1, Y1, 160.4, C, M.oakLight, b); lo.userData.styleB = hi.userData.styleB = true; lo.visible = hi.visible = false; };
+    tall(136, 640, 198, 699);
     B(p, 140, 638.5, 194, 640, 152, 186, M.black, b); B(p, 141, 638, 193, 638.5, 156, 182, M.steel, b);
     B(p, 140, 638.5, 194, 640, 88, 146, M.black, b); B(p, 141, 638, 193, 638.5, 92, 102, M.steel, b);
     for (let x = 150; x < 190; x += 30) B(p, x, 639.5, x + .4, 640.2, 0, 86, M.espresso, b);
     fridgeFD(p, b);
-    B(p, 199, 640, 289, 699, 188, C, M.oakLight, b); B(p, 289, 625, 296, 699, 0, C, M.oakLight, b);
+    B(p, 199, 640, 289, 699, 188, C, M.oakLight, b); tall(289, 625, 296, 699);
     for (const x of [244]) B(p, x - .3, 639.4, x + .3, 640, 190, C - 2, M.espresso, b);
     const pn0 = p.children.length;
     // white peninsula with a white quartz top, light-oak breakfast bar resting on it
@@ -3251,7 +3254,7 @@ Object.assign(M, {
 M.sOak.map = grainTex('#e2c49c', '#c7a57a', '#f0dab8'); M.sOak.color.set(0xffffff); relief(M.sOak, .3); relief(M.sSage, .6); relief(M.sParquet, .25);
 if (inspMats.O) { inspMats.O.map = M.sOak.map; inspMats.O.normalMap = M.sOak.normalMap; inspMats.O.normalScale.set(.3, .3); inspMats.O.color.set(0xffffff); inspMats.O.needsUpdate = true; }
 const STYLE_MAP = new Map([['oakLight', 'sOak'], ['walnutA', 'sOak'], ['nicheWood', 'sOak'], ['wood', 'sOak'], ['walnut', 'sOak'], ['espresso', 'sOak'], ['espressoDS', 'sOak'], ['wenge', 'sOak'],
-  ['veneer', 'sOak'], ['oak', 'sOak'], ['grayWood', 'sOak'], ['treadWood', 'sOak'], ['kWhite', 'sWhite'], ['qWhite', 'sQuartz'], ['taupe', 'sWhite'],
+  ['veneer', 'sOak'], ['oak', 'sOak'], ['grayWood', 'sOak'], ['kWhite', 'sWhite'], ['qWhite', 'sQuartz'], ['taupe', 'sWhite'],
   ['backsplash', 'sSage'], ['greenStack', 'sSage'], ['tealStack', 'sSage'], ['beigeStack', 'sSage'], ['taupeWall', 'interior'], ['plasterWarm', 'interior'],
   ['knit', 'sTerra'], ['rust', 'sTerra'], ['sageTowel', 'sSageCloth']].filter(([a, b]) => M[a] && M[b]).map(([a, b]) => [M[a], M[b]]));
 const inspFloor = r => !r.outdoor && !['wc', 'ensuite', 'bath', 'mamad', 'balcony'].includes(r.id);
