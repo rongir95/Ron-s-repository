@@ -223,6 +223,8 @@
   .fz-lightbar [data-fz-bar-row] > div:last-child { gap: 12px !important; padding-right: 0 !important; }
   .fz-lightbar [data-fz-bar-row] > div:last-child > img { width: 36px !important; height: 36px !important; margin: 0 !important; }
   .fz-lightbar [data-fz-bar-row] > div:last-child > button[aria-label="Change team"] { margin-left: -6px; }
+  [data-dz-closing="1"] { animation: fzSlideDown .28s cubic-bezier(.4,0,1,1) forwards !important; pointer-events: none !important; }
+  [data-dz-bd="1"] { animation: fzFadeOut .28s ease forwards !important; pointer-events: none !important; }
   @keyframes fzPushIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
   @keyframes fzPushOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
 </style>
@@ -307,7 +309,7 @@
       </div>
       <!-- ===================== GIF & STICKER DRAWER (Figma "Giphy - Stickers - Dev") ===================== -->
       <sc-if value="{{ gzOpen }}" hint-placeholder-val="{{ false }}">
-        <div class="gz-sheet" role="dialog" aria-label="GIFs and stickers" style="position:absolute;left:0;right:0;bottom:0;top:{{ gzTop }}px;z-index:5;pointer-events:auto;background:#1B2326;border-radius:24px 24px 0 0;box-shadow:0 -1px 0 rgba(249,250,250,.2);display:flex;flex-direction:column;overflow:hidden;font-family:'DAZN Oscine',sans-serif;color:#F9FAFA;">
+        <div class="gz-sheet" data-dz-closing="{{ dzGz }}" role="dialog" aria-label="GIFs and stickers" style="position:absolute;left:0;right:0;bottom:0;top:{{ gzTop }}px;z-index:5;pointer-events:auto;background:#1B2326;border-radius:24px 24px 0 0;box-shadow:0 -1px 0 rgba(249,250,250,.2);display:flex;flex-direction:column;overflow:hidden;font-family:'DAZN Oscine',sans-serif;color:#F9FAFA;">
           <!-- sheet header: handle + close -->
           <div style="position:relative;flex-shrink:0;height:48px;">
             <span aria-hidden="true" style="position:absolute;left:50%;top:12px;transform:translateX(-50%);width:44px;height:4px;border-radius:9999px;background:#CED0D2;"></span>
@@ -680,7 +682,7 @@
         </sc-if>
         <!-- Report drawer (FanZone DS 12356:11859) -->
         <sc-if value="{{ reportOn }}" hint-placeholder-val="{{ false }}">
-          <div role="dialog" aria-label="Report" style="position:absolute;left:0;right:0;top:0;bottom:0;z-index:12;border-radius:24px 24px 0 0;background:#1B2326;box-shadow:0 -1px 0 rgba(249,250,250,.2);animation:fzSlideUp .32s cubic-bezier(.22,1,.36,1);font-family:'DAZN Oscine',sans-serif;">
+          <div role="dialog" aria-label="Report" data-dz-closing="{{ dzReport }}" style="position:absolute;left:0;right:0;top:0;bottom:0;z-index:12;border-radius:24px 24px 0 0;background:#1B2326;box-shadow:0 -1px 0 rgba(249,250,250,.2);animation:fzSlideUp .32s cubic-bezier(.22,1,.36,1);font-family:'DAZN Oscine',sans-serif;">
             <span aria-hidden="true" style="position:absolute;left:50%;top:8px;transform:translateX(-50%);width:36px;height:4px;border-radius:9999px;background:#6D7377;"></span>
             <div style="height:56px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#F9FAFA;padding-top:6px;box-sizing:border-box;">Report</div>
             <button onClick="{{ closeReport }}" aria-label="Close" title="Close" style="position:absolute;right:16px;top:16px;width:32px;height:32px;border:0;padding:0;border-radius:9999px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="display:block;"><path d="M5 5L15 15M15 5L5 15" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round"></path></svg></button>
@@ -2226,8 +2228,8 @@
 
     <!-- ===================== EDIT MY FAVORITE (mini sheet) ===================== -->
     <sc-if value="{{ editFavOpen }}" hint-placeholder-val="{{ false }}">
-      <div onClick="{{ closeEditFav }}" style="position:absolute;inset:0;z-index:29;background:rgba(0,0,0,.55);animation:fzFadeIn .2s ease;"></div>
-      <div style="position:absolute;left:0;right:0;bottom:0;z-index:30;background:#1B2326;border-radius:24px 24px 0 0;padding:0 0 28px;animation:fzSlideUp .28s cubic-bezier(.22,1,.36,1);box-shadow:0 -8px 30px rgba(0,0,0,.5);">
+      <div onClick="{{ closeEditFav }}" data-dz-bd="{{ dzEditFav }}" style="position:absolute;inset:0;z-index:29;background:rgba(0,0,0,.55);animation:fzFadeIn .2s ease;"></div>
+      <div data-dz-closing="{{ dzEditFav }}" style="position:absolute;left:0;right:0;bottom:0;z-index:30;background:#1B2326;border-radius:24px 24px 0 0;padding:0 0 28px;animation:fzSlideUp .28s cubic-bezier(.22,1,.36,1);box-shadow:0 -8px 30px rgba(0,0,0,.5);">
         <div style="position:relative;height:64px;flex-shrink:0;">
           <div style="position:absolute;left:50%;top:8px;transform:translateX(-50%);width:36px;height:5px;border-radius:3px;background:rgba(255,255,255,.2);"></div>
           <div style="position:absolute;left:0;right:0;top:26px;text-align:center;font-size:16px;font-weight:700;pointer-events:none;">Edit my favorite</div>
@@ -2521,7 +2523,7 @@
 
     <!-- ===================== UPDATE STATUS DRAWER ===================== -->
     <sc-if value="{{ isStatus }}" hint-placeholder-val="{{ false }}">
-      <div style="position:absolute;left:0;right:0;top:282px;bottom:317px;z-index:26;border-radius:24px 24px 0 0;overflow:hidden;box-shadow:0 -1px 0 rgba(255,255,255,.2);background:#1B2326;animation:fzSlideUp .32s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;">
+      <div data-dz-closing="{{ dzStatus }}" style="position:absolute;left:0;right:0;top:282px;bottom:317px;z-index:26;border-radius:24px 24px 0 0;overflow:hidden;box-shadow:0 -1px 0 rgba(255,255,255,.2);background:#1B2326;animation:fzSlideUp .32s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;">
         <div style="position:absolute;inset:0;pointer-events:none;background:{{ cardGradient }};"></div>
         <!-- header -->
         <div style="position:relative;height:60px;flex-shrink:0;">
@@ -2570,8 +2572,8 @@
 
     <!-- Who reacted (Figma 1obxU2PGY0rkO25zHwpy9p 13746:38741 loader / 13746:38645 list) -->
     <sc-if value="{{ rxListOn }}" hint-placeholder-val="{{ false }}">
-      <div onClick="{{ closeRxList }}" style="position:absolute;inset:0;z-index:40;background:rgba(8,14,18,.6);animation:fzFadeIn .2s ease;"></div>
-      <div role="dialog" aria-label="Reactions" style="position:absolute;left:0;right:0;top:282px;bottom:0;z-index:41;display:flex;flex-direction:column;border-radius:24px 24px 0 0;background:#1B2326;box-shadow:0 -1px 0 rgba(249,250,250,.2);overflow:hidden;animation:fzSlideUp .32s cubic-bezier(.22,1,.36,1);font-family:'DAZN Oscine',sans-serif;">
+      <div onClick="{{ closeRxList }}" data-dz-bd="{{ dzRx }}" style="position:absolute;inset:0;z-index:40;background:rgba(8,14,18,.6);animation:fzFadeIn .2s ease;"></div>
+      <div role="dialog" aria-label="Reactions" data-dz-closing="{{ dzRx }}" style="position:absolute;left:0;right:0;top:282px;bottom:0;z-index:41;display:flex;flex-direction:column;border-radius:24px 24px 0 0;background:#1B2326;box-shadow:0 -1px 0 rgba(249,250,250,.2);overflow:hidden;animation:fzSlideUp .32s cubic-bezier(.22,1,.36,1);font-family:'DAZN Oscine',sans-serif;">
         <div style="position:relative;height:48px;flex-shrink:0;">
           <span aria-hidden="true" style="position:absolute;left:50%;top:8px;transform:translateX(-50%);width:44px;height:4px;border-radius:9999px;background:#CED0D2;"></span>
           <button onClick="{{ closeRxList }}" aria-label="Close" title="Close" style="position:absolute;right:16px;top:16px;width:32px;height:32px;border:0;padding:0;border-radius:9999px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="display:block;"><path d="M5 5L15 15M15 5L5 15" stroke="#F9FAFA" stroke-width="1.6" stroke-linecap="round"></path></svg></button>
@@ -3268,7 +3270,7 @@ class Component extends DCLogic {
     el.addEventListener("pointercancel", end);
     el.addEventListener("click", (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
   };
-  closeGiphy = () => { clearTimeout(this._gzT); this.setState({ gzOpen: false, gzExpanded: false, gzQuery: "", gzLoading: false }); };
+  closeGiphy = () => this.dismissDrawer("gz", () => { clearTimeout(this._gzT); this.setState({ gzOpen: false, gzExpanded: false, gzQuery: "", gzLoading: false }); });
   gzSetTab = (tab) => { clearTimeout(this._gzT); const q = this.state.gzQuery || ""; this.setState({ gzTab: tab, gzLoading: !!q.trim() }); if (q.trim()) this._gzT = setTimeout(() => this.setState({ gzLoading: false }), 700); };
   gzOnFocus = () => { if (!this.state.gzExpanded) this.setState({ gzExpanded: true }); };
   gzOnInput = (e) => {
@@ -3520,7 +3522,7 @@ class Component extends DCLogic {
   msgNoMenu = (e) => { if (e && e.preventDefault) e.preventDefault(); };
   msgFocusClose = () => this.setState({ msgFocus: null });
   openReport = (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.setState({ reportOn: true, reportReason: null }); };
-  closeReport = () => this.setState({ reportOn: false, msgFocus: null });
+  closeReport = () => this.dismissDrawer("report", () => this.setState({ reportOn: false, msgFocus: null }));
   sendReport = () => {
     if (this.state.reportReason == null) return;
     clearTimeout(this._repT);
@@ -3586,7 +3588,7 @@ class Component extends DCLogic {
     this.setState({ rxList: true, rxListLoading: true });
     this._rxlT = setTimeout(() => this.setState({ rxListLoading: false }), 900);
   };
-  closeRxList = () => { clearTimeout(this._rxlT); this.setState({ rxList: false }); };
+  closeRxList = () => this.dismissDrawer("rx", () => { clearTimeout(this._rxlT); this.setState({ rxList: false }); });
   rxListVals() {
     const s = this.state;
     const on = !!s.rxList && s.screen === "fixture";
@@ -3753,6 +3755,13 @@ class Component extends DCLogic {
           pick: () => this.setState(st => (st.pollVote || st.cpFinished ? null : { pollVote: id })) };
       }),
     };
+  }
+  // Drawers close with the Comments slide-down (fzSlideDown .28s), then really close
+  dismissDrawer(key, done) {
+    if (this.state.dzClosing === key) return;
+    clearTimeout(this._dzT);
+    this.setState({ dzClosing: key });
+    this._dzT = setTimeout(() => { this.setState({ dzClosing: null }); done(); }, 280);
   }
   openFanZoneOver = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
@@ -4389,9 +4398,9 @@ class Component extends DCLogic {
       this.setState({ status: v.slice(0, 60), sheet: "card", statusUpdating: false }, () => this.persist());
     }, 2000);
   };
-  closeStatus = () => this.setState({ sheet: "card" });
+  closeStatus = () => this.dismissDrawer("status", () => this.setState({ sheet: "card" }));
   statusInputRef = (el) => { if (el && this.state.sheet === "status") { el.style.height = "20px"; el.style.height = Math.max(20, el.scrollHeight) + "px"; if (document.activeElement !== el) { try { el.focus(); const n = el.value.length; el.setSelectionRange(n, n); } catch(e){} } } };
-  closeEditFav = () => this.setState({ editFavOpen: false });
+  closeEditFav = () => this.dismissDrawer("editFav", () => this.setState({ editFavOpen: false }));
 
 
   // ===================== COMMENTS & REPLIES (merged from the Replies prototype) =====================
@@ -5205,6 +5214,9 @@ class Component extends DCLogic {
     return {
       ...this.crVals(),
       ...this.gzVals(),
+      dzGz: this.state.dzClosing === "gz" ? "1" : "0", dzReport: this.state.dzClosing === "report" ? "1" : "0",
+      dzEditFav: this.state.dzClosing === "editFav" ? "1" : "0", dzStatus: this.state.dzClosing === "status" ? "1" : "0",
+      dzRx: this.state.dzClosing === "rx" ? "1" : "0",
       ...this.cpVals(),
       fzBarCls: this.isLight() && !this.state.fzTyping ? "fz-lightbar" : "",
       flyList: this.state.screen === "fanzone" ? (this.state.flyList || []) : [], flyReaction: this.flyReaction,
