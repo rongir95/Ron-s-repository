@@ -1,0 +1,27 @@
+<svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g filter="url(#f)">
+<use xlink:href="#s" fill="url(#p0)"/>
+<use xlink:href="#s" fill="#080E12" style="mix-blend-mode:color"/>
+<use xlink:href="#s" fill="url(#p1)" fill-opacity="0.48"/>
+</g>
+<defs>
+<filter id="f" x="1" y="0" width="10.5" height="12.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="0.5" dy="0.5"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.51 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+</filter>
+<linearGradient id="p0" x1="5.81592" y1="0" x2="5.81592" y2="12.0001" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FDFF3B"/>
+<stop offset="0.972014" stop-color="#D19914"/>
+</linearGradient>
+<linearGradient id="p1" x1="6.44568" y1="2" x2="1.94568" y2="2" gradientUnits="userSpaceOnUse">
+<stop offset="0.138566" stop-color="white" stop-opacity="0"/>
+<stop offset="0.170081" stop-color="white" stop-opacity="0.64"/>
+</linearGradient>
+<path id="s" d="M5.85352 0C8.10246 0.0148941 9.79924 0.698644 10.4971 1.11035C10.583 1.16111 10.6318 1.2547 10.6318 1.35449V4.56055C10.6317 4.63958 10.6008 4.71559 10.5449 4.77148L9.91602 5.39941C9.85795 5.45762 9.85811 5.55205 9.91602 5.61035L10.5449 6.23926C10.6007 6.29524 10.6318 6.37114 10.6318 6.4502V7.69043C10.6318 9.67972 7.72405 11.233 5.85352 11.9912C5.82658 12.0021 5.80946 12.0038 5.77832 11.9912C3.90778 11.233 1 9.67963 1 7.69043V6.48438C1 6.40517 1.03189 6.32945 1.08789 6.27344L1.75 5.61035C1.80798 5.55203 1.80814 5.45763 1.75 5.39941L1.08789 4.7373C1.03198 4.68139 1.00011 4.60543 1 4.52637V1.35449C1.00001 1.25478 1.04899 1.16114 1.13477 1.11035C1.83256 0.698661 3.52953 0.0149516 5.77832 0H5.85352ZM5.77832 4.62988C5.20118 4.63011 4.7334 5.09761 4.7334 5.6748C4.7334 6.252 5.20118 6.7195 5.77832 6.71973C6.35565 6.71973 6.82422 6.25213 6.82422 5.6748C6.82422 5.09748 6.35565 4.62988 5.77832 4.62988Z"/>
+</defs>
+</svg>

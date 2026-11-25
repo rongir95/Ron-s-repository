@@ -1,0 +1,28 @@
+<svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g filter="url(#f)">
+<use xlink:href="#s" fill="black"/>
+<use xlink:href="#s" fill="url(#p0)"/>
+<use xlink:href="#s" fill="#080E12" style="mix-blend-mode:color"/>
+<use xlink:href="#s" fill="url(#p1)" fill-opacity="0.48"/>
+</g>
+<defs>
+<filter id="f" x="0.999023" y="0.0078125" width="10.5" height="12.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="0.5" dy="0.5"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.51 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+</filter>
+<linearGradient id="p0" x1="5.81494" y1="0.0078125" x2="5.81494" y2="12.0079" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FDFF3B"/>
+<stop offset="0.61" stop-color="#FFC12F"/>
+</linearGradient>
+<linearGradient id="p1" x1="6.4447" y1="2.00781" x2="1.9447" y2="2.00781" gradientUnits="userSpaceOnUse">
+<stop offset="0.138566" stop-color="white" stop-opacity="0"/>
+<stop offset="0.170081" stop-color="white" stop-opacity="0.64"/>
+</linearGradient>
+<path id="s" d="M5.85254 0.0078125C8.10148 0.0227066 9.79827 0.706456 10.4961 1.11816C10.582 1.16892 10.6308 1.26251 10.6309 1.3623V4.56836C10.6307 4.64739 10.5998 4.7234 10.5439 4.7793L9.91504 5.40723C9.85697 5.46543 9.85714 5.55986 9.91504 5.61816L10.5439 6.24707C10.5998 6.30305 10.6309 6.37895 10.6309 6.45801V7.69824C10.6309 9.68753 7.72308 11.2408 5.85254 11.999C5.8256 12.0099 5.80849 12.0116 5.77734 11.999C3.9068 11.2408 0.999023 9.68744 0.999023 7.69824V6.49219C0.999023 6.41299 1.03092 6.33726 1.08691 6.28125L1.74902 5.61816C1.807 5.55984 1.80716 5.46545 1.74902 5.40723L1.08691 4.74512C1.03101 4.6892 0.999129 4.61324 0.999023 4.53418V1.3623C0.999035 1.2626 1.04802 1.16895 1.13379 1.11816C1.83159 0.706474 3.52855 0.0227641 5.77734 0.0078125H5.85254ZM7.625 4.61914L3.74219 5.91309C3.62029 5.95372 3.53817 6.06781 3.53809 6.19629V6.6123C3.53817 6.81603 3.73736 6.95982 3.93066 6.89551L7.81348 5.60156C7.9353 5.56095 8.0174 5.44674 8.01758 5.31836V4.90234C8.01758 4.69856 7.81833 4.55485 7.625 4.61914Z"/>
+</defs>
+</svg>

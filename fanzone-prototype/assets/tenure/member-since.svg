@@ -1,0 +1,31 @@
+<svg width="12" height="15" viewBox="0 0 12 15" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<use xlink:href="#s0" fill="#F9FAFA"/>
+<use xlink:href="#s0" fill="url(#p0)"/>
+<use xlink:href="#s1" fill="#F2AF3D"/>
+<use xlink:href="#s1" fill="url(#p1)"/>
+<use xlink:href="#s1" fill="url(#p2)"/>
+<use xlink:href="#s1" fill="black" fill-opacity="0.5"/>
+<use xlink:href="#s2" fill="#D9D9D9"/>
+<use xlink:href="#s2" fill="url(#p3)"/>
+<defs>
+<linearGradient id="p0" x1="5.99999" y1="2.50781" x2="5.99999" y2="12.5078" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FDFF3B"/>
+<stop offset="0.61" stop-color="#FFC12F"/>
+</linearGradient>
+<linearGradient id="p1" x1="6" y1="2.69771" x2="6" y2="12.2188" gradientUnits="userSpaceOnUse">
+<stop stop-color="#553B0F" stop-opacity="0.3"/>
+<stop offset="1" stop-color="#553B0F" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="p2" x1="6.00105" y1="1.45313" x2="6.00105" y2="11.4062" gradientUnits="userSpaceOnUse">
+<stop stop-color="#553B0F" stop-opacity="0.5"/>
+<stop offset="1" stop-color="#553B0F" stop-opacity="0.3"/>
+</linearGradient>
+<linearGradient id="p3" x1="6" y1="5.50781" x2="6" y2="9.50781" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FDFF3B"/>
+<stop offset="0.61" stop-color="#FFC12F"/>
+</linearGradient>
+<path id="s0" d="M9.42871 2.51514C10.3112 2.58977 10.9999 3.21108 11 3.96615V11.0495L10.9912 11.1984C10.9076 11.8848 10.2527 12.4309 9.42871 12.5005L9.25 12.5078H2.75C1.84361 12.5078 1.09833 11.9337 1.00879 11.1984L1 11.0495V3.96615C1.00015 3.16086 1.78366 2.50794 2.75 2.50781H9.25L9.42871 2.51514Z"/>
+<path id="s1" d="M9.25 3.50781C9.66418 3.50788 9.99993 3.84363 10 4.25781V6.50879H9.99707L9.00195 7.50391L9.00098 7.50586H9V7.50977L9.00195 7.51172L9.99707 8.50684H10V10.7578C9.99993 11.172 9.66424 11.5078 9.25 11.5078H2.75C2.33576 11.5078 2.00007 11.172 2 10.7578V8.50684H2.00293L2.99805 7.51172L3 7.50879V7.50684L2.99902 7.50586L2.99805 7.50391L2.00293 6.50879H2V4.25781C2.00007 3.84363 2.33582 3.50788 2.75 3.50781H9.25Z"/>
+<path id="s2" d="M6 5.50781L6.69359 6.55317L7.90211 6.88978L7.12225 7.87245L7.17557 9.12585L6 8.68781L4.82443 9.12585L4.87775 7.87245L4.09789 6.88978L5.30641 6.55317L6 5.50781Z"/>
+</defs>
+</svg>
