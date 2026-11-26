@@ -29,7 +29,7 @@ html, body { margin: 0; width: 812px; height: 375px; overflow: hidden; backgroun
 .btn { all: unset; box-sizing: border-box; height: 32px; width: 32px; border-radius: 8px; overflow: hidden; background: rgba(8,14,18,.75); border: 1px solid rgba(249,250,250,.10); display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: filter .12s ease; }
 .btn:active { filter: brightness(1.4); }
 .btn-inner { display: flex; align-items: center; justify-content: center; }
-.label-clip { overflow: hidden; width: 0; display: flex; }
+.label-clip { overflow: hidden; max-width: 0; display: flex; }
 .label { font: 700 14px/1 "DAZN Oscine", system-ui, sans-serif; color: #f9fafa; white-space: nowrap; padding-right: 4px; }
 .btn-icon { width: 16px; height: 16px; display: block; flex: none; }
 </style></head>
@@ -58,7 +58,6 @@ html, body { margin: 0; width: 812px; height: 375px; overflow: hidden; backgroun
   var $ = function (id) { return document.getElementById(id); };
   $("bmw").src = "assets/landscape/bmw.png";
   var sm = $("sm"); sm.hidden = false;
-  var labelW = Math.ceil($("label").scrollWidth);
   var OUT = "cubic-bezier(0.2, 0.8, 0.2, 1)", STD = "cubic-bezier(0.4, 0, 0.2, 1)";
   // Apple-style bounce (spring duration .5, bounce .6), as in the Share moment spec
   function bounce(peak, d, b) {
@@ -71,7 +70,7 @@ html, body { margin: 0; width: 812px; height: 375px; overflow: hidden; backgroun
     ["btn", [{ opacity: 0 }, { opacity: 1 }], 900, 120, "linear"],
     ["btn", bounce(.25, .5, .6), 900, 800, "linear"],
     ["btn", [{ width: "32px" }, { width: "209px" }], 1900, 400, STD],
-    ["labelClip", [{ width: "0px" }, { width: labelW + "px" }], 1900, 400, STD],
+    ["labelClip", [{ maxWidth: "0px" }, { maxWidth: "120px" }], 1900, 400, STD],
     ["label", [{ opacity: 0 }, { opacity: 1 }], 2050, 250, "linear"],
     ["card", [{ opacity: 0 }, { opacity: 1 }], 2800, 240, "linear"],
     ["card", [{ transform: "translateY(16px) scale(.94)" }, { transform: "none" }], 2800, 380, OUT],
