@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=812,initial-scale=1">
+<title>FanZone Landscape</title>
+<style>
+/* Landscape player (812x375) for the feature pages.
+   ?v=current  the player as it is today
+   ?v=share    + Share moment (landscape only): icon in, opens to the Share button, then the moment card */
+@font-face { font-family: "DAZN Oscine"; src: url("uploads/DAZN_Oscine_Rg.ttf") format("truetype"); font-weight: 400; font-display: block; }
+@font-face { font-family: "DAZN Oscine"; src: url("uploads/DAZN_Oscine_Bd.ttf") format("truetype"); font-weight: 700; font-display: block; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 812px; height: 375px; overflow: hidden; background: #0c161c; }
+.stage { position: absolute; inset: 0; background: #0c161c; overflow: hidden; }
+.video { position: absolute; top: 0; left: calc(50% - .67px); transform: translateX(-50%); width: 666.667px; height: 375px; display: block; object-fit: cover; background: #000; }
+.dazn { position: absolute; left: 692px; top: 20.1px; width: 32px; height: 32px; }
+.share-moment { position: absolute; right: 98px; bottom: 24px; width: 209px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-family: "DAZN Oscine", system-ui, sans-serif; -webkit-font-smoothing: antialiased; transform-origin: 100% 100%; }
+.share-moment[hidden] { display: none; }
+.card { width: 209px; padding: 8px; display: flex; flex-direction: column; gap: 8px; background: rgba(8,14,18,.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(249,250,250,.10); border-radius: 12px; transform-origin: 100% 100%; }
+.card-head { display: flex; align-items: center; justify-content: space-between; height: 24px; }
+.sponsor { display: flex; align-items: center; gap: 4px; }
+.sponsor span { font: 400 10px/1 "DAZN Oscine", system-ui, sans-serif; color: #fff; }
+.pill { width: 32px; height: 20px; border-radius: 999px; background: #fff; position: relative; }
+.pill img { position: absolute; left: 8px; top: 2px; width: 16px; height: 16px; }
+.close-btn { all: unset; display: block; width: 24px; height: 24px; border-radius: 9999px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.close-btn svg { display: block; }
+.moment { width: 193px; height: 108.56px; border-radius: 6px; overflow: hidden; border: 1px solid rgba(249,250,250,.20); position: relative; }
+.moment video { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; background: #000; }
+.caption { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 8px 6px; background: linear-gradient(181.69deg, rgba(0,0,0,0) 7.37%, rgba(0,0,0,.25) 50%, rgba(0,0,0,.4) 92.63%); }
+.caption p { margin: 0; font: 700 12px/normal "DAZN Oscine", system-ui, sans-serif; letter-spacing: .01em; color: #f9fafa; }
+.btn { all: unset; box-sizing: border-box; height: 32px; width: 32px; border-radius: 8px; overflow: hidden; background: rgba(8,14,18,.75); border: 1px solid rgba(249,250,250,.10); display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: filter .12s ease; }
+.btn:active { filter: brightness(1.4); }
+.btn-inner { display: flex; align-items: center; justify-content: center; }
+.label-clip { overflow: hidden; width: 0; display: flex; }
+.label { font: 700 14px/1 "DAZN Oscine", system-ui, sans-serif; color: #f9fafa; white-space: nowrap; padding-right: 4px; }
+.btn-icon { width: 16px; height: 16px; display: block; flex: none; }
+</style></head>
+<body>
+<div class="stage">
+  <video class="video" id="bg" src="assets/landscape/match-lite.mp4" autoplay muted loop playsinline preload="auto" aria-label="Match stream"></video>
+  <svg class="dazn" aria-hidden="true" width="32" height="32" viewBox="0 0 32 32" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.42651 24.6933C9.35589 24.6024 9.32252 24.488 9.33317 24.3733V23.4933C9.33687 23.3804 9.37923 23.2721 9.45317 23.1867L12.5865 18.7333H9.75984C9.64854 18.756 9.53282 18.7319 9.43984 18.6667C9.35803 18.5452 9.32038 18.3993 9.33317 18.2533V17.6133C9.31842 17.4792 9.34642 17.3439 9.41317 17.2267C9.50201 17.152 9.61813 17.1181 9.73317 17.1333H14.3065C14.436 17.1245 14.5653 17.1523 14.6798 17.2133C14.7538 17.3077 14.7874 17.4276 14.7732 17.5467V18.4C14.7873 18.4524 14.7873 18.5076 14.7732 18.56C14.7497 18.6216 14.7183 18.6798 14.6798 18.7333L11.5065 23.1867H14.5198C14.6932 23.1867 14.7998 23.1867 14.8398 23.28C14.9074 23.392 14.9355 23.5235 14.9198 23.6533V24.3067C14.9355 24.4366 14.9074 24.568 14.8398 24.68C14.8398 24.68 14.6932 24.7733 14.5198 24.7733H9.79984C9.67005 24.7871 9.53927 24.759 9.42651 24.6933ZM9.33318 14.4533V7.62667C9.33318 7.62667 9.33318 7.38667 9.42651 7.30667C9.54267 7.25026 9.67076 7.22281 9.79984 7.22667H11.9998C12.778 7.21219 13.5338 7.48786 14.1198 8C14.6576 8.56689 14.9458 9.32569 14.9198 10.1067V11.7867C14.9474 12.6148 14.6936 13.4279 14.1998 14.0933C13.6846 14.5976 12.9872 14.8717 12.2665 14.8533H9.79984C9.79984 14.8533 9.51984 14.8533 9.42651 14.7733C9.36364 14.6786 9.33108 14.567 9.33318 14.4533ZM11.0932 13.3333H11.9998C12.304 13.3584 12.6058 13.2626 12.8398 13.0667C13.1865 12.72 13.1465 11.7333 13.1465 11.7333V10.2667C13.1638 9.83263 13.0574 9.40262 12.8398 9.02667C12.6098 8.82004 12.3089 8.71018 11.9998 8.72H11.0932V13.3333ZM22.2532 17.1067H21.5332C21.4039 17.0999 21.275 17.1275 21.1598 17.1867C21.0972 17.2859 21.0691 17.4031 21.0798 17.52V21.52L18.9465 17.52C18.9019 17.3909 18.818 17.279 18.7065 17.2C18.5692 17.1359 18.4176 17.1083 18.2665 17.12H17.5998C17.4705 17.1132 17.3417 17.1408 17.2265 17.2C17.1639 17.2993 17.1358 17.4164 17.1465 17.5333V24.36C17.1333 24.4729 17.1618 24.5866 17.2265 24.68C17.3336 24.7476 17.4609 24.7758 17.5865 24.76H18.3198C18.4496 24.7737 18.5804 24.7457 18.6932 24.68C18.7638 24.5891 18.7972 24.4747 18.7865 24.36V20.36L20.9065 24.36C20.9553 24.4942 21.0437 24.6104 21.1598 24.6933C21.3005 24.7228 21.4458 24.7228 21.5865 24.6933H22.2532C22.383 24.7071 22.5137 24.679 22.6265 24.6133C22.6971 24.5224 22.7305 24.408 22.7198 24.2933V17.5467C22.7277 17.4282 22.6948 17.3105 22.6265 17.2133C22.5113 17.1542 22.3825 17.1266 22.2532 17.1333V17.1067ZM16.6265 14.4L18.8932 7.58667C18.9216 7.47807 18.982 7.38052 19.0665 7.30667C19.162 7.24686 19.2741 7.21885 19.3865 7.22667H20.6265C20.7391 7.21689 20.8517 7.24505 20.9465 7.30667C21.0186 7.38795 21.0731 7.48328 21.1065 7.58667L23.3598 14.4C23.4058 14.511 23.4058 14.6357 23.3598 14.7467C23.2928 14.8224 23.1939 14.8619 23.0932 14.8533H22.0265C21.9103 14.8701 21.7938 14.8246 21.7198 14.7333C21.6606 14.6287 21.6157 14.5166 21.5865 14.4L21.2265 13.2533H18.6665L18.3198 14.4C18.282 14.5434 18.2188 14.6789 18.1332 14.8C18.0532 14.8667 17.7865 14.8 17.7865 14.8H16.8665C16.8665 14.8 16.6665 14.8 16.5998 14.68C16.5814 14.5861 16.5906 14.4888 16.6265 14.4ZM19.0798 11.88H20.8132L19.9998 9L19.0798 11.88ZM29.3332 14.44L27.7865 16L29.3332 17.5467V29.3333H2.6665V17.5467L4.21317 16L2.6665 14.4533V2.66667H29.3332V14.44ZM27.6665 4.33333H4.33317V13.6667L6.1865 15.52C6.45411 15.7945 6.45411 16.2322 6.1865 16.5067L4.33317 18.3467V27.68H27.6665V18.3467L25.8132 16.4933C25.6778 16.3649 25.6012 16.1866 25.6012 16C25.6012 15.8134 25.6778 15.6351 25.8132 15.5067L27.6665 13.6533V4.33333Z" fill="#F9FAFA"/></svg>
+  <div class="share-moment" id="sm" hidden>
+    <div class="card" id="card">
+      <div class="card-head" id="head">
+        <div class="sponsor"><span>Sponsored by</span><div class="pill"><img id="bmw" alt="BMW" width="16" height="16"></div></div>
+        <button class="close-btn" id="closeBtn" type="button" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z" fill="#F9FAFA" fill-opacity="0.12"/><path d="M15.4904 7.52543C15.7638 7.2521 16.2073 7.25208 16.4806 7.52543C16.7536 7.79881 16.7538 8.24243 16.4806 8.51566L12.9953 12L16.4806 15.4844C16.7539 15.7577 16.7536 16.2013 16.4806 16.4746C16.2072 16.748 15.7637 16.748 15.4904 16.4746L12.005 12.9893L8.52065 16.4746C8.24729 16.748 7.80379 16.748 7.53042 16.4746C7.25714 16.2013 7.25708 15.7578 7.53042 15.4844L11.0148 12L7.53042 8.51566C7.2571 8.24234 7.25719 7.79881 7.53042 7.52543C7.80379 7.25206 8.24729 7.25206 8.52065 7.52543L12.005 11.0098L15.4904 7.52543Z" fill="#F9FAFA"/></svg></button>
+      </div>
+      <div class="moment" id="moment"><video id="momentVid" src="assets/landscape/match-lite.mp4#t=12" muted loop playsinline preload="auto" aria-hidden="true"></video><div class="caption"><p dir="auto">Harry Kane’s goal | 28’</p></div></div>
+    </div>
+    <button class="btn" id="btn" type="button" aria-label="Share">
+      <span class="btn-inner"><span class="label-clip" id="labelClip"><span class="label" id="label">Share</span></span>
+      <svg class="btn-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M1.34001 13.5606C1.33001 7.14058 6.71001 5.44058 8.58001 5.05058V3.28293C8.58001 2.95532 8.76077 2.65443 9.05001 2.50058C9.34001 2.38058 9.67001 2.44058 9.89001 2.65058L14.3848 7.00314C14.543 7.15629 14.6407 7.36128 14.66 7.58058C14.66 7.79058 14.58 7.99058 14.44 8.14058L9.98076 12.692C9.74691 12.9306 9.39939 13.0188 9.08001 12.9206C8.79001 12.8006 8.60001 12.5206 8.59001 12.2106V10.2106C6.45001 10.4906 2.73001 11.4206 2.74001 13.5506H1.34001V13.5606ZM9.99001 8.68058V10.6806L13 7.61058L9.98001 4.69058V6.26058L9.35001 6.33058C9.13001 6.35058 4.95001 6.84058 3.35001 10.4206C5.62001 9.02058 9.02001 8.75058 9.23001 8.74058L9.98001 8.69058L9.99001 8.68058Z" fill="#F9FAFA"/></svg></span>
+    </button>
+  </div>
+</div>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search), v = q.get("v") || "current";
+  if (v !== "share") return;
+  var $ = function (id) { return document.getElementById(id); };
+  $("bmw").src = "assets/landscape/bmw.png";
+  var sm = $("sm"); sm.hidden = false;
+  var labelW = Math.ceil($("label").scrollWidth);
+  var OUT = "cubic-bezier(0.2, 0.8, 0.2, 1)", STD = "cubic-bezier(0.4, 0, 0.2, 1)";
+  // Apple-style bounce (spring duration .5, bounce .6), as in the Share moment spec
+  function bounce(peak, d, b) {
+    var w = 2 * Math.PI / d, z = 1 - b, wd = w * Math.sqrt(1 - z * z), tPeak = Math.atan(wd / (z * w)) / wd;
+    var A = peak / (Math.exp(-z * w * tPeak) * Math.sin(wd * tPeak)), kf = [];
+    for (var i = 0; i <= 30; i++) { var t = i / 30 * .8; kf.push({ transform: "scale(" + (i === 30 ? 1 : 1 + A * Math.exp(-z * w * t) * Math.sin(wd * t)).toFixed(4) + ")", offset: i / 30 }); }
+    return kf;
+  }
+  var T = [
+    ["btn", [{ opacity: 0 }, { opacity: 1 }], 900, 120, "linear"],
+    ["btn", bounce(.25, .5, .6), 900, 800, "linear"],
+    ["btn", [{ width: "32px" }, { width: "209px" }], 1900, 400, STD],
+    ["labelClip", [{ width: "0px" }, { width: labelW + "px" }], 1900, 400, STD],
+    ["label", [{ opacity: 0 }, { opacity: 1 }], 2050, 250, "linear"],
+    ["card", [{ opacity: 0 }, { opacity: 1 }], 2800, 240, "linear"],
+    ["card", [{ transform: "translateY(16px) scale(.94)" }, { transform: "none" }], 2800, 380, OUT],
+    ["head", [{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }], 2920, 280, OUT],
+    ["moment", [{ opacity: 0 }, { opacity: 1 }], 2980, 260, "linear"],
+    ["momentVid", [{ transform: "scale(1.08)" }, { transform: "none" }], 2980, 360, OUT]
+  ];
+  var anims = [], exit = null, again = 0;
+  function play() {
+    clearTimeout(again);
+    if (exit) { exit.cancel(); exit = null; }
+    sm.style.pointerEvents = "";
+    anims.forEach(function (a) { a.cancel(); });
+    anims = T.map(function (t) { return $(t[0]).animate(t[1], { delay: t[2], duration: t[3], easing: t[4], fill: "both" }); });
+    var mv = $("momentVid"); try { mv.currentTime = 12; mv.play(); } catch (e) {}
+  }
+  // the X closes it; it comes back a few seconds later so the page keeps showing the feature
+  $("closeBtn").addEventListener("click", function () {
+    if (exit) return;
+    exit = sm.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(8px) scale(.96)" }], { duration: 220, easing: "cubic-bezier(0.4, 0, 1, 1)", fill: "forwards" });
+    sm.style.pointerEvents = "none";
+    again = setTimeout(play, 4000);
+  });
+  play();
+})();
+</script>
+</body></html>
