@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=375,initial-scale=1">
+<title>FanZone Screens</title>
+<style>
+/* Screens built in code from Figma FanZone 80-20, for the feature pages (sharp at any size).
+   ?v=browser   In-app browser, Current (Figma 1:41036): the browser sheet under the video. */
+@font-face { font-family: "DAZN Oscine"; src: url("uploads/DAZN_Oscine_Rg.ttf") format("truetype"); font-weight: 400; font-display: block; }
+@font-face { font-family: "DAZN Oscine"; src: url("uploads/DAZN_Oscine_Bd.ttf") format("truetype"); font-weight: 700; font-display: block; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 375px; height: 812px; overflow: hidden; background: #080E12; font-family: "DAZN Oscine", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.scr { position: absolute; inset: 0; background: #080E12; overflow: hidden; }
+.scr[hidden] { display: none; }
+.status { position: absolute; left: 0; top: 0; width: 375px; height: 62px; display: block; z-index: 3; background: #000; }
+.video { position: absolute; left: 0; top: 62px; width: 375px; height: 212px; object-fit: cover; display: block; background: #000; }
+.home-ind { position: absolute; left: 50%; bottom: 8px; width: 139px; height: 5px; margin-left: -69.5px; border-radius: 100px; background: #000; z-index: 5; }
+
+/* In-app browser (Figma 1:41162 / Live chat header "Webview" 1:791 / web view slot 1:41165) */
+.wv { position: absolute; left: 0; right: 0; top: 274px; bottom: 0; display: flex; flex-direction: column; background: #080E12; padding-top: 8px; }
+.wv-head { position: relative; height: 48px; flex: none; background: #fff; border-radius: 12px 12px 0 0; border-bottom: 1px solid rgba(8, 14, 18, .6); box-shadow: 0 -1px 0 rgba(249, 250, 250, .2); }
+.wv-icons { position: absolute; left: 12px; top: 50%; transform: translateY(calc(-50% + .5px)); display: flex; align-items: center; gap: 16px; }
+.wv-icons svg, .wv-icons img { display: block; width: 20px; height: 20px; }
+.wv-body { position: relative; flex: 1; background: #DDDEDF; overflow: hidden; }
+.wv-slot { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-weight: 700; font-size: 14px; line-height: 20px; color: #000; opacity: .5; white-space: nowrap; }
+</style></head>
+<body>
+<div class="scr" id="browser" data-fz-root="1" hidden>
+  <img class="status" src="assets/img/status-bar.svg" alt="">
+  <video class="video" src="assets/video/fixture-bayern-bvb-lite.mp4" autoplay muted loop playsinline preload="auto"></video>
+  <div class="wv">
+    <div class="wv-head">
+      <div class="wv-icons">
+        <img src="assets/icons/chevron-left.svg" alt="Back" style="filter: brightness(0);">
+        <svg viewBox="0 0 20 20" fill="none" aria-label="Minimize"><path d="M17 6L3 6" stroke="#080E12" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.6665 15.6667L9.99984 11L5.33317 15.6667" stroke="#080E12" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="wv-body"><div class="wv-slot">Web view slot</div></div>
+  </div>
+  <div class="home-ind"></div>
+</div>
+<script>
+(function () {
+  var v = new URLSearchParams(location.search).get("v") || "browser";
+  var el = document.getElementById(v) || document.getElementById("browser");
+  el.hidden = false;
+  var vid = el.querySelector("video");
+  if (vid) { vid.muted = true; var p = vid.play(); if (p && p.catch) p.catch(function () {}); }
+})();
+</script>
+</body></html>
