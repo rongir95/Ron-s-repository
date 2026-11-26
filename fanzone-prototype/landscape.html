@@ -202,7 +202,7 @@ html, body { margin: 0; width: 812px; height: 375px; overflow: hidden; backgroun
   // the X closes it; it comes back a few seconds later so the page keeps showing the feature
   box.querySelector(".lc-x").addEventListener("click", function () { box.hidden = true; clearTimeout(again); again = setTimeout(show, 3000); });
   // poll: the same question and answers as the portrait poll
-  var O = [["Arsenal", 41], ["Real Madrid", 17], ["Bayern Munich", 21], ["Barcelona", 21]], pT = 0;
+  var O = [["Bayern Munich", 56], ["Real Madrid", 44]], pT = 0;
   function pollStart() {
     var a = $("lpA"); box.classList.remove("voted"); a.innerHTML = "";
     O.forEach(function (o, i) {
